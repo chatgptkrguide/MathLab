@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_dimensions.dart';
+import '../constants/app_ui_constants.dart';
 
 /// 커스텀 하단 네비게이션 바
 /// 새 디자인에 맞게 홈 탭이 둥근 원형으로 구현
@@ -10,35 +11,38 @@ class CustomBottomNavigation extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   const CustomBottomNavigation({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 90 + MediaQuery.of(context).padding.bottom,
-      padding: EdgeInsets.only(
-        left: AppDimensions.paddingM,
-        right: AppDimensions.paddingM,
-        top: AppDimensions.paddingL,
-        bottom: MediaQuery.of(context).padding.bottom + AppDimensions.paddingS,
-      ),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.white, Color(0xFFF5F5F5)],
+    return Semantics(
+      container: true,
+      label: '하단 네비게이션',
+      child: Container(
+        height: AppUIConstants.navBarBaseHeight + MediaQuery.of(context).padding.bottom,
+        padding: EdgeInsets.only(
+          left: AppDimensions.paddingM,
+          right: AppDimensions.paddingM,
+          top: AppDimensions.paddingL,
+          bottom: MediaQuery.of(context).padding.bottom + AppDimensions.paddingS,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow.withOpacity(0.15),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white, Color(0xFFF5F5F5)],
           ),
-        ],
-      ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.cardShadow.withValues(alpha: AppUIConstants.shadowOpacity),
+              blurRadius: AppUIConstants.shadowBlurRadius,
+              offset: AppUIConstants.shadowOffset,
+            ),
+          ],
+        ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,6 +75,7 @@ class CustomBottomNavigation extends StatelessWidget {
             label: '프로필',
           ),
         ],
+      ),
       ),
     );
   }
@@ -111,7 +116,7 @@ class CustomBottomNavigation extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF6C63FF).withOpacity(isSelected ? 0.4 : 0.25),
+                    color: const Color(0xFF6C63FF).withValues(alpha: isSelected ? 0.4 : 0.25),
                     blurRadius: isSelected ? 12 : 8,
                     offset: Offset(0, isSelected ? 6 : 4),
                   ),
@@ -136,10 +141,16 @@ class CustomBottomNavigation extends StatelessWidget {
 
     // 일반 네비게이션 아이템 (플렉서블 디자인으로 오버플로우 방지)
     return Expanded(
-      child: GestureDetector(
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        label: '$label${isSelected ? ' 선택됨' : ''}',
         onTap: () => onTap(index),
-        behavior: HitTestBehavior.opaque, // 전체 영역 터치 가능
-        child: Container(
+        child: GestureDetector(
+          onTap: () => onTap(index),
+          behavior: HitTestBehavior.opaque, // 전체 영역 터치 가능
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48, minWidth: 48), // 접근성을 위한 최소 터치 영역
           padding: const EdgeInsets.symmetric(
             horizontal: 4.0, // 패딩 줄임
             vertical: 8.0,   // 패딩 줄임
@@ -153,7 +164,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   padding: const EdgeInsets.all(6.0), // 패딩 줄임
                   decoration: isSelected
                       ? BoxDecoration(
-                          color: AppColors.primaryBlue.withOpacity(0.1),
+                          color: AppColors.primaryBlue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         )
                       : null,
@@ -180,6 +191,7 @@ class CustomBottomNavigation extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

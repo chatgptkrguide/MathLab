@@ -14,17 +14,22 @@ class UserNotifier extends StateNotifier<User?> {
 
   /// 앱 시작 시 사용자 정보 로드
   Future<void> _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString('user');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userJson = prefs.getString('user');
 
-    if (userJson != null) {
-      // 저장된 사용자 정보가 있으면 로드
-      final userData = jsonDecode(userJson);
-      state = User.fromJson(userData);
-    } else {
-      // 없으면 샘플 사용자 생성
+      if (userJson != null) {
+        // 저장된 사용자 정보가 있으면 로드
+        final userData = jsonDecode(userJson);
+        state = User.fromJson(userData);
+      } else {
+        // 없으면 샘플 사용자 생성
+        state = _dataService.getSampleUser();
+        await _saveUser();
+      }
+    } catch (e) {
+      // 에러 시 샘플 사용자로 폴백
       state = _dataService.getSampleUser();
-      await _saveUser();
     }
   }
 
