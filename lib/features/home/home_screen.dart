@@ -341,38 +341,65 @@ class HomeScreen extends ConsumerWidget {
   // 이벤트 핸들러
 
   void _startLearning(BuildContext context, WidgetRef ref, List<Problem> problems) async {
+    print('🚀 학습하기 버튼 클릭됨');
+    print('📊 problems.length: ${problems.length}');
+
     if (problems.isEmpty) {
+      print('❌ 문제 데이터 없음');
       _showCustomSnackBar(context, '문제 데이터를 로드하는 중입니다...', AppColors.duolingoOrange);
       return;
     }
 
     final user = ref.read(userProvider);
-    if (user == null) return;
+    print('👤 user: ${user?.name} (level: ${user?.level})');
+    if (user == null) {
+      print('❌ 사용자 데이터 없음');
+      return;
+    }
 
     final recommendedProblems = ref
         .read(problemProvider.notifier)
         .getRecommendedProblems(user.level, count: 5);
+    print('🎯 recommendedProblems.length: ${recommendedProblems.length}');
 
     List<Problem> selectedProblems;
     if (recommendedProblems.isEmpty) {
+      print('📚 기본 레슨 사용');
       final lesson1Problems = ref
           .read(problemProvider.notifier)
           .getProblemsByLesson('lesson001');
       selectedProblems = lesson1Problems.take(5).toList();
+      print('📝 lesson1Problems.length: ${lesson1Problems.length}');
     } else {
       selectedProblems = recommendedProblems;
     }
 
-    if (selectedProblems.isNotEmpty) {
-      // 부드러운 페이지 전환 + 햅틱 피드백
-      await AppHapticFeedback.success();
+    print('✅ selectedProblems.length: ${selectedProblems.length}');
 
-      Navigator.of(context).push(
-        ProblemScreen(
-          lessonId: recommendedProblems.isEmpty ? 'lesson001' : 'recommended',
-          problems: selectedProblems,
-        ).slideAndFadeRoute(),
-      );
+    if (selectedProblems.isNotEmpty) {
+      print('🎮 학습 화면으로 이동 시작');
+
+      try {
+        // 부드러운 페이지 전환 + 햅틱 피드백
+        await AppHapticFeedback.success();
+
+        // 웹에서 더 안전한 네비게이션 사용
+        final route = MaterialPageRoute(
+          builder: (context) => ProblemScreen(
+            lessonId: recommendedProblems.isEmpty ? 'lesson001' : 'recommended',
+            problems: selectedProblems,
+          ),
+        );
+
+        Navigator.of(context).push(route);
+        print('✅ 네비게이션 성공');
+      } catch (e) {
+        print('❌ 네비게이션 에러: $e');
+        _showCustomSnackBar(context, '페이지 이동 중 오류가 발생했습니다.', AppColors.duolingoRed);
+      }
+    } else {
+      print('❌ 선택된 문제 없음');
+      _showCustomSnackBar(context, '문제를 찾을 수 없습니다.', AppColors.duolingoRed);
     }
   }
 
