@@ -15,7 +15,7 @@ class SpecialProgressCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const SpecialProgressCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.currentValue,
@@ -23,7 +23,7 @@ class SpecialProgressCard extends StatelessWidget {
     required this.unit,
     required this.emoji,
     this.onTap,
-  }) : super(key: key);
+  });
 
   double get progress => targetValue > 0 ? currentValue / targetValue : 0.0;
 
@@ -46,7 +46,7 @@ class SpecialProgressCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.accentCyan.withOpacity(0.1),
+              color: AppColors.accentCyan.withValues(alpha: 0.1),
               blurRadius: AppDimensions.cardElevation * 4,
               offset: const Offset(0, AppDimensions.cardElevation),
             ),

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_account.dart';
-import '../models/user.dart';
 
 /// 인증 시스템 상태 관리
 class AuthNotifier extends StateNotifier<AuthState> {

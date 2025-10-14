@@ -9,7 +9,7 @@ import '../../data/services/mock_data_service.dart';
 /// 학습 로드맵 화면 (커리큘럼)
 /// 실제 스크린샷과 동일한 레이아웃으로 구현
 class LessonsScreen extends StatefulWidget {
-  const LessonsScreen({Key? key}) : super(key: key);
+  const LessonsScreen({super.key});
 
   @override
   State<LessonsScreen> createState() => _LessonsScreenState();
@@ -200,10 +200,10 @@ class _LessonsScreenState extends State<LessonsScreen> {
       margin: const EdgeInsets.all(AppDimensions.paddingL),
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.purpleAccent.withOpacity(0.1),
+        color: AppColors.purpleAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.purpleAccent.withOpacity(0.3),
+          color: AppColors.purpleAccent.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

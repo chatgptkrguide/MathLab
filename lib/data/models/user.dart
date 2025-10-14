@@ -9,6 +9,7 @@ class User {
   final int streakDays;
   final String currentGrade; // 중1, 중2, 고1 등
   final String avatarUrl;
+  final int hearts; // 하트 (생명) 수
 
   const User({
     required this.id,
@@ -20,6 +21,7 @@ class User {
     required this.streakDays,
     required this.currentGrade,
     required this.avatarUrl,
+    this.hearts = 5, // 기본 하트 5개
   });
 
   /// JSON으로부터 User 객체 생성
@@ -34,6 +36,7 @@ class User {
       streakDays: json['streakDays'] as int,
       currentGrade: json['currentGrade'] as String,
       avatarUrl: json['avatarUrl'] as String,
+      hearts: json['hearts'] as int? ?? 5,
     );
   }
 
@@ -49,6 +52,7 @@ class User {
       'streakDays': streakDays,
       'currentGrade': currentGrade,
       'avatarUrl': avatarUrl,
+      'hearts': hearts,
     };
   }
 
@@ -63,6 +67,7 @@ class User {
     int? streakDays,
     String? currentGrade,
     String? avatarUrl,
+    int? hearts,
   }) {
     return User(
       id: id ?? this.id,
@@ -74,6 +79,7 @@ class User {
       streakDays: streakDays ?? this.streakDays,
       currentGrade: currentGrade ?? this.currentGrade,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      hearts: hearts ?? this.hearts,
     );
   }
 

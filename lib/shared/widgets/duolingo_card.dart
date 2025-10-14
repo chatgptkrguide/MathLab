@@ -16,7 +16,7 @@ class DuolingoCard extends StatelessWidget {
   final double? elevation;
 
   const DuolingoCard({
-    Key? key,
+    super.key,
     required this.child,
     this.gradientColors,
     this.borderColor,
@@ -24,7 +24,7 @@ class DuolingoCard extends StatelessWidget {
     this.padding,
     this.margin,
     this.elevation,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +39,13 @@ class DuolingoCard extends StatelessWidget {
         boxShadow: [
           // 3D 바닥 그림자
           BoxShadow(
-            color: (borderColor ?? AppColors.duolingoGreen).withOpacity(0.3),
+            color: (borderColor ?? AppColors.duolingoGreen).withValues(alpha: 0.3),
             offset: const Offset(0, 4),
             blurRadius: 0,
           ),
           // 부드러운 그림자
           BoxShadow(
-            color: AppColors.cardShadow.withOpacity(0.1),
+            color: AppColors.cardShadow.withValues(alpha: 0.1),
             offset: const Offset(0, 8),
             blurRadius: 16,
           ),
@@ -64,7 +64,7 @@ class DuolingoCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: borderColor != null
               ? Border.all(color: borderColor!, width: 2)
-              : Border.all(color: AppColors.borderLight.withOpacity(0.3), width: 1),
+              : Border.all(color: AppColors.borderLight.withValues(alpha: 0.3), width: 1),
         ),
         child: Material(
           color: Colors.transparent,
@@ -91,13 +91,13 @@ class DuolingoStatCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const DuolingoStatCard({
-    Key? key,
+    super.key,
     required this.emoji,
     required this.title,
     required this.value,
     required this.iconColor,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class DuolingoStatCard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    iconColor.withOpacity(0.8),
+                    iconColor.withValues(alpha: 0.8),
                     iconColor,
                   ],
                 ),
@@ -125,12 +125,12 @@ class DuolingoStatCard extends StatelessWidget {
                 boxShadow: [
                   // 더 강한 3D 효과
                   BoxShadow(
-                    color: iconColor.withOpacity(0.4),
+                    color: iconColor.withValues(alpha: 0.4),
                     offset: const Offset(0, 4),
                     blurRadius: 0,
                   ),
                   BoxShadow(
-                    color: iconColor.withOpacity(0.2),
+                    color: iconColor.withValues(alpha: 0.2),
                     offset: const Offset(0, 8),
                     blurRadius: 12,
                   ),
@@ -187,14 +187,14 @@ class DuolingoLessonNode extends StatelessWidget {
   final VoidCallback? onTap;
 
   const DuolingoLessonNode({
-    Key? key,
+    super.key,
     required this.emoji,
     this.isCompleted = false,
     this.isActive = false,
     this.isLocked = false,
     this.progress = 0.0,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -225,13 +225,13 @@ class DuolingoLessonNode extends StatelessWidget {
           boxShadow: [
             // 3D 바닥 그림자
             BoxShadow(
-              color: gradientColors[1].withOpacity(0.4),
+              color: gradientColors[1].withValues(alpha: 0.4),
               offset: const Offset(0, 6),
               blurRadius: 0,
             ),
             // 부드러운 그림자
             BoxShadow(
-              color: AppColors.cardShadow.withOpacity(0.2),
+              color: AppColors.cardShadow.withValues(alpha: 0.2),
               offset: const Offset(0, 8),
               blurRadius: 16,
             ),
@@ -253,7 +253,7 @@ class DuolingoLessonNode extends StatelessWidget {
                   emoji,
                   style: TextStyle(
                     fontSize: 32,
-                    color: isLocked ? Colors.white.withOpacity(0.5) : Colors.white,
+                    color: isLocked ? Colors.white.withValues(alpha: 0.5) : Colors.white,
                   ),
                 ),
               ),
@@ -262,7 +262,7 @@ class DuolingoLessonNode extends StatelessWidget {
                   child: CustomPaint(
                     painter: ProgressRingPainter(
                       progress: progress,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -293,7 +293,7 @@ class DuolingoLessonNode extends StatelessWidget {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(

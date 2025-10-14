@@ -14,14 +14,14 @@ class EmptyState extends StatelessWidget {
   final double? height;
 
   const EmptyState({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.message,
     this.actionText,
     this.onActionPressed,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

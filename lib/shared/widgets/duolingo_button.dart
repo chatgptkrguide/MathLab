@@ -14,7 +14,7 @@ class DuolingoButton extends StatefulWidget {
   final double? height;
 
   const DuolingoButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isEnabled = true,
@@ -22,7 +22,7 @@ class DuolingoButton extends StatefulWidget {
     this.icon,
     this.width,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   State<DuolingoButton> createState() => _DuolingoButtonState();
@@ -77,14 +77,14 @@ class _DuolingoButtonState extends State<DuolingoButton>
                 boxShadow: [
                   // 3D 바닥 그림자 (더 명확한 깊이감)
                   BoxShadow(
-                    color: widget.gradientColors[1].withOpacity(0.6),
+                    color: widget.gradientColors[1].withValues(alpha: 0.6),
                     offset: const Offset(0, 8),
                     blurRadius: 0,
                     spreadRadius: 0,
                   ),
                   // 부드러운 확산 그림자
                   BoxShadow(
-                    color: widget.gradientColors[1].withOpacity(0.3),
+                    color: widget.gradientColors[1].withValues(alpha: 0.3),
                     offset: const Offset(0, 12),
                     blurRadius: 24,
                     spreadRadius: 2,

@@ -14,14 +14,14 @@ class ProgressCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ProgressCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.currentValue,
     required this.targetValue,
     required this.unit,
     this.subtitle,
     this.onTap,
-  }) : super(key: key);
+  });
 
   double get progress => targetValue > 0 ? currentValue / targetValue : 0.0;
 
@@ -44,7 +44,7 @@ class ProgressCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.cardShadow.withOpacity(0.08),
+              color: AppColors.cardShadow.withValues(alpha: 0.08),
               blurRadius: AppDimensions.cardElevation * 3,
               offset: const Offset(0, AppDimensions.cardElevation),
             ),

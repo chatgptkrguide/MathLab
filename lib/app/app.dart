@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../shared/themes/app_theme.dart';
 import 'main_navigation.dart';
 
 /// MathLab 앱의 메인 위젯
 class MathLabApp extends StatelessWidget {
-  const MathLabApp({Key? key}) : super(key: key);
+  const MathLabApp({super.key});
 
   @override
   Widget build(BuildContext context) {

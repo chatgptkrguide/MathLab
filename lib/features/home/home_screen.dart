@@ -1,34 +1,29 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/duolingo_button.dart';
 import '../../shared/widgets/duolingo_card.dart';
 import '../../shared/widgets/duolingo_circular_progress.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
 import '../../shared/widgets/animated_button.dart';
-import '../../shared/widgets/xp_animation.dart';
 import '../../shared/widgets/loading_widgets.dart';
 import '../../shared/utils/haptic_feedback.dart';
-import '../../shared/utils/page_transitions.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
-import '../../data/providers/auth_provider.dart';
 import '../problem/problem_screen.dart';
-import '../auth/auth_screen.dart';
 
 /// 듀오링고 스타일 홈 화면
 /// 완전한 듀오링고 UI/UX 적용
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
     final problems = ref.watch(problemProvider);
-    final authState = ref.watch(authProvider);
 
     if (user == null) {
       return Scaffold(
@@ -114,7 +109,7 @@ class HomeScreen extends ConsumerWidget {
                 Text(
                   '${user.name}님의 수학 학습',
                   style: AppTextStyles.titleMedium.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -143,7 +138,7 @@ class HomeScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.duolingoOrange.withOpacity(0.3),
+            color: AppColors.duolingoOrange.withValues(alpha: 0.3),
             offset: const Offset(0, 4),
             blurRadius: 8,
           ),
@@ -198,7 +193,7 @@ class HomeScreen extends ConsumerWidget {
           Text(
             '다음 레벨까지 ${user.xpToNextLevel} XP',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -272,7 +267,7 @@ class HomeScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.duolingoGreen.withOpacity(0.3),
+                      color: AppColors.duolingoGreen.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -341,43 +336,61 @@ class HomeScreen extends ConsumerWidget {
   // 이벤트 핸들러
 
   void _startLearning(BuildContext context, WidgetRef ref, List<Problem> problems) async {
-    print('🚀 학습하기 버튼 클릭됨');
-    print('📊 problems.length: ${problems.length}');
+    if (kDebugMode) {
+      debugPrint('🚀 학습하기 버튼 클릭됨');
+      debugPrint('📊 problems.length: ${problems.length}');
+    }
 
     if (problems.isEmpty) {
-      print('❌ 문제 데이터 없음');
+      if (kDebugMode) {
+        debugPrint('❌ 문제 데이터 없음');
+      }
       _showCustomSnackBar(context, '문제 데이터를 로드하는 중입니다...', AppColors.duolingoOrange);
       return;
     }
 
     final user = ref.read(userProvider);
-    print('👤 user: ${user?.name} (level: ${user?.level})');
+    if (kDebugMode) {
+      debugPrint('👤 user: ${user?.name} (level: ${user?.level})');
+    }
     if (user == null) {
-      print('❌ 사용자 데이터 없음');
+      if (kDebugMode) {
+        debugPrint('❌ 사용자 데이터 없음');
+      }
       return;
     }
 
     final recommendedProblems = ref
         .read(problemProvider.notifier)
         .getRecommendedProblems(user.level, count: 5);
-    print('🎯 recommendedProblems.length: ${recommendedProblems.length}');
+    if (kDebugMode) {
+      debugPrint('🎯 recommendedProblems.length: ${recommendedProblems.length}');
+    }
 
     List<Problem> selectedProblems;
     if (recommendedProblems.isEmpty) {
-      print('📚 기본 레슨 사용');
+      if (kDebugMode) {
+        debugPrint('📚 기본 레슨 사용');
+      }
       final lesson1Problems = ref
           .read(problemProvider.notifier)
           .getProblemsByLesson('lesson001');
       selectedProblems = lesson1Problems.take(5).toList();
-      print('📝 lesson1Problems.length: ${lesson1Problems.length}');
+      if (kDebugMode) {
+        debugPrint('📝 lesson1Problems.length: ${lesson1Problems.length}');
+      }
     } else {
       selectedProblems = recommendedProblems;
     }
 
-    print('✅ selectedProblems.length: ${selectedProblems.length}');
+    if (kDebugMode) {
+      debugPrint('✅ selectedProblems.length: ${selectedProblems.length}');
+    }
 
     if (selectedProblems.isNotEmpty) {
-      print('🎮 학습 화면으로 이동 시작');
+      if (kDebugMode) {
+        debugPrint('🎮 학습 화면으로 이동 시작');
+      }
 
       try {
         // 부드러운 페이지 전환 + 햅틱 피드백
@@ -392,13 +405,19 @@ class HomeScreen extends ConsumerWidget {
         );
 
         Navigator.of(context).push(route);
-        print('✅ 네비게이션 성공');
+        if (kDebugMode) {
+          debugPrint('✅ 네비게이션 성공');
+        }
       } catch (e) {
-        print('❌ 네비게이션 에러: $e');
+        if (kDebugMode) {
+          debugPrint('❌ 네비게이션 에러: $e');
+        }
         _showCustomSnackBar(context, '페이지 이동 중 오류가 발생했습니다.', AppColors.duolingoRed);
       }
     } else {
-      print('❌ 선택된 문제 없음');
+      if (kDebugMode) {
+        debugPrint('❌ 선택된 문제 없음');
+      }
       _showCustomSnackBar(context, '문제를 찾을 수 없습니다.', AppColors.duolingoRed);
     }
   }

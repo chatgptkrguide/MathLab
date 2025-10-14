@@ -9,7 +9,7 @@ import '../../data/services/mock_data_service.dart';
 /// 학습 이력 화면
 /// 실제 스크린샷과 동일한 레이아웃으로 구현
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({Key? key}) : super(key: key);
+  const HistoryScreen({super.key});
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
@@ -333,7 +333,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                       vertical: AppDimensions.spacingXS,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withOpacity(0.1),
+                      color: AppColors.primaryBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(

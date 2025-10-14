@@ -12,7 +12,7 @@ import '../../data/providers/learning_stats_provider.dart';
 /// 프로필 화면 - Riverpod 버전
 /// 실제 스크린샷과 동일한 레이아웃으로 구현
 class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -406,7 +406,7 @@ class ProfileScreen extends ConsumerWidget {
                   vertical: AppDimensions.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.successGreen.withOpacity(0.1),
+                  color: AppColors.successGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(

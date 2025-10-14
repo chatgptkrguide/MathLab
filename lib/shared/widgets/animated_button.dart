@@ -17,7 +17,7 @@ class AnimatedButton extends StatefulWidget {
   final Duration animationDuration;
 
   const AnimatedButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isEnabled = true,
@@ -26,7 +26,7 @@ class AnimatedButton extends StatefulWidget {
     this.width,
     this.height,
     this.animationDuration = const Duration(milliseconds: 150),
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedButton> createState() => _AnimatedButtonState();
@@ -111,8 +111,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
                   // 3D 바닥 그림자 (깊이감)
                   BoxShadow(
                     color: enabled
-                        ? widget.gradientColors[1].withOpacity(_isPressed ? 0.6 : 0.4)
-                        : AppColors.disabled.withOpacity(0.3),
+                        ? widget.gradientColors[1].withValues(alpha: _isPressed ? 0.6 : 0.4)
+                        : AppColors.disabled.withValues(alpha: 0.3),
                     offset: Offset(0, _isPressed ? 3 : 6),
                     blurRadius: 0,
                     spreadRadius: 0,
@@ -120,8 +120,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
                   // 부드러운 확산 그림자
                   BoxShadow(
                     color: enabled
-                        ? widget.gradientColors[1].withOpacity(0.2)
-                        : AppColors.disabled.withOpacity(0.1),
+                        ? widget.gradientColors[1].withValues(alpha: 0.2)
+                        : AppColors.disabled.withValues(alpha: 0.1),
                     offset: const Offset(0, 8),
                     blurRadius: 16,
                     spreadRadius: 0,
@@ -138,7 +138,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
                         end: Alignment.bottomCenter,
                         colors: enabled
                             ? widget.gradientColors
-                            : [AppColors.disabled, AppColors.disabled.withOpacity(0.8)],
+                            : [AppColors.disabled, AppColors.disabled.withValues(alpha: 0.8)],
                       ),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                     ),
@@ -172,7 +172,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
                                   gradient: LinearGradient(
                                     colors: [
                                       Colors.transparent,
-                                      Colors.white.withOpacity(0.3),
+                                      Colors.white.withValues(alpha: 0.3),
                                       Colors.transparent,
                                     ],
                                     stops: const [0.0, 0.5, 1.0],

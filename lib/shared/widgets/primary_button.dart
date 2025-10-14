@@ -17,7 +17,7 @@ class PrimaryButton extends StatelessWidget {
   final double? height;
 
   const PrimaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isEnabled = true,
@@ -27,7 +27,7 @@ class PrimaryButton extends StatelessWidget {
     this.foregroundColor,
     this.width,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class PrimaryButton extends StatelessWidget {
           backgroundColor: backgroundColor ?? AppColors.primaryGreen,
           foregroundColor: foregroundColor ?? Colors.white,
           disabledBackgroundColor: AppColors.disabled,
-          disabledForegroundColor: Colors.white.withOpacity(0.6),
+          disabledForegroundColor: Colors.white.withValues(alpha: 0.6),
           elevation: AppDimensions.cardElevation,
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,

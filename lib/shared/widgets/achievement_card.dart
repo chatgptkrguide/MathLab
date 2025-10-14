@@ -12,12 +12,12 @@ class AchievementCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const AchievementCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.isUnlocked,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

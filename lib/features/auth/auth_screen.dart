@@ -11,7 +11,7 @@ import '../../data/providers/auth_provider.dart';
 /// 로그인/회원가입 화면
 /// 듀오링고 스타일의 매력적인 인증 화면
 class AuthScreen extends ConsumerStatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen({super.key});
 
   @override
   ConsumerState<AuthScreen> createState() => _AuthScreenState();
@@ -102,7 +102,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             borderRadius: BorderRadius.circular(60),
             boxShadow: [
               BoxShadow(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 blurRadius: 20,
                 spreadRadius: 5,
               ),
@@ -128,7 +128,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         Text(
           '재미있는 수학 학습의 시작',
           style: AppTextStyles.bodyLarge.copyWith(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
           ),
           textAlign: TextAlign.center,
         ),
@@ -199,7 +199,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Widget _buildAuthTabs() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: TabBar(
@@ -209,9 +209,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           Tab(text: '회원가입'),
         ],
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withOpacity(0.7),
+        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
         indicator: BoxDecoration(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         indicatorPadding: const EdgeInsets.all(4),
@@ -283,9 +283,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingM),
                 decoration: BoxDecoration(
-                  color: AppColors.duolingoRed.withOpacity(0.1),
+                  color: AppColors.duolingoRed.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  border: Border.all(color: AppColors.duolingoRed.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.duolingoRed.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -548,7 +548,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
 /// 사용자 전환 화면 (프로필에서 접근)
 class UserSwitchScreen extends ConsumerWidget {
-  const UserSwitchScreen({Key? key}) : super(key: key);
+  const UserSwitchScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,9 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
 
       state = problems;
     } catch (e) {
-      print('문제 로드 실패: $e');
+      if (kDebugMode) {
+        debugPrint('문제 로드 실패: $e');
+      }
       state = [];
     }
   }

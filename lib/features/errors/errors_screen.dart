@@ -9,7 +9,7 @@ import '../../data/services/mock_data_service.dart';
 /// 오답 노트 화면
 /// 실제 스크린샷과 동일한 레이아웃으로 구현
 class ErrorsScreen extends StatefulWidget {
-  const ErrorsScreen({Key? key}) : super(key: key);
+  const ErrorsScreen({super.key});
 
   @override
   State<ErrorsScreen> createState() => _ErrorsScreenState();
@@ -400,7 +400,7 @@ class _ErrorsScreenState extends State<ErrorsScreen>
                       vertical: AppDimensions.spacingXS,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.warningOrange.withOpacity(0.1),
+                      color: AppColors.warningOrange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(
@@ -425,7 +425,7 @@ class _ErrorsScreenState extends State<ErrorsScreen>
     String text;
 
     switch (status) {
-      case ErrorStatus.new_error:
+      case ErrorStatus.newError:
         color = AppColors.errorRed;
         text = '신규';
         break;
@@ -449,7 +449,7 @@ class _ErrorsScreenState extends State<ErrorsScreen>
         vertical: AppDimensions.spacingXS,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Text(
@@ -468,10 +468,10 @@ class _ErrorsScreenState extends State<ErrorsScreen>
       margin: const EdgeInsets.all(AppDimensions.paddingL),
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.warningOrange.withOpacity(0.1),
+        color: AppColors.warningOrange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.warningOrange.withOpacity(0.3),
+          color: AppColors.warningOrange.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

@@ -152,7 +152,7 @@ class ErrorNote {
   /// 상태별 색상
   String get statusColor {
     switch (status) {
-      case ErrorStatus.new_error:
+      case ErrorStatus.newError:
         return '#EA4335'; // 빨간색
       case ErrorStatus.reviewing:
         return '#FF9800'; // 주황색
@@ -166,7 +166,7 @@ class ErrorNote {
   /// 상태별 한글 텍스트
   String get statusText {
     switch (status) {
-      case ErrorStatus.new_error:
+      case ErrorStatus.newError:
         return '신규 오답';
       case ErrorStatus.reviewing:
         return '복습 중';
@@ -212,7 +212,7 @@ class ErrorNote {
 
 /// 오답 상태
 enum ErrorStatus {
-  new_error, // 신규 오답
+  newError, // 신규 오답
   reviewing, // 복습 중
   improving, // 향상 중
   mastered, // 완전 이해

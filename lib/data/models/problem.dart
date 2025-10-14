@@ -96,8 +96,6 @@ class Problem {
         return '✏️';
       case ProblemType.calculation:
         return '🔢';
-      default:
-        return '❓';
     }
   }
 

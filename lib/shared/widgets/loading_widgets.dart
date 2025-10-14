@@ -11,11 +11,11 @@ class DuolingoLoadingIndicator extends StatefulWidget {
   final Color? color;
 
   const DuolingoLoadingIndicator({
-    Key? key,
+    super.key,
     this.message,
     this.size = 60.0,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   State<DuolingoLoadingIndicator> createState() => _DuolingoLoadingIndicatorState();
@@ -88,13 +88,13 @@ class _DuolingoLoadingIndicatorState extends State<DuolingoLoadingIndicator>
                     gradient: LinearGradient(
                       colors: [
                         widget.color ?? AppColors.duolingoBlue,
-                        (widget.color ?? AppColors.duolingoBlue).withOpacity(0.6),
+                        (widget.color ?? AppColors.duolingoBlue).withValues(alpha: 0.6),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(widget.size / 2),
                     boxShadow: [
                       BoxShadow(
-                        color: (widget.color ?? AppColors.duolingoBlue).withOpacity(0.3),
+                        color: (widget.color ?? AppColors.duolingoBlue).withValues(alpha: 0.3),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
@@ -190,7 +190,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
               // 베이스 색상
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.borderLight.withOpacity(0.3),
+                  color: AppColors.borderLight.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                 ),
               ),
@@ -209,7 +209,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            AppColors.borderLight.withOpacity(0.5),
+                            AppColors.borderLight.withValues(alpha: 0.5),
                             Colors.transparent,
                           ],
                           stops: const [0.0, 0.5, 1.0],
@@ -229,7 +229,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
 
 /// 스켈레톤 카드 (홈 화면용)
 class SkeletonCard extends StatelessWidget {
-  const SkeletonCard({Key? key}) : super(key: key);
+  const SkeletonCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +255,7 @@ class SkeletonCard extends StatelessWidget {
 
 /// 프로그레스 카드 스켈레톤
 class SkeletonProgressCard extends StatelessWidget {
-  const SkeletonProgressCard({Key? key}) : super(key: key);
+  const SkeletonProgressCard({super.key});
 
   @override
   Widget build(BuildContext context) {

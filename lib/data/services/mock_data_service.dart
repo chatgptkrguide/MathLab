@@ -19,6 +19,7 @@ class MockDataService {
       streakDays: 0,
       currentGrade: '중1',
       avatarUrl: '',
+      hearts: 5,
     );
   }
 

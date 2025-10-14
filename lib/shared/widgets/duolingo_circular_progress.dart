@@ -13,14 +13,14 @@ class DuolingoCircularProgress extends StatefulWidget {
   final VoidCallback? onTap;
 
   const DuolingoCircularProgress({
-    Key? key,
+    super.key,
     required this.progress,
     required this.level,
     this.emoji,
     this.size = 80.0,
     this.progressColor,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<DuolingoCircularProgress> createState() => _DuolingoCircularProgressState();
@@ -140,7 +140,7 @@ class DuolingoProgressPainter extends CustomPainter {
       final progressPaint = Paint()
         ..shader = LinearGradient(
           colors: [
-            progressColor.withOpacity(0.8),
+            progressColor.withValues(alpha: 0.8),
             progressColor,
           ],
         ).createShader(Rect.fromCircle(center: center, radius: radius))

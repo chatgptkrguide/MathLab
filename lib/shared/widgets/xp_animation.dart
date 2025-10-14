@@ -12,11 +12,11 @@ class XPAnimation extends StatefulWidget {
   final Duration duration;
 
   const XPAnimation({
-    Key? key,
+    super.key,
     required this.xpAmount,
     this.onCompleted,
     this.duration = const Duration(milliseconds: 2000),
-  }) : super(key: key);
+  });
 
   @override
   State<XPAnimation> createState() => _XPAnimationState();
@@ -132,7 +132,7 @@ class _XPAnimationState extends State<XPAnimation>
                       borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.duolingoYellow.withOpacity(0.4),
+                          color: AppColors.duolingoYellow.withValues(alpha: 0.4),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -196,7 +196,7 @@ class _XPAnimationState extends State<XPAnimation>
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.duolingoYellow.withOpacity(0.6),
+                      color: AppColors.duolingoYellow.withValues(alpha: 0.6),
                       blurRadius: 4,
                     ),
                   ],
@@ -216,10 +216,10 @@ class LevelUpAnimation extends StatefulWidget {
   final VoidCallback? onCompleted;
 
   const LevelUpAnimation({
-    Key? key,
+    super.key,
     required this.newLevel,
     this.onCompleted,
-  }) : super(key: key);
+  });
 
   @override
   State<LevelUpAnimation> createState() => _LevelUpAnimationState();
@@ -304,13 +304,13 @@ class _LevelUpAnimationState extends State<LevelUpAnimation>
                 gradient: LinearGradient(
                   colors: [
                     _colorAnimation.value ?? AppColors.duolingoYellow,
-                    (_colorAnimation.value ?? AppColors.duolingoYellow).withOpacity(0.8),
+                    (_colorAnimation.value ?? AppColors.duolingoYellow).withValues(alpha: 0.8),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
-                    color: (_colorAnimation.value ?? AppColors.duolingoYellow).withOpacity(0.5),
+                    color: (_colorAnimation.value ?? AppColors.duolingoYellow).withValues(alpha: 0.5),
                     blurRadius: 24,
                     spreadRadius: 8,
                   ),
@@ -334,7 +334,7 @@ class _LevelUpAnimationState extends State<LevelUpAnimation>
                   Text(
                     '레벨 ${widget.newLevel}',
                     style: AppTextStyles.headlineMedium.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],

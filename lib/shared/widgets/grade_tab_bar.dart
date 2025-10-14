@@ -11,11 +11,11 @@ class GradeTabBar extends StatelessWidget {
   final ValueChanged<int> onTabChanged;
 
   const GradeTabBar({
-    Key? key,
+    super.key,
     required this.grades,
     required this.selectedIndex,
     required this.onTabChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

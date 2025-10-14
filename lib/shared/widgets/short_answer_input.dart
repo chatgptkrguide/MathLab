@@ -18,7 +18,7 @@ class ShortAnswerInput extends StatefulWidget {
   final TextInputType keyboardType;
 
   const ShortAnswerInput({
-    Key? key,
+    super.key,
     this.hint,
     this.onChanged,
     this.onSubmitted,
@@ -28,7 +28,7 @@ class ShortAnswerInput extends StatefulWidget {
     this.isCorrect = false,
     this.correctAnswer,
     this.keyboardType = TextInputType.text,
-  }) : super(key: key);
+  });
 
   @override
   State<ShortAnswerInput> createState() => _ShortAnswerInputState();
@@ -90,14 +90,14 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
     if (widget.showResult) {
       if (widget.isCorrect) {
         borderColor = AppColors.duolingoGreen;
-        backgroundColor = AppColors.duolingoGreen.withOpacity(0.1);
+        backgroundColor = AppColors.duolingoGreen.withValues(alpha: 0.1);
         suffixIcon = const Icon(
           Icons.check_circle,
           color: AppColors.duolingoGreen,
         );
       } else {
         borderColor = AppColors.duolingoRed;
-        backgroundColor = AppColors.duolingoRed.withOpacity(0.1);
+        backgroundColor = AppColors.duolingoRed.withValues(alpha: 0.1);
         suffixIcon = const Icon(
           Icons.cancel,
           color: AppColors.duolingoRed,
@@ -133,7 +133,7 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                     boxShadow: widget.showResult && widget.isCorrect
                         ? [
                             BoxShadow(
-                              color: AppColors.duolingoGreen.withOpacity(0.2),
+                              color: AppColors.duolingoGreen.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -215,11 +215,11 @@ class MathKeyboard extends StatelessWidget {
   final VoidCallback? onBackspace;
 
   const MathKeyboard({
-    Key? key,
+    super.key,
     this.onKeyPressed,
     this.onClear,
     this.onBackspace,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +232,7 @@ class MathKeyboard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow.withOpacity(0.1),
+            color: AppColors.cardShadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -324,7 +324,7 @@ class MathKeyboard extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onBackspace,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.duolingoOrange.withOpacity(0.1),
+            backgroundColor: AppColors.duolingoOrange.withValues(alpha: 0.1),
             foregroundColor: AppColors.duolingoOrange,
             elevation: 1,
             padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
@@ -345,7 +345,7 @@ class MathKeyboard extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onClear,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.duolingoRed.withOpacity(0.1),
+            backgroundColor: AppColors.duolingoRed.withValues(alpha: 0.1),
             foregroundColor: AppColors.duolingoRed,
             elevation: 1,
             padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),

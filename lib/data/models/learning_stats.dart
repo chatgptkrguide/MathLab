@@ -110,16 +110,16 @@ class LearningStats {
     final minutes = totalStudyTime % 60;
 
     if (hours == 0) {
-      return '${minutes}분';
+      return '$minutes분';
     } else {
-      return '${hours}시간 ${minutes}분';
+      return '$hours시간 $minutes분';
     }
   }
 
   /// 평균 세션 시간
   String get formattedAverageSessionTime {
     final avgMinutes = averageDailyStudyTime.round();
-    return '${avgMinutes}분';
+    return '$avgMinutes분';
   }
 
   /// 학습 레벨 (총 XP 기준)
@@ -166,7 +166,7 @@ class LearningStats {
 
   @override
   String toString() {
-    return 'LearningStats{userId: $userId, totalXP: $totalXP, accuracy: ${accuracyPercentage}%}';
+    return 'LearningStats{userId: $userId, totalXP: $totalXP, accuracy: $accuracyPercentage%}';
   }
 
   @override

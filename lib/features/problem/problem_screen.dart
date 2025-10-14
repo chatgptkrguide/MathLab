@@ -16,10 +16,10 @@ class ProblemScreen extends ConsumerStatefulWidget {
   final List<Problem> problems;
 
   const ProblemScreen({
-    Key? key,
+    super.key,
     required this.lessonId,
     required this.problems,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<ProblemScreen> createState() => _ProblemScreenState();
@@ -130,8 +130,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   /// 하트 표시 (생명)
   Widget _buildHeartsIndicator() {
-    const maxHearts = 5;
-    const currentHearts = 5; // TODO: 실제 하트 시스템 구현
+    return Consumer(
+      builder: (context, ref, child) {
+        final user = ref.watch(userProvider);
+        const maxHearts = 5;
+        final currentHearts = user?.hearts ?? 5;
 
     return Padding(
       padding: const EdgeInsets.only(right: AppDimensions.paddingL),
@@ -144,6 +147,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
           );
         }),
       ),
+    );
+      },
     );
   }
 
@@ -193,7 +198,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                   vertical: AppDimensions.spacingXS,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlue.withOpacity(0.1),
+                  color: AppColors.primaryBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
@@ -211,7 +216,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                   vertical: AppDimensions.spacingXS,
                 ),
                 decoration: BoxDecoration(
-                  color: _getDifficultyColor(problem.difficulty).withOpacity(0.1),
+                  color: _getDifficultyColor(problem.difficulty).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
@@ -280,20 +285,20 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       if (isSelected && isCorrect) {
         // 선택한 답이 정답
         borderColor = AppColors.successGreen;
-        backgroundColor = AppColors.successGreen.withOpacity(0.1);
+        backgroundColor = AppColors.successGreen.withValues(alpha: 0.1);
       } else if (isSelected && !isCorrect) {
         // 선택한 답이 오답
         borderColor = AppColors.errorRed;
-        backgroundColor = AppColors.errorRed.withOpacity(0.1);
+        backgroundColor = AppColors.errorRed.withValues(alpha: 0.1);
       } else if (!isSelected && isCorrect) {
         // 선택하지 않았지만 정답인 경우
         borderColor = AppColors.successGreen;
-        backgroundColor = AppColors.successGreen.withOpacity(0.05);
+        backgroundColor = AppColors.successGreen.withValues(alpha: 0.05);
       }
     } else if (isSelected) {
       // 선택된 상태 (아직 체크 전)
       borderColor = AppColors.primaryBlue;
-      backgroundColor = AppColors.primaryBlue.withOpacity(0.1);
+      backgroundColor = AppColors.primaryBlue.withValues(alpha: 0.1);
     }
 
     return Container(
@@ -315,7 +320,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: borderColor.withOpacity(0.2),
+                  color: borderColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
@@ -360,10 +365,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       width: double.infinity,
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.primaryBlue.withOpacity(0.1),
+        color: AppColors.primaryBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.primaryBlue.withOpacity(0.3),
+          color: AppColors.primaryBlue.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

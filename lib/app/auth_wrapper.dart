@@ -7,7 +7,7 @@ import 'main_navigation.dart';
 
 /// 인증 상태에 따라 적절한 화면을 보여주는 래퍼
 class AuthWrapper extends ConsumerWidget {
-  const AuthWrapper({Key? key}) : super(key: key);
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

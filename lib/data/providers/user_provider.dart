@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
@@ -89,15 +90,22 @@ class UserNotifier extends StateNotifier<User?> {
 
   /// 레벨업 처리
   Future<void> _onLevelUp(int newLevel) async {
-    // TODO: 레벨업 애니메이션 표시 (글로벌 오버레이)
-    print('🎉 레벨 업! 새 레벨: $newLevel');
+    if (kDebugMode) {
+      debugPrint('🎉 레벨 업! 새 레벨: $newLevel');
+    }
 
-    // 레벨업 햅틱 피드백 (import 필요 시)
+    // 레벨업 햅틱 피드백
     try {
       // await AppHapticFeedback.levelUp();
     } catch (e) {
       // 햅틱 미지원 디바이스 대응
+      if (kDebugMode) {
+        debugPrint('햅틱 피드백 실패: $e');
+      }
     }
+
+    // 레벨업 시 하트 완전 회복
+    state = state!.copyWith(hearts: 5);
   }
 
   /// 스트릭 업데이트 (매일 학습 시 호출)
@@ -190,6 +198,22 @@ class UserNotifier extends StateNotifier<User?> {
   double get levelProgress {
     if (state == null) return 0.0;
     return state!.levelProgress;
+  }
+
+  /// 하트 감소 (오답 시)
+  Future<void> decreaseHeart() async {
+    if (state == null || state!.hearts <= 0) return;
+
+    state = state!.copyWith(hearts: state!.hearts - 1);
+    await _saveUser();
+  }
+
+  /// 하트 복구 (시간 경과 또는 구매)
+  Future<void> restoreHearts() async {
+    if (state == null) return;
+
+    state = state!.copyWith(hearts: 5);
+    await _saveUser();
   }
 }
 

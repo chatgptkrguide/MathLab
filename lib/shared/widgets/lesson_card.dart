@@ -14,14 +14,14 @@ class LessonCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const LessonCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.description,
     required this.progress,
     this.isLocked = false,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class LessonCard extends StatelessWidget {
       height: AppDimensions.iconXXL,
       decoration: BoxDecoration(
         color: isLocked
-            ? AppColors.disabled.withOpacity(0.1)
+            ? AppColors.disabled.withValues(alpha: 0.1)
             : AppColors.secondaryBlue,
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),

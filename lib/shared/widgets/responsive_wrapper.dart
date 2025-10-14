@@ -8,11 +8,11 @@ class ResponsiveWrapper extends StatelessWidget {
   final bool enableScroll;
 
   const ResponsiveWrapper({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.enableScroll = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +51,12 @@ class SafeColumn extends StatelessWidget {
   final MainAxisSize mainAxisSize;
 
   const SafeColumn({
-    Key? key,
+    super.key,
     required this.children,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.mainAxisSize = MainAxisSize.max,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,12 +92,12 @@ class SafeRow extends StatelessWidget {
   final MainAxisSize mainAxisSize;
 
   const SafeRow({
-    Key? key,
+    super.key,
     required this.children,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.mainAxisSize = MainAxisSize.max,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -138,12 +138,12 @@ class ResponsiveText extends StatelessWidget {
 
   const ResponsiveText(
     this.text, {
-    Key? key,
+    super.key,
     this.style,
     this.textAlign,
     this.maxLinesLarge,
     this.maxLinesSmall,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
