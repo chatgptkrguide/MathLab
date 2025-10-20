@@ -1,391 +1,372 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/widgets.dart';
-import '../../data/models/models.dart';
-import '../../data/services/mock_data_service.dart';
+import '../../shared/widgets/responsive_wrapper.dart';
+import '../../data/providers/user_provider.dart';
 
-/// 학습 이력 화면
-/// 실제 스크린샷과 동일한 레이아웃으로 구현
-class HistoryScreen extends StatefulWidget {
+/// 학습 이력 화면 (Figma 디자인 03)
+/// 챌린지 진행 상황과 캘린더를 표시
+class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen>
-    with TickerProviderStateMixin {
-  final MockDataService _dataService = MockDataService();
-  late TabController _tabController;
-
-  LearningStats? _stats;
-
-  final List<String> _periodTabs = ['오늘', '이번 주', '전체'];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _periodTabs.length, vsync: this);
-    _loadData();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void _loadData() {
-    _stats = _dataService.getSampleLearningStats();
-    setState(() {});
-  }
+class _HistoryScreenState extends ConsumerState<HistoryScreen> {
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
 
   @override
   Widget build(BuildContext context) {
-    if (_stats == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    final user = ref.watch(userProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('학습 이력'),
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          _buildHeader(),
-          _buildStatsGrid(),
-          _buildPeriodTabs(),
-          Expanded(child: _buildHistoryContent()),
-        ],
-      ),
-    );
-  }
-
-  /// 헤더 텍스트
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      alignment: Alignment.centerLeft,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '자세한 학습 기록을 확인하세요',
-            style: AppTextStyles.headlineSmall,
+      backgroundColor: AppColors.mathBlue,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: AppColors.mathBlueGradient,
           ),
-          const SizedBox(height: AppDimensions.spacingXS),
-          Text(
-            '학습 패턴을 분석하여 더 나은 학습 계획을 세워보세요.',
-            style: AppTextStyles.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 통계 카드 그리드 (4열)
-  Widget _buildStatsGrid() {
-    return Padding(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isSmallScreen = constraints.maxWidth < 500;
-
-          if (isSmallScreen) {
-            // 작은 화면에서는 2x2 그리드
-            return Column(
+        ),
+        child: SafeArea(
+          child: ResponsiveWrapper(
+            child: Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        icon: '🕐',
-                        label: '총 학습 시간',
-                        value: _stats!.formattedTotalStudyTime,
-                        color: AppColors.primaryBlue,
-                      ),
-                    ),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Expanded(
-                      child: _buildStatCard(
-                        icon: '🎯',
-                        label: '푼 문제',
-                        value: '${_stats!.totalProblems}개',
-                        color: AppColors.successGreen,
-                      ),
-                    ),
-                  ],
+                _buildHeader(context),
+                _buildUserStats(
+                  streakDays: user?.streakDays ?? 0,
+                  xp: user?.xp ?? 0,
+                  level: user?.level ?? 1,
                 ),
-                const SizedBox(height: AppDimensions.spacingS),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        icon: '📊',
-                        label: '정답률',
-                        value: '${_stats!.accuracyPercentage}%',
-                        color: AppColors.warningOrange,
-                      ),
-                    ),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Expanded(
-                      child: _buildStatCard(
-                        icon: '🏆',
-                        label: '학습 세션',
-                        value: '${_stats!.totalSessions}회',
-                        color: AppColors.purpleAccent,
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: _buildContent(),
                 ),
               ],
-            );
-          }
-
-          // 일반 화면에서는 4열 가로 배치
-          return Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  icon: '🕐',
-                  label: '총 학습 시간',
-                  value: _stats!.formattedTotalStudyTime,
-                  color: AppColors.primaryBlue,
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacingS),
-              Expanded(
-                child: _buildStatCard(
-                  icon: '🎯',
-                  label: '푼 문제',
-                  value: '${_stats!.totalProblems}개',
-                  color: AppColors.successGreen,
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacingS),
-              Expanded(
-                child: _buildStatCard(
-                  icon: '📊',
-                  label: '정답률',
-                  value: '${_stats!.accuracyPercentage}%',
-                  color: AppColors.warningOrange,
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacingS),
-              Expanded(
-                child: _buildStatCard(
-                  icon: '🏆',
-                  label: '학습 세션',
-                  value: '${_stats!.totalSessions}회',
-                  color: AppColors.purpleAccent,
-                ),
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  /// 통계 카드
-  Widget _buildStatCard({
+  /// 헤더 (뒤로가기 + 로고)
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'GoMATH',
+              style: AppTextStyles.titleSmall.copyWith(
+                color: AppColors.mathButtonBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 사용자 통계
+  Widget _buildUserStats({
+    required int streakDays,
+    required int xp,
+    required int level,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              '소인수분해',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          _buildStatItem('🔥', streakDays.toString()),
+          const SizedBox(width: AppDimensions.spacingM),
+          _buildStatItem('🔶', xp.toString()),
+          const SizedBox(width: AppDimensions.spacingM),
+          _buildStatItem('⭐', level.toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String emoji, String value) {
+    return Row(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 20)),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 메인 컨텐츠 (챌린지 + 캘린더)
+  Widget _buildContent() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppDimensions.paddingXL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildChallengeSection(),
+            const SizedBox(height: AppDimensions.spacingXXL),
+            _buildCalendarSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 챌린지 섹션
+  Widget _buildChallengeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Challenges (Day)',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '6/12',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.mathBlue,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppDimensions.spacingM),
+        // 진행률 바
+        ClipRRect(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+          child: LinearProgressIndicator(
+            value: 6 / 12,
+            minHeight: 12,
+            backgroundColor: AppColors.progressBackground,
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.mathBlue),
+          ),
+        ),
+        const SizedBox(height: AppDimensions.spacingXL),
+        Row(
+          children: [
+            Expanded(
+              child: _buildChallengeCard(
+                icon: '🔥',
+                label: 'Challenge Done',
+                value: '6 Days',
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacingM),
+            Expanded(
+              child: _buildChallengeCard(
+                icon: '📅',
+                label: 'Remaining',
+                value: '10 Days',
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChallengeCard({
     required String icon,
     required String label,
     required String value,
-    required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingM),
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: AppDimensions.cardElevation,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         children: [
-          Text(
-            icon,
-            style: AppTextStyles.emojiLarge,
-          ),
-          const SizedBox(height: AppDimensions.spacingXS),
+          Text(icon, style: const TextStyle(fontSize: 36)),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
-            style: AppTextStyles.labelSmall,
-            textAlign: TextAlign.center,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: AppDimensions.spacingXS),
           Text(
             value,
-            style: AppTextStyles.titleSmall.copyWith(
-              color: color,
+            style: AppTextStyles.headlineSmall.copyWith(
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  /// 기간 선택 탭바
-  Widget _buildPeriodTabs() {
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.spacingM,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        tabs: _periodTabs.map((tab) => Tab(text: tab)).toList(),
-        labelColor: AppColors.primaryBlue,
-        unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: AppTextStyles.titleSmall,
-        unselectedLabelStyle: AppTextStyles.bodyMedium,
-        indicator: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.cardShadow,
-              blurRadius: AppDimensions.cardElevation,
-              offset: const Offset(0, 1),
+  /// 캘린더 섹션
+  Widget _buildCalendarSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'December 2022',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // VIEW 액션
+              },
+              child: Text(
+                'VIEW',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.mathBlue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
-        indicatorPadding: const EdgeInsets.all(4),
-        onTap: (_) => setState(() {}),
-      ),
-    );
-  }
-
-  /// 학습 이력 콘텐츠
-  Widget _buildHistoryContent() {
-    return TabBarView(
-      controller: _tabController,
-      children: [
-        _buildPeriodContent('오늘'),
-        _buildPeriodContent('이번 주'),
-        _buildPeriodContent('전체'),
+        const SizedBox(height: AppDimensions.spacingM),
+        _buildCalendar(),
       ],
     );
   }
 
-  /// 기간별 콘텐츠
-  Widget _buildPeriodContent(String period) {
-    // 모든 기간에서 빈 상태로 표시 (샘플 데이터가 없으므로)
-    return EmptyState(
-      icon: '📅',
-      title: '학습 기록이 없습니다',
-      message: '아직 $period 학습 기록이 없어요.\n학습을 시작해서 기록을 만들어보세요!',
-      actionText: '학습 시작하기',
-      onActionPressed: () {
-        _navigateToLearning();
-      },
-    );
-  }
-
-  /// 학습 기록 카드 (실제 데이터가 있을 때 사용)
-  Widget _buildHistoryCard({
-    required String date,
-    required int studyTime,
-    required int problemsSolved,
-    required int xpEarned,
-    required double accuracy,
-  }) {
+  Widget _buildCalendar() {
+    // 간단한 캘린더 UI (table_calendar 패키지 필요)
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.spacingXS,
+      padding: const EdgeInsets.all(AppDimensions.paddingM),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.paddingL),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    date,
-                    style: AppTextStyles.titleMedium,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingS,
-                      vertical: AppDimensions.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                    ),
-                    child: Text(
-                      '+$xpEarned XP',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.primaryBlue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppDimensions.spacingM),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildMiniStat('⏱️', '${studyTime}분'),
-                  _buildMiniStat('📝', '$problemsSolved문제'),
-                  _buildMiniStat('🎯', '${(accuracy * 100).round()}%'),
-                ],
-              ),
-            ],
-          ),
-        ),
+      child: Column(
+        children: [
+          _buildCalendarHeader(),
+          const SizedBox(height: AppDimensions.spacingM),
+          _buildCalendarGrid(),
+        ],
       ),
     );
   }
 
-  /// 미니 통계 위젯
-  Widget _buildMiniStat(String icon, String value) {
+  Widget _buildCalendarHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          .map((day) => SizedBox(
+                width: 40,
+                child: Text(
+                  day,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  Widget _buildCalendarGrid() {
+    // 12월 달력 데이터 (2022년 12월은 목요일부터 시작, 31일까지)
+    final completedDays = [13, 14, 15, 16, 17, 18]; // 파란 원으로 표시된 날들
+
     return Column(
       children: [
-        Text(icon, style: AppTextStyles.emoji),
-        const SizedBox(height: AppDimensions.spacingXS),
-        Text(value, style: AppTextStyles.bodySmall),
+        // 1주차 (빈칸 3개 + 1일)
+        _buildWeekRow([null, null, null, 1, 2, 3, 4], completedDays),
+        _buildWeekRow([5, 6, 7, 8, 9, 10, 11], completedDays),
+        _buildWeekRow([12, 13, 14, 15, 16, 17, 18], completedDays),
+        _buildWeekRow([19, 20, 21, 22, 23, 24, 25], completedDays),
+        _buildWeekRow([26, 27, 28, 29, 30, 31, null], completedDays),
       ],
     );
   }
 
-  // 이벤트 핸들러들
+  Widget _buildWeekRow(List<int?> days, List<int> completedDays) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: days.map((day) {
+          if (day == null) {
+            return const SizedBox(width: 40, height: 40);
+          }
 
-  void _navigateToLearning() {
-    // TODO: 학습 화면으로 이동
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('학습 화면으로 이동합니다!'),
-        action: SnackBarAction(
-          label: '시작',
-          onPressed: () {
-            // 학습 화면으로 이동 로직
-          },
-        ),
+          final isCompleted = completedDays.contains(day);
+
+          return Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isCompleted ? AppColors.mathBlue : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '$day',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isCompleted ? Colors.white : AppColors.textPrimary,
+                  fontWeight: isCompleted ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

@@ -1,314 +1,317 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/widgets.dart';
-import '../../data/models/models.dart';
-import '../../data/services/mock_data_service.dart';
+import '../../shared/widgets/responsive_wrapper.dart';
+import '../../data/providers/user_provider.dart';
 
-/// 학습 로드맵 화면 (커리큘럼)
-/// 실제 스크린샷과 동일한 레이아웃으로 구현
-class LessonsScreen extends StatefulWidget {
+/// 학습 카드 그리드 화면 (Figma 디자인 01)
+/// 학습 주제별 카드를 그리드로 표시
+class LessonsScreen extends ConsumerWidget {
   const LessonsScreen({super.key});
 
   @override
-  State<LessonsScreen> createState() => _LessonsScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
 
-class _LessonsScreenState extends State<LessonsScreen> {
-  final MockDataService _dataService = MockDataService();
-  final List<String> _grades = ['중1', '중2', '고1'];
-  int _selectedGradeIndex = 0;
-  Map<String, List<Lesson>> _lessonsByGrade = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  void _loadData() {
-    _lessonsByGrade = _dataService.getLessonsByGrade();
-
-    // 중2, 고1 더미 데이터 추가 (중1 데이터를 복사해서 수정)
-    _lessonsByGrade['중2'] = _createDummyLessonsForGrade('중2');
-    _lessonsByGrade['고1'] = _createDummyLessonsForGrade('고1');
-  }
-
-  List<Lesson> _createDummyLessonsForGrade(String grade) {
-    // 중2 커리큘럼
-    if (grade == '중2') {
-      return [
-        Lesson(
-          id: '${grade}_lesson001',
-          title: '1. 유리수와 순환소수',
-          description: '유리수를 소수로 나타내고 순환소수의 성질을 학습합니다',
-          icon: '🔢',
-          order: 1,
-          grade: grade,
-          category: '수와 연산',
-          topics: ['유리수', '순환소수', '근삿값'],
-          totalProblems: 25,
-          completedProblems: 0,
-          isUnlocked: false,
-          xpReward: 120,
-        ),
-        Lesson(
-          id: '${grade}_lesson002',
-          title: '2. 식의 계산',
-          description: '다항식의 덧셈과 뺄셈, 단항식의 곱셈과 나눗셈을 학습합니다',
-          icon: '🔤',
-          order: 2,
-          grade: grade,
-          category: '문자와 식',
-          topics: ['다항식', '단항식', '식의 계산'],
-          totalProblems: 30,
-          completedProblems: 0,
-          isUnlocked: false,
-          xpReward: 150,
-        ),
-      ];
-    }
-
-    // 고1 커리큘럼
-    if (grade == '고1') {
-      return [
-        Lesson(
-          id: '${grade}_lesson001',
-          title: '1. 다항식의 연산',
-          description: '다항식의 곱셈과 나눗셈, 나머지 정리를 학습합니다',
-          icon: '📊',
-          order: 1,
-          grade: grade,
-          category: '다항식',
-          topics: ['다항식의 곱셈', '나머지 정리', '인수분해'],
-          totalProblems: 35,
-          completedProblems: 0,
-          isUnlocked: false,
-          xpReward: 180,
-        ),
-        Lesson(
-          id: '${grade}_lesson002',
-          title: '2. 방정식과 부등식',
-          description: '이차방정식과 이차부등식의 해법을 학습합니다',
-          icon: '⚖️',
-          order: 2,
-          grade: grade,
-          category: '방정식',
-          topics: ['이차방정식', '이차부등식', '연립방정식'],
-          totalProblems: 40,
-          completedProblems: 0,
-          isUnlocked: false,
-          xpReward: 200,
-        ),
-      ];
-    }
-
-    return [];
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('학습 로드맵'),
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          _buildHeader(),
-          _buildGradeTabs(),
-          const SizedBox(height: AppDimensions.spacingL),
-          Expanded(child: _buildLessonsList()),
-          _buildLearningGuide(),
-        ],
-      ),
-    );
-  }
-
-  /// 헤더 텍스트
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      alignment: Alignment.centerLeft,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '체계적인 수학 학습을 시작하세요',
-            style: AppTextStyles.headlineSmall,
+      backgroundColor: AppColors.mathBlue,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: AppColors.mathBlueGradient,
           ),
-          const SizedBox(height: AppDimensions.spacingXS),
-          Text(
-            '단계별로 구성된 커리큘럼을 통해 수학 실력을 체계적으로 향상시킬 수 있습니다.',
-            style: AppTextStyles.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 학년 선택 탭
-  Widget _buildGradeTabs() {
-    return GradeTabBar(
-      grades: _grades,
-      selectedIndex: _selectedGradeIndex,
-      onTabChanged: (index) {
-        setState(() {
-          _selectedGradeIndex = index;
-        });
-      },
-    );
-  }
-
-  /// 레슨 목록
-  Widget _buildLessonsList() {
-    final selectedGrade = _grades[_selectedGradeIndex];
-    final lessons = _lessonsByGrade[selectedGrade] ?? [];
-
-    if (lessons.isEmpty) {
-      return EmptyState(
-        icon: '📚',
-        title: '준비 중입니다',
-        message: '$selectedGrade 커리큘럼을 준비하고 있습니다.\n곧 만나볼 수 있어요!',
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingS),
-      itemCount: lessons.length,
-      itemBuilder: (context, index) {
-        final lesson = lessons[index];
-
-        return LessonCard(
-          icon: lesson.icon,
-          title: lesson.title,
-          description: lesson.description,
-          progress: lesson.progress,
-          isLocked: !lesson.isUnlocked,
-          onTap: lesson.isUnlocked ? () => _navigateToLesson(lesson) : null,
-        );
-      },
-    );
-  }
-
-  /// 학습 가이드
-  Widget _buildLearningGuide() {
-    return Container(
-      margin: const EdgeInsets.all(AppDimensions.paddingL),
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
-        color: AppColors.purpleAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: AppColors.purpleAccent.withValues(alpha: 0.3),
-          width: 1,
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: AppDimensions.iconXL,
-            height: AppDimensions.iconXL,
-            decoration: BoxDecoration(
-              color: AppColors.purpleAccent,
-              borderRadius: BorderRadius.circular(AppDimensions.iconXL / 2),
-            ),
-            child: const Icon(
-              Icons.lightbulb_outline,
-              color: Colors.white,
-              size: AppDimensions.iconM,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Flexible(
-            flex: 3,
+        child: SafeArea(
+          child: ResponsiveWrapper(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '학습 가이드',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.purpleAccent,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                _buildHeader(),
+                _buildUserStats(
+                  streakDays: user?.streakDays ?? 0,
+                  xp: user?.xp ?? 0,
+                  level: user?.level ?? 1,
                 ),
-                const SizedBox(height: AppDimensions.spacingXS),
-                Flexible(
-                  child: Text(
-                    '각 에피소드는 개념 학습 → 문제 풀이 → 총이 취약 순서로 진행됩니다. '
-                    '난이도가 높은 문제는 오답 노트에 자동으로 저장됩니다.',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textPrimary,
-                      height: 1.4,
-                    ),
-                    overflow: TextOverflow.fade,
-                    maxLines: 4,
-                  ),
+                Expanded(
+                  child: _buildLearningGrid(context),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 헤더 (GoMath 스타일)
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // 햄버거 메뉴 아이콘
+          Icon(
+            Icons.menu,
+            color: Colors.white,
+            size: 28,
+          ),
+          // Home 텍스트
+          Text(
+            'Home',
+            style: AppTextStyles.headlineMedium.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          // GoMath 로고 (임시로 텍스트)
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 6,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'GoMATH',
+              style: AppTextStyles.titleSmall.copyWith(
+                color: AppColors.mathButtonBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // 이벤트 핸들러들
+  /// 사용자 통계 (상단)
+  Widget _buildUserStats({
+    required int streakDays,
+    required int xp,
+    required int level,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // 사용자 이름
+          Expanded(
+            child: Text(
+              '소인수분해',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          // 스트릭
+          _buildStatItem('🔥', streakDays.toString()),
+          const SizedBox(width: AppDimensions.spacingM),
+          // XP
+          _buildStatItem('🔶', xp.toString()),
+          const SizedBox(width: AppDimensions.spacingM),
+          // 레벨
+          _buildStatItem('⭐', level.toString()),
+        ],
+      ),
+    );
+  }
 
-  void _navigateToLesson(Lesson lesson) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(lesson.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildStatItem(String emoji, String value) {
+    return Row(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 20)),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 학습 카드 그리드
+  Widget _buildLearningGrid(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppDimensions.paddingXL),
+        child: Column(
           children: [
-            Text(lesson.description),
-            const SizedBox(height: AppDimensions.spacingM),
-            Text('📝 총 ${lesson.totalProblems}개 문제'),
-            Text('⏱️ 예상 소요시간: ${lesson.estimatedMinutes}분'),
-            Text('🎯 획득 XP: ${lesson.xpReward}'),
-            const SizedBox(height: AppDimensions.spacingM),
-            Text('주요 주제:', style: AppTextStyles.titleSmall),
-            const SizedBox(height: AppDimensions.spacingXS),
-            ...lesson.topics.map(
-              (topic) => Text('• $topic', style: AppTextStyles.bodySmall),
+            // 큰 학습 카드들
+            Row(
+              children: [
+                Expanded(
+                  child: _buildLargeCard(
+                    icon: '📚',
+                    label: 'START!',
+                    onTap: () => _showComingSoon(context, '학습 시작'),
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.spacingM),
+                Expanded(
+                  child: Column(
+                    children: [
+                      _buildMediumCard(
+                        icon: '📐',
+                        onTap: () => _showComingSoon(context, '기하'),
+                      ),
+                      const SizedBox(height: AppDimensions.spacingM),
+                      _buildMediumCard(
+                        icon: '✏️',
+                        onTap: () => _showComingSoon(context, '대수'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacingL),
+            // 작은 아이콘 카드 그리드
+            GridView.count(
+              crossAxisCount: 3,
+              mainAxisSpacing: AppDimensions.spacingM,
+              crossAxisSpacing: AppDimensions.spacingM,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _buildSmallCard('🎒', '가방'),
+                _buildSmallCard('⏰', '시간'),
+                _buildSmallCard('🏆', '트로피'),
+                _buildSmallCard('💻', '컴퓨터'),
+                _buildSmallCard('🌍', '지구본'),
+                _buildSmallCard('📋', '칠판'),
+                _buildSmallCard('⚛️', '원자'),
+                _buildSmallCard('🔬', '현미경'),
+                _buildSmallCard('📖', '책'),
+              ],
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _startLesson(lesson);
-            },
-            child: const Text('학습 시작'),
-          ),
-        ],
       ),
     );
   }
 
-  void _startLesson(Lesson lesson) {
-    // TODO: 실제 학습 화면으로 이동
+  /// 큰 학습 카드
+  Widget _buildLargeCard({
+    required String icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 160,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: AppColors.mathButtonGradient,
+          ),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              icon,
+              style: const TextStyle(fontSize: 48),
+            ),
+            const SizedBox(height: AppDimensions.spacingS),
+            Text(
+              label,
+              style: AppTextStyles.titleLarge.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 중간 크기 카드
+  Widget _buildMediumCard({
+    required String icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 74,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: AppColors.mathButtonGradient,
+          ),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.mathButtonBlue.withValues(alpha: 0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            icon,
+            style: const TextStyle(fontSize: 36),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 작은 아이콘 카드
+  Widget _buildSmallCard(String icon, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.mathBlueLight.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      ),
+      child: Center(
+        child: Text(
+          icon,
+          style: const TextStyle(fontSize: 32),
+        ),
+      ),
+    );
+  }
+
+  void _showComingSoon(BuildContext context, String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${lesson.title} 학습을 시작합니다!'),
-        action: SnackBarAction(
-          label: '시작',
-          onPressed: () {
-            // 학습 화면으로 이동 로직
-          },
+        content: Text('$feature 기능이 곧 추가됩니다!'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
       ),
     );
