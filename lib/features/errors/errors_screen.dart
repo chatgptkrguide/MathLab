@@ -61,20 +61,68 @@ class _ErrorsScreenState extends State<ErrorsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('오답 노트'),
-        backgroundColor: AppColors.surface,
-        elevation: 0,
+      backgroundColor: AppColors.mathBlue,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: AppColors.mathBlueGradient,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildGoMathHeader(context),
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      _buildStatsGrid(),
+                      _buildActionButtons(),
+                      _buildFilterTabs(),
+                      Expanded(child: _buildErrorNotesList()),
+                      _buildTips(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      body: Column(
+    );
+  }
+
+  /// GoMath 스타일 헤더 (뒤로가기 + 제목)
+  Widget _buildGoMathHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      child: Row(
         children: [
-          _buildHeader(),
-          _buildStatsGrid(),
-          _buildActionButtons(),
-          _buildFilterTabs(),
-          Expanded(child: _buildErrorNotesList()),
-          _buildTips(),
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          Expanded(
+            child: Text(
+              '오답 노트',
+              style: AppTextStyles.headlineMedium.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(width: 48), // 대칭을 위한 공간
         ],
       ),
     );
