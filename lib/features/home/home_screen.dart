@@ -27,20 +27,20 @@ class HomeScreen extends ConsumerWidget {
 
     if (user == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF235390),
+        backgroundColor: AppColors.mathBlue,
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF235390), Color(0xFF1CB0F6)],
+              colors: AppColors.mathBlueGradient,
             ),
           ),
           child: const Center(
             child: DuolingoLoadingIndicator(
               message: '수학 학습을 준비하고 있어요...',
               size: 80,
-              color: AppColors.duolingoYellow,
+              color: AppColors.mathYellow,
             ),
           ),
         ),
@@ -48,16 +48,13 @@ class HomeScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF235390), // 듀오링고 블루 배경
+      backgroundColor: AppColors.mathBlue, // GoMath 파란 배경
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF235390), // 진한 파랑
-              Color(0xFF1CB0F6), // 밝은 파랑
-            ],
+            colors: AppColors.mathBlueGradient, // Figma 디자인 그라디언트
           ),
         ),
         child: SafeArea(
@@ -124,7 +121,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 스트릭 표시 (듀오링고 스타일)
+  /// 스트릭 표시 (GoMath 스타일)
   Widget _buildStreakDisplay(int streakDays) {
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -138,7 +135,7 @@ class HomeScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.duolingoOrange.withValues(alpha: 0.3),
+            color: AppColors.mathOrange.withValues(alpha: 0.3),
             offset: const Offset(0, 4),
             blurRadius: 8,
           ),
@@ -164,7 +161,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 듀오링고 스타일 레벨 진행률
+  /// GoMath 스타일 레벨 진행률
   Widget _buildLevelProgress(User user) {
     final levelProgress = user.levelProgress;
 
@@ -178,7 +175,7 @@ class HomeScreen extends ConsumerWidget {
             level: user.level,
             emoji: '🧮', // 수학 이모지
             size: 120,
-            progressColor: AppColors.duolingoYellow,
+            progressColor: AppColors.mathYellow,
           ),
           const SizedBox(height: AppDimensions.spacingL),
           // 레벨 정보
@@ -249,7 +246,7 @@ class HomeScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppDimensions.spacingL),
-          // 듀오링고 스타일 진행률 바
+          // GoMath 스타일 진행률 바 (틸색)
           Container(
             height: 16,
             decoration: BoxDecoration(
@@ -262,12 +259,12 @@ class HomeScreen extends ConsumerWidget {
               child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: AppColors.greenGradient,
+                    colors: AppColors.mathTealGradient,
                   ),
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.duolingoGreen.withValues(alpha: 0.3),
+                      color: AppColors.mathTeal.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -281,7 +278,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 메인 학습 시작 버튼 (매끄러운 애니메이션)
+  /// 메인 학습 시작 버튼 (GoMath 스타일 - 진한 파란색)
   Widget _buildStartButton(BuildContext context, WidgetRef ref, List<Problem> problems) {
     return AnimatedButton(
       text: '학습 시작하기',
@@ -289,14 +286,14 @@ class HomeScreen extends ConsumerWidget {
         await AppHapticFeedback.mediumImpact();
         _startLearning(context, ref, problems);
       },
-      gradientColors: AppColors.greenGradient,
+      gradientColors: AppColors.mathButtonGradient,
       icon: Icons.play_arrow,
       height: 64,
       animationDuration: const Duration(milliseconds: 150),
     );
   }
 
-  /// 빠른 통계 (듀오링고 스타일)
+  /// 빠른 통계 (GoMath 스타일)
   Widget _buildQuickStats(User user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
@@ -304,19 +301,19 @@ class HomeScreen extends ConsumerWidget {
         children: [
           Expanded(
             child: DuolingoStatCard(
-              emoji: '⚡',
+              emoji: '🔶',
               title: 'XP',
               value: user.xp.toString(),
-              iconColor: AppColors.duolingoYellow,
+              iconColor: AppColors.mathOrange,
             ),
           ),
           const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: DuolingoStatCard(
-              emoji: '🎖️',
+              emoji: '⭐',
               title: '레벨',
               value: user.level.toString(),
-              iconColor: AppColors.duolingoBlue,
+              iconColor: AppColors.mathYellow,
             ),
           ),
           const SizedBox(width: AppDimensions.spacingM),
@@ -325,7 +322,7 @@ class HomeScreen extends ConsumerWidget {
               emoji: '🔥',
               title: '연속',
               value: '${user.streakDays}일',
-              iconColor: AppColors.duolingoOrange,
+              iconColor: AppColors.mathOrange,
             ),
           ),
         ],

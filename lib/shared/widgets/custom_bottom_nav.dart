@@ -89,7 +89,7 @@ class CustomBottomNavigation extends StatelessWidget {
     final isSelected = currentIndex == index;
 
     if (isSpecial) {
-      // 홈 탭 - 깔끔한 현대적 디자인
+      // 홈 탭 - GoMath 스타일 원형 버튼
       return Expanded(
         child: Center(
           child: GestureDetector(
@@ -104,19 +104,16 @@ class CustomBottomNavigation extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isSelected
-                    ? [
-                        const Color(0xFF6C63FF),
-                        const Color(0xFF5A52E5),
-                      ]
+                    ? AppColors.mathButtonGradient
                     : [
-                        const Color(0xFF8B85FF),
-                        const Color(0xFF7B74F0),
+                        AppColors.mathButtonBlue.withValues(alpha: 0.7),
+                        AppColors.mathButtonBlue.withValues(alpha: 0.6),
                       ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF6C63FF).withValues(alpha: isSelected ? 0.4 : 0.25),
+                    color: AppColors.mathButtonBlue.withValues(alpha: isSelected ? 0.4 : 0.25),
                     blurRadius: isSelected ? 12 : 8,
                     offset: Offset(0, isSelected ? 6 : 4),
                   ),
@@ -164,13 +161,13 @@ class CustomBottomNavigation extends StatelessWidget {
                   padding: const EdgeInsets.all(6.0), // 패딩 줄임
                   decoration: isSelected
                       ? BoxDecoration(
-                          color: AppColors.primaryBlue.withValues(alpha: 0.1),
+                          color: AppColors.mathButtonBlue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         )
                       : null,
                   child: Icon(
                     isSelected ? _getSelectedIcon(icon) : icon,
-                    color: isSelected ? AppColors.primaryBlue : AppColors.textSecondary,
+                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary,
                     size: 20, // 아이콘 크기 고정
                   ),
                 ),
@@ -180,7 +177,7 @@ class CustomBottomNavigation extends StatelessWidget {
                 child: Text(
                   label,
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: isSelected ? AppColors.primaryBlue : AppColors.textSecondary,
+                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 10, // 폰트 크기 줄임
                   ),
