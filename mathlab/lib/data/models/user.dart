@@ -104,6 +104,9 @@ class User {
     return '전문가';
   }
 
+  /// streak 접근자 (streakDays의 별칭)
+  int get streak => streakDays;
+
   @override
   String toString() {
     return 'User{id: $id, name: $name, level: $level, xp: $xp}';

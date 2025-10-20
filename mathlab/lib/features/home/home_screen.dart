@@ -30,41 +30,33 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 40),
-                        // 헤더: "안녕하세요!" + 스트릭
-                        _buildHeader(user),
-                        const SizedBox(height: 40),
-                        // 중앙 UFO 일러스트 + 진행 원
-                        _buildCenterIllustration(),
-                        const SizedBox(height: 40),
-                        // 오늘의 목표 카드
-                        _buildDailyGoalCard(),
-                        const SizedBox(height: 24),
-                        // 학습 시작하기 버튼
-                        _buildStartButton(),
-                        const SizedBox(height: 24),
-                        // 통계 카드 3개
-                        _buildStatsCards(user),
-                        const SizedBox(height: 40),
-                        // GoMATH 로고
-                        _buildLogo(),
-                        const SizedBox(height: 80),
-                      ],
-                    ),
-                  ),
-                ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  // 헤더: "안녕하세요!" + 스트릭
+                  _buildHeader(user),
+                  const SizedBox(height: 40),
+                  // 중앙 UFO 일러스트 + 진행 원
+                  _buildCenterIllustration(),
+                  const SizedBox(height: 40),
+                  // 오늘의 목표 카드
+                  _buildDailyGoalCard(),
+                  const SizedBox(height: 24),
+                  // 학습 시작하기 버튼
+                  _buildStartButton(context),
+                  const SizedBox(height: 24),
+                  // 통계 카드 3개
+                  _buildStatsCards(user),
+                  const SizedBox(height: 40),
+                  // GoMATH 로고
+                  _buildLogo(),
+                  const SizedBox(height: 100), // 하단 네비게이션 바 공간 확보
+                ],
               ),
-              // 하단 네비게이션 바
-              _buildBottomNav(),
-            ],
+            ),
           ),
         ),
       ),
@@ -261,7 +253,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// 학습 시작하기 버튼
-  Widget _buildStartButton() {
+  Widget _buildStartButton(BuildContext context) {
     return Container(
       width: double.infinity,
       height: 60,
@@ -279,7 +271,10 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          // 학습 화면으로 이동
+          Navigator.pushNamed(context, '/lessons');
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -416,62 +411,4 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 하단 네비게이션 바
-  Widget _buildBottomNav() {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(Icons.school_outlined, '학습', false),
-          _buildNavItem(Icons.star_border, '오답', false),
-          _buildNavItem(Icons.home, 'Home', true),
-          _buildNavItem(Icons.person_outline, '프로필', false),
-          _buildNavItem(Icons.history, '학습이력', false),
-        ],
-      ),
-    );
-  }
-
-  /// 네비게이션 아이템
-  Widget _buildNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isActive
-                ? AppColors.mathButtonBlue
-                : Colors.transparent,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: isActive ? Colors.white : Colors.grey,
-            size: 24,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: isActive ? AppColors.mathButtonBlue : Colors.grey,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
-  }
 }
