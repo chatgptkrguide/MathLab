@@ -3,6 +3,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../shared/widgets/fade_in_widget.dart';
 import '../../data/models/models.dart';
 import '../../data/services/mock_data_service.dart';
 
@@ -85,12 +86,27 @@ class _ErrorsScreenState extends State<ErrorsScreen>
                   ),
                   child: Column(
                     children: [
-                      _buildHeader(),
-                      _buildStatsGrid(),
-                      _buildActionButtons(),
-                      _buildFilterTabs(),
+                      FadeInWidget(
+                        delay: const Duration(milliseconds: 100),
+                        child: _buildHeader(),
+                      ),
+                      FadeInWidget(
+                        delay: const Duration(milliseconds: 200),
+                        child: _buildStatsGrid(),
+                      ),
+                      FadeInWidget(
+                        delay: const Duration(milliseconds: 300),
+                        child: _buildActionButtons(),
+                      ),
+                      FadeInWidget(
+                        delay: const Duration(milliseconds: 400),
+                        child: _buildFilterTabs(),
+                      ),
                       Expanded(child: _buildErrorNotesList()),
-                      _buildTips(),
+                      FadeInWidget(
+                        delay: const Duration(milliseconds: 500),
+                        child: _buildTips(),
+                      ),
                     ],
                   ),
                 ),
@@ -364,7 +380,10 @@ class _ErrorsScreenState extends State<ErrorsScreen>
       itemCount: filteredNotes.length,
       itemBuilder: (context, index) {
         final errorNote = filteredNotes[index];
-        return _buildErrorNoteCard(errorNote);
+        return FadeInWidget(
+          delay: Duration(milliseconds: 100 + (index * 50)),
+          child: _buildErrorNoteCard(errorNote),
+        );
       },
     );
   }

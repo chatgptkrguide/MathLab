@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/widgets/fade_in_widget.dart';
 import '../../data/providers/user_provider.dart';
 
 /// Figma Screen 05: ProfileScreen (프로필)
@@ -61,7 +62,9 @@ class ProfileScreen extends ConsumerWidget {
       child: Column(
         children: [
           // 프로필 사진
-          Stack(
+          FadeInWidget(
+            delay: const Duration(milliseconds: 100),
+            child: Stack(
             children: [
               Container(
                 width: 140,
@@ -120,28 +123,37 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
+          ),
           const SizedBox(height: 20),
           // 이름
-          const Text(
-            'Natalya Undergrowth',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          FadeInWidget(
+            delay: const Duration(milliseconds: 200),
+            child: const Text(
+              'Natalya Undergrowth',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(height: 8),
           // 가입일
-          Text(
-            'Joined since 17 April 2021',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.8),
+          FadeInWidget(
+            delay: const Duration(milliseconds: 250),
+            child: Text(
+              'Joined since 17 April 2021',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white.withValues(alpha: 0.8),
+              ),
             ),
           ),
           const SizedBox(height: 30),
           // 통계 (Followers, Lifetime XP, Following)
-          Row(
+          FadeInWidget(
+            delay: const Duration(milliseconds: 300),
+            child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildTopStat('1,820', 'Followers'),
@@ -159,9 +171,12 @@ class ProfileScreen extends ConsumerWidget {
               _buildTopStat('284', 'Following'),
             ],
           ),
+          ),
           const SizedBox(height: 30),
           // 버튼들
-          Row(
+          FadeInWidget(
+            delay: const Duration(milliseconds: 400),
+            child: Row(
             children: [
               Expanded(
                 child: OutlinedButton(
@@ -207,6 +222,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
+          ),
           const SizedBox(height: 20),
         ],
       ),
@@ -244,17 +260,22 @@ class ProfileScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Your Statistics',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+        FadeInWidget(
+          delay: const Duration(milliseconds: 100),
+          child: const Text(
+            'Your Statistics',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
         ),
         const SizedBox(height: 20),
         // 통계 카드들 (2x3 그리드)
-        GridView.count(
+        FadeInWidget(
+          delay: const Duration(milliseconds: 200),
+          child: GridView.count(
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
@@ -269,6 +290,7 @@ class ProfileScreen extends ConsumerWidget {
             _buildStatCard('Correct Practices', '1,239'),
             _buildStatCard('Top 3 Position', '43'),
           ],
+        ),
         ),
       ],
     );

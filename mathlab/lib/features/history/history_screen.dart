@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/widgets/fade_in_widget.dart';
 import '../../data/providers/user_provider.dart';
 
 /// Figma Screen 03: HistoryScreen (학습 이력)
@@ -125,9 +126,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildChallengeSection(),
+          FadeInWidget(
+            delay: const Duration(milliseconds: 100),
+            child: _buildChallengeSection(),
+          ),
           const SizedBox(height: 40),
-          _buildCalendarSection(),
+          FadeInWidget(
+            delay: const Duration(milliseconds: 300),
+            child: _buildCalendarSection(),
+          ),
         ],
       ),
     );
