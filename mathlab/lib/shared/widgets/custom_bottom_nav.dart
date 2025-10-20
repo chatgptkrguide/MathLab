@@ -149,8 +149,8 @@ class CustomBottomNavigation extends StatelessWidget {
           child: Container(
             constraints: const BoxConstraints(minHeight: 48, minWidth: 48), // 접근성을 위한 최소 터치 영역
           padding: const EdgeInsets.symmetric(
-            horizontal: 4.0, // 패딩 줄임
-            vertical: 8.0,   // 패딩 줄임
+            horizontal: 2.0, // 모바일을 위해 더 줄임
+            vertical: 6.0,   // 모바일을 위해 더 줄임
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -158,7 +158,7 @@ class CustomBottomNavigation extends StatelessWidget {
             children: [
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.all(6.0), // 패딩 줄임
+                  padding: const EdgeInsets.all(4.0), // 모바일을 위해 더 줄임
                   decoration: isSelected
                       ? BoxDecoration(
                           color: AppColors.mathButtonBlue.withValues(alpha: 0.1),
@@ -172,14 +172,14 @@ class CustomBottomNavigation extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 2), // 간격 줄임
+              const SizedBox(height: 1), // 간격 더 줄임
               Flexible(
                 child: Text(
                   label,
                   style: AppTextStyles.labelSmall.copyWith(
                     color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 10, // 폰트 크기 줄임
+                    fontSize: 9, // 모바일을 위해 더 줄임
                   ),
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,

@@ -14,6 +14,7 @@ class LoginScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     return Scaffold(
       body: Container(
@@ -29,28 +30,28 @@ class LoginScreen extends ConsumerWidget {
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 32),
               child: Column(
                 children: [
-                  const SizedBox(height: 60),
+                  SizedBox(height: isMobile ? 40 : 60),
 
                   // GoMATH 로고
                   FadeInWidget(
                     delay: const Duration(milliseconds: 100),
-                    child: _buildLogo(),
+                    child: _buildLogo(isMobile),
                   ),
 
-                  const SizedBox(height: 80),
+                  SizedBox(height: isMobile ? 40 : 80),
 
                   // 환영 메시지
                   FadeInWidget(
                     delay: const Duration(milliseconds: 200),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           '수학 학습의 새로운 시작',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: isMobile ? 20 : 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -60,7 +61,7 @@ class LoginScreen extends ConsumerWidget {
                         Text(
                           '간편하게 로그인하고\n재미있는 수학 학습을 시작하세요',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: isMobile ? 14 : 16,
                             color: Colors.white.withValues(alpha: 0.9),
                             height: 1.5,
                           ),
@@ -70,7 +71,7 @@ class LoginScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 80),
+                  SizedBox(height: isMobile ? 40 : 80),
 
                   // 구글 로그인 버튼
                   FadeInWidget(
@@ -86,7 +87,7 @@ class LoginScreen extends ConsumerWidget {
                     child: _buildKakaoLoginButton(context, ref),
                   ),
 
-                  const SizedBox(height: 40),
+                  SizedBox(height: isMobile ? 24 : 40),
 
                   // 이용약관 및 개인정보처리방침
                   FadeInWidget(
@@ -94,7 +95,7 @@ class LoginScreen extends ConsumerWidget {
                     child: _buildTermsText(),
                   ),
 
-                  const SizedBox(height: 40),
+                  SizedBox(height: isMobile ? 24 : 40),
                 ],
               ),
             ),
@@ -105,46 +106,47 @@ class LoginScreen extends ConsumerWidget {
   }
 
   /// GoMATH 로고
-  Widget _buildLogo() {
+  Widget _buildLogo(bool isMobile) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(isMobile ? 20 : 24),
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 30,
-            offset: const Offset(0, 10),
+            blurRadius: isMobile ? 20 : 30,
+            offset: Offset(0, isMobile ? 6 : 10),
           ),
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // 로고 이모지
-          const Text(
+          Text(
             '🎓',
-            style: TextStyle(fontSize: 60),
+            style: TextStyle(fontSize: isMobile ? 48 : 60),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: isMobile ? 8 : 12),
           // GoMATH 텍스트
           RichText(
-            text: const TextSpan(
+            text: TextSpan(
               children: [
                 TextSpan(
                   text: 'Go',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: isMobile ? 24 : 32,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF61A1D8),
+                    color: const Color(0xFF61A1D8),
                   ),
                 ),
                 TextSpan(
                   text: 'MATH',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: isMobile ? 24 : 32,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF3B5BFF),
+                    color: const Color(0xFF3B5BFF),
                   ),
                 ),
               ],

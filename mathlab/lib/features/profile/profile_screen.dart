@@ -43,7 +43,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(20),
                     child: _buildStatisticsSection(),
                   ),
                 ),
@@ -58,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
   /// 프로필 섹션 (파란 배경 영역)
   Widget _buildProfileSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         children: [
           // 프로필 사진
@@ -67,20 +67,20 @@ class ProfileScreen extends ConsumerWidget {
             child: Stack(
             children: [
               Container(
-                width: 140,
-                height: 140,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
-                    width: 4,
+                    width: 3,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -91,7 +91,7 @@ class ProfileScreen extends ConsumerWidget {
                       child: Text(
                         'N',
                         style: TextStyle(
-                          fontSize: 60,
+                          fontSize: 44,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -104,19 +104,19 @@ class ProfileScreen extends ConsumerWidget {
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: AppColors.mathButtonBlue,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Colors.white,
-                      width: 3,
+                      width: 2,
                     ),
                   ),
                   child: const Icon(
                     Icons.edit,
-                    size: 20,
+                    size: 16,
                     color: Colors.white,
                   ),
                 ),
@@ -124,32 +124,35 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           // 이름
           FadeInWidget(
             delay: const Duration(milliseconds: 200),
             child: const Text(
               'Natalya Undergrowth',
               style: TextStyle(
-                fontSize: 26,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           // 가입일
           FadeInWidget(
             delay: const Duration(milliseconds: 250),
             child: Text(
               'Joined since 17 April 2021',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           // 통계 (Followers, Lifetime XP, Following)
           FadeInWidget(
             delay: const Duration(milliseconds: 300),
@@ -159,20 +162,20 @@ class ProfileScreen extends ConsumerWidget {
               _buildTopStat('1,820', 'Followers'),
               Container(
                 width: 1,
-                height: 40,
+                height: 32,
                 color: Colors.white.withValues(alpha: 0.3),
               ),
               _buildTopStat('12,695', 'Lifetime XP'),
               Container(
                 width: 1,
-                height: 40,
+                height: 32,
                 color: Colors.white.withValues(alpha: 0.3),
               ),
               _buildTopStat('284', 'Following'),
             ],
           ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           // 버튼들
           FadeInWidget(
             delay: const Duration(milliseconds: 400),
@@ -184,36 +187,36 @@ class ProfileScreen extends ConsumerWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white, width: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
                     'EDIT PROFILE',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: Text(
                     'MESSAGE',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: AppColors.mathButtonBlue,
                     ),
@@ -223,7 +226,7 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -237,18 +240,21 @@ class ProfileScreen extends ConsumerWidget {
           Text(
             value,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               color: Colors.white.withValues(alpha: 0.8),
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -265,20 +271,20 @@ class ProfileScreen extends ConsumerWidget {
           child: const Text(
             'Your Statistics',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         // 통계 카드들 (2x3 그리드)
         FadeInWidget(
           delay: const Duration(milliseconds: 200),
           child: GridView.count(
           crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           childAspectRatio: 1.3,
@@ -299,14 +305,14 @@ class ProfileScreen extends ConsumerWidget {
   /// 통계 카드
   Widget _buildStatCard(String label, String value) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -317,16 +323,18 @@ class ProfileScreen extends ConsumerWidget {
           Text(
             label,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               color: Colors.black54,
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),

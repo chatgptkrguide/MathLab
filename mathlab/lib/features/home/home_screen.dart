@@ -135,15 +135,15 @@ class HomeScreen extends ConsumerWidget {
   /// 중앙 UFO 일러스트 + 진행 점들
   Widget _buildCenterIllustration() {
     return SizedBox(
-      width: 280,
-      height: 280,
+      width: 240,
+      height: 240,
       child: Stack(
         alignment: Alignment.center,
         children: [
           // 진행 점들 (원형 배치)
           ...List.generate(12, (index) {
             final angle = (index * 30) * 3.14159 / 180;
-            final radius = 130.0;
+            final radius = 110.0;
             final x = radius * math.cos(angle);
             final y = radius * math.sin(angle);
             final isActive = index < 6; // 6개 활성화
@@ -151,8 +151,8 @@ class HomeScreen extends ConsumerWidget {
             return Transform.translate(
               offset: Offset(x, y),
               child: Container(
-                width: 12,
-                height: 12,
+                width: 10,
+                height: 10,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isActive
@@ -164,8 +164,8 @@ class HomeScreen extends ConsumerWidget {
           }),
           // UFO 일러스트 (원형)
           Container(
-            width: 200,
-            height: 200,
+            width: 170,
+            height: 170,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white.withValues(alpha: 0.15),
@@ -179,8 +179,8 @@ class HomeScreen extends ConsumerWidget {
             ),
             child: Center(
               child: Container(
-                width: 150,
-                height: 150,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
@@ -195,7 +195,7 @@ class HomeScreen extends ConsumerWidget {
                 child: const Center(
                   child: Text(
                     '🛸',
-                    style: TextStyle(fontSize: 80),
+                    style: TextStyle(fontSize: 64),
                   ),
                 ),
               ),
@@ -280,7 +280,7 @@ class HomeScreen extends ConsumerWidget {
       },
       child: Container(
         width: double.infinity,
-        height: 60,
+        height: 56,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF3B5BFF), Color(0xFF2A45CC)],
@@ -333,7 +333,7 @@ class HomeScreen extends ConsumerWidget {
   /// 개별 통계 카드
   Widget _buildStatCard(String emoji, String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -349,24 +349,28 @@ class HomeScreen extends ConsumerWidget {
         children: [
           Text(
             emoji,
-            style: const TextStyle(fontSize: 32),
+            style: const TextStyle(fontSize: 28),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: Colors.black54,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

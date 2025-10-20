@@ -91,21 +91,21 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   /// 헤더
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
             '리더보드',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           // 정보 버튼
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Colors.white, size: 28),
+            icon: const Icon(Icons.info_outline, color: Colors.white, size: 24),
             onPressed: _showLeagueInfo,
           ),
         ],
@@ -116,18 +116,18 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   /// 리그 정보 카드
   Widget _buildLeagueCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF3B5BFF), Color(0xFF2A45CC)],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF3B5BFF).withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -138,8 +138,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
@@ -147,86 +147,101 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 child: const Center(
                   child: Text(
                     '🏆',
-                    style: TextStyle(fontSize: 32),
+                    style: TextStyle(fontSize: 26),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Silver League',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+              const SizedBox(width: 12),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Silver League',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Text(
-                    '상위 10명 승격',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.8),
+                    Text(
+                      '상위 10명 승격',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.8),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           // 나의 순위와 XP
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '15',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF3B5BFF),
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '15',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF3B5BFF),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '나의 순위',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                          ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '나의 순위',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'MathDesigner',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                        Text(
-                          'MathDesigner',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -234,14 +249,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     Text(
                       '이번 주',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 10,
                         color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                     const Text(
                       '549 XP',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -259,10 +274,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   /// 탭바
   Widget _buildTabs() {
     return Container(
-      margin: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: TabBar(
         controller: _tabController,
@@ -270,25 +285,25 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         labelColor: AppColors.mathBlue,
         unselectedLabelColor: Colors.black54,
         labelStyle: const TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelStyle: const TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.normal,
         ),
         indicator: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        indicatorPadding: const EdgeInsets.all(4),
+        indicatorPadding: const EdgeInsets.all(3),
         onTap: (_) => setState(() {}),
       ),
     );
@@ -309,7 +324,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     );
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: leaderboard.length,
       itemBuilder: (context, index) {
         final user = leaderboard[index];
@@ -328,13 +343,13 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     final isTopThree = rank <= 3;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isCurrentUser
             ? AppColors.mathBlue.withValues(alpha: 0.1)
             : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isCurrentUser
               ? AppColors.mathBlue
@@ -345,7 +360,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           if (isTopThree)
             BoxShadow(
               color: _getRankColor(rank).withValues(alpha: 0.2),
-              blurRadius: 8,
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
         ],
@@ -354,8 +369,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         children: [
           // 순위
           Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               color: isTopThree ? _getRankColor(rank) : Colors.grey[300],
               shape: BoxShape.circle,
@@ -364,25 +379,25 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               child: isTopThree
                   ? Text(
                       _getRankEmoji(rank),
-                      style: const TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 16),
                     )
                   : Text(
                       '$rank',
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           // 아바타
           Text(
             user['avatar'] as String,
-            style: const TextStyle(fontSize: 32),
+            style: const TextStyle(fontSize: 24),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           // 이름
           Expanded(
             child: Column(
@@ -391,17 +406,19 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 Text(
                   user['name'] as String,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight:
                         isCurrentUser ? FontWeight.bold : FontWeight.w600,
                     color: Colors.black87,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (isCurrentUser)
                   Text(
                     '나',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: AppColors.mathBlue,
                     ),
                   ),
@@ -415,7 +432,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               Text(
                 '${user['xp']} XP',
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
@@ -424,7 +441,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 Text(
                   '승격',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: _getRankColor(rank),
                     fontWeight: FontWeight.bold,
                   ),

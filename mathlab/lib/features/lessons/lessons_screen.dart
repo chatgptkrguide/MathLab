@@ -138,7 +138,7 @@ class LessonsScreen extends ConsumerWidget {
   Widget _buildUserStatsBar(user) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
@@ -148,52 +148,59 @@ class LessonsScreen extends ConsumerWidget {
         children: [
           // 현재 학습 중인 단원
           Flexible(
+            flex: 2,
             child: Text(
               user?.currentGrade ?? '중1 수학',
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
               overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
+          const SizedBox(width: 8),
           // 통계
-          Row(
-            children: [
-              const Text('🔥', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.streak ?? 6}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          Flexible(
+            flex: 3,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🔥', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 2),
+                Text(
+                  '${user?.streak ?? 6}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              const Text('🔶', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.xp ?? 549}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                const SizedBox(width: 8),
+                const Text('🔶', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 2),
+                Text(
+                  '${user?.xp ?? 549}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              const Text('⭐', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.level ?? 1}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                const SizedBox(width: 8),
+                const Text('⭐', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 2),
+                Text(
+                  '${user?.level ?? 1}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -282,7 +289,7 @@ class LessonsScreen extends ConsumerWidget {
   Widget _buildStartCard() {
     return Container(
       width: double.infinity,
-      height: 140,
+      height: 120,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -306,7 +313,7 @@ class LessonsScreen extends ConsumerWidget {
           },
           borderRadius: BorderRadius.circular(20),
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 // 좌측: 아이콘과 텍스트
@@ -317,22 +324,22 @@ class LessonsScreen extends ConsumerWidget {
                     children: [
                       const Text(
                         '📚',
-                        style: TextStyle(fontSize: 40),
+                        style: TextStyle(fontSize: 32),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       const Text(
                         'START!',
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         '학습 시작하기',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),

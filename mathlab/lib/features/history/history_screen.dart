@@ -61,58 +61,66 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   /// 사용자 정보 바
   Widget _buildUserStatsBar(user) {
     return Container(
-      margin: const EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 0),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            '소인수분해',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+          Flexible(
+            child: Text(
+              '소인수분해',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          Row(
-            children: [
-              const Text('🔥', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.streak ?? 6}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          const SizedBox(width: 8),
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🔥', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 2),
+                Text(
+                  '${user?.streak ?? 6}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              const Text('🔶', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.xp ?? 549}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                const SizedBox(width: 8),
+                const Text('🔶', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 2),
+                Text(
+                  '${user?.xp ?? 549}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              const Text('⭐', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.level ?? 1}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                const SizedBox(width: 8),
+                const Text('⭐', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 2),
+                Text(
+                  '${user?.level ?? 1}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -122,7 +130,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   /// 메인 컨텐츠 (챌린지 + 캘린더)
   Widget _buildContent() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -130,7 +138,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             delay: const Duration(milliseconds: 100),
             child: _buildChallengeSection(),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
           FadeInWidget(
             delay: const Duration(milliseconds: 300),
             child: _buildCalendarSection(),
@@ -148,36 +156,41 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Challenges (Day)',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Flexible(
+              child: Text(
+                'Challenges (Day)',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               '6/12',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.mathBlue,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         // 진행률 바
         ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           child: LinearProgressIndicator(
             value: 6 / 12,
-            minHeight: 12,
+            minHeight: 10,
             backgroundColor: Colors.grey[200],
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.mathBlue),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
@@ -187,7 +200,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 value: '6 Days',
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: _buildChallengeCard(
                 icon: '📅',
@@ -207,34 +220,37 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     required String value,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 40)),
-          const SizedBox(height: 8),
+          Text(icon, style: const TextStyle(fontSize: 32)),
+          const SizedBox(height: 6),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: Colors.black54,
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -252,12 +268,16 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'December 2022',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Flexible(
+              child: Text(
+                'December 2022',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             TextButton(
@@ -265,7 +285,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               child: Text(
                 'VIEW',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: AppColors.mathBlue,
                 ),
@@ -273,7 +293,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _buildCalendar(),
       ],
     );
@@ -281,15 +301,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Widget _buildCalendar() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           _buildCalendarHeader(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _buildCalendarGrid(),
         ],
       ),
@@ -301,12 +321,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
           .map((day) => SizedBox(
-                width: 40,
+                width: 32,
                 child: Text(
                   day,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: Colors.black54,
                     fontWeight: FontWeight.w600,
                   ),
@@ -334,19 +354,19 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Widget _buildWeekRow(List<int?> days, List<int> completedDays) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: days.map((day) {
           if (day == null) {
-            return const SizedBox(width: 40, height: 40);
+            return const SizedBox(width: 32, height: 32);
           }
 
           final isCompleted = completedDays.contains(day);
 
           return Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               color: isCompleted ? AppColors.mathBlue : Colors.transparent,
               shape: BoxShape.circle,
@@ -355,7 +375,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               child: Text(
                 '$day',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   color: isCompleted ? Colors.white : Colors.black87,
                   fontWeight: isCompleted ? FontWeight.bold : FontWeight.normal,
                 ),
