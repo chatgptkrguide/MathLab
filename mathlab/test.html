@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#6C63FF">
+  <title>MathLab 테스트</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #6C63FF, #5A52E5);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .container {
+      max-width: 400px;
+      padding: 40px 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    .status {
+      font-size: 20px;
+      font-weight: 600;
+      color: #4CAF50;
+      margin-bottom: 20px;
+    }
+    .info {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 20px;
+    }
+    .btn {
+      background: white;
+      color: #6C63FF;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px;
+      transition: transform 0.2s;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧮 MathLab</h1>
+    <div class="status">✅ 서버 연결 성공!</div>
+    <p>게이미피케이션 수학 학습 앱</p>
+    <button class="btn" onclick="loadApp()">앱 실행</button>
+    <button class="btn" onclick="showInfo()">정보</button>
+    <div class="info" id="info">
+      모바일 브라우저에서 정상 작동 중
+    </div>
+  </div>
+
+  <script>
+    function loadApp() {
+      document.getElementById('info').innerHTML = '앱을 로딩 중입니다...<br>잠시만 기다려주세요.';
+      setTimeout(() => {
+        window.location.href = './index.html';
+      }, 1000);
+    }
+
+    function showInfo() {
+      const info = document.getElementById('info');
+      info.innerHTML = `
+        <strong>접속 정보:</strong><br>
+        시간: ${new Date().toLocaleString()}<br>
+        화면 크기: ${window.innerWidth}x${window.innerHeight}<br>
+        사용자 에이전트: ${navigator.userAgent.includes('Mobile') ? '모바일' : '데스크톱'}
+      `;
+    }
+
+    // 페이지 로드 시 정보 표시
+    window.onload = function() {
+      showInfo();
+    };
+  </script>
+</body>
+</html>
