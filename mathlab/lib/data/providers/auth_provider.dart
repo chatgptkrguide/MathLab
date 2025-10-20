@@ -143,6 +143,68 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// 구글 OAuth 로그인
+  Future<bool> signInWithGoogle() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      // TODO: Firebase Google Auth 구현
+      // 임시 구현: 구글 계정 생성 또는 로그인
+      final email = 'google_user@gmail.com'; // 실제로는 Firebase에서 가져옴
+      final displayName = 'Google User'; // 실제로는 Firebase에서 가져옴
+
+      final existingAccounts = await _loadAccounts();
+      final existingAccount = existingAccounts.where((acc) => acc.email == email).firstOrNull;
+
+      if (existingAccount != null) {
+        // 기존 계정으로 로그인
+        return await signIn(email);
+      } else {
+        // 새 계정 생성 후 로그인
+        return await signUp(
+          email: email,
+          displayName: displayName,
+          grade: '중1',
+          accountType: AccountType.student,
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: '구글 로그인에 실패했습니다: $e');
+      return false;
+    }
+  }
+
+  /// 카카오 OAuth 로그인
+  Future<bool> signInWithKakao() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      // TODO: Kakao SDK Auth 구현
+      // 임시 구현: 카카오 계정 생성 또는 로그인
+      final email = 'kakao_user@kakao.com'; // 실제로는 Kakao SDK에서 가져옴
+      final displayName = 'Kakao User'; // 실제로는 Kakao SDK에서 가져옴
+
+      final existingAccounts = await _loadAccounts();
+      final existingAccount = existingAccounts.where((acc) => acc.email == email).firstOrNull;
+
+      if (existingAccount != null) {
+        // 기존 계정으로 로그인
+        return await signIn(email);
+      } else {
+        // 새 계정 생성 후 로그인
+        return await signUp(
+          email: email,
+          displayName: displayName,
+          grade: '중1',
+          accountType: AccountType.student,
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: '카카오 로그인에 실패했습니다: $e');
+      return false;
+    }
+  }
+
   /// 계정 전환
   Future<void> switchAccount(String accountId) async {
     final accounts = state.availableAccounts;

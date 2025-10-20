@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import '../shared/widgets/custom_bottom_nav.dart';
 import '../features/home/home_screen.dart';
 import '../features/lessons/lessons_screen.dart';
-import '../features/errors/errors_screen.dart';
+import '../features/leaderboard/leaderboard_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/profile/profile_screen.dart';
 
@@ -22,7 +22,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const LessonsScreen(),
-    const ErrorsScreen(),
+    const LeaderboardScreen(),
     const HistoryScreen(),
     const ProfileScreen(),
   ];

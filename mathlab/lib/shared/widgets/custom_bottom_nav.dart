@@ -54,8 +54,8 @@ class CustomBottomNavigation extends StatelessWidget {
           ),
           _buildNavItem(
             index: 2,
-            icon: Icons.error_outline,
-            label: '오답',
+            icon: Icons.leaderboard,
+            label: '랭킹',
           ),
           // 홈을 중앙에 특별 배치
           _buildNavItem(
@@ -201,8 +201,8 @@ class CustomBottomNavigation extends StatelessWidget {
         return Icons.home;
       case Icons.school:
         return Icons.school;
-      case Icons.error_outline:
-        return Icons.error;
+      case Icons.leaderboard:
+        return Icons.leaderboard;
       case Icons.history:
         return Icons.history;
       case Icons.person:

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../shared/themes/app_theme.dart';
+import '../data/providers/auth_provider.dart';
+import '../features/auth/login_screen.dart';
 import 'main_navigation.dart';
 
 /// MathLab 앱의 메인 위젯
-class MathLabApp extends StatelessWidget {
+class MathLabApp extends ConsumerWidget {
   const MathLabApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'MathLab',
       debugShowCheckedModeBanner: false,
@@ -33,8 +36,8 @@ class MathLabApp extends StatelessWidget {
         );
       },
 
-      // 메인 네비게이션으로 시작
-      home: const MainNavigation(),
+      // 인증 상태에 따라 화면 표시
+      home: const AuthWrapper(),
 
       // 라우팅 설정 (향후 확장용)
       routes: {
@@ -56,5 +59,31 @@ class MathLabApp extends StatelessWidget {
       // 스크롤 동작 설정
       scrollBehavior: const MaterialScrollBehavior(),
     );
+  }
+}
+
+/// 인증 상태에 따라 적절한 화면을 보여주는 래퍼 위젯
+class AuthWrapper extends ConsumerWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
+    // 로딩 중일 때는 스플래시 화면 표시
+    if (authState.isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // 인증 상태에 따라 적절한 화면 반환
+    if (authState.isAuthenticated) {
+      return const MainNavigation();
+    } else {
+      return const LoginScreen();
+    }
   }
 }
