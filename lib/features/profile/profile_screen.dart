@@ -4,6 +4,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
+import '../../shared/widgets/fade_in_widget.dart';
 import '../../data/providers/user_provider.dart';
 
 /// 프로필/계정 화면 (Figma 디자인 05)
@@ -98,10 +99,12 @@ class ProfileScreen extends ConsumerWidget {
 
   /// 프로필 섹션 (파란 배경 영역)
   Widget _buildProfileSection(user) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXL),
-      child: Column(
-        children: [
+    return FadeInWidget(
+      duration: const Duration(milliseconds: 600),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXL),
+        child: Column(
+          children: [
           // 프로필 사진
           Stack(
             children: [
@@ -232,6 +235,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: AppDimensions.spacingXL),
         ],
       ),
+    ),
     );
   }
 
@@ -261,9 +265,12 @@ class ProfileScreen extends ConsumerWidget {
 
   /// 통계 섹션 (흰색 배경 영역)
   Widget _buildStatisticsSection(user) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return FadeInWidget(
+      duration: const Duration(milliseconds: 600),
+      delay: const Duration(milliseconds: 200),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         Text(
           'Your Statistics',
           style: AppTextStyles.headlineSmall.copyWith(
@@ -289,6 +296,7 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
       ],
+    ),
     );
   }
 
