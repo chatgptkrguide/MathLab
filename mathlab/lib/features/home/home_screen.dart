@@ -5,6 +5,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../data/providers/user_provider.dart';
+import '../../shared/widgets/fade_in_widget.dart';
 
 /// Figma Screen 02: HomeScreen (메인 화면)
 /// 정확한 Figma 디자인 구현
@@ -37,22 +38,40 @@ class HomeScreen extends ConsumerWidget {
                 children: [
                   const SizedBox(height: 40),
                   // 헤더: "안녕하세요!" + 스트릭
-                  _buildHeader(user),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 100),
+                    child: _buildHeader(user),
+                  ),
                   const SizedBox(height: 40),
                   // 중앙 UFO 일러스트 + 진행 원
-                  _buildCenterIllustration(),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 200),
+                    child: _buildCenterIllustration(),
+                  ),
                   const SizedBox(height: 40),
                   // 오늘의 목표 카드
-                  _buildDailyGoalCard(),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 300),
+                    child: _buildDailyGoalCard(),
+                  ),
                   const SizedBox(height: 24),
                   // 학습 시작하기 버튼
-                  _buildStartButton(context),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 400),
+                    child: _buildStartButton(context),
+                  ),
                   const SizedBox(height: 24),
                   // 통계 카드 3개
-                  _buildStatsCards(user),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 500),
+                    child: _buildStatsCards(user),
+                  ),
                   const SizedBox(height: 40),
                   // GoMATH 로고
-                  _buildLogo(),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 600),
+                    child: _buildLogo(),
+                  ),
                   const SizedBox(height: 100), // 하단 네비게이션 바 공간 확보
                 ],
               ),
@@ -254,33 +273,26 @@ class HomeScreen extends ConsumerWidget {
 
   /// 학습 시작하기 버튼
   Widget _buildStartButton(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 60,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF3B5BFF), Color(0xFF2A45CC)],
-        ),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3B5BFF).withValues(alpha: 0.4),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
+    return _AnimatedButton(
+      onPressed: () {
+        // 학습 화면으로 이동
+        Navigator.pushNamed(context, '/lessons');
+      },
+      child: Container(
+        width: double.infinity,
+        height: 60,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF3B5BFF), Color(0xFF2A45CC)],
           ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: () {
-          // 학습 화면으로 이동
-          Navigator.pushNamed(context, '/lessons');
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF3B5BFF).withValues(alpha: 0.4),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -411,4 +423,68 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+}
+
+/// 애니메이션 버튼 위젯 (스케일 효과)
+class _AnimatedButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final Widget child;
+
+  const _AnimatedButton({
+    required this.onPressed,
+    required this.child,
+  });
+
+  @override
+  State<_AnimatedButton> createState() => _AnimatedButtonState();
+}
+
+class _AnimatedButtonState extends State<_AnimatedButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onPressed();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: widget.child,
+      ),
+    );
+  }
 }
