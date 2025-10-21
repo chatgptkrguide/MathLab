@@ -103,7 +103,8 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                         _buildActionButtons(filteredNotes),
                         _buildFilterTabs(),
                         Expanded(child: _buildErrorNotesList(userErrorNotes, filteredNotes)),
-                        _buildTips(),
+                        if (filteredNotes.isEmpty)
+                          Flexible(child: _buildTips()),
                       ],
                     ),
                   ),
