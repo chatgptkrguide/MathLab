@@ -1,20 +1,23 @@
-// 모든 공통 위젯들을 한번에 export하는 barrel 파일
-export 'stat_card.dart';
-export 'progress_card.dart';
-export 'primary_button.dart';
-export 'empty_state.dart';
-export 'lesson_card.dart';
-export 'grade_tab_bar.dart';
-export 'achievement_card.dart';
-export 'responsive_wrapper.dart';
-export 'custom_bottom_nav.dart';
-export 'special_progress_card.dart';
-export 'duolingo_button.dart';
-export 'duolingo_card.dart';
-export 'duolingo_circular_progress.dart';
-export 'short_answer_input.dart';
-export 'animated_button.dart';
-export 'xp_animation.dart';
-export 'loading_widgets.dart';
-export 'fade_in_widget.dart';
-export 'badge_unlock_dialog.dart';
+/// 모든 공통 위젯들을 한번에 export하는 barrel 파일
+/// 카테고리별로 정리되어 관리가 용이합니다
+
+// 버튼 위젯
+export 'buttons/buttons.dart';
+
+// 카드 위젯
+export 'cards/cards.dart';
+
+// 다이얼로그 위젯
+export 'dialogs/dialogs.dart';
+
+// 진행/상태 표시 위젯
+export 'indicators/indicators.dart';
+
+// 애니메이션 위젯
+export 'animations/animations.dart';
+
+// 레이아웃 위젯
+export 'layout/layout.dart';
+
+// 입력 위젯
+export 'inputs/inputs.dart';
