@@ -333,6 +333,8 @@ class LessonsScreen extends ConsumerWidget {
             color: AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 3,
         ),
         actions: [
           TextButton(
@@ -376,6 +378,8 @@ class LessonsScreen extends ConsumerWidget {
             color: AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 3,
         ),
         actions: [
           TextButton(

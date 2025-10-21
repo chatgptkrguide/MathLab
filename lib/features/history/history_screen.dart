@@ -104,6 +104,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
           _buildStatItem('🔥', streakDays.toString()),
@@ -240,6 +242,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppDimensions.spacingXS),
           Text(
@@ -247,6 +252,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             style: AppTextStyles.headlineSmall.copyWith(
               fontWeight: FontWeight.bold,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
           ),
         ],
       ),

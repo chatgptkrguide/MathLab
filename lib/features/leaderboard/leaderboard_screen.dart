@@ -327,48 +327,53 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                   ],
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      entry.grade,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                Flexible(
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          entry.grade,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '•',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                      const SizedBox(width: 8),
+                      Text(
+                        '•',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Lv.${entry.level}',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                      const SizedBox(width: 8),
+                      Text(
+                        'Lv.${entry.level}',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '•',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                      const SizedBox(width: 8),
+                      Text(
+                        '•',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '🔥',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${entry.streakDays}일',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                      const SizedBox(width: 8),
+                      Text(
+                        '🔥',
+                        style: const TextStyle(fontSize: 12),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        '${entry.streakDays}일',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
