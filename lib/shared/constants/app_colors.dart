@@ -28,6 +28,7 @@ class AppColors {
   static const Color secondaryBlue = Color(0xFFE3F2FD);
   static const Color accentCyan = duolingoBlue;
   static const Color warningOrange = duolingoOrange;
+  static const Color warningYellow = mathYellow;
   static const Color successGreen = duolingoGreen;
   static const Color errorRed = duolingoRed;
   static const Color purpleAccent = duolingoPurple;

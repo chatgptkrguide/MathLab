@@ -4,46 +4,91 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
+import '../../shared/widgets/fade_in_widget.dart';
+import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/providers/problem_provider.dart';
+import '../../data/providers/error_note_provider.dart';
+import '../../data/providers/achievement_provider.dart';
+import 'widgets/problem_option_button.dart';
+import 'widgets/problem_result_dialog.dart';
+import 'widgets/xp_gain_animation.dart';
 
-/// 문제 풀이 화면 (Figma 디자인 04)
-/// 타일/워드뱅크 방식의 문제 풀이 인터페이스
+/// 문제 풀이 화면
+/// 실제 Problem 데이터 기반, 경험치/뱃지 시스템 통합
 class ProblemScreen extends ConsumerStatefulWidget {
-  final String? lessonId;
-  final List<dynamic>? problems;
+  final String lessonId;
+  final List<Problem> problems;
 
   const ProblemScreen({
     super.key,
-    this.lessonId,
-    this.problems,
+    required this.lessonId,
+    required this.problems,
   });
 
   @override
   ConsumerState<ProblemScreen> createState() => _ProblemScreenState();
 }
 
-class _ProblemScreenState extends ConsumerState<ProblemScreen> {
-  // 예시 데이터
-  final String _questionTitle = 'Solve the equation';
-  final String _problemText = '2x + 5 = 13';
+class _ProblemScreenState extends ConsumerState<ProblemScreen>
+    with SingleTickerProviderStateMixin {
+  // 현재 상태
+  int _currentProblemIndex = 0;
+  int? _selectedAnswerIndex;
+  bool _isAnswerSubmitted = false;
+  bool _isCorrect = false;
 
-  // 사용 가능한 타일
-  final List<String> _availableTiles = [
-    'x = 4',
-    'x = 8',
-    'x = 2',
-    'x = 6',
-    'x = 3',
-    'x = 5',
-    'x = 7',
-  ];
+  // 세션 통계
+  int _totalCorrect = 0;
+  int _totalXPEarned = 0;
+  final List<ProblemResult> _results = [];
 
-  // 선택된 타일들
-  final List<String> _selectedTiles = [];
+  // 애니메이션
+  late AnimationController _transitionController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
-  int _currentProgress = 3;
-  int _totalQuestions = 10;
-  int _xpPoints = 549;
+  @override
+  void initState() {
+    super.initState();
+    _setupAnimations();
+  }
+
+  void _setupAnimations() {
+    _transitionController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _transitionController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.3, 0),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _transitionController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _transitionController.forward();
+  }
+
+  @override
+  void dispose() {
+    _transitionController.dispose();
+    super.dispose();
+  }
+
+  Problem get _currentProblem => widget.problems[_currentProblemIndex];
+  double get _progress => (_currentProblemIndex + 1) / widget.problems.length;
+  bool get _isLastProblem => _currentProblemIndex == widget.problems.length - 1;
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +106,15 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
           child: ResponsiveWrapper(
             child: Column(
               children: [
-                _buildHeader(context),
+                _buildHeader(),
                 Expanded(
-                  child: _buildContent(),
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: _buildContent(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -73,69 +124,40 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
     );
   }
 
-  /// 헤더 (뒤로가기 + 제목 + 진행률 + XP)
-  Widget _buildHeader(BuildContext context) {
-    final progress = _currentProgress / _totalQuestions;
+  /// 헤더 (뒤로가기 + 진행률 + XP)
+  Widget _buildHeader() {
+    final user = ref.watch(userProvider);
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       child: Column(
         children: [
-          // 뒤로가기 + 제목
+          // 뒤로가기 + XP
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                onPressed: () => _showExitDialog(),
               ),
-              Text(
-                'Question',
-                style: AppTextStyles.headlineMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 48), // 대칭을 위한 공간
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacingM),
-          // 진행률 바 + XP
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 12,
-                    backgroundColor: Colors.white.withValues(alpha: 0.3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacingM),
-              // XP 표시
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: AppDimensions.paddingM,
+                  vertical: AppDimensions.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.mathOrange,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.hexagon,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 4),
                     Text(
-                      _xpPoints.toString(),
+                      '🔶',
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(width: AppDimensions.spacingS),
+                    Text(
+                      '${user?.xp ?? 0} XP',
                       style: AppTextStyles.titleMedium.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -146,12 +168,55 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
               ),
             ],
           ),
+          const SizedBox(height: AppDimensions.spacingM),
+          // 진행률 바
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '문제 ${_currentProblemIndex + 1}/${widget.problems.length}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '${(_progress * 100).round()}%',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimensions.spacingS),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                child: TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutCubic,
+                  tween: Tween(begin: 0.0, end: _progress),
+                  builder: (context, value, child) {
+                    return LinearProgressIndicator(
+                      value: value,
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
+                      valueColor: const AlwaysStoppedAnimation(Colors.white),
+                      minHeight: 8,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  /// 메인 컨텐츠
+  /// 메인 콘텐츠
   Widget _buildContent() {
     return Container(
       decoration: const BoxDecoration(
@@ -169,140 +234,69 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 제목
-                  Text(
-                    _questionTitle,
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  // 문제 + 오디오 아이콘
-                  _buildProblemCard(),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  // 선택된 타일 영역
-                  _buildAnswerArea(),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  // 사용 가능한 타일들
-                  _buildTileBank(),
+                  _buildCategoryBadge(),
+                  const SizedBox(height: AppDimensions.spacingL),
+                  _buildQuestionText(),
+                  const SizedBox(height: AppDimensions.spacingXXL),
+                  _buildOptions(),
+                  if (_isAnswerSubmitted) ...[
+                    const SizedBox(height: AppDimensions.spacingXL),
+                    _buildExplanation(),
+                  ],
                 ],
               ),
             ),
           ),
-          // 하단 버튼
           _buildBottomButton(),
         ],
       ),
     );
   }
 
-  /// 문제 카드 (오디오 아이콘 + 텍스트)
-  Widget _buildProblemCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.mathOrange.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-            ),
-            child: Icon(
-              Icons.volume_up,
-              color: AppColors.mathOrange,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Expanded(
-            child: Text(
-              _problemText,
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 답안 영역 (선택된 타일들이 들어가는 곳)
-  Widget _buildAnswerArea() {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 2,
-        ),
-      ),
-      child: _selectedTiles.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingL),
-                child: Text(
-                  'Select answer from below',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            )
-          : Wrap(
-              spacing: AppDimensions.spacingS,
-              runSpacing: AppDimensions.spacingS,
-              children: _selectedTiles.map((tile) {
-                return _buildSelectedTile(tile);
-              }).toList(),
-            ),
-    );
-  }
-
-  /// 선택된 타일
-  Widget _buildSelectedTile(String text) {
+  /// 카테고리 뱃지
+  Widget _buildCategoryBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingM,
-        vertical: AppDimensions.spacingS,
+        vertical: AppDimensions.paddingS,
       ),
       decoration: BoxDecoration(
-        color: AppColors.mathButtonBlue.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(
-          color: AppColors.mathButtonBlue,
-          width: 2,
+        gradient: const LinearGradient(
+          colors: AppColors.mathButtonGradient,
         ),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            text,
-            style: AppTextStyles.titleMedium.copyWith(
-              color: AppColors.mathButtonBlue,
-              fontWeight: FontWeight.w600,
+            _currentProblem.typeIcon,
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(width: AppDimensions.spacingS),
+          Text(
+            _currentProblem.category,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(width: AppDimensions.spacingS),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedTiles.remove(text);
-              });
-            },
-            child: Icon(
-              Icons.close,
-              size: 18,
-              color: AppColors.mathButtonBlue,
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '+${_currentProblem.xpReward} XP',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -310,53 +304,92 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
     );
   }
 
-  /// 타일 뱅크 (사용 가능한 타일들)
-  Widget _buildTileBank() {
-    return Wrap(
-      spacing: AppDimensions.spacingM,
-      runSpacing: AppDimensions.spacingM,
-      children: _availableTiles.map((tile) {
-        final isSelected = _selectedTiles.contains(tile);
-        return _buildTile(tile, isSelected);
-      }).toList(),
+  /// 문제 텍스트
+  Widget _buildQuestionText() {
+    return FadeInWidget(
+      child: Text(
+        _currentProblem.question,
+        style: AppTextStyles.headlineMedium.copyWith(
+          fontWeight: FontWeight.bold,
+          height: 1.4,
+        ),
+      ),
     );
   }
 
-  /// 개별 타일
-  Widget _buildTile(String text, bool isSelected) {
-    return GestureDetector(
-      onTap: isSelected
-          ? null
-          : () {
-              setState(() {
-                _selectedTiles.add(text);
-              });
-            },
+  /// 선택지
+  Widget _buildOptions() {
+    if (_currentProblem.options == null) return const SizedBox();
+
+    return Column(
+      children: List.generate(
+        _currentProblem.options!.length,
+        (index) {
+          final isCorrectAnswer = _currentProblem.correctAnswerIndex == index;
+
+          return FadeInWidget(
+            delay: Duration(milliseconds: 100 * index),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppDimensions.spacingM),
+              child: ProblemOptionButton(
+                optionText: _currentProblem.options![index],
+                index: index,
+                selectedIndex: _selectedAnswerIndex,
+                isAnswerSubmitted: _isAnswerSubmitted,
+                isCorrectAnswer: isCorrectAnswer,
+                onTap: () => _selectAnswer(index),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// 해설
+  Widget _buildExplanation() {
+    return FadeInWidget(
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.paddingL,
-          vertical: AppDimensions.paddingM,
-        ),
+        padding: const EdgeInsets.all(AppDimensions.paddingL),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.background
-              : Colors.white,
+          color: _isCorrect
+              ? AppColors.successGreen.withValues(alpha: 0.1)
+              : AppColors.warningOrange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
-            color: isSelected
-                ? AppColors.borderLight
-                : AppColors.textSecondary.withValues(alpha: 0.3),
+            color: _isCorrect
+                ? AppColors.successGreen.withValues(alpha: 0.3)
+                : AppColors.warningOrange.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
-        child: Text(
-          text,
-          style: AppTextStyles.titleMedium.copyWith(
-            color: isSelected
-                ? AppColors.textSecondary.withValues(alpha: 0.5)
-                : AppColors.textPrimary,
-            fontWeight: isSelected ? FontWeight.normal : FontWeight.w500,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  _isCorrect ? '✅' : '💡',
+                  style: const TextStyle(fontSize: 24),
+                ),
+                const SizedBox(width: AppDimensions.spacingS),
+                Text(
+                  _isCorrect ? '정답입니다!' : '다시 한번 확인해보세요',
+                  style: AppTextStyles.titleLarge.copyWith(
+                    color: _isCorrect ? AppColors.successGreen : AppColors.warningOrange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacingM),
+            Text(
+              _currentProblem.explanation,
+              style: AppTextStyles.bodyMedium.copyWith(
+                height: 1.6,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -364,35 +397,38 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
 
   /// 하단 버튼
   Widget _buildBottomButton() {
-    final hasAnswer = _selectedTiles.isNotEmpty;
-
     return Container(
-      padding: EdgeInsets.only(
-        left: AppDimensions.paddingXL,
-        right: AppDimensions.paddingXL,
-        top: AppDimensions.paddingL,
-        bottom: MediaQuery.of(context).padding.bottom + AppDimensions.paddingL,
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: hasAnswer ? _checkAnswer : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: hasAnswer
-                ? AppColors.mathButtonBlue
-                : AppColors.textSecondary.withValues(alpha: 0.3),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-            ),
-            elevation: 0,
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-          child: Text(
-            'CHECK ANSWER',
-            style: AppTextStyles.titleLarge.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _getButtonAction(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _getButtonColor(),
+              padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingL),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+              ),
+              elevation: 0,
+            ),
+            child: Text(
+              _getButtonText(),
+              style: AppTextStyles.titleLarge.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -400,32 +436,228 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen> {
     );
   }
 
-  void _checkAnswer() {
-    // 답안 확인 로직
+  VoidCallback? _getButtonAction() {
+    if (!_isAnswerSubmitted && _selectedAnswerIndex == null) {
+      return null; // 답을 선택하지 않으면 비활성화
+    }
+    if (!_isAnswerSubmitted) {
+      return _submitAnswer;
+    }
+    if (_isLastProblem) {
+      return _showResults;
+    }
+    return _nextProblem;
+  }
+
+  Color _getButtonColor() {
+    if (_isAnswerSubmitted) {
+      return _isCorrect ? AppColors.successGreen : AppColors.mathButtonBlue;
+    }
+    if (_selectedAnswerIndex == null) {
+      return AppColors.disabled;
+    }
+    return AppColors.mathButtonBlue;
+  }
+
+  String _getButtonText() {
+    if (!_isAnswerSubmitted) {
+      return '제출';
+    }
+    if (_isLastProblem) {
+      return '결과 확인';
+    }
+    return '다음 문제';
+  }
+
+  /// 답 선택
+  void _selectAnswer(int index) {
+    setState(() {
+      _selectedAnswerIndex = index;
+    });
+  }
+
+  /// 답 제출
+  void _submitAnswer() async {
+    if (_selectedAnswerIndex == null) return;
+
+    final user = ref.read(userProvider);
+    final userId = user?.id ?? 'user001';
+
+    _isCorrect = _currentProblem.isCorrectAnswer(_selectedAnswerIndex!);
+
+    setState(() {
+      _isAnswerSubmitted = true;
+    });
+
+    // 결과 저장
+    final result = ProblemResult(
+      problemId: _currentProblem.id,
+      userId: userId,
+      selectedAnswerIndex: _selectedAnswerIndex,
+      isCorrect: _isCorrect,
+      solvedAt: DateTime.now(),
+      timeSpentSeconds: 30, // TODO: 실제 시간 측정
+      xpEarned: _isCorrect ? _currentProblem.xpReward : 0,
+    );
+
+    _results.add(result);
+    await ref.read(problemResultsProvider.notifier).addResult(result);
+
+    if (_isCorrect) {
+      // 정답: XP 획득
+      _totalCorrect++;
+      _totalXPEarned += _currentProblem.xpReward;
+
+      // 사용자 XP 업데이트
+      await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward);
+
+      // XP 획득 애니메이션 표시
+      if (mounted) {
+        _showXPGainAnimation(_currentProblem.xpReward);
+      }
+
+      // 뱃지 언락 체크
+      _checkAchievements();
+    } else {
+      // 오답: 오답 노트에 저장
+      await ref.read(errorNoteProvider.notifier).addErrorNote(
+            userId: userId,
+            problem: _currentProblem,
+            userAnswer: _currentProblem.options![_selectedAnswerIndex!],
+          );
+    }
+  }
+
+  /// XP 획득 애니메이션
+  void _showXPGainAnimation(int xp) {
+    showXPGainAnimation(context, xp);
+  }
+
+  /// 뱃지 언락 체크
+  void _checkAchievements() {
+    // TODO: 뱃지 언락 체크 및 알림
+    final achievements = ref.read(achievementProvider);
+
+    // 예시: 첫 문제 풀기 뱃지
+    if (_totalCorrect == 1) {
+      final firstProblemAchievement = achievements.firstWhere(
+        (a) => a.id == 'achievement001',
+        orElse: () => achievements.first,
+      );
+
+      if (!firstProblemAchievement.isUnlocked) {
+        _showAchievementUnlocked(firstProblemAchievement);
+      }
+    }
+  }
+
+  /// 뱃지 언락 알림
+  void _showAchievementUnlocked(Achievement achievement) {
+    // TODO: 뱃지 언락 애니메이션 구현
+  }
+
+  /// 다음 문제
+  void _nextProblem() async {
+    setState(() {
+      _currentProblemIndex++;
+      _selectedAnswerIndex = null;
+      _isAnswerSubmitted = false;
+      _isCorrect = false;
+    });
+
+    // 전환 애니메이션
+    await _transitionController.reverse();
+    await _transitionController.forward();
+  }
+
+  /// 결과 확인
+  void _showResults() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ProblemResultDialog(
+        lessonTitle: '기초 산술',
+        results: _results,
+        totalXPEarned: _totalXPEarned,
+        onComplete: () {
+          Navigator.of(context).pop(); // 다이얼로그 닫기
+          Navigator.of(context).pop(); // ProblemScreen 닫기
+        },
+        onRetry: () {
+          Navigator.of(context).pop(); // 다이얼로그 닫기
+          _resetProblemSet(); // 문제 세트 리셋
+        },
+      ),
+    );
+  }
+
+  /// 나가기 다이얼로그
+  void _showExitDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('답안 확인'),
-        content: Text('선택한 답안: ${_selectedTiles.join(", ")}'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        ),
+        title: Row(
+          children: [
+            Text('⚠️', style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: AppDimensions.spacingS),
+            Text(
+              '학습 중단',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          '정말 나가시겠습니까?\n\n현재까지의 진행 상황은 저장되지 않습니다.',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _selectedTiles.clear();
-              });
-            },
-            child: const Text('다시 풀기'),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              '계속하기',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.mathButtonBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              // 다음 문제로 이동
+              Navigator.of(context).pop(); // 다이얼로그 닫기
+              Navigator.of(context).pop(); // ProblemScreen 닫기
             },
-            child: const Text('다음 문제'),
+            child: Text(
+              '나가기',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.errorRed,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  /// 문제 세트 리셋 (다시 풀기용)
+  void _resetProblemSet() {
+    setState(() {
+      _currentProblemIndex = 0;
+      _selectedAnswerIndex = null;
+      _isAnswerSubmitted = false;
+      _isCorrect = false;
+      _totalCorrect = 0;
+      _totalXPEarned = 0;
+      _results.clear();
+    });
+    _transitionController.reset();
+    _transitionController.forward();
   }
 }

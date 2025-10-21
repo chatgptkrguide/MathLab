@@ -45,6 +45,7 @@ dependencies:
 
   # 애니메이션
   lottie: ^2.7.0
+  confetti: ^0.7.0
 
   # 수학 렌더링 (향후 사용)
   flutter_math_fork: ^0.7.2
