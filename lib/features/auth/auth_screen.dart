@@ -4,6 +4,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../shared/widgets/responsive_wrapper.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/user_account.dart';
 import '../../data/providers/auth_provider.dart';
@@ -64,21 +65,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(AppDimensions.paddingXL),
-              child: Column(
-                children: [
-                  const SizedBox(height: AppDimensions.spacingXXL),
-                  _buildHeader(),
-                  const SizedBox(height: AppDimensions.spacingXXL),
-                  _buildAccountSelector(),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  _buildAuthTabs(),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  _buildAuthForm(authState),
-                  const SizedBox(height: AppDimensions.spacingXXL),
-                ],
+          child: ResponsiveWrapper(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingXL),
+                child: Column(
+                  children: [
+                    const SizedBox(height: AppDimensions.spacingXXL),
+                    _buildHeader(),
+                    const SizedBox(height: AppDimensions.spacingXXL),
+                    _buildAccountSelector(),
+                    const SizedBox(height: AppDimensions.spacingXL),
+                    _buildAuthTabs(),
+                    const SizedBox(height: AppDimensions.spacingXL),
+                    _buildAuthForm(authState),
+                    const SizedBox(height: AppDimensions.spacingXXL),
+                  ],
+                ),
               ),
             ),
           ),

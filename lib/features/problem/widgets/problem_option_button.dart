@@ -217,6 +217,8 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                     color: _textColor,
                     fontWeight: _isSelected ? FontWeight.bold : FontWeight.w500,
                   ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               // 정답/오답 아이콘

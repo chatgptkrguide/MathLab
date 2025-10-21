@@ -141,6 +141,10 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
             child: Container(
               margin: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.paddingXL,
+                vertical: AppDimensions.paddingXL,
+              ),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
               ),
               padding: const EdgeInsets.all(AppDimensions.paddingXXL),
               decoration: BoxDecoration(
@@ -154,9 +158,10 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   // 타이틀
                   Text(
                     widget.lessonTitle,
@@ -271,95 +276,194 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                   ),
                   const SizedBox(height: AppDimensions.spacingXXL),
 
-                  // 버튼들
-                  Row(
-                    children: [
-                      // 다시 풀기 버튼
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: widget.onRetry,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppDimensions.paddingL,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusL),
-                              border: Border.all(
-                                color: AppColors.mathTeal,
-                                width: 2,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.refresh,
-                                  color: AppColors.mathTeal,
-                                ),
-                                const SizedBox(width: AppDimensions.spacingS),
-                                Text(
-                                  '다시 풀기',
-                                  style: AppTextStyles.bodyLarge.copyWith(
-                                    color: AppColors.mathTeal,
-                                    fontWeight: FontWeight.bold,
+                  // 버튼들 (반응형)
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isSmallWidth = constraints.maxWidth < 400;
+
+                      if (isSmallWidth) {
+                        // 작은 화면: 세로 배치
+                        return Column(
+                          children: [
+                            // 완료 버튼
+                            SizedBox(
+                              width: double.infinity,
+                              child: GestureDetector(
+                                onTap: widget.onComplete,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: AppDimensions.paddingL,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: AppColors.mathButtonGradient,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                        AppDimensions.radiusL),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.mathButtonBlue
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: AppDimensions.spacingS),
+                                      Text(
+                                        '완료',
+                                        style: AppTextStyles.bodyLarge.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.spacingM),
-                      // 완료 버튼
-                      Expanded(
-                        flex: 2,
-                        child: GestureDetector(
-                          onTap: widget.onComplete,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppDimensions.paddingL,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: AppColors.mathButtonGradient,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusL),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.mathButtonBlue
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.check_circle,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: AppDimensions.spacingS),
-                                Text(
-                                  '완료',
-                                  style: AppTextStyles.bodyLarge.copyWith(
+                            const SizedBox(height: AppDimensions.spacingM),
+                            // 다시 풀기 버튼
+                            SizedBox(
+                              width: double.infinity,
+                              child: GestureDetector(
+                                onTap: widget.onRetry,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: AppDimensions.paddingL,
+                                  ),
+                                  decoration: BoxDecoration(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                    borderRadius: BorderRadius.circular(
+                                        AppDimensions.radiusL),
+                                    border: Border.all(
+                                      color: AppColors.mathTeal,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.refresh,
+                                        color: AppColors.mathTeal,
+                                      ),
+                                      const SizedBox(width: AppDimensions.spacingS),
+                                      Text(
+                                        '다시 풀기',
+                                        style: AppTextStyles.bodyLarge.copyWith(
+                                          color: AppColors.mathTeal,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      // 큰 화면: 가로 배치
+                      return Row(
+                        children: [
+                          // 다시 풀기 버튼
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: widget.onRetry,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppDimensions.paddingL,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusL),
+                                  border: Border.all(
+                                    color: AppColors.mathTeal,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.refresh,
+                                      color: AppColors.mathTeal,
+                                    ),
+                                    const SizedBox(width: AppDimensions.spacingS),
+                                    Text(
+                                      '다시 풀기',
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: AppColors.mathTeal,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
+                          const SizedBox(width: AppDimensions.spacingM),
+                          // 완료 버튼
+                          Expanded(
+                            flex: 2,
+                            child: GestureDetector(
+                              onTap: widget.onComplete,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppDimensions.paddingL,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: AppColors.mathButtonGradient,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusL),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.mathButtonBlue
+                                          .withValues(alpha: 0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(width: AppDimensions.spacingS),
+                                    Text(
+                                      '완료',
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
+                ),
             ),
           ),
         ),
