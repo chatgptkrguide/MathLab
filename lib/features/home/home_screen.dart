@@ -108,6 +108,8 @@ class HomeScreen extends ConsumerWidget {
                   style: AppTextStyles.titleMedium.copyWith(
                     color: Colors.white.withValues(alpha: 0.9),
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ],
             ),
@@ -293,39 +295,87 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 빠른 통계 (GoMath 스타일)
+  /// 빠른 통계 (GoMath 스타일 - 반응형)
   Widget _buildQuickStats(User user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-      child: Row(
-        children: [
-          Expanded(
-            child: DuolingoStatCard(
-              emoji: '🔶',
-              title: 'XP',
-              value: user.xp.toString(),
-              iconColor: AppColors.mathOrange,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Expanded(
-            child: DuolingoStatCard(
-              emoji: '⭐',
-              title: '레벨',
-              value: user.level.toString(),
-              iconColor: AppColors.mathYellow,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Expanded(
-            child: DuolingoStatCard(
-              emoji: '🔥',
-              title: '연속',
-              value: '${user.streakDays}일',
-              iconColor: AppColors.mathOrange,
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // 작은 화면에서는 세로 방향으로 배치
+          final isSmallScreen = constraints.maxWidth < 400;
+          final spacing = isSmallScreen
+              ? AppDimensions.spacingS
+              : AppDimensions.spacingM;
+
+          if (isSmallScreen) {
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: DuolingoStatCard(
+                        emoji: '🔶',
+                        title: 'XP',
+                        value: user.xp.toString(),
+                        iconColor: AppColors.mathOrange,
+                      ),
+                    ),
+                    SizedBox(width: spacing),
+                    Expanded(
+                      child: DuolingoStatCard(
+                        emoji: '⭐',
+                        title: '레벨',
+                        value: user.level.toString(),
+                        iconColor: AppColors.mathYellow,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: spacing),
+                SizedBox(
+                  width: double.infinity,
+                  child: DuolingoStatCard(
+                    emoji: '🔥',
+                    title: '연속',
+                    value: '${user.streakDays}일',
+                    iconColor: AppColors.mathOrange,
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              Expanded(
+                child: DuolingoStatCard(
+                  emoji: '🔶',
+                  title: 'XP',
+                  value: user.xp.toString(),
+                  iconColor: AppColors.mathOrange,
+                ),
+              ),
+              SizedBox(width: spacing),
+              Expanded(
+                child: DuolingoStatCard(
+                  emoji: '⭐',
+                  title: '레벨',
+                  value: user.level.toString(),
+                  iconColor: AppColors.mathYellow,
+                ),
+              ),
+              SizedBox(width: spacing),
+              Expanded(
+                child: DuolingoStatCard(
+                  emoji: '🔥',
+                  title: '연속',
+                  value: '${user.streakDays}일',
+                  iconColor: AppColors.mathOrange,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

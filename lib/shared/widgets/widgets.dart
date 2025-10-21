@@ -17,3 +17,4 @@ export 'animated_button.dart';
 export 'xp_animation.dart';
 export 'loading_widgets.dart';
 export 'fade_in_widget.dart';
+export 'badge_unlock_dialog.dart';

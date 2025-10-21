@@ -295,7 +295,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 액션 버튼들 (2열)
+  /// 액션 버튼들 (반응형 2열)
   Widget _buildActionButtons(List<ErrorNote> filteredNotes) {
     final user = ref.watch(userProvider);
     final userId = user?.id ?? 'user001';
@@ -306,34 +306,88 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
       delay: const Duration(milliseconds: 100),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: selectedErrorCount > 0 ? () => _reviewSelectedProblems(filteredNotes) : null,
-                icon: const Icon(Icons.refresh, size: AppDimensions.iconS),
-                label: Text('선택 문제 복습 ($selectedErrorCount)'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppDimensions.paddingM,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isSmallScreen = constraints.maxWidth < 500;
+
+            if (isSmallScreen) {
+              return Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: selectedErrorCount > 0
+                          ? () => _reviewSelectedProblems(filteredNotes)
+                          : null,
+                      icon: const Icon(Icons.refresh, size: AppDimensions.iconS),
+                      label: Text('선택 문제 복습 ($selectedErrorCount)'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppDimensions.paddingM,
+                        ),
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingS),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: filteredNotes.isNotEmpty
+                          ? () => _createCustomReviewSet(userId)
+                          : null,
+                      icon: const Icon(Icons.library_books,
+                          size: AppDimensions.iconS),
+                      label: const Text('맞춤 복습 세트'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppDimensions.paddingM,
+                        ),
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: selectedErrorCount > 0
+                        ? () => _reviewSelectedProblems(filteredNotes)
+                        : null,
+                    icon: const Icon(Icons.refresh, size: AppDimensions.iconS),
+                    label: Text('선택 문제 복습 ($selectedErrorCount)'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppDimensions.paddingM,
+                      ),
+                      minimumSize: const Size(0, 48),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: AppDimensions.spacingS),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: filteredNotes.isNotEmpty ? () => _createCustomReviewSet(userId) : null,
-                icon: const Icon(Icons.library_books, size: AppDimensions.iconS),
-                label: const Text('맞춤 복습 세트 만들기'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppDimensions.paddingM,
+                const SizedBox(width: AppDimensions.spacingS),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: filteredNotes.isNotEmpty
+                        ? () => _createCustomReviewSet(userId)
+                        : null,
+                    icon: const Icon(Icons.library_books,
+                        size: AppDimensions.iconS),
+                    label: const Text('맞춤 복습 세트'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppDimensions.paddingM,
+                      ),
+                      minimumSize: const Size(0, 48),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
@@ -435,12 +489,13 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                   children: [
                     Expanded(
                       child: Text(
-                        errorNote.question.length > 50
-                            ? '${errorNote.question.substring(0, 50)}...'
-                            : errorNote.question,
+                        errorNote.question,
                         style: AppTextStyles.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
                     ),
+                    const SizedBox(width: AppDimensions.spacingS),
                     _buildStatusBadge(errorNote.status),
                   ],
                 ),

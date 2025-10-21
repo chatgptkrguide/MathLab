@@ -16,9 +16,6 @@ class HistoryScreen extends ConsumerStatefulWidget {
 }
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
@@ -161,6 +158,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   /// 챌린지 섹션
   Widget _buildChallengeSection() {
+    final user = ref.watch(userProvider);
+    final currentStreak = user?.streakDays ?? 0;
+    final challengeGoal = 30; // 30일 챌린지
+    final remaining = challengeGoal - currentStreak;
+    final progress = (currentStreak / challengeGoal).clamp(0.0, 1.0);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -168,13 +171,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Challenges (Day)',
+              'Challenges (30 Days)',
               style: AppTextStyles.headlineSmall.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              '6/12',
+              '$currentStreak/$challengeGoal',
               style: AppTextStyles.headlineSmall.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.mathBlue,
@@ -187,10 +190,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         ClipRRect(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           child: LinearProgressIndicator(
-            value: 6 / 12,
+            value: progress,
             minHeight: 12,
             backgroundColor: AppColors.progressBackground,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.mathBlue),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.mathBlue),
           ),
         ),
         const SizedBox(height: AppDimensions.spacingXL),
@@ -199,8 +202,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             Expanded(
               child: _buildChallengeCard(
                 icon: '🔥',
-                label: 'Challenge Done',
-                value: '6 Days',
+                label: 'Current Streak',
+                value: '$currentStreak Days',
               ),
             ),
             const SizedBox(width: AppDimensions.spacingM),
@@ -208,7 +211,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               child: _buildChallengeCard(
                 icon: '📅',
                 label: 'Remaining',
-                value: '10 Days',
+                value: '${remaining > 0 ? remaining : 0} Days',
               ),
             ),
           ],

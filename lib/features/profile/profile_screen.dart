@@ -141,7 +141,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   child: Center(
                     child: Text(
-                      user?.name?.isNotEmpty == true ? user!.name[0] : '학',
+                      (user?.name != null && user!.name.isNotEmpty) ? user.name[0] : '학',
                       style: const TextStyle(
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
@@ -154,11 +154,17 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppDimensions.spacingL),
             // 이름
-            Text(
-              user?.name ?? '학습자',
-              style: AppTextStyles.headlineLarge.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+              child: Text(
+                user?.name ?? '학습자',
+                style: AppTextStyles.headlineLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
             ),
             const SizedBox(height: AppDimensions.spacingS),
@@ -236,7 +242,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  /// 통계 섹션 (흰색 배경 영역)
+  /// 통계 섹션 (흰색 배경 영역 - 반응형)
   Widget _buildStatisticsSection(User? user) {
     return FadeInWidget(
       duration: const Duration(milliseconds: 600),
@@ -251,20 +257,29 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppDimensions.spacingL),
-          // 통계 카드들 (2x2 그리드)
-          GridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: AppDimensions.spacingM,
-            crossAxisSpacing: AppDimensions.spacingM,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.3,
-            children: [
-              _buildStatCard('레벨', '${user?.level ?? 1}', '⭐'),
-              _buildStatCard('총 XP', '${user?.xp ?? 0}', '🔶'),
-              _buildStatCard('연속일', '${user?.streakDays ?? 0}일', '🔥'),
-              _buildStatCard('하트', '${user?.hearts ?? 5}개', '❤️'),
-            ],
+          // 통계 카드들 (반응형 그리드)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isSmallScreen = constraints.maxWidth < 400;
+              return GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: isSmallScreen
+                    ? AppDimensions.spacingS
+                    : AppDimensions.spacingM,
+                crossAxisSpacing: isSmallScreen
+                    ? AppDimensions.spacingS
+                    : AppDimensions.spacingM,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: isSmallScreen ? 1.2 : 1.3,
+                children: [
+                  _buildStatCard('레벨', '${user?.level ?? 1}', '⭐'),
+                  _buildStatCard('총 XP', '${user?.xp ?? 0}', '🔶'),
+                  _buildStatCard('연속일', '${user?.streakDays ?? 0}일', '🔥'),
+                  _buildStatCard('하트', '${user?.hearts ?? 5}개', '❤️'),
+                ],
+              );
+            },
           ),
         ],
       ),

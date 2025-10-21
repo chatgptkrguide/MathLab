@@ -178,10 +178,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         title: Text(
           account.displayName,
           style: AppTextStyles.titleMedium,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         subtitle: Text(
           '${account.email} • ${account.accountTypeText}',
           style: AppTextStyles.bodySmall,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () async {
@@ -289,7 +293,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: AppColors.duolingoRed, size: 20),
+                    const Icon(Icons.error_outline, color: AppColors.duolingoRed, size: 20),
                     const SizedBox(width: AppDimensions.spacingS),
                     Expanded(
                       child: Text(
@@ -297,6 +301,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.duolingoRed,
                         ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -622,10 +628,14 @@ class UserSwitchScreen extends ConsumerWidget {
                   style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
                 subtitle: Text(
                   '${account.email}\n${account.accountTypeText}',
                   style: AppTextStyles.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
                 trailing: isCurrent
                     ? Container(

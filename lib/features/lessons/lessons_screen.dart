@@ -129,6 +129,8 @@ class LessonsScreen extends ConsumerWidget {
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
           // 스트릭
@@ -330,6 +332,7 @@ class LessonsScreen extends ConsumerWidget {
           style: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.textSecondary,
           ),
+          textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
@@ -372,6 +375,7 @@ class LessonsScreen extends ConsumerWidget {
           style: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.textSecondary,
           ),
+          textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(

@@ -195,6 +195,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ],
               ),
@@ -289,13 +291,17 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               children: [
                 Row(
                   children: [
-                    Text(
-                      entry.userName,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: entry.isCurrentUser
-                            ? AppColors.mathTeal
-                            : AppColors.textPrimary,
+                    Flexible(
+                      child: Text(
+                        entry.userName,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: entry.isCurrentUser
+                              ? AppColors.mathTeal
+                              : AppColors.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                     if (entry.isCurrentUser) ...[

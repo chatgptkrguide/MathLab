@@ -43,6 +43,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   int _totalXPEarned = 0;
   final List<ProblemResult> _results = [];
 
+  // 시간 측정
+  final Stopwatch _stopwatch = Stopwatch();
+
   // 애니메이션
   late AnimationController _transitionController;
   late Animation<double> _fadeAnimation;
@@ -52,6 +55,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   void initState() {
     super.initState();
     _setupAnimations();
+    _stopwatch.start(); // 타이머 시작
   }
 
   void _setupAnimations() {
@@ -489,6 +493,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _isAnswerSubmitted = true;
     });
 
+    // 실제 시간 측정
+    _stopwatch.stop();
+    final timeSpent = _stopwatch.elapsed.inSeconds;
+
     // 결과 저장
     final result = ProblemResult(
       problemId: _currentProblem.id,
@@ -496,7 +504,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       selectedAnswerIndex: _selectedAnswerIndex,
       isCorrect: _isCorrect,
       solvedAt: DateTime.now(),
-      timeSpentSeconds: 30, // TODO: 실제 시간 측정
+      timeSpentSeconds: timeSpent,
       xpEarned: _isCorrect ? _currentProblem.xpReward : 0,
     );
 
@@ -564,6 +572,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _isAnswerSubmitted = false;
       _isCorrect = false;
     });
+
+    // 타이머 리셋 및 재시작
+    _stopwatch.reset();
+    _stopwatch.start();
 
     // 전환 애니메이션
     await _transitionController.reverse();
@@ -657,6 +669,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _totalXPEarned = 0;
       _results.clear();
     });
+
+    // 타이머 리셋 및 재시작
+    _stopwatch.reset();
+    _stopwatch.start();
+
     _transitionController.reset();
     _transitionController.forward();
   }

@@ -45,7 +45,7 @@ class ErrorNoteNotifier extends StateNotifier<List<ErrorNote>> {
       question: problem.question,
       userAnswer: userAnswer,
       correctAnswer: problem.correctAnswer ?? '',
-      explanation: problem.explanation ?? '설명이 없습니다.',
+      explanation: problem.explanation,
       category: problem.category,
       createdAt: DateTime.now(),
       reviewDates: [],

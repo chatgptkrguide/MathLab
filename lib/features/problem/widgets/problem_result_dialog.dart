@@ -164,6 +164,8 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppDimensions.spacingS),
                   Text(
