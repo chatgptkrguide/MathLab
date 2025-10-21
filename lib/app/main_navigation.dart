@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import '../shared/widgets/custom_bottom_nav.dart';
 import '../features/home/home_screen.dart';
 import '../features/lessons/lessons_screen.dart';
+import '../features/leaderboard/leaderboard_screen.dart';
 import '../features/errors/errors_screen.dart';
-import '../features/history/history_screen.dart';
 import '../features/profile/profile_screen.dart';
 
 /// 메인 네비게이션 위젯
@@ -22,8 +22,8 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const LessonsScreen(),
+    const LeaderboardScreen(),
     const ErrorsScreen(),
-    const HistoryScreen(),
     const ProfileScreen(),
   ];
 

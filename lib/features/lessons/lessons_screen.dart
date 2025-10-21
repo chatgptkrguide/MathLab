@@ -4,16 +4,26 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
+import '../../shared/widgets/fade_in_widget.dart';
+import '../../shared/widgets/lesson_card.dart';
+import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/providers/lesson_provider.dart';
+import '../../data/providers/problem_provider.dart';
+import '../problem/problem_screen.dart';
 
-/// 학습 카드 그리드 화면 (Figma 디자인 01)
-/// 학습 주제별 카드를 그리드로 표시
+/// 학습 레슨 화면 (완전히 데이터 기반으로 재구성)
+/// 실제 레슨 데이터를 카테고리별로 표시
 class LessonsScreen extends ConsumerWidget {
   const LessonsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
+    final lessons = ref.watch(lessonProvider);
+
+    // 카테고리별로 레슨 그룹화
+    final lessonsByCategory = _groupLessonsByCategory(lessons);
 
     return Scaffold(
       backgroundColor: AppColors.mathBlue,
@@ -31,12 +41,16 @@ class LessonsScreen extends ConsumerWidget {
               children: [
                 _buildHeader(),
                 _buildUserStats(
+                  userName: user?.name ?? '학습자',
                   streakDays: user?.streakDays ?? 0,
                   xp: user?.xp ?? 0,
                   level: user?.level ?? 1,
                 ),
+                const SizedBox(height: AppDimensions.spacingL),
                 Expanded(
-                  child: _buildLearningGrid(context),
+                  child: lessons.isEmpty
+                      ? _buildEmptyState()
+                      : _buildLessonsList(context, ref, lessonsByCategory),
                 ),
               ],
             ),
@@ -54,20 +68,20 @@ class LessonsScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 햄버거 메뉴 아이콘
-          Icon(
+          const Icon(
             Icons.menu,
             color: Colors.white,
             size: 28,
           ),
-          // Home 텍스트
+          // 학습 경로 텍스트
           Text(
-            'Home',
+            '학습 경로',
             style: AppTextStyles.headlineMedium.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          // GoMath 로고 (임시로 텍스트)
+          // GoMath 로고
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -92,6 +106,7 @@ class LessonsScreen extends ConsumerWidget {
 
   /// 사용자 통계 (상단)
   Widget _buildUserStats({
+    required String userName,
     required int streakDays,
     required int xp,
     required int level,
@@ -109,7 +124,7 @@ class LessonsScreen extends ConsumerWidget {
           // 사용자 이름
           Expanded(
             child: Text(
-              '소인수분해',
+              userName,
               style: AppTextStyles.titleMedium.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -145,8 +160,34 @@ class LessonsScreen extends ConsumerWidget {
     );
   }
 
-  /// 학습 카드 그리드
-  Widget _buildLearningGrid(BuildContext context) {
+  /// 빈 상태 화면
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '📚',
+            style: const TextStyle(fontSize: 64),
+          ),
+          const SizedBox(height: AppDimensions.spacingL),
+          Text(
+            '아직 레슨이 없습니다',
+            style: AppTextStyles.headlineMedium.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 카테고리별 레슨 목록
+  Widget _buildLessonsList(
+    BuildContext context,
+    WidgetRef ref,
+    Map<String, List<Lesson>> lessonsByCategory,
+  ) {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -158,162 +199,212 @@ class LessonsScreen extends ConsumerWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppDimensions.paddingXL),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 큰 학습 카드들
-            Row(
-              children: [
-                Expanded(
-                  child: _buildLargeCard(
-                    icon: '📚',
-                    label: 'START!',
-                    onTap: () => _showComingSoon(context, '학습 시작'),
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.spacingM),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildMediumCard(
-                        icon: '📐',
-                        onTap: () => _showComingSoon(context, '기하'),
-                      ),
-                      const SizedBox(height: AppDimensions.spacingM),
-                      _buildMediumCard(
-                        icon: '✏️',
-                        onTap: () => _showComingSoon(context, '대수'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppDimensions.spacingL),
-            // 작은 아이콘 카드 그리드
-            GridView.count(
-              crossAxisCount: 3,
-              mainAxisSpacing: AppDimensions.spacingM,
-              crossAxisSpacing: AppDimensions.spacingM,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _buildSmallCard('🎒', '가방'),
-                _buildSmallCard('⏰', '시간'),
-                _buildSmallCard('🏆', '트로피'),
-                _buildSmallCard('💻', '컴퓨터'),
-                _buildSmallCard('🌍', '지구본'),
-                _buildSmallCard('📋', '칠판'),
-                _buildSmallCard('⚛️', '원자'),
-                _buildSmallCard('🔬', '현미경'),
-                _buildSmallCard('📖', '책'),
-              ],
-            ),
+            // 카테고리별로 섹션 표시
+            ...lessonsByCategory.entries.map((entry) {
+              final category = entry.key;
+              final categoryLessons = entry.value;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCategoryHeader(category),
+                  const SizedBox(height: AppDimensions.spacingM),
+                  _buildLessonGrid(context, ref, categoryLessons),
+                  const SizedBox(height: AppDimensions.spacingXL),
+                ],
+              );
+            }),
           ],
         ),
       ),
     );
   }
 
-  /// 큰 학습 카드
-  Widget _buildLargeCard({
-    required String icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 160,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppColors.mathButtonGradient,
+  /// 카테고리 헤더
+  Widget _buildCategoryHeader(String category) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 24,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: AppColors.mathButtonGradient,
+            ),
+            borderRadius: BorderRadius.circular(2),
           ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        const SizedBox(width: AppDimensions.spacingM),
+        Text(
+          category,
+          style: AppTextStyles.headlineSmall.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 레슨 그리드
+  Widget _buildLessonGrid(
+    BuildContext context,
+    WidgetRef ref,
+    List<Lesson> lessons,
+  ) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: AppDimensions.spacingM,
+        crossAxisSpacing: AppDimensions.spacingM,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: lessons.length,
+      itemBuilder: (context, index) {
+        final lesson = lessons[index];
+        return FadeInWidget(
+          delay: Duration(milliseconds: 100 * index),
+          child: LessonCard(
+            lesson: lesson,
+            onTap: () => _onLessonTap(context, ref, lesson),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 레슨 카드 탭 이벤트
+  void _onLessonTap(BuildContext context, WidgetRef ref, Lesson lesson) {
+    if (!lesson.isUnlocked) {
+      // 잠긴 레슨
+      _showLockedDialog(context);
+      return;
+    }
+
+    // 해당 레슨의 문제들 가져오기
+    final problems = ref
+        .read(problemProvider.notifier)
+        .getProblemsByLesson(lesson.id);
+
+    if (problems.isEmpty) {
+      _showNoProblemsDialog(context);
+      return;
+    }
+
+    // 문제 풀이 화면으로 이동
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ProblemScreen(
+          lessonId: lesson.id,
+          problems: problems,
+        ),
+      ),
+    );
+  }
+
+  /// 잠긴 레슨 다이얼로그
+  void _showLockedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        ),
+        title: Row(
           children: [
+            Text('🔒', style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(
-              icon,
-              style: const TextStyle(fontSize: 48),
-            ),
-            const SizedBox(height: AppDimensions.spacingS),
-            Text(
-              label,
-              style: AppTextStyles.titleLarge.copyWith(
-                color: Colors.white,
+              '잠긴 레슨',
+              style: AppTextStyles.headlineSmall.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
+        content: Text(
+          '이전 레슨을 완료하면\n이 레슨을 시작할 수 있습니다.',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              '확인',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.mathButtonBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// 중간 크기 카드
-  Widget _buildMediumCard({
-    required String icon,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 74,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppColors.mathButtonGradient,
-          ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.mathButtonBlue.withValues(alpha: 0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+  /// 문제 없음 다이얼로그
+  void _showNoProblemsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        ),
+        title: Row(
+          children: [
+            Text('📝', style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: AppDimensions.spacingS),
+            Text(
+              '문제 준비 중',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            icon,
-            style: const TextStyle(fontSize: 36),
+        content: Text(
+          '이 레슨의 문제가 아직 준비되지 않았습니다.\n곧 추가될 예정입니다!',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              '확인',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.mathButtonBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// 작은 아이콘 카드
-  Widget _buildSmallCard(String icon, String label) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.mathBlueLight.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-      ),
-      child: Center(
-        child: Text(
-          icon,
-          style: const TextStyle(fontSize: 32),
-        ),
-      ),
-    );
-  }
+  /// 카테고리별로 레슨 그룹화
+  Map<String, List<Lesson>> _groupLessonsByCategory(List<Lesson> lessons) {
+    final Map<String, List<Lesson>> grouped = {};
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature 기능이 곧 추가됩니다!'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        ),
-      ),
-    );
+    for (final lesson in lessons) {
+      if (!grouped.containsKey(lesson.category)) {
+        grouped[lesson.category] = [];
+      }
+      grouped[lesson.category]!.add(lesson);
+    }
+
+    // 각 카테고리의 레슨을 순서대로 정렬
+    grouped.forEach((category, lessonList) {
+      lessonList.sort((a, b) => a.order.compareTo(b.order));
+    });
+
+    return grouped;
   }
 }
