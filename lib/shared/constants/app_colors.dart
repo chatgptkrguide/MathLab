@@ -13,6 +13,7 @@ class AppColors {
   static const Color mathOrange = Color(0xFFFF9600); // 스트릭 오렌지
   static const Color mathYellow = Color(0xFFFFD900); // 별 노란색
   static const Color mathRed = Color(0xFFFF4B4B); // 에러 빨간색
+  static const Color mathPurple = Color(0xFFCE82FF); // 힌트 퍼플
 
   // 듀오링고 스타일 브랜드 색상 (호환성 유지)
   static const Color duolingoGreen = Color(0xFF58CC02); // 듀오링고 메인 그린
@@ -23,13 +24,16 @@ class AppColors {
   static const Color duolingoYellow = mathYellow; // 노란색
 
   // 기본 색상들 (호환성)
+  static const Color primary = mathButtonBlue; // 주요 색상
   static const Color primaryGreen = duolingoGreen;
   static const Color primaryBlue = duolingoBlue;
   static const Color secondaryBlue = Color(0xFFE3F2FD);
   static const Color accentCyan = duolingoBlue;
   static const Color warningOrange = duolingoOrange;
   static const Color warningYellow = mathYellow;
+  static const Color success = duolingoGreen; // 성공 색상
   static const Color successGreen = duolingoGreen;
+  static const Color error = mathRed; // 에러 색상
   static const Color errorRed = duolingoRed;
   static const Color purpleAccent = duolingoPurple;
 
@@ -61,12 +65,15 @@ class AppColors {
   static const List<Color> mathBlueGradient = [mathBlue, mathBlueLight]; // 메인 배경
   static const List<Color> mathButtonGradient = [Color(0xFF3B5BFF), Color(0xFF2B4BEF)]; // 버튼
   static const List<Color> mathTealGradient = [Color(0xFF48C9B0), Color(0xFF38B9A0)]; // 진행바
+  static const List<Color> mathOrangeGradient = [Color(0xFFFFB74D), mathOrange]; // 오렌지
+  static const List<Color> mathYellowGradient = [Color(0xFFFFF59D), mathYellow]; // 노란색
+  static const List<Color> mathPurpleGradient = [Color(0xFFE1BEE7), duolingoPurple]; // 퍼플
 
   // 기존 그라디언트 (호환성)
   static const List<Color> greenGradient = [Color(0xFF89E219), Color(0xFF58CC02)];
   static const List<Color> blueGradient = mathBlueGradient; // GoMath 그라디언트로 매핑
-  static const List<Color> orangeGradient = [Color(0xFFFFB74D), mathOrange];
-  static const List<Color> purpleGradient = [Color(0xFFE1BEE7), Color(0xFFCE82FF)];
+  static const List<Color> orangeGradient = mathOrangeGradient;
+  static const List<Color> purpleGradient = mathPurpleGradient;
 
   // 카드 그림자
   static const Color cardShadow = Color(0x0D000000);

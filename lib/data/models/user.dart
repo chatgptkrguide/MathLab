@@ -10,6 +10,8 @@ class User {
   final String currentGrade; // 중1, 중2, 고1 등
   final String avatarUrl;
   final int hearts; // 하트 (생명) 수
+  final int dailyXP; // 오늘 획득한 XP
+  final DateTime lastXPResetDate; // 마지막 XP 리셋 날짜
 
   const User({
     required this.id,
@@ -22,21 +24,28 @@ class User {
     required this.currentGrade,
     required this.avatarUrl,
     this.hearts = 5, // 기본 하트 5개
-  });
+    this.dailyXP = 0, // 기본 일일 XP 0
+    DateTime? lastXPResetDate,
+  }) : lastXPResetDate = lastXPResetDate ?? joinDate;
 
   /// JSON으로부터 User 객체 생성
   factory User.fromJson(Map<String, dynamic> json) {
+    final joinDate = DateTime.parse(json['joinDate'] as String);
     return User(
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
-      joinDate: DateTime.parse(json['joinDate'] as String),
+      joinDate: joinDate,
       level: json['level'] as int,
       xp: json['xp'] as int,
       streakDays: json['streakDays'] as int,
       currentGrade: json['currentGrade'] as String,
       avatarUrl: json['avatarUrl'] as String,
       hearts: json['hearts'] as int? ?? 5,
+      dailyXP: json['dailyXP'] as int? ?? 0,
+      lastXPResetDate: json['lastXPResetDate'] != null
+          ? DateTime.parse(json['lastXPResetDate'] as String)
+          : joinDate,
     );
   }
 
@@ -53,6 +62,8 @@ class User {
       'currentGrade': currentGrade,
       'avatarUrl': avatarUrl,
       'hearts': hearts,
+      'dailyXP': dailyXP,
+      'lastXPResetDate': lastXPResetDate.toIso8601String(),
     };
   }
 
@@ -68,6 +79,8 @@ class User {
     String? currentGrade,
     String? avatarUrl,
     int? hearts,
+    int? dailyXP,
+    DateTime? lastXPResetDate,
   }) {
     return User(
       id: id ?? this.id,
@@ -80,6 +93,8 @@ class User {
       currentGrade: currentGrade ?? this.currentGrade,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       hearts: hearts ?? this.hearts,
+      dailyXP: dailyXP ?? this.dailyXP,
+      lastXPResetDate: lastXPResetDate ?? this.lastXPResetDate,
     );
   }
 

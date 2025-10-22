@@ -10,7 +10,10 @@ class LearningStats {
   final int correctAnswers; // 정답 수
   final int totalSessions; // 총 학습 세션 수
   final DateTime lastStudyDate; // 마지막 학습 날짜
-  final Map<String, int> categoryStats; // 카테고리별 통계
+  final Map<String, int> categoryStats; // 카테고리별 푼 문제 수
+  final Map<String, int> categoryCorrect; // 카테고리별 정답 수
+  final Map<String, int> categoryTime; // 카테고리별 학습 시간 (초)
+  final List<DateTime> sessionTimestamps; // 세션 타임스탬프 (학습 시간 패턴 분석용)
 
   const LearningStats({
     required this.userId,
@@ -24,6 +27,9 @@ class LearningStats {
     required this.totalSessions,
     required this.lastStudyDate,
     required this.categoryStats,
+    this.categoryCorrect = const {},
+    this.categoryTime = const {},
+    this.sessionTimestamps = const [],
   });
 
   /// JSON으로부터 LearningStats 객체 생성
@@ -40,6 +46,17 @@ class LearningStats {
       totalSessions: json['totalSessions'] as int,
       lastStudyDate: DateTime.parse(json['lastStudyDate'] as String),
       categoryStats: Map<String, int>.from(json['categoryStats'] as Map),
+      categoryCorrect: json['categoryCorrect'] != null
+          ? Map<String, int>.from(json['categoryCorrect'] as Map)
+          : {},
+      categoryTime: json['categoryTime'] != null
+          ? Map<String, int>.from(json['categoryTime'] as Map)
+          : {},
+      sessionTimestamps: json['sessionTimestamps'] != null
+          ? (json['sessionTimestamps'] as List)
+              .map((e) => DateTime.parse(e as String))
+              .toList()
+          : [],
     );
   }
 
@@ -57,6 +74,9 @@ class LearningStats {
       'totalSessions': totalSessions,
       'lastStudyDate': lastStudyDate.toIso8601String(),
       'categoryStats': categoryStats,
+      'categoryCorrect': categoryCorrect,
+      'categoryTime': categoryTime,
+      'sessionTimestamps': sessionTimestamps.map((e) => e.toIso8601String()).toList(),
     };
   }
 
@@ -73,6 +93,9 @@ class LearningStats {
     int? totalSessions,
     DateTime? lastStudyDate,
     Map<String, int>? categoryStats,
+    Map<String, int>? categoryCorrect,
+    Map<String, int>? categoryTime,
+    List<DateTime>? sessionTimestamps,
   }) {
     return LearningStats(
       userId: userId ?? this.userId,
@@ -86,6 +109,9 @@ class LearningStats {
       totalSessions: totalSessions ?? this.totalSessions,
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
       categoryStats: categoryStats ?? this.categoryStats,
+      categoryCorrect: categoryCorrect ?? this.categoryCorrect,
+      categoryTime: categoryTime ?? this.categoryTime,
+      sessionTimestamps: sessionTimestamps ?? this.sessionTimestamps,
     );
   }
 

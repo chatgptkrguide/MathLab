@@ -274,11 +274,26 @@ class AchievementProvider extends StateNotifier<AchievementState> {
       if (data != null) {
         final unlockedIds = List<String>.from(data['unlockedIds'] ?? []);
         final progressMap = Map<String, int>.from(data['progressMap'] ?? {});
+        final unlockedDatesData = data['unlockedDates'];
+
+        // 달성 날짜 맵 생성
+        final unlockedDates = <String, DateTime>{};
+        if (unlockedDatesData != null) {
+          final datesMap = Map<String, String>.from(unlockedDatesData);
+          for (final entry in datesMap.entries) {
+            try {
+              unlockedDates[entry.key] = DateTime.parse(entry.value);
+            } catch (e) {
+              Logger.warning('Failed to parse unlock date for ${entry.key}');
+            }
+          }
+        }
 
         // 업적 상태 복원
         final updatedAchievements = state.achievements.map((achievement) {
           final isUnlocked = unlockedIds.contains(achievement.id);
           final progress = progressMap[achievement.id] ?? 0;
+          final unlockDate = unlockedDates[achievement.id];
 
           return Achievement(
             id: achievement.id,
@@ -289,7 +304,7 @@ class AchievementProvider extends StateNotifier<AchievementState> {
             targetValue: achievement.targetValue,
             currentValue: progress,
             isUnlocked: isUnlocked,
-            unlockedAt: isUnlocked ? DateTime.now() : null, // TODO: 실제 날짜 저장
+            unlockedAt: unlockDate,
             rarity: achievement.rarity,
             xpReward: achievement.xpReward,
           );
@@ -311,13 +326,21 @@ class AchievementProvider extends StateNotifier<AchievementState> {
   Future<void> _saveState() async {
     try {
       final progressMap = <String, int>{};
+      final unlockedDates = <String, String>{};
+
       for (final achievement in state.achievements) {
         progressMap[achievement.id] = achievement.currentValue;
+
+        // 달성 날짜 저장
+        if (achievement.isUnlocked && achievement.unlockedAt != null) {
+          unlockedDates[achievement.id] = achievement.unlockedAt!.toIso8601String();
+        }
       }
 
       await _storage.saveObject(_storageKey, {
         'unlockedIds': state.unlockedIds,
         'progressMap': progressMap,
+        'unlockedDates': unlockedDates,
       });
 
       Logger.info('Achievement state saved');

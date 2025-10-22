@@ -65,9 +65,29 @@ class LearningStatsNotifier extends StateNotifier<LearningStats?> {
 
     // 카테고리별 통계 업데이트
     final newCategoryStats = Map<String, int>.from(state!.categoryStats);
+    final newCategoryCorrect = Map<String, int>.from(state!.categoryCorrect);
+    final newCategoryTime = Map<String, int>.from(state!.categoryTime);
+
+    // 각 문제의 카테고리별 통계 추적
+    final categoryTimePerProblem = totalTimeSpent.inSeconds ~/ (totalProblems > 0 ? totalProblems : 1);
     for (final problem in problems) {
-      newCategoryStats[problem.category] =
-          (newCategoryStats[problem.category] ?? 0) + 1;
+      final category = problem.category;
+
+      // 문제 수 증가
+      newCategoryStats[category] = (newCategoryStats[category] ?? 0) + 1;
+
+      // 시간 추가 (대략적인 분배)
+      newCategoryTime[category] = (newCategoryTime[category] ?? 0) + categoryTimePerProblem;
+    }
+
+    // 정답 처리된 문제의 카테고리별 정답 수 증가
+    // 참고: 이 메서드에서 정확한 정답 여부를 알 수 없으므로,
+    // recordProblemResult 메서드를 통해 개별적으로 추적하는 것이 더 정확
+
+    // 세션 타임스탬프 추가 (최근 50개만 유지)
+    final newTimestamps = [...state!.sessionTimestamps, now];
+    if (newTimestamps.length > 50) {
+      newTimestamps.removeRange(0, newTimestamps.length - 50);
     }
 
     state = state!.copyWith(
@@ -78,6 +98,36 @@ class LearningStatsNotifier extends StateNotifier<LearningStats?> {
       totalStudyTime: state!.totalStudyTime + totalTimeSpent.inMinutes,
       lastStudyDate: today,
       categoryStats: newCategoryStats,
+      categoryCorrect: newCategoryCorrect,
+      categoryTime: newCategoryTime,
+      sessionTimestamps: newTimestamps,
+    );
+
+    await _saveStats();
+  }
+
+  /// 개별 문제 결과 기록 (카테고리별 정답률 추적용)
+  Future<void> recordProblemResult({
+    required String category,
+    required bool isCorrect,
+    required int timeSpentSeconds,
+  }) async {
+    if (state == null) return;
+
+    final newCategoryCorrect = Map<String, int>.from(state!.categoryCorrect);
+    final newCategoryTime = Map<String, int>.from(state!.categoryTime);
+
+    // 정답이면 카테고리별 정답 수 증가
+    if (isCorrect) {
+      newCategoryCorrect[category] = (newCategoryCorrect[category] ?? 0) + 1;
+    }
+
+    // 카테고리별 시간 추가
+    newCategoryTime[category] = (newCategoryTime[category] ?? 0) + timeSpentSeconds;
+
+    state = state!.copyWith(
+      categoryCorrect: newCategoryCorrect,
+      categoryTime: newCategoryTime,
     );
 
     await _saveStats();
@@ -168,12 +218,23 @@ class LearningStatsNotifier extends StateNotifier<LearningStats?> {
       final category = entry.key;
       final problemCount = entry.value;
 
+      // 카테고리별 정답 수
+      final correctCount = state!.categoryCorrect[category] ?? 0;
+      final categoryAccuracy = problemCount > 0 ? correctCount / problemCount : 0.0;
+
+      // 카테고리별 평균 시간 (초 단위)
+      final totalTime = state!.categoryTime[category] ?? 0;
+      final avgTimeSeconds = problemCount > 0 ? totalTime ~/ problemCount : 0;
+
+      // 개선도 계산 (간단하게: 정답률이 0.7 이상이면 양수)
+      final improvementRate = categoryAccuracy >= 0.7 ? 0.1 : -0.05;
+
       performance[category] = CategoryPerformance(
         category: category,
         problemsSolved: problemCount,
-        accuracy: 0.8, // TODO: 실제 카테고리별 정답률 계산
-        averageTime: 45, // TODO: 실제 평균 시간 계산
-        improvement: 0.1, // TODO: 실제 개선도 계산
+        accuracy: categoryAccuracy,
+        averageTime: avgTimeSeconds,
+        improvement: improvementRate,
       );
     }
 
@@ -205,8 +266,41 @@ class LearningStatsNotifier extends StateNotifier<LearningStats?> {
         .map((e) => e.key)
         .toList();
 
+    // 선호하는 학습 시간대 분석
+    String preferredStudyTime = 'unknown';
+    if (state!.sessionTimestamps.isNotEmpty) {
+      final timeOfDayCounts = <String, int>{
+        'morning': 0, // 6-12시
+        'afternoon': 0, // 12-18시
+        'evening': 0, // 18-22시
+        'night': 0, // 22-6시
+      };
+
+      for (final timestamp in state!.sessionTimestamps) {
+        final hour = timestamp.hour;
+        if (hour >= 6 && hour < 12) {
+          timeOfDayCounts['morning'] = (timeOfDayCounts['morning'] ?? 0) + 1;
+        } else if (hour >= 12 && hour < 18) {
+          timeOfDayCounts['afternoon'] = (timeOfDayCounts['afternoon'] ?? 0) + 1;
+        } else if (hour >= 18 && hour < 22) {
+          timeOfDayCounts['evening'] = (timeOfDayCounts['evening'] ?? 0) + 1;
+        } else {
+          timeOfDayCounts['night'] = (timeOfDayCounts['night'] ?? 0) + 1;
+        }
+      }
+
+      // 가장 많이 학습한 시간대 찾기
+      var maxCount = 0;
+      for (final entry in timeOfDayCounts.entries) {
+        if (entry.value > maxCount) {
+          maxCount = entry.value;
+          preferredStudyTime = entry.key;
+        }
+      }
+    }
+
     return LearningPattern(
-      preferredStudyTime: 'afternoon', // TODO: 실제 시간 패턴 분석
+      preferredStudyTime: preferredStudyTime,
       strongCategories: strongCategories,
       weakCategories: weakCategories,
       recommendedFocus: weakCategories.isNotEmpty ? weakCategories.first : 'balanced',

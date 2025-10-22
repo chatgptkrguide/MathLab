@@ -155,8 +155,12 @@ class UserNotifier extends StateNotifier<User?> {
   Future<void> addXP(int xp) async {
     if (state == null) return;
 
+    // 날짜가 바뀌었으면 일일 XP 리셋
+    _checkAndResetDailyXP();
+
     final currentXP = state!.xp + xp;
     final currentLevel = state!.level;
+    final currentDailyXP = state!.dailyXP + (xp > 0 ? xp : 0); // 음수 XP는 일일 XP에 반영하지 않음
 
     // 레벨업 체크
     final newLevel = (currentXP ~/ GameConstants.xpPerLevel) + 1;
@@ -165,12 +169,13 @@ class UserNotifier extends StateNotifier<User?> {
     state = state!.copyWith(
       xp: currentXP,
       level: newLevel,
+      dailyXP: currentDailyXP,
     );
 
     await _saveUser();
 
     Logger.info(
-      'XP 추가: +$xp XP (총 $currentXP XP, 레벨 $newLevel)',
+      'XP 추가: +$xp XP (총 $currentXP XP, 오늘 $currentDailyXP XP, 레벨 $newLevel)',
       tag: 'UserProvider',
     );
 
@@ -283,10 +288,36 @@ class UserNotifier extends StateNotifier<User?> {
   }
 
   /// 오늘 획득한 XP
-  /// TODO: LearningStats에서 실제 값 추적하도록 개선 필요
   int _getTodayXP() {
-    // 임시로 전체 XP의 일부로 계산
-    return state?.xp.remainder(GameConstants.dailyGoalXP) ?? 0;
+    if (state == null) return 0;
+
+    // 날짜가 바뀌었는지 확인
+    _checkAndResetDailyXP();
+
+    return state!.dailyXP;
+  }
+
+  /// 일일 XP 리셋 필요 여부 확인 및 실행
+  void _checkAndResetDailyXP() {
+    if (state == null) return;
+
+    final now = DateTime.now();
+    final lastReset = state!.lastXPResetDate;
+
+    // 날짜가 바뀌었는지 확인 (년-월-일만 비교)
+    final isSameDay = now.year == lastReset.year &&
+                      now.month == lastReset.month &&
+                      now.day == lastReset.day;
+
+    if (!isSameDay) {
+      // 날짜가 바뀌었으면 일일 XP 리셋
+      state = state!.copyWith(
+        dailyXP: 0,
+        lastXPResetDate: now,
+      );
+      _saveUser();
+      Logger.info('일일 XP 리셋 완료', tag: 'UserProvider');
+    }
   }
 
   /// 다음 레벨까지 필요한 XP
