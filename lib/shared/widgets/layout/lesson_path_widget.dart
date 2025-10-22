@@ -17,7 +17,7 @@ class LessonPathWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF7F7F7), // 듀오링고 스타일 밝은 회색 배경
+      color: AppColors.background, // GoMath 배경색
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
@@ -136,7 +136,7 @@ class LessonPathWidget extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFD700), // 골드
+                            color: AppColors.mathYellow, // GoMath 골드
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -155,7 +155,7 @@ class LessonPathWidget extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFD700), // 골드
+                            color: AppColors.mathYellow, // GoMath 골드
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -199,36 +199,36 @@ class LessonPathWidget extends StatelessWidget {
     );
   }
 
-  /// 듀오링고 스타일 플랫 색상
+  /// GoMath 스타일 플랫 색상
   Color _getColor(LessonNode lesson) {
-    if (lesson.isLocked) return const Color(0xFFE5E5E5); // 밝은 회색
-    if (lesson.isCompleted) return const Color(0xFF58CC02); // 듀오링고 그린
-    if (lesson.isCurrent) return const Color(0xFF1CB0F6); // 듀오링고 블루
+    if (lesson.isLocked) return AppColors.borderLight; // 밝은 회색
+    if (lesson.isCompleted) return AppColors.successGreen; // GoMath 그린
+    if (lesson.isCurrent) return AppColors.mathBlue; // GoMath 블루
 
-    // 다양한 파스텔 색상들 (듀오링고 스타일)
+    // 다양한 GoMath 색상들
     final colors = [
-      const Color(0xFF58CC02), // 그린
-      const Color(0xFF1CB0F6), // 블루
-      const Color(0xFFFF9600), // 오렌지
-      const Color(0xFFCE82FF), // 퍼플
-      const Color(0xFFFF4B4B), // 레드
-      const Color(0xFF2CB8E6), // 하늘색
+      AppColors.successGreen, // 그린
+      AppColors.mathBlue, // 블루
+      AppColors.mathOrange, // 오렌지
+      AppColors.mathPurple, // 퍼플
+      AppColors.mathRed, // 레드
+      AppColors.mathTeal, // 틸
     ];
     return colors[lesson.lessonNumber % colors.length];
   }
 
-  /// 3D 그림자용 더 어두운 색상
+  /// 3D 그림자용 더 어두운 색상 (GoMath)
   Color _getDarkerColor(LessonNode lesson) {
-    if (lesson.isCompleted) return const Color(0xFF46A302); // 어두운 그린
-    if (lesson.isCurrent) return const Color(0xFF1899D6); // 어두운 블루
+    if (lesson.isCompleted) return const Color(0xFF2A8643); // 어두운 그린
+    if (lesson.isCurrent) return const Color(0xFF4E91C8); // 어두운 블루
 
     final darkColors = [
-      const Color(0xFF46A302), // 어두운 그린
-      const Color(0xFF1899D6), // 어두운 블루
-      const Color(0xFFE07B00), // 어두운 오렌지
-      const Color(0xFFB568E0), // 어두운 퍼플
-      const Color(0xFFE03B3B), // 어두운 레드
-      const Color(0xFF23A0C6), // 어두운 하늘색
+      const Color(0xFF2A8643), // 어두운 그린 (successGreen 20% darker)
+      const Color(0xFF4E91C8), // 어두운 블루 (mathBlue 20% darker)
+      const Color(0xFFE68600), // 어두운 오렌지 (mathOrange 20% darker)
+      const Color(0xFFBE72EF), // 어두운 퍼플 (mathPurple 20% darker)
+      const Color(0xFFE03B3B), // 어두운 레드 (mathRed 20% darker)
+      const Color(0xFF38B9A0), // 어두운 틸 (mathTeal 20% darker)
     ];
     return darkColors[lesson.lessonNumber % darkColors.length];
   }
@@ -268,9 +268,9 @@ class DuolingoPathPainter extends CustomPainter {
             ? size.width - 45.0
             : size.width / 2;
 
-    // 듀오링고 스타일 점선 그리기
+    // GoMath 스타일 점선 그리기
     final paint = Paint()
-      ..color = const Color(0xFFD7D7D7) // 밝은 회색 점선
+      ..color = AppColors.borderLight // 밝은 회색 점선
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 
