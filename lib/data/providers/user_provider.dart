@@ -1,9 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
+import '../services/local_storage_service.dart';
+import '../../shared/constants/game_constants.dart';
+import '../../shared/utils/logger.dart';
 
 /// 사용자 정보 상태 관리
 class UserNotifier extends StateNotifier<User?> {
@@ -12,23 +13,36 @@ class UserNotifier extends StateNotifier<User?> {
   }
 
   final MockDataService _dataService = MockDataService();
+  final LocalStorageService _storage = LocalStorageService();
 
   /// 앱 시작 시 사용자 정보 로드
   Future<void> _loadUser() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userJson = prefs.getString('user');
+      Logger.info('사용자 정보 로드 시작', tag: 'UserProvider');
 
-      if (userJson != null) {
+      final user = await _storage.loadObject<User>(
+        key: GameConstants.userStorageKey,
+        fromJson: User.fromJson,
+      );
+
+      if (user != null) {
         // 저장된 사용자 정보가 있으면 로드
-        final userData = jsonDecode(userJson);
-        state = User.fromJson(userData);
+        state = user;
+        Logger.info('사용자 정보 로드 성공: ${user.name}', tag: 'UserProvider');
       } else {
         // 없으면 샘플 사용자 생성
         state = _dataService.getSampleUser();
         await _saveUser();
+        Logger.info('새 사용자 생성: ${state?.name}', tag: 'UserProvider');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 정보 로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserProvider',
+      );
+
       // 에러 시 샘플 사용자로 폴백
       state = _dataService.getSampleUser();
     }
@@ -36,17 +50,29 @@ class UserNotifier extends StateNotifier<User?> {
 
   /// 특정 계정의 사용자 정보 로드
   Future<void> loadUserByAccount(String accountId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString('user_$accountId');
+    try {
+      final user = await _storage.loadObject<User>(
+        key: 'user_$accountId',
+        fromJson: User.fromJson,
+      );
 
-    if (userJson != null) {
-      // 저장된 사용자 정보가 있으면 로드
-      final userData = jsonDecode(userJson);
-      state = User.fromJson(userData);
-    } else {
-      // 없으면 새 사용자 생성
-      state = _dataService.getSampleUser().copyWith(id: accountId);
-      await _saveUser();
+      if (user != null) {
+        // 저장된 사용자 정보가 있으면 로드
+        state = user;
+        Logger.info('계정 로드 성공: $accountId', tag: 'UserProvider');
+      } else {
+        // 없으면 새 사용자 생성
+        state = _dataService.getSampleUser().copyWith(id: accountId);
+        await _saveUser();
+        Logger.info('새 계정 생성: $accountId', tag: 'UserProvider');
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        '계정 로드 실패: $accountId',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserProvider',
+      );
     }
   }
 
@@ -59,9 +85,21 @@ class UserNotifier extends StateNotifier<User?> {
   Future<void> _saveUser() async {
     if (state == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = jsonEncode(state!.toJson());
-    await prefs.setString('user', userJson);
+    try {
+      await _storage.saveObject<User>(
+        key: GameConstants.userStorageKey,
+        data: state!,
+        toJson: (user) => user.toJson(),
+      );
+      Logger.debug('사용자 정보 저장 완료', tag: 'UserProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 정보 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserProvider',
+      );
+    }
   }
 
   /// XP 추가
@@ -71,8 +109,8 @@ class UserNotifier extends StateNotifier<User?> {
     final currentXP = state!.xp + xp;
     final currentLevel = state!.level;
 
-    // 레벨업 체크 (100 XP = 1 레벨)
-    final newLevel = (currentXP ~/ 100) + 1;
+    // 레벨업 체크
+    final newLevel = (currentXP ~/ GameConstants.xpPerLevel) + 1;
     final leveledUp = newLevel > currentLevel;
 
     state = state!.copyWith(
@@ -82,6 +120,11 @@ class UserNotifier extends StateNotifier<User?> {
 
     await _saveUser();
 
+    Logger.info(
+      'XP 추가: +$xp XP (총 $currentXP XP, 레벨 $newLevel)',
+      tag: 'UserProvider',
+    );
+
     // 레벨업 시 알림
     if (leveledUp) {
       await _onLevelUp(newLevel);
@@ -90,22 +133,21 @@ class UserNotifier extends StateNotifier<User?> {
 
   /// 레벨업 처리
   Future<void> _onLevelUp(int newLevel) async {
-    if (kDebugMode) {
-      debugPrint('🎉 레벨 업! 새 레벨: $newLevel');
-    }
+    Logger.info('🎉 레벨 업! 새 레벨: $newLevel', tag: 'UserProvider');
 
     // 레벨업 햅틱 피드백
     try {
       // await AppHapticFeedback.levelUp();
-    } catch (e) {
-      // 햅틱 미지원 디바이스 대응
-      if (kDebugMode) {
-        debugPrint('햅틱 피드백 실패: $e');
-      }
+    } catch (e, stackTrace) {
+      Logger.warning(
+        '햅틱 피드백 실패',
+        tag: 'UserProvider',
+      );
     }
 
     // 레벨업 시 하트 완전 회복
-    state = state!.copyWith(hearts: 5);
+    state = state!.copyWith(hearts: GameConstants.maxHearts);
+    await _saveUser();
   }
 
   /// 스트릭 업데이트 (매일 학습 시 호출)
@@ -115,9 +157,8 @@ class UserNotifier extends StateNotifier<User?> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // SharedPreferences에서 마지막 학습 날짜 확인
-    final prefs = await SharedPreferences.getInstance();
-    final lastStudyDateString = prefs.getString('lastStudyDate');
+    // 마지막 학습 날짜 확인
+    final lastStudyDateString = await _storage.getString(GameConstants.lastStudyDateKey);
 
     DateTime? lastStudyDate;
     if (lastStudyDateString != null) {
@@ -130,21 +171,29 @@ class UserNotifier extends StateNotifier<User?> {
     if (lastStudyDate == null) {
       // 첫 학습
       newStreakDays = 1;
+      Logger.info('첫 학습 시작! 스트릭: 1일', tag: 'UserProvider');
     } else if (lastStudyDate.isAtSameMomentAs(today)) {
       // 오늘 이미 학습함 - 스트릭 유지
+      Logger.debug('오늘 이미 학습 완료', tag: 'UserProvider');
       return;
     } else if (lastStudyDate.add(const Duration(days: 1)).isAtSameMomentAs(today)) {
       // 어제 학습했음 - 스트릭 증가
       newStreakDays = state!.streakDays + 1;
+      Logger.info('스트릭 증가! 현재: $newStreakDays일', tag: 'UserProvider');
     } else {
       // 스트릭 끊김 - 새로 시작
+      final oldStreak = state!.streakDays;
       newStreakDays = 1;
+      Logger.warning(
+        '스트릭 끊김! 이전: $oldStreak일 → 새로 시작: 1일',
+        tag: 'UserProvider',
+      );
     }
 
     state = state!.copyWith(streakDays: newStreakDays);
 
     // 마지막 학습 날짜 저장
-    await prefs.setString('lastStudyDate', today.toIso8601String());
+    await _storage.setString(GameConstants.lastStudyDateKey, today.toIso8601String());
     await _saveUser();
   }
 
@@ -166,26 +215,29 @@ class UserNotifier extends StateNotifier<User?> {
 
   /// 사용자 초기화 (테스트용)
   Future<void> resetUser() async {
+    Logger.warning('사용자 데이터 초기화 시작', tag: 'UserProvider');
+
     state = _dataService.getSampleUser();
     await _saveUser();
 
-    // SharedPreferences 클리어
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('lastStudyDate');
+    // Storage 클리어
+    await _storage.remove(GameConstants.lastStudyDateKey);
+
+    Logger.info('사용자 데이터 초기화 완료', tag: 'UserProvider');
   }
 
   /// 일일 XP 목표 달성 여부
   bool get hasReachedDailyGoal {
     if (state == null) return false;
-    const dailyGoal = 100;
     final todayXP = _getTodayXP();
-    return todayXP >= dailyGoal;
+    return todayXP >= GameConstants.dailyGoalXP;
   }
 
-  /// 오늘 획득한 XP (실제로는 서버에서 계산해야 함)
+  /// 오늘 획득한 XP
+  /// TODO: LearningStats에서 실제 값 추적하도록 개선 필요
   int _getTodayXP() {
     // 임시로 전체 XP의 일부로 계산
-    return state?.xp.remainder(100) ?? 0;
+    return state?.xp.remainder(GameConstants.dailyGoalXP) ?? 0;
   }
 
   /// 다음 레벨까지 필요한 XP
@@ -212,8 +264,10 @@ class UserNotifier extends StateNotifier<User?> {
   Future<void> restoreHearts() async {
     if (state == null) return;
 
-    state = state!.copyWith(hearts: 5);
+    state = state!.copyWith(hearts: GameConstants.maxHearts);
     await _saveUser();
+
+    Logger.info('하트 복구 완료: ${GameConstants.maxHearts}개', tag: 'UserProvider');
   }
 }
 

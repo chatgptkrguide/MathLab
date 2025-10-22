@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_text_styles.dart';
-import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/constants.dart';
+import '../../shared/utils/utils.dart';
 import '../../shared/widgets/duolingo_card.dart';
 import '../../shared/widgets/duolingo_circular_progress.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
@@ -383,89 +381,78 @@ class HomeScreen extends ConsumerWidget {
   // 이벤트 핸들러
 
   void _startLearning(BuildContext context, WidgetRef ref, List<Problem> problems) async {
-    if (kDebugMode) {
-      debugPrint('🚀 학습하기 버튼 클릭됨');
-      debugPrint('📊 problems.length: ${problems.length}');
-    }
+    Logger.ui('학습하기 버튼 클릭', screen: 'HomeScreen', action: 'StartLearning');
 
     if (problems.isEmpty) {
-      if (kDebugMode) {
-        debugPrint('❌ 문제 데이터 없음');
-      }
+      Logger.warning('문제 데이터 없음', tag: 'HomeScreen');
       _showCustomSnackBar(context, '문제 데이터를 로드하는 중입니다...', AppColors.duolingoOrange);
       return;
     }
 
     final user = ref.read(userProvider);
-    if (kDebugMode) {
-      debugPrint('👤 user: ${user?.name} (level: ${user?.level})');
-    }
     if (user == null) {
-      if (kDebugMode) {
-        debugPrint('❌ 사용자 데이터 없음');
-      }
+      Logger.error('사용자 데이터 없음', tag: 'HomeScreen');
       return;
     }
 
+    Logger.info(
+      '사용자: ${user.name} (레벨: ${user.level})',
+      tag: 'HomeScreen',
+    );
+
     final recommendedProblems = ref
         .read(problemProvider.notifier)
-        .getRecommendedProblems(user.level, count: 5);
-    if (kDebugMode) {
-      debugPrint('🎯 recommendedProblems.length: ${recommendedProblems.length}');
-    }
+        .getRecommendedProblems(user.level, count: GameConstants.recommendedProblemCount);
 
     List<Problem> selectedProblems;
+    String lessonId;
+
     if (recommendedProblems.isEmpty) {
-      if (kDebugMode) {
-        debugPrint('📚 기본 레슨 사용');
-      }
+      Logger.debug('기본 레슨 사용', tag: 'HomeScreen');
       final lesson1Problems = ref
           .read(problemProvider.notifier)
-          .getProblemsByLesson('lesson001');
-      selectedProblems = lesson1Problems.take(5).toList();
-      if (kDebugMode) {
-        debugPrint('📝 lesson1Problems.length: ${lesson1Problems.length}');
-      }
+          .getProblemsByLesson(GameConstants.defaultLessonId);
+      selectedProblems = lesson1Problems.take(GameConstants.recommendedProblemCount).toList();
+      lessonId = GameConstants.defaultLessonId;
     } else {
       selectedProblems = recommendedProblems;
+      lessonId = 'recommended';
     }
 
-    if (kDebugMode) {
-      debugPrint('✅ selectedProblems.length: ${selectedProblems.length}');
+    if (selectedProblems.isEmpty) {
+      Logger.error('선택된 문제 없음', tag: 'HomeScreen');
+      _showCustomSnackBar(context, '문제를 찾을 수 없습니다.', AppColors.duolingoRed);
+      return;
     }
 
-    if (selectedProblems.isNotEmpty) {
-      if (kDebugMode) {
-        debugPrint('🎮 학습 화면으로 이동 시작');
+    Logger.info('문제 ${selectedProblems.length}개 선택 완료', tag: 'HomeScreen');
+
+    try {
+      // 햅틱 피드백
+      await AppHapticFeedback.success();
+
+      // 학습 화면으로 이동
+      final route = MaterialPageRoute(
+        builder: (context) => ProblemScreen(
+          lessonId: lessonId,
+          problems: selectedProblems,
+        ),
+      );
+
+      if (context.mounted) {
+        await Navigator.of(context).push(route);
+        Logger.ui('학습 화면 이동 성공', screen: 'HomeScreen');
       }
-
-      try {
-        // 부드러운 페이지 전환 + 햅틱 피드백
-        await AppHapticFeedback.success();
-
-        // 웹에서 더 안전한 네비게이션 사용
-        final route = MaterialPageRoute(
-          builder: (context) => ProblemScreen(
-            lessonId: recommendedProblems.isEmpty ? 'lesson001' : 'recommended',
-            problems: selectedProblems,
-          ),
-        );
-
-        Navigator.of(context).push(route);
-        if (kDebugMode) {
-          debugPrint('✅ 네비게이션 성공');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint('❌ 네비게이션 에러: $e');
-        }
+    } catch (e, stackTrace) {
+      Logger.error(
+        '네비게이션 에러',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'HomeScreen',
+      );
+      if (context.mounted) {
         _showCustomSnackBar(context, '페이지 이동 중 오류가 발생했습니다.', AppColors.duolingoRed);
       }
-    } else {
-      if (kDebugMode) {
-        debugPrint('❌ 선택된 문제 없음');
-      }
-      _showCustomSnackBar(context, '문제를 찾을 수 없습니다.', AppColors.duolingoRed);
     }
   }
 

@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
+import '../services/local_storage_service.dart';
+import '../../shared/constants/game_constants.dart';
+import '../../shared/utils/logger.dart';
 
 /// 문제 관련 상태 관리
 class ProblemNotifier extends StateNotifier<List<Problem>> {
@@ -11,9 +12,13 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
     _loadProblems();
   }
 
+  final LocalStorageService _storage = LocalStorageService();
+
   /// 문제 데이터 로드
   Future<void> _loadProblems() async {
     try {
+      Logger.info('문제 데이터 로드 시작', tag: 'ProblemProvider');
+
       final String data = await rootBundle.loadString('assets/data/problems.json');
       final Map<String, dynamic> jsonData = jsonDecode(data);
       final List<dynamic> problemsData = jsonData['problems'];
@@ -23,10 +28,14 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
           .toList();
 
       state = problems;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('문제 로드 실패: $e');
-      }
+      Logger.info('문제 ${problems.length}개 로드 완료', tag: 'ProblemProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '문제 로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'ProblemProvider',
+      );
       state = [];
     }
   }
@@ -52,30 +61,48 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
         ? getProblemsByCategory(category)
         : state;
 
-    if (filteredProblems.isEmpty) return [];
+    if (filteredProblems.isEmpty) {
+      Logger.warning('랜덤 문제 조회 실패: 문제 없음', tag: 'ProblemProvider');
+      return [];
+    }
 
-    filteredProblems.shuffle();
-    return filteredProblems.take(count).toList();
+    // 원본 리스트를 변경하지 않도록 복사 후 셔플
+    final shuffled = List<Problem>.from(filteredProblems)..shuffle();
+    final result = shuffled.take(count).toList();
+
+    Logger.debug(
+      '랜덤 문제 ${result.length}개 조회 (카테고리: ${category ?? "전체"})',
+      tag: 'ProblemProvider',
+    );
+
+    return result;
   }
 
   /// 특정 문제 조회
   Problem? getProblemById(String problemId) {
     try {
-      return state.firstWhere((problem) => problem.id == problemId);
-    } catch (e) {
+      return state.firstWhere(
+        (problem) => problem.id == problemId,
+        orElse: () => throw StateError('Problem not found: $problemId'),
+      );
+    } on StateError {
+      Logger.warning('문제를 찾을 수 없음: $problemId', tag: 'ProblemProvider');
       return null;
     }
   }
 
   /// 사용자 레벨에 맞는 문제 추천
-  List<Problem> getRecommendedProblems(int userLevel, {int count = 5}) {
+  List<Problem> getRecommendedProblems(
+    int userLevel, {
+    int count = GameConstants.recommendedProblemCount,
+  }) {
     // 사용자 레벨에 따른 난이도 매핑
     int targetDifficulty;
-    if (userLevel <= 2) {
+    if (userLevel <= GameConstants.beginnerLevelMax) {
       targetDifficulty = 1;
-    } else if (userLevel <= 5) {
+    } else if (userLevel <= GameConstants.intermediateLevelMax) {
       targetDifficulty = 2;
-    } else if (userLevel <= 10) {
+    } else if (userLevel <= 15) {
       targetDifficulty = 3;
     } else {
       targetDifficulty = 4;
@@ -87,8 +114,24 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
           problem.difficulty <= (targetDifficulty + 1);
     }).toList();
 
-    recommendedProblems.shuffle();
-    return recommendedProblems.take(count).toList();
+    if (recommendedProblems.isEmpty) {
+      Logger.warning(
+        '추천 문제 없음 (레벨: $userLevel, 난이도: $targetDifficulty)',
+        tag: 'ProblemProvider',
+      );
+      return [];
+    }
+
+    // 원본 리스트를 변경하지 않도록 복사 후 셔플
+    final shuffled = List<Problem>.from(recommendedProblems)..shuffle();
+    final result = shuffled.take(count).toList();
+
+    Logger.info(
+      '추천 문제 ${result.length}개 (레벨: $userLevel, 난이도: $targetDifficulty)',
+      tag: 'ProblemProvider',
+    );
+
+    return result;
   }
 }
 
@@ -98,26 +141,48 @@ class ProblemResultsNotifier extends StateNotifier<List<ProblemResult>> {
     _loadResults();
   }
 
+  final LocalStorageService _storage = LocalStorageService();
+
   /// 결과 데이터 로드
   Future<void> _loadResults() async {
-    final prefs = await SharedPreferences.getInstance();
-    final resultsJson = prefs.getStringList('problemResults') ?? [];
+    try {
+      Logger.debug('문제 결과 로드 시작', tag: 'ProblemResultsProvider');
 
-    final results = resultsJson
-        .map((json) => ProblemResult.fromJson(jsonDecode(json)))
-        .toList();
+      final results = await _storage.loadList<ProblemResult>(
+        key: GameConstants.problemResultsKey,
+        fromJson: ProblemResult.fromJson,
+      );
 
-    state = results;
+      state = results;
+      Logger.info('문제 결과 ${results.length}개 로드 완료', tag: 'ProblemResultsProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '문제 결과 로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'ProblemResultsProvider',
+      );
+      state = [];
+    }
   }
 
   /// 결과 데이터 저장
   Future<void> _saveResults() async {
-    final prefs = await SharedPreferences.getInstance();
-    final resultsJson = state
-        .map((result) => jsonEncode(result.toJson()))
-        .toList();
-
-    await prefs.setStringList('problemResults', resultsJson);
+    try {
+      await _storage.saveList<ProblemResult>(
+        key: GameConstants.problemResultsKey,
+        data: state,
+        toJson: (result) => result.toJson(),
+      );
+      Logger.debug('문제 결과 저장 완료: ${state.length}개', tag: 'ProblemResultsProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '문제 결과 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'ProblemResultsProvider',
+      );
+    }
   }
 
   /// 새 결과 추가
