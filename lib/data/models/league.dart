@@ -3,10 +3,10 @@ import '../../shared/constants/app_colors.dart';
 
 /// 리그 티어
 enum LeagueTier {
-  bronze('브론즈', '🥉', AppColors.mathOrange, 0),
-  silver('실버', '🥈', Color(0xFFC0C0C0), 100),
-  gold('골드', '🥇', AppColors.mathYellow, 500),
-  diamond('다이아', '💎', Color(0xFF00BCD4), 1000);
+  bronze('브론즈', '🥉', AppColors.mathOrange, 0), // GoMath orange
+  silver('실버', '🥈', Color(0xFFC0C0C0), 100), // Silver (actual metal color)
+  gold('골드', '🥇', AppColors.mathYellow, 500), // GoMath yellow (gold)
+  diamond('다이아', '💎', AppColors.mathTeal, 1000); // GoMath teal (diamond)
 
   const LeagueTier(this.displayName, this.emoji, this.color, this.xpThreshold);
 
@@ -60,13 +60,13 @@ enum LeagueTier {
   List<Color> get gradientColors {
     switch (this) {
       case LeagueTier.bronze:
-        return [Color(0xFFCD7F32), Color(0xFFB8692D)];
+        return AppColors.orangeGradient; // GoMath orange gradient
       case LeagueTier.silver:
-        return [Color(0xFFC0C0C0), Color(0xFFA8A8A8)];
+        return [const Color(0xFFC0C0C0), const Color(0xFFA8A8A8)]; // Silver metal gradient
       case LeagueTier.gold:
-        return [Color(0xFFFFD700), Color(0xFFFFA500)];
+        return [AppColors.mathYellow, AppColors.mathYellow.withValues(alpha: 0.8)]; // GoMath gold gradient
       case LeagueTier.diamond:
-        return [Color(0xFF00BCD4), Color(0xFF0097A7)];
+        return [AppColors.mathTeal, AppColors.mathTeal.withValues(alpha: 0.8)]; // GoMath teal gradient
     }
   }
 }
