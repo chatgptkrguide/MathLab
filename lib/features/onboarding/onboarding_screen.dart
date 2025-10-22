@@ -82,8 +82,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       title: '주간 리그 경쟁',
       description: '50명과 함께 주간 리그에서\n경쟁하며 승급을 노리세요',
       gradient: [
-        Color(0xFFFFD700),
-        Color(0xFFFFA500),
+        AppColors.mathYellow, // GoMath 골드
+        AppColors.mathOrange, // GoMath 오렌지
       ],
       features: [
         '🥇 상위 20% 승급',
