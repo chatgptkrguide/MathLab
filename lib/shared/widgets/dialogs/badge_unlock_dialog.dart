@@ -157,19 +157,19 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
     super.dispose();
   }
 
-  /// 희귀도별 색상
+  /// 희귀도별 색상 (GoMath)
   Color get _rarityColor {
     switch (widget.achievement.rarity) {
       case AchievementRarity.common:
-        return const Color(0xFF9E9E9E); // Gray
+        return AppColors.textSecondary; // Gray (GoMath)
       case AchievementRarity.uncommon:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.successGreen; // Green (GoMath)
       case AchievementRarity.rare:
-        return const Color(0xFF2196F3); // Blue
+        return AppColors.mathBlue; // Blue (GoMath)
       case AchievementRarity.epic:
-        return const Color(0xFF9C27B0); // Purple
+        return AppColors.mathPurple; // Purple (GoMath)
       case AchievementRarity.legendary:
-        return const Color(0xFFFFD700); // Gold
+        return AppColors.mathYellow; // Gold (GoMath)
     }
   }
 
@@ -455,7 +455,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
           AppColors.mathTeal,
           AppColors.mathButtonBlue,
           AppColors.successGreen,
-          const Color(0xFFFFD700),
+          AppColors.mathYellow, // Gold (GoMath)
         ],
       ),
     );
