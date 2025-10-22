@@ -496,7 +496,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     if (_isAnswerSubmitted) {
       return _isCorrect
           ? AppColors.successGreen.withValues(alpha: 0.8)
-          : const Color(0xFF2B4BEF); // GoMath 버튼 블루 다크
+          : const Color(0xFF2B4BEF); // Darker mathButtonBlue (GoMath 20% darker)
     }
     return AppColors.successGreen.withValues(alpha: 0.8); // 어두운 초록색
   }
