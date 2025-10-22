@@ -282,9 +282,9 @@ class _ParticipantCard extends StatelessWidget {
   });
 
   Color _getRankColor() {
-    if (rank == 1) return const Color(0xFFFFD700); // 금
-    if (rank == 2) return const Color(0xFFC0C0C0); // 은
-    if (rank == 3) return const Color(0xFFCD7F32); // 동
+    if (rank == 1) return AppColors.mathYellow; // 금 (GoMath)
+    if (rank == 2) return const Color(0xFFC0C0C0); // 은 (표준 메달 색상)
+    if (rank == 3) return const Color(0xFFCD7F32); // 동 (표준 메달 색상)
     return AppColors.textSecondary;
   }
 
