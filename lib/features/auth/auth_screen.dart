@@ -1,10 +1,10 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_text_styles.dart';
-import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/constants.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
+import '../../shared/widgets/buttons/social_login_button.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/user_account.dart';
 import '../../data/providers/auth_provider.dart';
@@ -313,6 +313,54 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
             ],
 
+            const SizedBox(height: AppDimensions.spacingXL),
+
+            // 구분선
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingM),
+                  child: Text(
+                    '또는',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+
+            const SizedBox(height: AppDimensions.spacingXL),
+
+            // 소셜 로그인 버튼들
+            SocialLoginButton(
+              provider: SocialLoginProvider.google,
+              onPressed: _signInWithGoogle,
+              isLoading: authState.isLoading,
+            ),
+
+            const SizedBox(height: AppDimensions.spacingM),
+
+            SocialLoginButton(
+              provider: SocialLoginProvider.kakao,
+              onPressed: _signInWithKakao,
+              isLoading: authState.isLoading,
+            ),
+
+            const SizedBox(height: AppDimensions.spacingM),
+
+            // Apple 로그인은 iOS에서만 표시
+            if (Platform.isIOS) ...[
+              SocialLoginButton(
+                provider: SocialLoginProvider.apple,
+                onPressed: _signInWithApple,
+                isLoading: authState.isLoading,
+              ),
+              const SizedBox(height: AppDimensions.spacingM),
+            ],
+
             const SizedBox(height: AppDimensions.spacingL),
 
             // 게스트로 계속하기
@@ -516,6 +564,53 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
     if (success && mounted) {
       Navigator.of(context).pop();
+    }
+  }
+
+  // ==================== 소셜 로그인 핸들러 ====================
+
+  void _signInWithGoogle() async {
+    await AppHapticFeedback.mediumImpact();
+
+    final success = await ref.read(authProvider.notifier).signInWithGoogle();
+
+    if (success) {
+      await AppHapticFeedback.success();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } else {
+      await AppHapticFeedback.error();
+    }
+  }
+
+  void _signInWithKakao() async {
+    await AppHapticFeedback.mediumImpact();
+
+    final success = await ref.read(authProvider.notifier).signInWithKakao();
+
+    if (success) {
+      await AppHapticFeedback.success();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } else {
+      await AppHapticFeedback.error();
+    }
+  }
+
+  void _signInWithApple() async {
+    await AppHapticFeedback.mediumImpact();
+
+    final success = await ref.read(authProvider.notifier).signInWithApple();
+
+    if (success) {
+      await AppHapticFeedback.success();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } else {
+      await AppHapticFeedback.error();
     }
   }
 

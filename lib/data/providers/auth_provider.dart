@@ -1,61 +1,133 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_account.dart';
+import '../services/local_storage_service.dart';
+import '../services/social_auth_service.dart';
+import '../../shared/constants/game_constants.dart';
+import '../../shared/utils/logger.dart';
 
 /// 인증 시스템 상태 관리
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(AuthState.initial()) {
-    _checkExistingLogin();
+    _initialize();
+  }
+
+  final LocalStorageService _storage = LocalStorageService();
+  final SocialAuthService _socialAuth = SocialAuthService();
+
+  /// 초기화
+  Future<void> _initialize() async {
+    await _initializeSocialAuth();
+    await _checkExistingLogin();
+  }
+
+  /// 소셜 로그인 초기화
+  Future<void> _initializeSocialAuth() async {
+    try {
+      await _socialAuth.initializeGoogle();
+
+      // Kakao Native App Key는 실제 앱에서 환경변수나 설정 파일에서 불러와야 함
+      // TODO: 실제 Kakao Native App Key로 교체 필요
+      await _socialAuth.initializeKakao(
+        nativeAppKey: 'YOUR_KAKAO_NATIVE_APP_KEY', // 실제 키로 교체 필요
+      );
+
+      Logger.info('소셜 로그인 초기화 완료', tag: 'AuthProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '소셜 로그인 초기화 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+    }
   }
 
   /// 기존 로그인 확인
   Future<void> _checkExistingLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final currentAccountId = prefs.getString('currentAccountId');
+    try {
+      final currentAccountId = await _storage.getString('currentAccountId');
 
-    if (currentAccountId != null) {
-      final accounts = await _loadAccounts();
-      final account = accounts.firstWhere(
-        (acc) => acc.id == currentAccountId,
-        orElse: () => throw Exception('계정을 찾을 수 없습니다'),
+      if (currentAccountId != null) {
+        final accounts = await _loadAccounts();
+        final account = accounts.firstWhere(
+          (acc) => acc.id == currentAccountId,
+          orElse: () => throw StateError('계정을 찾을 수 없습니다'),
+        );
+
+        state = AuthState(
+          isAuthenticated: true,
+          currentAccount: account,
+          availableAccounts: accounts,
+          isLoading: false,
+        );
+
+        Logger.info(
+          '기존 계정 로그인: ${account.displayName}',
+          tag: 'AuthProvider',
+        );
+      } else {
+        state = AuthState(
+          isAuthenticated: false,
+          currentAccount: null,
+          availableAccounts: await _loadAccounts(),
+          isLoading: false,
+        );
+
+        Logger.info('로그인되지 않은 상태', tag: 'AuthProvider');
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        '기존 로그인 확인 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
       );
 
-      state = AuthState(
-        isAuthenticated: true,
-        currentAccount: account,
-        availableAccounts: accounts,
-        isLoading: false,
-      );
-    } else {
-      state = AuthState(
-        isAuthenticated: false,
-        currentAccount: null,
-        availableAccounts: await _loadAccounts(),
-        isLoading: false,
-      );
+      state = AuthState.initial().copyWith(isLoading: false);
     }
   }
 
   /// 계정 목록 로드
   Future<List<UserAccount>> _loadAccounts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final accountsJson = prefs.getStringList('userAccounts') ?? [];
+    try {
+      final accounts = await _storage.loadList<UserAccount>(
+        key: 'userAccounts',
+        fromJson: UserAccount.fromJson,
+      );
 
-    return accountsJson
-        .map((json) => UserAccount.fromJson(jsonDecode(json)))
-        .toList();
+      Logger.debug('계정 ${accounts.length}개 로드 완료', tag: 'AuthProvider');
+      return accounts;
+    } catch (e, stackTrace) {
+      Logger.error(
+        '계정 목록 로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+      return [];
+    }
   }
 
   /// 계정 목록 저장
   Future<void> _saveAccounts(List<UserAccount> accounts) async {
-    final prefs = await SharedPreferences.getInstance();
-    final accountsJson = accounts
-        .map((account) => jsonEncode(account.toJson()))
-        .toList();
+    try {
+      await _storage.saveList<UserAccount>(
+        key: 'userAccounts',
+        data: accounts,
+        toJson: (account) => account.toJson(),
+      );
 
-    await prefs.setStringList('userAccounts', accountsJson);
+      Logger.debug('계정 ${accounts.length}개 저장 완료', tag: 'AuthProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '계정 목록 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+    }
   }
 
   /// 간단 회원가입 (이메일 + 이름)
@@ -158,15 +230,202 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
+  // ==================== 소셜 로그인 ====================
+
+  /// Google 로그인
+  Future<bool> signInWithGoogle() async {
+    try {
+      state = state.copyWith(isLoading: true);
+      Logger.info('Google 로그인 시도', tag: 'AuthProvider');
+
+      final result = await _socialAuth.signInWithGoogle();
+
+      if (result == null) {
+        state = state.copyWith(isLoading: false);
+        Logger.info('Google 로그인 취소됨', tag: 'AuthProvider');
+        return false;
+      }
+
+      // Google 계정으로 기존 계정이 있는지 확인
+      final existingAccounts = await _loadAccounts();
+      UserAccount? existingAccount;
+
+      try {
+        existingAccount = existingAccounts.firstWhere(
+          (acc) => acc.email == result.email,
+        );
+      } catch (e) {
+        // 기존 계정 없음
+      }
+
+      if (existingAccount != null) {
+        // 기존 계정으로 로그인
+        return await signIn(existingAccount.email);
+      } else {
+        // 새 계정 생성
+        return await signUp(
+          email: result.email,
+          displayName: result.displayName,
+          grade: GameConstants.defaultGrade,
+          accountType: AccountType.student,
+        );
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Google 로그인 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Google 로그인에 실패했습니다',
+      );
+      return false;
+    }
+  }
+
+  /// Kakao 로그인
+  Future<bool> signInWithKakao() async {
+    try {
+      state = state.copyWith(isLoading: true);
+      Logger.info('Kakao 로그인 시도', tag: 'AuthProvider');
+
+      final result = await _socialAuth.signInWithKakao();
+
+      if (result == null) {
+        state = state.copyWith(isLoading: false);
+        Logger.info('Kakao 로그인 취소됨', tag: 'AuthProvider');
+        return false;
+      }
+
+      // Kakao 계정으로 기존 계정이 있는지 확인
+      final existingAccounts = await _loadAccounts();
+      UserAccount? existingAccount;
+
+      // 이메일이 있으면 이메일로 찾고, 없으면 user ID로 찾기
+      try {
+        if (result.email.isNotEmpty) {
+          existingAccount = existingAccounts.firstWhere(
+            (acc) => acc.email == result.email,
+          );
+        } else {
+          existingAccount = existingAccounts.firstWhere(
+            (acc) => acc.id == 'kakao_${result.userId}',
+          );
+        }
+      } catch (e) {
+        // 기존 계정 없음
+      }
+
+      if (existingAccount != null) {
+        // 기존 계정으로 로그인
+        return await signIn(existingAccount.email);
+      } else {
+        // 새 계정 생성
+        return await signUp(
+          email: result.email.isNotEmpty ? result.email : 'kakao_${result.userId}@mathlab.com',
+          displayName: result.displayName,
+          grade: GameConstants.defaultGrade,
+          accountType: AccountType.student,
+        );
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Kakao 로그인 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Kakao 로그인에 실패했습니다',
+      );
+      return false;
+    }
+  }
+
+  /// Apple 로그인
+  Future<bool> signInWithApple() async {
+    try {
+      state = state.copyWith(isLoading: true);
+      Logger.info('Apple 로그인 시도', tag: 'AuthProvider');
+
+      final result = await _socialAuth.signInWithApple();
+
+      if (result == null) {
+        state = state.copyWith(isLoading: false);
+        Logger.info('Apple 로그인 취소됨', tag: 'AuthProvider');
+        return false;
+      }
+
+      // Apple 계정으로 기존 계정이 있는지 확인
+      final existingAccounts = await _loadAccounts();
+      UserAccount? existingAccount;
+
+      try {
+        if (result.email.isNotEmpty) {
+          existingAccount = existingAccounts.firstWhere(
+            (acc) => acc.email == result.email,
+          );
+        } else {
+          existingAccount = existingAccounts.firstWhere(
+            (acc) => acc.id == 'apple_${result.userId}',
+          );
+        }
+      } catch (e) {
+        // 기존 계정 없음
+      }
+
+      if (existingAccount != null) {
+        // 기존 계정으로 로그인
+        return await signIn(existingAccount.email);
+      } else {
+        // 새 계정 생성
+        return await signUp(
+          email: result.email.isNotEmpty ? result.email : 'apple_${result.userId}@mathlab.com',
+          displayName: result.displayName,
+          grade: GameConstants.defaultGrade,
+          accountType: AccountType.student,
+        );
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Apple 로그인 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Apple 로그인에 실패했습니다',
+      );
+      return false;
+    }
+  }
+
   /// 로그아웃
   Future<void> signOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('currentAccountId');
+    try {
+      await _storage.remove('currentAccountId');
 
-    state = state.copyWith(
-      isAuthenticated: false,
-      currentAccount: null,
-    );
+      // 소셜 로그인도 함께 로그아웃
+      await _socialAuth.signOutAll();
+
+      state = state.copyWith(
+        isAuthenticated: false,
+        currentAccount: null,
+      );
+
+      Logger.info('로그아웃 완료', tag: 'AuthProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '로그아웃 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+    }
   }
 
   /// 계정 삭제
@@ -189,8 +448,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// 현재 계정 설정
   Future<void> _setCurrentAccount(String accountId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentAccountId', accountId);
+    await _storage.setString('currentAccountId', accountId);
   }
 
   /// 사용자 ID 생성
@@ -200,8 +458,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// 사용자 데이터 삭제
   Future<void> _deleteUserData(String accountId) async {
-    final prefs = await SharedPreferences.getInstance();
-
     // 해당 사용자의 모든 데이터 키를 삭제
     final keys = [
       'user_$accountId',
@@ -213,8 +469,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     ];
 
     for (final key in keys) {
-      await prefs.remove(key);
+      await _storage.remove(key);
     }
+
+    Logger.info('사용자 데이터 삭제 완료: $accountId', tag: 'AuthProvider');
   }
 
   /// 에러 클리어
