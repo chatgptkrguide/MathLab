@@ -53,7 +53,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         .getCurrentUserEntry(_selectedPeriod);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1CB0F6), // Duolingo blue flat
+      backgroundColor: AppColors.mathBlue, // GoMath blue
       body: SafeArea(
         child: ResponsiveWrapper(
           child: Column(
@@ -114,7 +114,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           borderRadius: BorderRadius.circular(12),
         ),
         dividerColor: Colors.transparent,
-        labelColor: const Color(0xFF1CB0F6), // Blue text when selected
+        labelColor: AppColors.mathBlue, // GoMath blue text when selected
         unselectedLabelColor: Colors.white,
         labelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
@@ -142,7 +142,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // Duolingo 3D solid shadow
+            // GoMath 3D solid shadow
             Positioned(
               top: 6,
               left: 0,
@@ -150,7 +150,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               bottom: -6,
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF46A302), // Darker green
+                  color: const Color(0xFF2A8643), // Darker green (successGreen 20% darker)
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
@@ -159,10 +159,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF58CC02), // Duolingo green flat
+                color: AppColors.successGreen, // GoMath green
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFF46A302),
+                  color: const Color(0xFF2A8643), // Darker green
                   width: 3,
                 ),
               ),
@@ -176,7 +176,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(28),
                       border: Border.all(
-                        color: const Color(0xFF46A302),
+                        color: const Color(0xFF2A8643), // Darker green
                         width: 3,
                       ),
                     ),
@@ -184,7 +184,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       child: Text(
                         '${entry.rank}',
                         style: const TextStyle(
-                          color: Color(0xFF58CC02),
+                          color: AppColors.successGreen, // GoMath green
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
                         ),
@@ -284,12 +284,12 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? const Color(0xFFD7FFB8) // Light green highlight
+            ? const Color(0xFFD4F4DD) // Light green highlight (successGreen 80% lighter)
             : Colors.white,
         border: Border.all(
           color: entry.isCurrentUser
-              ? const Color(0xFF58CC02) // Green border for current user
-              : const Color(0xFFE5E5E5), // Light gray border
+              ? AppColors.successGreen // GoMath green border for current user
+              : AppColors.borderLight, // Light gray border
           width: entry.isCurrentUser ? 3 : 2,
         ),
         borderRadius: BorderRadius.circular(16),
@@ -313,7 +313,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Color(0xFF4B4B4B),
+                          color: AppColors.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -327,7 +327,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF58CC02), // Duolingo green
+                          color: AppColors.successGreen, // GoMath green
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -348,7 +348,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     Text(
                       entry.grade,
                       style: const TextStyle(
-                        color: Color(0xFF777777),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -358,7 +358,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     const Text(
                       '•',
                       style: TextStyle(
-                        color: Color(0xFF777777),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                       ),
                     ),
@@ -366,7 +366,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     Text(
                       'Lv.${entry.level}',
                       style: const TextStyle(
-                        color: Color(0xFF777777),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                       ),
                     ),
@@ -376,7 +376,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     Text(
                       '${entry.streakDays}일',
                       style: const TextStyle(
-                        color: Color(0xFF777777),
+                        color: AppColors.textSecondary,
                         fontSize: 13,
                       ),
                     ),
@@ -438,15 +438,15 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       );
     }
 
-    // 나머지는 순위 숫자 with Duolingo style
+    // 나머지는 순위 숫자 with GoMath style
     return Container(
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F7F7), // Light gray
+        color: AppColors.background, // Light gray
         borderRadius: BorderRadius.circular(26),
         border: Border.all(
-          color: const Color(0xFFE5E5E5),
+          color: AppColors.borderLight,
           width: 2,
         ),
       ),
@@ -456,22 +456,22 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Color(0xFF777777),
+            color: AppColors.textSecondary,
           ),
         ),
       ),
     );
   }
 
-  /// 순위별 색상
+  /// 순위별 색상 (GoMath)
   Color _getRankColor(int rank) {
     switch (rank) {
       case 1:
-        return const Color(0xFFFFD700); // 금
+        return AppColors.mathYellow; // 금 (GoMath)
       case 2:
-        return const Color(0xFFC0C0C0); // 은
+        return const Color(0xFFC0C0C0); // 은 (표준 메달 색상)
       case 3:
-        return const Color(0xFFCD7F32); // 동
+        return const Color(0xFFCD7F32); // 동 (표준 메달 색상)
       default:
         return AppColors.textSecondary;
     }
@@ -481,13 +481,13 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Color _getDarkerRankColor(int rank) {
     switch (rank) {
       case 1:
-        return const Color(0xFFE0B800); // Darker gold
+        return const Color(0xFFE5C200); // Darker gold (mathYellow 20% darker)
       case 2:
-        return const Color(0xFFA0A0A0); // Darker silver
+        return const Color(0xFFA0A0A0); // Darker silver (표준 메달 색상)
       case 3:
-        return const Color(0xFFB86D28); // Darker bronze
+        return const Color(0xFFB86D28); // Darker bronze (표준 메달 색상)
       default:
-        return const Color(0xFFE5E5E5);
+        return AppColors.borderLight;
     }
   }
 }
