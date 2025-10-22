@@ -30,10 +30,10 @@ class CustomBottomNavigation extends StatelessWidget {
           bottom: MediaQuery.of(context).padding.bottom + AppDimensions.paddingS,
         ),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Color(0xFFF5F5F5)],
+            colors: [Colors.white, AppColors.background], // White to light gray (GoMath)
           ),
           boxShadow: [
             BoxShadow(
