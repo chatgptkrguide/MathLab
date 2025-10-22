@@ -281,7 +281,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               text: _isSignUp ? '계정 만들기' : '로그인',
               onPressed: authState.isLoading ? null : _handleAuth,
               isEnabled: !authState.isLoading,
-              gradientColors: AppColors.greenGradient,
+              backgroundColor: AppColors.successGreen, // GoMath green
               height: 56,
             ),
 
@@ -691,7 +691,7 @@ class UserSwitchScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  gradientColors: AppColors.purpleGradient,
+                  backgroundColor: AppColors.mathPurple, // GoMath purple
                   icon: Icons.add,
                 ),
               );

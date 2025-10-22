@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/auth/auth_screen.dart';
 import '../shared/widgets/indicators/loading_widgets.dart';
+import '../shared/constants/app_colors.dart';
 import '../data/providers/auth_provider.dart';
 import 'main_navigation.dart';
 

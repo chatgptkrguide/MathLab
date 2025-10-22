@@ -134,7 +134,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              gradientColors: AppColors.greenGradient,
+              backgroundColor: AppColors.successGreen, // GoMath green
             ),
           ),
         ],
@@ -284,7 +284,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                   text: _isClaimingReward ? '받는 중...' : '오늘의 보상 받기',
                   onPressed: _isClaimingReward ? null : _claimReward,
                   isEnabled: !_isClaimingReward,
-                  gradientColors: AppColors.greenGradient,
+                  backgroundColor: AppColors.successGreen, // GoMath green
                   icon: Icons.card_giftcard,
                 ),
               )
