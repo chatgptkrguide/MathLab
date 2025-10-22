@@ -103,10 +103,10 @@ class _DuolingoButtonState extends State<DuolingoButton>
                   // Main button
                   Container(
                     decoration: BoxDecoration(
-                      color: enabled ? widget.backgroundColor : const Color(0xFFE5E5E5),
+                      color: enabled ? widget.backgroundColor : AppColors.borderLight, // GoMath disabled gray
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: enabled ? widget.shadowColor : const Color(0xFFD0D0D0),
+                        color: enabled ? widget.shadowColor : AppColors.borderLight.withValues(alpha: 0.8), // Darker border
                         width: 3,
                       ),
                     ),
