@@ -184,7 +184,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   decoration: BoxDecoration(
-                    color: _getShadowColor(),
+                    color: _getShadowColor, // getter - no parentheses
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
