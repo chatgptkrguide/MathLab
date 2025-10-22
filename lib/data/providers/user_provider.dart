@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
@@ -14,6 +15,7 @@ class UserNotifier extends StateNotifier<User?> {
 
   final MockDataService _dataService = MockDataService();
   final LocalStorageService _storage = LocalStorageService();
+  Timer? _heartRegenTimer;
 
   /// 앱 시작 시 사용자 정보 로드
   Future<void> _loadUser() async {
@@ -35,6 +37,9 @@ class UserNotifier extends StateNotifier<User?> {
         await _saveUser();
         Logger.info('새 사용자 생성: ${state?.name}', tag: 'UserProvider');
       }
+
+      // 하트 재생 타이머 시작
+      _startHeartRegeneration();
     } catch (e, stackTrace) {
       Logger.error(
         '사용자 정보 로드 실패',
@@ -45,7 +50,51 @@ class UserNotifier extends StateNotifier<User?> {
 
       // 에러 시 샘플 사용자로 폴백
       state = _dataService.getSampleUser();
+      _startHeartRegeneration();
     }
+  }
+
+  @override
+  void dispose() {
+    _heartRegenTimer?.cancel();
+    super.dispose();
+  }
+
+  /// 하트 재생 타이머 시작 (30분마다 하트 1개)
+  void _startHeartRegeneration() {
+    _heartRegenTimer?.cancel();
+
+    // 30분마다 실행
+    _heartRegenTimer = Timer.periodic(
+      const Duration(minutes: 30),
+      (timer) {
+        if (state != null && state!.hearts < GameConstants.maxHearts) {
+          _regenerateOneHeart();
+        }
+      },
+    );
+
+    Logger.info('하트 재생 타이머 시작 (30분마다)', tag: 'UserProvider');
+  }
+
+  /// 하트 1개 재생
+  Future<void> _regenerateOneHeart() async {
+    if (state == null || state!.hearts >= GameConstants.maxHearts) return;
+
+    state = state!.copyWith(hearts: state!.hearts + 1);
+    await _saveUser();
+
+    Logger.info('하트 재생: ${state!.hearts}/${GameConstants.maxHearts}', tag: 'UserProvider');
+  }
+
+  /// 하트 전체 구매 (광고 시청 또는 IAP)
+  Future<void> purchaseFullHearts() async {
+    if (state == null) return;
+
+    state = state!.copyWith(hearts: GameConstants.maxHearts);
+    await _saveUser();
+
+    Logger.info('하트 전체 구매 완료: ${GameConstants.maxHearts}개', tag: 'UserProvider');
   }
 
   /// 특정 계정의 사용자 정보 로드
@@ -258,6 +307,17 @@ class UserNotifier extends StateNotifier<User?> {
 
     state = state!.copyWith(hearts: state!.hearts - 1);
     await _saveUser();
+  }
+
+  /// 하트 추가
+  Future<void> addHearts(int amount) async {
+    if (state == null) return;
+
+    final newHearts = (state!.hearts + amount).clamp(0, GameConstants.maxHearts);
+    state = state!.copyWith(hearts: newHearts);
+    await _saveUser();
+
+    Logger.info('하트 추가: +$amount (현재: $newHearts개)', tag: 'UserProvider');
   }
 
   /// 하트 복구 (시간 경과 또는 구매)

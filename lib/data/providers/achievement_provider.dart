@@ -1,288 +1,504 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/models.dart';
-import '../services/mock_data_service.dart';
+import '../models/achievement.dart';
+import '../models/user.dart';
+import 'user_provider.dart';
+import '../../shared/utils/logger.dart';
+import '../../shared/services/local_storage_service.dart';
 
-/// 업적 시스템 상태 관리
-class AchievementNotifier extends StateNotifier<List<Achievement>> {
-  AchievementNotifier() : super([]) {
-    _loadAchievements();
-  }
+/// 업적 상태
+class AchievementState {
+  final List<Achievement> achievements;
+  final List<String> unlockedIds;
+  final Achievement? recentlyUnlocked;
 
-  final MockDataService _dataService = MockDataService();
+  const AchievementState({
+    required this.achievements,
+    required this.unlockedIds,
+    this.recentlyUnlocked,
+  });
 
-  /// 업적 데이터 로드
-  Future<void> _loadAchievements() async {
-    final prefs = await SharedPreferences.getInstance();
-    final achievementsJson = prefs.getStringList('achievements');
-
-    if (achievementsJson != null && achievementsJson.isNotEmpty) {
-      // 저장된 업적이 있으면 로드
-      final achievements = achievementsJson
-          .map((json) => Achievement.fromJson(jsonDecode(json)))
-          .toList();
-      state = achievements;
-    } else {
-      // 없으면 기본 업적들 로드
-      state = _dataService.getSampleAchievements();
-      await _saveAchievements();
-    }
-  }
-
-  /// 업적 데이터 저장
-  Future<void> _saveAchievements() async {
-    final prefs = await SharedPreferences.getInstance();
-    final achievementsJson = state
-        .map((achievement) => jsonEncode(achievement.toJson()))
-        .toList();
-    await prefs.setStringList('achievements', achievementsJson);
-  }
-
-  /// 업적 진행도 업데이트
-  Future<List<Achievement>> updateProgress({
-    required String userId,
-    required int totalXP,
-    required int streakDays,
-    required int problemsSolved,
-    required int correctAnswers,
-    required bool isPerfectScore,
-  }) async {
-    final updatedAchievements = <Achievement>[];
-
-    for (final achievement in state) {
-      var currentValue = achievement.currentValue;
-
-      // 업적 타입별로 현재 값 업데이트
-      switch (achievement.type) {
-        case AchievementType.xp:
-          currentValue = totalXP;
-          break;
-        case AchievementType.streak:
-          currentValue = streakDays;
-          break;
-        case AchievementType.problems:
-          currentValue = problemsSolved;
-          break;
-        case AchievementType.perfect:
-          if (isPerfectScore) {
-            currentValue = achievement.currentValue + 1;
-          }
-          break;
-        case AchievementType.lessons:
-          // TODO: 완료된 레슨 수로 업데이트
-          break;
-        case AchievementType.time:
-          // TODO: 학습 시간으로 업데이트
-          break;
-        case AchievementType.special:
-          // 특별 업적은 별도 로직으로 처리
-          break;
-      }
-
-      // 업적 달성 체크
-      final shouldUnlock = currentValue >= achievement.requiredValue &&
-                          !achievement.isUnlocked;
-
-      final updatedAchievement = achievement.copyWith(
-        currentValue: currentValue,
-        isUnlocked: achievement.isUnlocked || shouldUnlock,
-        unlockedAt: shouldUnlock ? DateTime.now() : achievement.unlockedAt,
-      );
-
-      // 새로 달성한 업적이면 리스트에 추가
-      if (shouldUnlock) {
-        updatedAchievements.add(updatedAchievement);
-      }
-
-      // 상태 업데이트
-      final index = state.indexWhere((a) => a.id == achievement.id);
-      if (index != -1) {
-        state = [
-          ...state.take(index),
-          updatedAchievement,
-          ...state.skip(index + 1),
-        ];
-      }
-    }
-
-    await _saveAchievements();
-    return updatedAchievements; // 새로 달성한 업적들 반환
-  }
-
-  /// 특정 업적 잠금 해제
-  Future<void> unlockAchievement(String achievementId) async {
-    final index = state.indexWhere((a) => a.id == achievementId);
-    if (index == -1) return;
-
-    final achievement = state[index];
-    if (achievement.isUnlocked) return;
-
-    final unlockedAchievement = achievement.copyWith(
-      isUnlocked: true,
-      unlockedAt: DateTime.now(),
+  AchievementState copyWith({
+    List<Achievement>? achievements,
+    List<String>? unlockedIds,
+    Achievement? recentlyUnlocked,
+    bool clearRecent = false,
+  }) {
+    return AchievementState(
+      achievements: achievements ?? this.achievements,
+      unlockedIds: unlockedIds ?? this.unlockedIds,
+      recentlyUnlocked: clearRecent ? null : (recentlyUnlocked ?? this.recentlyUnlocked),
     );
+  }
+}
 
-    state = [
-      ...state.take(index),
-      unlockedAchievement,
-      ...state.skip(index + 1),
+/// 업적 Provider
+class AchievementProvider extends StateNotifier<AchievementState> {
+  final Ref _ref;
+  final LocalStorageService _storage = LocalStorageService();
+
+  static const String _storageKey = 'achievements_state';
+
+  AchievementProvider(this._ref)
+      : super(const AchievementState(
+          achievements: [],
+          unlockedIds: [],
+        )) {
+    _initializeAchievements();
+    _loadState();
+  }
+
+  /// 업적 초기화
+  void _initializeAchievements() {
+    final achievements = [
+      // 문제 풀이 업적
+      Achievement(
+        id: 'first_problem',
+        name: '첫 걸음',
+        description: '첫 문제를 풀어보세요',
+        icon: '🎯',
+        type: AchievementType.problemsSolved,
+        targetValue: 1,
+        rarity: AchievementRarity.common,
+        xpReward: 10,
+      ),
+      Achievement(
+        id: 'problems_10',
+        name: '탐험가',
+        description: '문제 10개 해결',
+        icon: '🌟',
+        type: AchievementType.problemsSolved,
+        targetValue: 10,
+        rarity: AchievementRarity.common,
+        xpReward: 20,
+      ),
+      Achievement(
+        id: 'problems_50',
+        name: '수학 전사',
+        description: '문제 50개 해결',
+        icon: '⚔️',
+        type: AchievementType.problemsSolved,
+        targetValue: 50,
+        rarity: AchievementRarity.rare,
+        xpReward: 50,
+      ),
+      Achievement(
+        id: 'problems_100',
+        name: '수학 마스터',
+        description: '문제 100개 해결',
+        icon: '👑',
+        type: AchievementType.problemsSolved,
+        targetValue: 100,
+        rarity: AchievementRarity.epic,
+        xpReward: 100,
+      ),
+      Achievement(
+        id: 'problems_500',
+        name: '전설의 수학자',
+        description: '문제 500개 해결',
+        icon: '🏆',
+        type: AchievementType.problemsSolved,
+        targetValue: 500,
+        rarity: AchievementRarity.legendary,
+        xpReward: 300,
+      ),
+
+      // 스트릭 업적
+      Achievement(
+        id: 'streak_3',
+        name: '꾸준함의 시작',
+        description: '3일 연속 학습',
+        icon: '🔥',
+        type: AchievementType.streak,
+        targetValue: 3,
+        rarity: AchievementRarity.common,
+        xpReward: 15,
+      ),
+      Achievement(
+        id: 'streak_7',
+        name: '일주일의 힘',
+        description: '7일 연속 학습',
+        icon: '💪',
+        type: AchievementType.streak,
+        targetValue: 7,
+        rarity: AchievementRarity.rare,
+        xpReward: 40,
+      ),
+      Achievement(
+        id: 'streak_30',
+        name: '한 달의 기적',
+        description: '30일 연속 학습',
+        icon: '🌈',
+        type: AchievementType.streak,
+        targetValue: 30,
+        rarity: AchievementRarity.epic,
+        xpReward: 150,
+      ),
+      Achievement(
+        id: 'streak_100',
+        name: '불굴의 의지',
+        description: '100일 연속 학습',
+        icon: '💎',
+        type: AchievementType.streak,
+        targetValue: 100,
+        rarity: AchievementRarity.legendary,
+        xpReward: 500,
+      ),
+
+      // 레벨 업적
+      Achievement(
+        id: 'level_5',
+        name: '초보 탈출',
+        description: '레벨 5 달성',
+        icon: '📚',
+        type: AchievementType.level,
+        targetValue: 5,
+        rarity: AchievementRarity.common,
+        xpReward: 25,
+      ),
+      Achievement(
+        id: 'level_10',
+        name: '중급자',
+        description: '레벨 10 달성',
+        icon: '📖',
+        type: AchievementType.level,
+        targetValue: 10,
+        rarity: AchievementRarity.rare,
+        xpReward: 50,
+      ),
+      Achievement(
+        id: 'level_25',
+        name: '고급 학습자',
+        description: '레벨 25 달성',
+        icon: '🎓',
+        type: AchievementType.level,
+        targetValue: 25,
+        rarity: AchievementRarity.epic,
+        xpReward: 100,
+      ),
+      Achievement(
+        id: 'level_50',
+        name: '수학 천재',
+        description: '레벨 50 달성',
+        icon: '🧠',
+        type: AchievementType.level,
+        targetValue: 50,
+        rarity: AchievementRarity.legendary,
+        xpReward: 250,
+      ),
+
+      // XP 업적
+      Achievement(
+        id: 'xp_1000',
+        name: 'XP 수집가',
+        description: '총 1,000 XP 획득',
+        icon: '⭐',
+        type: AchievementType.totalXp,
+        targetValue: 1000,
+        rarity: AchievementRarity.rare,
+        xpReward: 30,
+      ),
+      Achievement(
+        id: 'xp_5000',
+        name: 'XP 전문가',
+        description: '총 5,000 XP 획득',
+        icon: '✨',
+        type: AchievementType.totalXp,
+        targetValue: 5000,
+        rarity: AchievementRarity.epic,
+        xpReward: 100,
+      ),
+      Achievement(
+        id: 'xp_10000',
+        name: 'XP 마스터',
+        description: '총 10,000 XP 획득',
+        icon: '💫',
+        type: AchievementType.totalXp,
+        targetValue: 10000,
+        rarity: AchievementRarity.legendary,
+        xpReward: 300,
+      ),
+
+      // 퍼펙트 업적
+      Achievement(
+        id: 'perfect_5',
+        name: '완벽주의자',
+        description: '5번 연속 정답',
+        icon: '✅',
+        type: AchievementType.perfect,
+        targetValue: 5,
+        rarity: AchievementRarity.rare,
+        xpReward: 35,
+      ),
+      Achievement(
+        id: 'perfect_10',
+        name: '무결점',
+        description: '10번 연속 정답',
+        icon: '💯',
+        type: AchievementType.perfect,
+        targetValue: 10,
+        rarity: AchievementRarity.epic,
+        xpReward: 80,
+      ),
+
+      // 시간 업적
+      Achievement(
+        id: 'speed_demon',
+        name: '스피드 데몬',
+        description: '10초 안에 문제 해결',
+        icon: '⚡',
+        type: AchievementType.timeRecord,
+        targetValue: 10,
+        rarity: AchievementRarity.rare,
+        xpReward: 40,
+      ),
+      Achievement(
+        id: 'lightning_fast',
+        name: '번개처럼 빠르게',
+        description: '5초 안에 문제 해결',
+        icon: '🚀',
+        type: AchievementType.timeRecord,
+        targetValue: 5,
+        rarity: AchievementRarity.epic,
+        xpReward: 75,
+      ),
     ];
 
-    await _saveAchievements();
+    state = state.copyWith(achievements: achievements);
+    Logger.info('Achievements initialized: ${achievements.length} achievements');
   }
 
-  /// 달성한 업적들 조회
-  List<Achievement> get unlockedAchievements {
-    return state.where((achievement) => achievement.isUnlocked).toList();
+  /// 상태 로드
+  Future<void> _loadState() async {
+    try {
+      final data = await _storage.loadObject(_storageKey);
+      if (data != null) {
+        final unlockedIds = List<String>.from(data['unlockedIds'] ?? []);
+        final progressMap = Map<String, int>.from(data['progressMap'] ?? {});
+
+        // 업적 상태 복원
+        final updatedAchievements = state.achievements.map((achievement) {
+          final isUnlocked = unlockedIds.contains(achievement.id);
+          final progress = progressMap[achievement.id] ?? 0;
+
+          return Achievement(
+            id: achievement.id,
+            name: achievement.name,
+            description: achievement.description,
+            icon: achievement.icon,
+            type: achievement.type,
+            targetValue: achievement.targetValue,
+            currentValue: progress,
+            isUnlocked: isUnlocked,
+            unlockedAt: isUnlocked ? DateTime.now() : null, // TODO: 실제 날짜 저장
+            rarity: achievement.rarity,
+            xpReward: achievement.xpReward,
+          );
+        }).toList();
+
+        state = state.copyWith(
+          achievements: updatedAchievements,
+          unlockedIds: unlockedIds,
+        );
+
+        Logger.info('Achievement state loaded: ${unlockedIds.length} unlocked');
+      }
+    } catch (e) {
+      Logger.error('Failed to load achievement state', error: e);
+    }
   }
 
-  /// 미달성 업적들 조회
-  List<Achievement> get lockedAchievements {
-    return state.where((achievement) => !achievement.isUnlocked).toList();
+  /// 상태 저장
+  Future<void> _saveState() async {
+    try {
+      final progressMap = <String, int>{};
+      for (final achievement in state.achievements) {
+        progressMap[achievement.id] = achievement.currentValue;
+      }
+
+      await _storage.saveObject(_storageKey, {
+        'unlockedIds': state.unlockedIds,
+        'progressMap': progressMap,
+      });
+
+      Logger.info('Achievement state saved');
+    } catch (e) {
+      Logger.error('Failed to save achievement state', error: e);
+    }
   }
 
-  /// 달성 가능한 업적들 (조건 만족)
-  List<Achievement> get achievableAchievements {
-    return state.where((achievement) => achievement.canUnlock).toList();
+  /// 업적 조건 체크
+  Future<void> checkAchievements(User user, {Map<String, dynamic>? stats}) async {
+    final newlyUnlocked = <Achievement>[];
+
+    for (final achievement in state.achievements) {
+      if (achievement.isUnlocked) continue;
+
+      bool shouldUnlock = false;
+      int progress = 0;
+
+      switch (achievement.type) {
+        case AchievementType.problemsSolved:
+          // TODO: 실제 문제 풀이 수를 추적하는 시스템 필요
+          progress = stats?['problemsSolved'] ?? 0;
+          shouldUnlock = progress >= achievement.targetValue;
+          break;
+
+        case AchievementType.streak:
+          progress = user.streakDays;
+          shouldUnlock = progress >= achievement.targetValue;
+          break;
+
+        case AchievementType.level:
+          progress = user.level;
+          shouldUnlock = progress >= achievement.targetValue;
+          break;
+
+        case AchievementType.totalXp:
+          progress = user.xp;
+          shouldUnlock = progress >= achievement.targetValue;
+          break;
+
+        case AchievementType.perfect:
+          progress = stats?['perfectStreak'] ?? 0;
+          shouldUnlock = progress >= achievement.targetValue;
+          break;
+
+        case AchievementType.timeRecord:
+          final bestTime = stats?['bestTime'] ?? double.infinity;
+          progress = (achievement.targetValue - bestTime).clamp(0, achievement.targetValue).toInt();
+          shouldUnlock = bestTime <= achievement.targetValue;
+          break;
+
+        default:
+          // 기타 타입은 스킵
+          continue;
+      }
+
+      // 진행률 업데이트
+      await _updateProgress(achievement.id, progress);
+
+      // 업적 언락
+      if (shouldUnlock) {
+        final unlocked = await unlockAchievement(achievement.id);
+        if (unlocked != null) {
+          newlyUnlocked.add(unlocked);
+        }
+      }
+    }
+
+    if (newlyUnlocked.isNotEmpty) {
+      Logger.info('Unlocked ${newlyUnlocked.length} new achievements');
+    }
   }
 
-  /// 카테고리별 업적 조회
-  List<Achievement> getAchievementsByType(AchievementType type) {
-    return state.where((achievement) => achievement.type == type).toList();
+  /// 진행률 업데이트
+  Future<void> _updateProgress(String achievementId, int progress) async {
+    final updatedAchievements = state.achievements.map((achievement) {
+      if (achievement.id == achievementId) {
+        return Achievement(
+          id: achievement.id,
+          name: achievement.name,
+          description: achievement.description,
+          icon: achievement.icon,
+          type: achievement.type,
+          targetValue: achievement.targetValue,
+          currentValue: progress,
+          isUnlocked: achievement.isUnlocked,
+          unlockedAt: achievement.unlockedAt,
+          rarity: achievement.rarity,
+          xpReward: achievement.xpReward,
+        );
+      }
+      return achievement;
+    }).toList();
+
+    state = state.copyWith(achievements: updatedAchievements);
   }
 
-  /// 희귀도별 업적 조회
-  List<Achievement> getAchievementsByRarity(AchievementRarity rarity) {
-    return state.where((achievement) => achievement.rarity == rarity).toList();
+  /// 업적 언락
+  Future<Achievement?> unlockAchievement(String achievementId) async {
+    final achievement = state.achievements.firstWhere(
+      (a) => a.id == achievementId,
+      orElse: () => state.achievements.first,
+    );
+
+    if (achievement.id != achievementId || achievement.isUnlocked) {
+      return null;
+    }
+
+    try {
+      // 업적 언락 처리
+      final now = DateTime.now();
+      final unlockedAchievement = Achievement(
+        id: achievement.id,
+        name: achievement.name,
+        description: achievement.description,
+        icon: achievement.icon,
+        type: achievement.type,
+        targetValue: achievement.targetValue,
+        currentValue: achievement.targetValue,
+        isUnlocked: true,
+        unlockedAt: now,
+        rarity: achievement.rarity,
+        xpReward: achievement.xpReward,
+      );
+
+      // 상태 업데이트
+      final updatedAchievements = state.achievements.map((a) {
+        return a.id == achievementId ? unlockedAchievement : a;
+      }).toList();
+
+      state = state.copyWith(
+        achievements: updatedAchievements,
+        unlockedIds: [...state.unlockedIds, achievementId],
+        recentlyUnlocked: unlockedAchievement,
+      );
+
+      await _saveState();
+
+      // XP 보상 지급
+      _ref.read(userProvider.notifier).addXP(achievement.xpReward);
+
+      Logger.info(
+        'Achievement unlocked: ${achievement.name} (+${achievement.xpReward} XP)',
+      );
+
+      return unlockedAchievement;
+    } catch (e) {
+      Logger.error('Failed to unlock achievement', error: e);
+      return null;
+    }
   }
 
-  /// 총 획득 XP (업적 보상)
-  int get totalAchievementXP {
-    return unlockedAchievements.fold(0, (total, achievement) => total + achievement.xpReward);
+  /// 최근 언락된 업적 클리어
+  void clearRecentlyUnlocked() {
+    state = state.copyWith(clearRecent: true);
   }
 
-  /// 업적 달성률
-  double get completionRate {
-    if (state.isEmpty) return 0.0;
-    return unlockedAchievements.length / state.length;
+  /// 진행률 계산
+  double getProgress(String achievementId) {
+    final achievement = state.achievements.firstWhere(
+      (a) => a.id == achievementId,
+      orElse: () => state.achievements.first,
+    );
+
+    if (achievement.id != achievementId) return 0.0;
+
+    return (achievement.currentValue / achievement.targetValue).clamp(0.0, 1.0);
   }
 
-  /// 업적 초기화 (테스트용)
-  Future<void> resetAchievements() async {
-    state = _dataService.getSampleAchievements();
-    await _saveAchievements();
-  }
+  /// 언락된 업적 수
+  int get unlockedCount => state.unlockedIds.length;
 
-  /// 커스텀 업적 추가 (향후 확장용)
-  Future<void> addCustomAchievement(Achievement achievement) async {
-    state = [...state, achievement];
-    await _saveAchievements();
-  }
+  /// 전체 업적 수
+  int get totalCount => state.achievements.length;
 
-  /// 업적 삭제 (관리자용)
-  Future<void> removeAchievement(String achievementId) async {
-    state = state.where((achievement) => achievement.id != achievementId).toList();
-    await _saveAchievements();
-  }
+  /// 완료율
+  double get completionRate => totalCount > 0 ? unlockedCount / totalCount : 0.0;
 }
 
-/// 업적 진행률 트래커
-class AchievementTrackerNotifier extends StateNotifier<Map<String, dynamic>> {
-  AchievementTrackerNotifier() : super({});
-
-  /// 학습 활동 추적
-  void trackLearningActivity({
-    required int problemsSolved,
-    required int correctAnswers,
-    required bool isPerfectSession,
-    required int sessionXP,
-    required int currentStreak,
-    required int totalXP,
-  }) {
-    state = {
-      ...state,
-      'problemsSolved': problemsSolved,
-      'correctAnswers': correctAnswers,
-      'perfectSessions': (state['perfectSessions'] ?? 0) + (isPerfectSession ? 1 : 0),
-      'sessionXP': sessionXP,
-      'currentStreak': currentStreak,
-      'totalXP': totalXP,
-      'lastActivityAt': DateTime.now().toIso8601String(),
-    };
-  }
-
-  /// 특별 이벤트 추적
-  void trackSpecialEvent(String eventType, Map<String, dynamic> eventData) {
-    final events = Map<String, dynamic>.from(state['specialEvents'] ?? {});
-    events[eventType] = {
-      ...eventData,
-      'timestamp': DateTime.now().toIso8601String(),
-    };
-
-    state = {
-      ...state,
-      'specialEvents': events,
-    };
-  }
-
-  /// 연속 정답 추적
-  void trackConsecutiveCorrect(int consecutiveCount) {
-    final currentMax = state['maxConsecutiveCorrect'] ?? 0;
-    state = {
-      ...state,
-      'consecutiveCorrect': consecutiveCount,
-      'maxConsecutiveCorrect': consecutiveCount > currentMax ? consecutiveCount : currentMax,
-    };
-  }
-
-  /// 학습 시간 추적
-  void trackStudyTime(int minutes) {
-    final totalMinutes = (state['totalStudyTimeMinutes'] ?? 0) + minutes;
-    state = {
-      ...state,
-      'totalStudyTimeMinutes': totalMinutes,
-      'lastSessionMinutes': minutes,
-    };
-  }
-
-  /// 데이터 초기화
-  void reset() {
-    state = {};
-  }
-}
-
-/// 프로바이더들
-final achievementProvider = StateNotifierProvider<AchievementNotifier, List<Achievement>>((ref) {
-  return AchievementNotifier();
-});
-
-final achievementTrackerProvider = StateNotifierProvider<AchievementTrackerNotifier, Map<String, dynamic>>((ref) {
-  return AchievementTrackerNotifier();
-});
-
-/// 편의 프로바이더들
-final unlockedAchievementsProvider = Provider<List<Achievement>>((ref) {
-  final achievements = ref.watch(achievementProvider);
-  return achievements.where((achievement) => achievement.isUnlocked).toList();
-});
-
-final lockedAchievementsProvider = Provider<List<Achievement>>((ref) {
-  final achievements = ref.watch(achievementProvider);
-  return achievements.where((achievement) => !achievement.isUnlocked).toList();
-});
-
-final achievementCompletionRateProvider = Provider<double>((ref) {
-  final achievements = ref.watch(achievementProvider);
-  if (achievements.isEmpty) return 0.0;
-
-  final unlockedCount = achievements.where((a) => a.isUnlocked).length;
-  return unlockedCount / achievements.length;
-});
-
-final totalAchievementXPProvider = Provider<int>((ref) {
-  final achievements = ref.watch(achievementProvider);
-  return achievements
-      .where((a) => a.isUnlocked)
-      .fold(0, (total, a) => total + a.xpReward);
+/// Provider 정의
+final achievementProvider =
+    StateNotifierProvider<AchievementProvider, AchievementState>((ref) {
+  return AchievementProvider(ref);
 });
