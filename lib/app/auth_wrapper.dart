@@ -16,13 +16,13 @@ class AuthWrapper extends ConsumerWidget {
     // 로딩 중
     if (authState.isLoading) {
       return Scaffold(
-        backgroundColor: const Color(0xFF235390),
+        backgroundColor: AppColors.mathBlue, // GoMath blue
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF235390), Color(0xFF1CB0F6)],
+              colors: AppColors.mathBlueGradient, // GoMath gradient
             ),
           ),
           child: const Center(
