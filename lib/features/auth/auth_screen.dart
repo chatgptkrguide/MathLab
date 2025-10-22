@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/widgets/widgets.dart';
-import '../../shared/widgets/responsive_wrapper.dart';
+import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/buttons/social_login_button.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/user_account.dart';

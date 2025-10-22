@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
-import '../utils/haptic_feedback.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
+import '../../utils/haptic_feedback.dart';
 
 /// 듀오링고 스타일 3D 효과 버튼
 class DuolingoButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isEnabled;
-  final List<Color> gradientColors;
+  final Color backgroundColor;
+  final Color shadowColor;
   final IconData? icon;
   final double? width;
   final double? height;
@@ -19,7 +20,8 @@ class DuolingoButton extends StatefulWidget {
     required this.text,
     this.onPressed,
     this.isEnabled = true,
-    this.gradientColors = AppColors.greenGradient,
+    this.backgroundColor = AppColors.mathButtonBlue, // GoMath 버튼 색상
+    this.shadowColor = const Color(0xFF2B4BEF), // 어두운 변형
     this.icon,
     this.width,
     this.height,
@@ -81,46 +83,45 @@ class _DuolingoButtonState extends State<DuolingoButton>
                 horizontal: AppDimensions.paddingL,
                 vertical: AppDimensions.paddingS,
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
-                boxShadow: [
-                  // 3D 바닥 그림자 (더 명확한 깊이감)
-                  BoxShadow(
-                    color: widget.gradientColors[1].withValues(alpha: 0.6),
-                    offset: const Offset(0, 8),
-                    blurRadius: 0,
-                    spreadRadius: 0,
-                  ),
-                  // 부드러운 확산 그림자
-                  BoxShadow(
-                    color: widget.gradientColors[1].withValues(alpha: 0.3),
-                    offset: const Offset(0, 12),
-                    blurRadius: 24,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: enabled
-                        ? widget.gradientColors
-                        : [AppColors.disabled, AppColors.disabled],
-                  ),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: enabled ? widget.onPressed : null,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
-                    child: Center(
-                      child: _buildButtonContent(),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Duolingo 3D solid shadow
+                  if (enabled)
+                    Positioned(
+                      top: 6,
+                      left: 0,
+                      right: 0,
+                      bottom: -6,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: widget.shadowColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  // Main button
+                  Container(
+                    decoration: BoxDecoration(
+                      color: enabled ? widget.backgroundColor : const Color(0xFFE5E5E5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: enabled ? widget.shadowColor : const Color(0xFFD0D0D0),
+                        width: 3,
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: enabled ? widget.onPressed : null,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Center(
+                          child: _buildButtonContent(),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           );

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
 
 /// 듀오링고 스타일 원형 진행률 표시
 class DuolingoCircularProgress extends StatefulWidget {

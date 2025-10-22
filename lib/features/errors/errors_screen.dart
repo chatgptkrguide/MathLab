@@ -73,16 +73,8 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     final errorStats = _getErrorStats(userErrorNotes);
 
     return Scaffold(
-      backgroundColor: AppColors.mathBlue,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: AppColors.mathBlueGradient,
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: AppColors.mathBlue, // GoMath 파란색
+      body: SafeArea(
           child: ResponsiveWrapper(
             child: Column(
               children: [
@@ -117,22 +109,29 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// GoMath 스타일 헤더 (뒤로가기 + 제목)
+  /// Duolingo 스타일 헤더 (뒤로가기 + 제목)
   Widget _buildGoMathHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
           Expanded(
             child: Text(
               '오답 노트',
-              style: AppTextStyles.headlineMedium.copyWith(
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
               textAlign: TextAlign.center,
             ),
@@ -143,7 +142,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 헤더 텍스트
+  /// 헤더 텍스트 - Duolingo style
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
@@ -151,14 +150,21 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             '틀린 문제를 복습하고 완벽하게 이해하세요',
-            style: AppTextStyles.headlineSmall,
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
           ),
           const SizedBox(height: AppDimensions.spacingXS),
-          Text(
+          const Text(
             '반복 학습을 통해 약점을 보완하고 실력을 향상시킬 수 있습니다.',
-            style: AppTextStyles.bodyMedium,
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 15,
+            ),
           ),
         ],
       ),
@@ -264,31 +270,36 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 통계 카드
+  /// 통계 카드 - GoMath flat style
   Widget _buildStatCard(String label, String value, Color valueColor) {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: AppDimensions.cardElevation,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.borderLight,
+          width: 2,
+        ),
       ),
       child: Column(
         children: [
           Text(
             value,
-            style: AppTextStyles.statValue.copyWith(color: valueColor),
+            style: TextStyle(
+              color: valueColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
+            ),
           ),
           const SizedBox(height: AppDimensions.spacingXS),
           Text(
             label,
-            style: AppTextStyles.statLabel,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -394,36 +405,37 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 필터 탭바
+  /// 필터 탭바 - GoMath flat style
   Widget _buildFilterTabs() {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingL,
         vertical: AppDimensions.spacingM,
       ),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        color: AppColors.background, // GoMath 배경색
+        borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
         controller: _tabController,
-        tabs: _filterTabs.map((tab) => Tab(text: tab)).toList(),
-        labelColor: AppColors.primaryBlue,
+        tabs: _filterTabs.map((tab) => Tab(height: 40, text: tab)).toList(),
+        labelColor: AppColors.mathBlue, // GoMath 파란색 (선택됨)
         unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: AppTextStyles.titleSmall,
-        unselectedLabelStyle: AppTextStyles.bodyMedium,
-        indicator: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.cardShadow,
-              blurRadius: AppDimensions.cardElevation,
-              offset: const Offset(0, 1),
-            ),
-          ],
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
         ),
-        indicatorPadding: const EdgeInsets.all(4),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+        ),
+        indicator: BoxDecoration(
+          color: Colors.white, // Duolingo flat white
+          borderRadius: BorderRadius.circular(12),
+        ),
+        dividerColor: Colors.transparent,
+        indicatorPadding: const EdgeInsets.all(0),
         onTap: (_) => setState(() {}),
       ),
     );
@@ -472,16 +484,23 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 오답 노트 카드
+  /// 오답 노트 카드 - Duolingo flat style
   Widget _buildErrorNoteCard(ErrorNote errorNote) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
-      child: Card(
-        child: InkWell(
-          onTap: () => _showErrorNoteDetails(errorNote),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.paddingL),
+      child: InkWell(
+        onTap: () => _showErrorNoteDetails(errorNote),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.paddingL),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.borderLight,
+              width: 2,
+            ),
+          ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -491,7 +510,11 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                     Expanded(
                       child: Text(
                         errorNote.question,
-                        style: AppTextStyles.titleMedium,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                       ),
@@ -503,8 +526,10 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   errorNote.category,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primaryBlue,
+                  style: const TextStyle(
+                    color: AppColors.mathBlue,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingXS),
@@ -513,11 +538,17 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                   children: [
                     Text(
                       '복습 ${errorNote.reviewCount}회',
-                      style: AppTextStyles.bodySmall,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                     Text(
                       '${errorNote.daysSinceCreated}일 전',
-                      style: AppTextStyles.bodySmall,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -548,44 +579,45 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 상태 뱃지
+  /// 상태 뱃지 - GoMath style
   Widget _buildStatusBadge(ErrorStatus status) {
     Color color;
     String text;
 
     switch (status) {
       case ErrorStatus.newError:
-        color = AppColors.errorRed;
+        color = AppColors.errorRed; // GoMath 빨간색
         text = '신규';
         break;
       case ErrorStatus.reviewing:
-        color = AppColors.warningOrange;
+        color = AppColors.mathOrange; // GoMath 주황색
         text = '복습중';
         break;
       case ErrorStatus.improving:
-        color = AppColors.primaryBlue;
+        color = AppColors.mathBlue; // GoMath 파란색
         text = '향상중';
         break;
       case ErrorStatus.mastered:
-        color = AppColors.successGreen;
+        color = AppColors.successGreen; // GoMath 초록색
         text = '완료';
         break;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingS,
-        vertical: AppDimensions.spacingXS,
+        horizontal: 10,
+        vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+        color: color,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         text,
-        style: AppTextStyles.labelSmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
         ),
       ),
     );

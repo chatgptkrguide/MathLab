@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/responsive_wrapper.dart';
+import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../data/providers/user_provider.dart';
 
 /// 학습 이력 화면 (Figma 디자인 03)

@@ -69,53 +69,67 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 현재 버튼이 선택되었는지
   bool get _isSelected => widget.selectedIndex == widget.index;
 
-  /// 버튼의 현재 상태를 기반으로 한 색상
+  /// 버튼의 현재 상태를 기반으로 한 색상 - Duolingo flat style
   Color get _backgroundColor {
     if (!widget.isAnswerSubmitted) {
       // 답변 제출 전
-      return _isSelected ? AppColors.mathTeal : Colors.white;
+      return _isSelected ? const Color(0xFF1CB0F6) : Colors.white; // Duolingo blue
     } else {
       // 답변 제출 후
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? AppColors.successGreen
-            : AppColors.errorRed;
+            ? const Color(0xFF58CC02) // Duolingo green
+            : const Color(0xFFFF4B4B); // Duolingo red
       } else if (widget.isCorrectAnswer) {
         // 정답 표시
-        return AppColors.successGreen.withValues(alpha: 0.3);
+        return const Color(0xFFD7FFB8); // Light green
       } else {
         return Colors.white;
       }
     }
   }
 
-  /// 테두리 색상
+  /// 테두리 색상 - Duolingo style
   Color get _borderColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? AppColors.mathTeal : AppColors.borderColor;
+      return _isSelected ? const Color(0xFF1899D6) : const Color(0xFFE5E5E5); // Duolingo border
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? AppColors.successGreen
-            : AppColors.errorRed;
+            ? const Color(0xFF46A302) // Darker green
+            : const Color(0xFFE03B3B); // Darker red
       } else if (widget.isCorrectAnswer) {
-        return AppColors.successGreen;
+        return const Color(0xFF58CC02); // Duolingo green
       } else {
-        return AppColors.borderColor;
+        return const Color(0xFFE5E5E5);
       }
     }
   }
 
-  /// 텍스트 색상
+  /// 텍스트 색상 - Duolingo style
   Color get _textColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? Colors.white : AppColors.textPrimary;
+      return _isSelected ? Colors.white : const Color(0xFF4B4B4B); // Duolingo dark gray
     } else {
       if (_isSelected || widget.isCorrectAnswer) {
         return Colors.white;
       } else {
-        return AppColors.textPrimary;
+        return const Color(0xFF4B4B4B);
       }
+    }
+  }
+
+  /// 3D 그림자 색상 - Duolingo style
+  Color get _getShadowColor {
+    if (!widget.isAnswerSubmitted) {
+      return _isSelected ? const Color(0xFF1899D6) : const Color(0xFFE5E5E5); // Darker blue
+    } else {
+      if (_isSelected) {
+        return widget.isCorrectAnswer
+            ? const Color(0xFF46A302) // Darker green
+            : const Color(0xFFE03B3B); // Darker red
+      }
+      return const Color(0xFFE5E5E5);
     }
   }
 
@@ -156,78 +170,87 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
       scale: _scaleAnimation,
       child: GestureDetector(
         onTap: _handleTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.all(AppDimensions.paddingL),
-          decoration: BoxDecoration(
-            color: _backgroundColor,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            border: Border.all(
-              color: _borderColor,
-              width: 2,
-            ),
-            boxShadow: _isSelected && !widget.isAnswerSubmitted
-                ? [
-                    BoxShadow(
-                      color: AppColors.mathTeal.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Duolingo-style 3D solid shadow
+            if (_isSelected && !widget.isAnswerSubmitted)
+              Positioned(
+                top: 4,
+                left: 0,
+                right: 0,
+                bottom: -4,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  decoration: BoxDecoration(
+                    color: _getShadowColor(),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            // Main button container
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _backgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _borderColor,
+                  width: 3,
+                ),
+              ),
+              child: Row(
+                children: [
+                  // 선택지 번호 (A, B, C, D)
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: _textColor.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _textColor.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
                     ),
-                  ]
-                : widget.isAnswerSubmitted && _isSelected
-                    ? [
-                        BoxShadow(
-                          color: (widget.isCorrectAnswer
-                                  ? AppColors.successGreen
-                                  : AppColors.errorRed)
-                              .withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                    child: Center(
+                      child: Text(
+                        String.fromCharCode(65 + widget.index), // A, B, C, D
+                        style: TextStyle(
+                          color: _textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-                      ]
-                    : [],
-          ),
-          child: Row(
-            children: [
-              // 선택지 번호
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: _textColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    String.fromCharCode(65 + widget.index), // A, B, C, D
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: _textColor,
-                      fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacingM),
-              // 선택지 텍스트
-              Expanded(
-                child: Text(
-                  widget.optionText,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: _textColor,
-                    fontWeight: _isSelected ? FontWeight.bold : FontWeight.w500,
+                  const SizedBox(width: 14),
+                  // 선택지 텍스트
+                  Expanded(
+                    child: Text(
+                      widget.optionText,
+                      style: TextStyle(
+                        color: _textColor,
+                        fontWeight: _isSelected ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 16,
+                        height: 1.4,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                  // 정답/오답 아이콘
+                  if (_icon != null) ...[
+                    const SizedBox(width: 12),
+                    _icon!,
+                  ],
+                ],
               ),
-              // 정답/오답 아이콘
-              if (_icon != null) ...[
-                const SizedBox(width: AppDimensions.spacingM),
-                _icon!,
-              ],
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

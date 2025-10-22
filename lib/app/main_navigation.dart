@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../shared/widgets/custom_bottom_nav.dart';
+import '../shared/widgets/layout/custom_bottom_nav.dart';
 import '../features/home/home_screen.dart';
 import '../features/lessons/lessons_screen.dart';
 import '../features/leaderboard/leaderboard_screen.dart';

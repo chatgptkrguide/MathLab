@@ -3,7 +3,7 @@ import '../models/achievement.dart';
 import '../models/user.dart';
 import 'user_provider.dart';
 import '../../shared/utils/logger.dart';
-import '../../shared/services/local_storage_service.dart';
+import '../../data/services/local_storage_service.dart';
 
 /// 업적 상태
 class AchievementState {
@@ -29,6 +29,23 @@ class AchievementState {
       recentlyUnlocked: clearRecent ? null : (recentlyUnlocked ?? this.recentlyUnlocked),
     );
   }
+
+  /// 언락된 업적 수
+  int get unlockedCount => achievements.where((a) => a.isUnlocked).length;
+
+  /// 전체 업적 수
+  int get totalCount => achievements.length;
+
+  /// 달성률 (0.0 ~ 1.0)
+  double get completionRate => totalCount > 0 ? unlockedCount / totalCount : 0.0;
+
+  /// Iterable 지원을 위한 firstWhere 메서드
+  Achievement firstWhere(bool Function(Achievement) test, {Achievement Function()? orElse}) {
+    return achievements.firstWhere(test, orElse: orElse);
+  }
+
+  /// Iterable 지원을 위한 first getter
+  Achievement get first => achievements.first;
 }
 
 /// 업적 Provider
@@ -53,213 +70,253 @@ class AchievementProvider extends StateNotifier<AchievementState> {
       // 문제 풀이 업적
       Achievement(
         id: 'first_problem',
-        name: '첫 걸음',
+        title: '첫 걸음',
         description: '첫 문제를 풀어보세요',
         icon: '🎯',
-        type: AchievementType.problemsSolved,
-        targetValue: 1,
+        type: AchievementType.problems,
+        requiredValue: 1,
         rarity: AchievementRarity.common,
         xpReward: 10,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'problems_10',
-        name: '탐험가',
+        title: '탐험가',
         description: '문제 10개 해결',
         icon: '🌟',
-        type: AchievementType.problemsSolved,
-        targetValue: 10,
+        type: AchievementType.problems,
+        requiredValue: 10,
         rarity: AchievementRarity.common,
         xpReward: 20,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'problems_50',
-        name: '수학 전사',
+        title: '수학 전사',
         description: '문제 50개 해결',
         icon: '⚔️',
-        type: AchievementType.problemsSolved,
-        targetValue: 50,
+        type: AchievementType.problems,
+        requiredValue: 50,
         rarity: AchievementRarity.rare,
         xpReward: 50,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'problems_100',
-        name: '수학 마스터',
+        title: '수학 마스터',
         description: '문제 100개 해결',
         icon: '👑',
-        type: AchievementType.problemsSolved,
-        targetValue: 100,
+        type: AchievementType.problems,
+        requiredValue: 100,
         rarity: AchievementRarity.epic,
         xpReward: 100,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'problems_500',
-        name: '전설의 수학자',
+        title: '전설의 수학자',
         description: '문제 500개 해결',
         icon: '🏆',
-        type: AchievementType.problemsSolved,
-        targetValue: 500,
+        type: AchievementType.problems,
+        requiredValue: 500,
         rarity: AchievementRarity.legendary,
         xpReward: 300,
+        currentValue: 0,
+        isUnlocked: false,
       ),
 
       // 스트릭 업적
       Achievement(
         id: 'streak_3',
-        name: '꾸준함의 시작',
+        title: '꾸준함의 시작',
         description: '3일 연속 학습',
         icon: '🔥',
         type: AchievementType.streak,
-        targetValue: 3,
+        requiredValue: 3,
         rarity: AchievementRarity.common,
         xpReward: 15,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'streak_7',
-        name: '일주일의 힘',
+        title: '일주일의 힘',
         description: '7일 연속 학습',
         icon: '💪',
         type: AchievementType.streak,
-        targetValue: 7,
+        requiredValue: 7,
         rarity: AchievementRarity.rare,
         xpReward: 40,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'streak_30',
-        name: '한 달의 기적',
+        title: '한 달의 기적',
         description: '30일 연속 학습',
         icon: '🌈',
         type: AchievementType.streak,
-        targetValue: 30,
+        requiredValue: 30,
         rarity: AchievementRarity.epic,
         xpReward: 150,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'streak_100',
-        name: '불굴의 의지',
+        title: '불굴의 의지',
         description: '100일 연속 학습',
         icon: '💎',
         type: AchievementType.streak,
-        targetValue: 100,
+        requiredValue: 100,
         rarity: AchievementRarity.legendary,
         xpReward: 500,
+        currentValue: 0,
+        isUnlocked: false,
       ),
 
       // 레벨 업적
       Achievement(
         id: 'level_5',
-        name: '초보 탈출',
+        title: '초보 탈출',
         description: '레벨 5 달성',
         icon: '📚',
         type: AchievementType.level,
-        targetValue: 5,
+        requiredValue: 5,
         rarity: AchievementRarity.common,
         xpReward: 25,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'level_10',
-        name: '중급자',
+        title: '중급자',
         description: '레벨 10 달성',
         icon: '📖',
         type: AchievementType.level,
-        targetValue: 10,
+        requiredValue: 10,
         rarity: AchievementRarity.rare,
         xpReward: 50,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'level_25',
-        name: '고급 학습자',
+        title: '고급 학습자',
         description: '레벨 25 달성',
         icon: '🎓',
         type: AchievementType.level,
-        targetValue: 25,
+        requiredValue: 25,
         rarity: AchievementRarity.epic,
         xpReward: 100,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'level_50',
-        name: '수학 천재',
+        title: '수학 천재',
         description: '레벨 50 달성',
         icon: '🧠',
         type: AchievementType.level,
-        targetValue: 50,
+        requiredValue: 50,
         rarity: AchievementRarity.legendary,
         xpReward: 250,
+        currentValue: 0,
+        isUnlocked: false,
       ),
 
       // XP 업적
       Achievement(
         id: 'xp_1000',
-        name: 'XP 수집가',
+        title: 'XP 수집가',
         description: '총 1,000 XP 획득',
         icon: '⭐',
-        type: AchievementType.totalXp,
-        targetValue: 1000,
+        type: AchievementType.xp,
+        requiredValue: 1000,
         rarity: AchievementRarity.rare,
         xpReward: 30,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'xp_5000',
-        name: 'XP 전문가',
+        title: 'XP 전문가',
         description: '총 5,000 XP 획득',
         icon: '✨',
-        type: AchievementType.totalXp,
-        targetValue: 5000,
+        type: AchievementType.xp,
+        requiredValue: 5000,
         rarity: AchievementRarity.epic,
         xpReward: 100,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'xp_10000',
-        name: 'XP 마스터',
+        title: 'XP 마스터',
         description: '총 10,000 XP 획득',
         icon: '💫',
-        type: AchievementType.totalXp,
-        targetValue: 10000,
+        type: AchievementType.xp,
+        requiredValue: 10000,
         rarity: AchievementRarity.legendary,
         xpReward: 300,
+        currentValue: 0,
+        isUnlocked: false,
       ),
 
       // 퍼펙트 업적
       Achievement(
         id: 'perfect_5',
-        name: '완벽주의자',
+        title: '완벽주의자',
         description: '5번 연속 정답',
         icon: '✅',
         type: AchievementType.perfect,
-        targetValue: 5,
+        requiredValue: 5,
         rarity: AchievementRarity.rare,
         xpReward: 35,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'perfect_10',
-        name: '무결점',
+        title: '무결점',
         description: '10번 연속 정답',
         icon: '💯',
         type: AchievementType.perfect,
-        targetValue: 10,
+        requiredValue: 10,
         rarity: AchievementRarity.epic,
         xpReward: 80,
+        currentValue: 0,
+        isUnlocked: false,
       ),
 
       // 시간 업적
       Achievement(
         id: 'speed_demon',
-        name: '스피드 데몬',
+        title: '스피드 데몬',
         description: '10초 안에 문제 해결',
         icon: '⚡',
-        type: AchievementType.timeRecord,
-        targetValue: 10,
+        type: AchievementType.time,
+        requiredValue: 10,
         rarity: AchievementRarity.rare,
         xpReward: 40,
+        currentValue: 0,
+        isUnlocked: false,
       ),
       Achievement(
         id: 'lightning_fast',
-        name: '번개처럼 빠르게',
+        title: '번개처럼 빠르게',
         description: '5초 안에 문제 해결',
         icon: '🚀',
-        type: AchievementType.timeRecord,
-        targetValue: 5,
+        type: AchievementType.time,
+        requiredValue: 5,
         rarity: AchievementRarity.epic,
         xpReward: 75,
+        currentValue: 0,
+        isUnlocked: false,
       ),
     ];
 
@@ -270,7 +327,7 @@ class AchievementProvider extends StateNotifier<AchievementState> {
   /// 상태 로드
   Future<void> _loadState() async {
     try {
-      final data = await _storage.loadObject(_storageKey);
+      final data = await _storage.loadMap(_storageKey);
       if (data != null) {
         final unlockedIds = List<String>.from(data['unlockedIds'] ?? []);
         final progressMap = Map<String, int>.from(data['progressMap'] ?? {});
@@ -297,11 +354,11 @@ class AchievementProvider extends StateNotifier<AchievementState> {
 
           return Achievement(
             id: achievement.id,
-            name: achievement.name,
+            title: achievement.title,
             description: achievement.description,
             icon: achievement.icon,
             type: achievement.type,
-            targetValue: achievement.targetValue,
+            requiredValue: achievement.requiredValue,
             currentValue: progress,
             isUnlocked: isUnlocked,
             unlockedAt: unlockDate,
@@ -337,7 +394,7 @@ class AchievementProvider extends StateNotifier<AchievementState> {
         }
       }
 
-      await _storage.saveObject(_storageKey, {
+      await _storage.saveMap(_storageKey, {
         'unlockedIds': state.unlockedIds,
         'progressMap': progressMap,
         'unlockedDates': unlockedDates,
@@ -360,36 +417,36 @@ class AchievementProvider extends StateNotifier<AchievementState> {
       int progress = 0;
 
       switch (achievement.type) {
-        case AchievementType.problemsSolved:
+        case AchievementType.problems:
           // TODO: 실제 문제 풀이 수를 추적하는 시스템 필요
           progress = stats?['problemsSolved'] ?? 0;
-          shouldUnlock = progress >= achievement.targetValue;
+          shouldUnlock = progress >= achievement.requiredValue;
           break;
 
         case AchievementType.streak:
           progress = user.streakDays;
-          shouldUnlock = progress >= achievement.targetValue;
+          shouldUnlock = progress >= achievement.requiredValue;
           break;
 
         case AchievementType.level:
           progress = user.level;
-          shouldUnlock = progress >= achievement.targetValue;
+          shouldUnlock = progress >= achievement.requiredValue;
           break;
 
-        case AchievementType.totalXp:
+        case AchievementType.xp:
           progress = user.xp;
-          shouldUnlock = progress >= achievement.targetValue;
+          shouldUnlock = progress >= achievement.requiredValue;
           break;
 
         case AchievementType.perfect:
           progress = stats?['perfectStreak'] ?? 0;
-          shouldUnlock = progress >= achievement.targetValue;
+          shouldUnlock = progress >= achievement.requiredValue;
           break;
 
-        case AchievementType.timeRecord:
+        case AchievementType.time:
           final bestTime = stats?['bestTime'] ?? double.infinity;
-          progress = (achievement.targetValue - bestTime).clamp(0, achievement.targetValue).toInt();
-          shouldUnlock = bestTime <= achievement.targetValue;
+          progress = (achievement.requiredValue - bestTime).clamp(0, achievement.requiredValue).toInt();
+          shouldUnlock = bestTime <= achievement.requiredValue;
           break;
 
         default:
@@ -420,11 +477,11 @@ class AchievementProvider extends StateNotifier<AchievementState> {
       if (achievement.id == achievementId) {
         return Achievement(
           id: achievement.id,
-          name: achievement.name,
+          title: achievement.title,
           description: achievement.description,
           icon: achievement.icon,
           type: achievement.type,
-          targetValue: achievement.targetValue,
+          requiredValue: achievement.requiredValue,
           currentValue: progress,
           isUnlocked: achievement.isUnlocked,
           unlockedAt: achievement.unlockedAt,
@@ -454,12 +511,12 @@ class AchievementProvider extends StateNotifier<AchievementState> {
       final now = DateTime.now();
       final unlockedAchievement = Achievement(
         id: achievement.id,
-        name: achievement.name,
+        title: achievement.title,
         description: achievement.description,
         icon: achievement.icon,
         type: achievement.type,
-        targetValue: achievement.targetValue,
-        currentValue: achievement.targetValue,
+        requiredValue: achievement.requiredValue,
+        currentValue: achievement.requiredValue,
         isUnlocked: true,
         unlockedAt: now,
         rarity: achievement.rarity,
@@ -483,7 +540,7 @@ class AchievementProvider extends StateNotifier<AchievementState> {
       _ref.read(userProvider.notifier).addXP(achievement.xpReward);
 
       Logger.info(
-        'Achievement unlocked: ${achievement.name} (+${achievement.xpReward} XP)',
+        'Achievement unlocked: ${achievement.title} (+${achievement.xpReward} XP)',
       );
 
       return unlockedAchievement;
@@ -507,7 +564,7 @@ class AchievementProvider extends StateNotifier<AchievementState> {
 
     if (achievement.id != achievementId) return 0.0;
 
-    return (achievement.currentValue / achievement.targetValue).clamp(0.0, 1.0);
+    return (achievement.currentValue / achievement.requiredValue).clamp(0.0, 1.0);
   }
 
   /// 언락된 업적 수

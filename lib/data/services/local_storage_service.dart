@@ -89,6 +89,57 @@ class LocalStorageService {
     }
   }
 
+  /// 단순 Map 로드 (fromJson 변환 없이)
+  Future<Map<String, dynamic>?> loadMap(String key) async {
+    try {
+      final preferences = await prefs;
+      final jsonString = preferences.getString(key);
+
+      if (jsonString == null) {
+        Logger.debug('No data found for key: $key', tag: 'Storage');
+        return null;
+      }
+
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+      Logger.debug('Loaded map for key: $key', tag: 'Storage');
+      return jsonData;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Failed to load map for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'Storage',
+      );
+      return null;
+    }
+  }
+
+  /// 단순 Map 저장 (toJson 변환 없이)
+  Future<bool> saveMap(String key, Map<String, dynamic> data) async {
+    try {
+      final preferences = await prefs;
+      final jsonString = jsonEncode(data);
+
+      final success = await preferences.setString(key, jsonString);
+
+      if (success) {
+        Logger.debug('Saved map for key: $key', tag: 'Storage');
+      } else {
+        Logger.warning('Failed to save map for key: $key', tag: 'Storage');
+      }
+
+      return success;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Error saving map for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'Storage',
+      );
+      return false;
+    }
+  }
+
   /// JSON 객체 리스트 로드
   Future<List<T>> loadList<T>({
     required String key,
@@ -206,7 +257,7 @@ class LocalStorageService {
   Future<bool> setInt(String key, int value) async {
     try {
       final preferences = await prefs;
-      return await preferences.setString(key, value);
+      return await preferences.setInt(key, value);
     } catch (e, stackTrace) {
       Logger.error(
         'Failed to set int for key: $key',

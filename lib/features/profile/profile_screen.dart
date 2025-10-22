@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/responsive_wrapper.dart';
-import '../../shared/widgets/fade_in_widget.dart';
-import '../../shared/widgets/achievement_card.dart';
+import '../../shared/widgets/layout/responsive_wrapper.dart';
+import '../../shared/widgets/animations/fade_in_widget.dart';
+import '../../shared/widgets/cards/achievement_card.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/achievement_provider.dart';
@@ -36,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 _buildHeader(),
                 Expanded(
-                  child: _buildContent(user, achievements),
+                  child: _buildContent(user, achievements.achievements),
                 ),
               ],
             ),

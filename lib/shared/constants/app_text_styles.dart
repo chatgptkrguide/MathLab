@@ -5,6 +5,21 @@ import 'app_colors.dart';
 class AppTextStyles {
   AppTextStyles._(); // private constructor
 
+  // 디스플레이 스타일 (Material 3)
+  static const TextStyle displayLarge = TextStyle(
+    fontSize: 36,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  static const TextStyle displaySmall = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
   // 헤드라인 스타일
   static const TextStyle headlineLarge = TextStyle(
     fontSize: 24,

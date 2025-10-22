@@ -74,6 +74,7 @@ class AppColors {
   static const List<Color> blueGradient = mathBlueGradient; // GoMath 그라디언트로 매핑
   static const List<Color> orangeGradient = mathOrangeGradient;
   static const List<Color> purpleGradient = mathPurpleGradient;
+  static const List<Color> goldGradient = [Color(0xFFFFD700), Color(0xFFFFA500)]; // 골드 그라디언트
 
   // 카드 그림자
   static const Color cardShadow = Color(0x0D000000);

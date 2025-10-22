@@ -14,20 +14,21 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background, // GoMath 배경색
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
           '설정',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.close, color: AppColors.mathBlue),
           onPressed: () async {
             await AppHapticFeedback.lightImpact();
             if (context.mounted) Navigator.of(context).pop();
@@ -185,14 +186,22 @@ class SettingsScreen extends ConsumerWidget {
           ),
           child: Text(
             title,
-            style: AppTextStyles.titleSmall.copyWith(
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontWeight: FontWeight.bold,
+              fontSize: 13,
+              letterSpacing: 0.5,
             ),
           ),
         ),
         Container(
-          color: AppColors.surface,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: AppColors.borderLight, width: 1),
+              bottom: BorderSide(color: AppColors.borderLight, width: 1),
+            ),
+          ),
           child: Column(children: children),
         ),
       ],
@@ -253,7 +262,10 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               // 계정 삭제 로직
-              await ref.read(authProvider.notifier).deleteAccount();
+              final currentAccount = ref.read(authProvider).currentAccount;
+              if (currentAccount != null) {
+                await ref.read(authProvider.notifier).deleteAccount(currentAccount.id);
+              }
               if (context.mounted) {
                 Navigator.of(context).pop();
                 // 앱 재시작 (스플래시 화면으로 이동)
@@ -270,7 +282,7 @@ class SettingsScreen extends ConsumerWidget {
   void _showLanguageDialog(
     BuildContext context,
     WidgetRef ref,
-    AppSettings settings,
+    SettingsState settings,
   ) {
     showDialog(
       context: context,
@@ -407,23 +419,26 @@ class _SettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primary),
+      leading: Icon(icon, color: AppColors.mathBlue, size: 24),
       title: Text(
         title,
-        style: AppTextStyles.bodyLarge.copyWith(
-          fontWeight: FontWeight.w600,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(
+        style: const TextStyle(
+          fontSize: 13,
           color: AppColors.textSecondary,
         ),
       ),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.primary,
+        activeColor: AppColors.mathTeal, // GoMath 틸 색상
       ),
     );
   }
@@ -448,18 +463,24 @@ class _SettingListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: textColor ?? AppColors.primary),
+      leading: Icon(
+        icon,
+        color: textColor ?? AppColors.mathBlue,
+        size: 24,
+      ),
       title: Text(
         title,
-        style: AppTextStyles.bodyLarge.copyWith(
-          fontWeight: FontWeight.w600,
-          color: textColor,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: textColor ?? AppColors.textPrimary,
         ),
       ),
       trailing: value.isNotEmpty
           ? Text(
               value,
-              style: AppTextStyles.bodyMedium.copyWith(
+              style: const TextStyle(
+                fontSize: 14,
                 color: AppColors.textSecondary,
               ),
             )

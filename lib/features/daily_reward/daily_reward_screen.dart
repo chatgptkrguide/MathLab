@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/daily_reward.dart';
 import '../../data/providers/daily_reward_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
@@ -85,24 +86,24 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (currentReward.xpReward > 0) ...[
+            if (currentReward.type == RewardType.xp) ...[
               _buildRewardItem(
                 icon: '⭐',
                 label: 'XP',
-                value: '+${currentReward.xpReward}',
+                value: '+${currentReward.amount}',
                 color: AppColors.primary,
               ),
               const SizedBox(height: AppDimensions.spacingS),
             ],
-            if (currentReward.heartsReward > 0) ...[
+            if (currentReward.type == RewardType.hearts) ...[
               _buildRewardItem(
                 icon: '❤️',
                 label: '하트',
-                value: '+${currentReward.heartsReward}',
+                value: '+${currentReward.amount}',
                 color: AppColors.error,
               ),
             ],
-            if (currentReward.isStreakBonus) ...[
+            if (currentReward.day == 7) ...[
               const SizedBox(height: AppDimensions.spacingM),
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingM),
@@ -258,7 +259,8 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                 itemBuilder: (context, index) {
                   final reward = state.rewards[index];
                   final isCurrentDay = reward.day == state.currentDay;
-                  final isClaimed = reward.isClaimed;
+                  final isClaimed = reward.day < state.currentDay ||
+                                    (reward.day == state.currentDay && !state.canClaimToday);
                   final isLocked = reward.day > state.currentDay;
 
                   return Padding(
@@ -411,30 +413,17 @@ class _DayRewardCard extends StatelessWidget {
                 const SizedBox(height: AppDimensions.spacingXS),
                 Row(
                   children: [
-                    if (reward.xpReward > 0) ...[
-                      const Text('⭐', style: TextStyle(fontSize: 16)),
-                      const SizedBox(width: 4),
-                      Text(
-                        '+${reward.xpReward} XP',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    Text(reward.emoji, style: const TextStyle(fontSize: 16)),
+                    const SizedBox(width: 4),
+                    Text(
+                      reward.displayName,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
                       ),
-                    ],
-                    if (reward.heartsReward > 0) ...[
-                      if (reward.xpReward > 0) const SizedBox(width: AppDimensions.spacingS),
-                      const Text('❤️', style: TextStyle(fontSize: 16)),
-                      const SizedBox(width: 4),
-                      Text(
-                        '+${reward.heartsReward}',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
+                    ),
                   ],
                 ),
-                if (reward.isStreakBonus) ...[
+                if (reward.day == 7) ...[
                   const SizedBox(height: AppDimensions.spacingXS),
                   Container(
                     padding: const EdgeInsets.symmetric(

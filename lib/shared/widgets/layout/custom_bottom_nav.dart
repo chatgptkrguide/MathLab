@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
-import '../constants/app_ui_constants.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
+import '../../constants/app_ui_constants.dart';
 
 /// 커스텀 하단 네비게이션 바
 /// 새 디자인에 맞게 홈 탭이 둥근 원형으로 구현

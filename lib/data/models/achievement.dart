@@ -137,6 +137,7 @@ enum AchievementType {
   perfect, // 완벽한 성취
   time, // 시간 관련
   special, // 특별 업적
+  level, // 레벨 달성
 }
 
 /// 업적 희귀도

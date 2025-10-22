@@ -3,7 +3,7 @@ import '../models/daily_reward.dart';
 import '../models/user.dart';
 import 'user_provider.dart';
 import '../../shared/utils/logger.dart';
-import '../../shared/services/local_storage_service.dart';
+import '../../data/services/local_storage_service.dart';
 
 /// 데일리 리워드 상태
 class DailyRewardState {
@@ -36,12 +36,12 @@ class DailyRewardState {
 
 /// 데일리 리워드 Provider
 class DailyRewardProvider extends StateNotifier<DailyRewardState> {
-  final UserProvider _userProvider;
+  final Ref _ref;
   final LocalStorageService _storage = LocalStorageService();
 
   static const String _storageKey = 'daily_rewards_state';
 
-  DailyRewardProvider(this._userProvider)
+  DailyRewardProvider(this._ref)
       : super(const DailyRewardState(
           rewards: [],
           currentDay: 1,
@@ -53,51 +53,8 @@ class DailyRewardProvider extends StateNotifier<DailyRewardState> {
 
   /// 7일 보상 초기화
   void _initializeRewards() {
-    final rewards = [
-      DailyReward(
-        day: 1,
-        xpReward: 10,
-        heartsReward: 0,
-        isClaimed: false,
-      ),
-      DailyReward(
-        day: 2,
-        xpReward: 15,
-        heartsReward: 0,
-        isClaimed: false,
-      ),
-      DailyReward(
-        day: 3,
-        xpReward: 20,
-        heartsReward: 1,
-        isClaimed: false,
-      ),
-      DailyReward(
-        day: 4,
-        xpReward: 25,
-        heartsReward: 0,
-        isClaimed: false,
-      ),
-      DailyReward(
-        day: 5,
-        xpReward: 30,
-        heartsReward: 1,
-        isClaimed: false,
-      ),
-      DailyReward(
-        day: 6,
-        xpReward: 40,
-        heartsReward: 0,
-        isClaimed: false,
-      ),
-      DailyReward(
-        day: 7,
-        xpReward: 50,
-        heartsReward: 2,
-        isClaimed: false,
-        isStreakBonus: true,
-      ),
-    ];
+    // DailyReward 모델에서 정의된 weeklyRewards 사용
+    final rewards = DailyReward.weeklyRewards;
 
     state = state.copyWith(rewards: rewards);
     Logger.info('Daily rewards initialized: 7 days');
@@ -106,27 +63,14 @@ class DailyRewardProvider extends StateNotifier<DailyRewardState> {
   /// 상태 로드
   Future<void> _loadState() async {
     try {
-      final data = await _storage.loadObject(_storageKey);
+      final data = await _storage.loadMap(_storageKey);
       if (data != null) {
         final lastClaimDate = data['lastClaimDate'] != null
             ? DateTime.parse(data['lastClaimDate'])
             : null;
         final currentDay = data['currentDay'] ?? 1;
-        final claimedDays = List<int>.from(data['claimedDays'] ?? []);
-
-        // 보상 상태 복원
-        final updatedRewards = state.rewards.map((reward) {
-          return DailyReward(
-            day: reward.day,
-            xpReward: reward.xpReward,
-            heartsReward: reward.heartsReward,
-            isClaimed: claimedDays.contains(reward.day),
-            isStreakBonus: reward.isStreakBonus,
-          );
-        }).toList();
 
         state = state.copyWith(
-          rewards: updatedRewards,
           lastClaimDate: lastClaimDate,
           currentDay: currentDay,
           canClaimToday: _checkCanClaimToday(lastClaimDate),
@@ -143,13 +87,9 @@ class DailyRewardProvider extends StateNotifier<DailyRewardState> {
   /// 상태 저장
   Future<void> _saveState() async {
     try {
-      final claimedDays =
-          state.rewards.where((r) => r.isClaimed).map((r) => r.day).toList();
-
-      await _storage.saveObject(_storageKey, {
+      await _storage.saveMap(_storageKey, {
         'lastClaimDate': state.lastClaimDate?.toIso8601String(),
         'currentDay': state.currentDay,
-        'claimedDays': claimedDays,
       });
 
       Logger.info('Daily reward state saved');
@@ -183,42 +123,17 @@ class DailyRewardProvider extends StateNotifier<DailyRewardState> {
     try {
       final currentReward = state.rewards[state.currentDay - 1];
 
-      // 보상 지급
-      _userProvider.addXP(currentReward.xpReward);
-      if (currentReward.heartsReward > 0) {
-        _userProvider.addHearts(currentReward.heartsReward);
+      // 보상 지급 (타입에 따라 처리)
+      if (currentReward.type == RewardType.xp) {
+        await _ref.read(userProvider.notifier).addXP(currentReward.amount);
+      } else if (currentReward.type == RewardType.hearts) {
+        await _ref.read(userProvider.notifier).addHearts(currentReward.amount);
       }
-
-      // 상태 업데이트
-      final updatedRewards = state.rewards.map((reward) {
-        if (reward.day == state.currentDay) {
-          return DailyReward(
-            day: reward.day,
-            xpReward: reward.xpReward,
-            heartsReward: reward.heartsReward,
-            isClaimed: true,
-            isStreakBonus: reward.isStreakBonus,
-          );
-        }
-        return reward;
-      }).toList();
 
       // 다음 날로 이동 (7일 주기)
       final nextDay = state.currentDay >= 7 ? 1 : state.currentDay + 1;
 
-      // 7일 완료 시 모든 보상 초기화
-      final finalRewards = nextDay == 1
-          ? updatedRewards.map((r) => DailyReward(
-                day: r.day,
-                xpReward: r.xpReward,
-                heartsReward: r.heartsReward,
-                isClaimed: false,
-                isStreakBonus: r.isStreakBonus,
-              )).toList()
-          : updatedRewards;
-
       state = state.copyWith(
-        rewards: finalRewards,
         lastClaimDate: DateTime.now(),
         currentDay: nextDay,
         canClaimToday: false,
@@ -227,7 +142,7 @@ class DailyRewardProvider extends StateNotifier<DailyRewardState> {
       await _saveState();
 
       Logger.info(
-        'Daily reward claimed: day ${currentReward.day}, XP: ${currentReward.xpReward}, Hearts: ${currentReward.heartsReward}',
+        'Daily reward claimed: day ${currentReward.day}, type: ${currentReward.type.name}, amount: ${currentReward.amount}',
       );
 
       return true;
@@ -259,6 +174,5 @@ class DailyRewardProvider extends StateNotifier<DailyRewardState> {
 /// Provider 정의
 final dailyRewardProvider =
     StateNotifierProvider<DailyRewardProvider, DailyRewardState>((ref) {
-  final userProvider = ref.watch(userProvider.notifier);
-  return DailyRewardProvider(userProvider);
+  return DailyRewardProvider(ref);
 });

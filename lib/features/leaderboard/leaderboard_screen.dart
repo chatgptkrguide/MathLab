@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/responsive_wrapper.dart';
-import '../../shared/widgets/fade_in_widget.dart';
+import '../../shared/widgets/layout/responsive_wrapper.dart';
+import '../../shared/widgets/animations/fade_in_widget.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/leaderboard_provider.dart';
 
@@ -53,30 +53,21 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         .getCurrentUserEntry(_selectedPeriod);
 
     return Scaffold(
-      backgroundColor: AppColors.mathBlue,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: AppColors.mathBlueGradient,
-          ),
-        ),
-        child: SafeArea(
-          child: ResponsiveWrapper(
-            child: Column(
-              children: [
-                _buildHeader(),
-                _buildPeriodTabs(),
-                const SizedBox(height: AppDimensions.spacingL),
-                if (currentUserEntry != null)
-                  _buildCurrentUserRank(currentUserEntry),
-                const SizedBox(height: AppDimensions.spacingL),
-                Expanded(
-                  child: _buildLeaderboardList(entries),
-                ),
-              ],
-            ),
+      backgroundColor: const Color(0xFF1CB0F6), // Duolingo blue flat
+      body: SafeArea(
+        child: ResponsiveWrapper(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildPeriodTabs(),
+              const SizedBox(height: AppDimensions.spacingL),
+              if (currentUserEntry != null)
+                _buildCurrentUserRank(currentUserEntry),
+              const SizedBox(height: AppDimensions.spacingL),
+              Expanded(
+                child: _buildLeaderboardList(entries),
+              ),
+            ],
           ),
         ),
       ),
@@ -107,119 +98,152 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     );
   }
 
-  /// 기간 선택 탭
+  /// 기간 선택 탭 - Duolingo flat style
   Widget _buildPeriodTabs() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        color: Colors.white.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: AppColors.mathButtonGradient,
-          ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          color: Colors.white, // Duolingo flat white
+          borderRadius: BorderRadius.circular(12),
         ),
         dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
-        labelStyle: AppTextStyles.titleMedium.copyWith(
+        labelColor: const Color(0xFF1CB0F6), // Blue text when selected
+        unselectedLabelColor: Colors.white,
+        labelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
+          fontSize: 15,
         ),
-        unselectedLabelStyle: AppTextStyles.titleMedium,
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+        ),
         tabs: LeaderboardPeriod.values
-            .map((period) => Tab(text: period.displayName))
+            .map((period) => Tab(
+                  height: 40,
+                  text: period.displayName,
+                ))
             .toList(),
       ),
     );
   }
 
-  /// 현재 사용자 순위 표시
+  /// 현재 사용자 순위 표시 - Duolingo flat style with 3D shadow
   Widget _buildCurrentUserRank(LeaderboardEntry entry) {
     return FadeInWidget(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
-          ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            // 순위
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Center(
-                child: Text(
-                  '${entry.rank}',
-                  style: AppTextStyles.headlineMedium.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+            // Duolingo 3D solid shadow
+            Positioned(
+              top: 6,
+              left: 0,
+              right: 0,
+              bottom: -6,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF46A302), // Darker green
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
             ),
-            const SizedBox(width: AppDimensions.spacingM),
-            // 사용자 정보
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Main container
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFF58CC02), // Duolingo green flat
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF46A302),
+                  width: 3,
+                ),
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    '나의 순위',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                  // 순위
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(
+                        color: const Color(0xFF46A302),
+                        width: 3,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${entry.rank}',
+                        style: const TextStyle(
+                          color: Color(0xFF58CC02),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    entry.userName,
-                    style: AppTextStyles.titleLarge.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(width: 14),
+                  // 사용자 정보
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '나의 순위',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          entry.userName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  ),
+                  // XP
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${entry.xp} XP',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Lv.${entry.level}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-            // XP
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '${entry.xp} XP',
-                  style: AppTextStyles.titleLarge.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Lv.${entry.level}',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -253,31 +277,22 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     );
   }
 
-  /// 리더보드 카드
+  /// 리더보드 카드 - Duolingo flat style (Fixed: Flexible instead of Expanded)
   Widget _buildLeaderboardCard(LeaderboardEntry entry, bool isTopThree) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
-      padding: const EdgeInsets.all(AppDimensions.paddingM),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? AppColors.mathTeal.withValues(alpha: 0.1)
+            ? const Color(0xFFD7FFB8) // Light green highlight
             : Colors.white,
         border: Border.all(
           color: entry.isCurrentUser
-              ? AppColors.mathTeal
-              : AppColors.borderColor,
-          width: entry.isCurrentUser ? 2 : 1,
+              ? const Color(0xFF58CC02) // Green border for current user
+              : const Color(0xFFE5E5E5), // Light gray border
+          width: entry.isCurrentUser ? 3 : 2,
         ),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        boxShadow: isTopThree
-            ? [
-                BoxShadow(
-                  color: _getRankColor(entry.rank).withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
@@ -285,8 +300,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           _buildRankBadge(entry),
           const SizedBox(width: AppDimensions.spacingM),
           // 사용자 정보
-          Expanded(
+          Flexible(
             child: Column(
+              mainAxisSize: MainAxisSize.min, // FIX: Prevent unbounded height
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -294,11 +310,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     Flexible(
                       child: Text(
                         entry.userName,
-                        style: AppTextStyles.titleMedium.copyWith(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: entry.isCurrentUser
-                              ? AppColors.mathTeal
-                              : AppColors.textPrimary,
+                          fontSize: 16,
+                          color: Color(0xFF4B4B4B),
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -309,71 +324,63 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
-                          vertical: 2,
+                          vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.mathTeal,
+                          color: const Color(0xFF58CC02), // Duolingo green
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
+                        child: const Text(
                           '나',
-                          style: AppTextStyles.bodySmall.copyWith(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
                         ),
                       ),
                     ],
                   ],
                 ),
-                const SizedBox(height: 4),
-                Flexible(
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          entry.grade,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text(
+                      entry.grade,
+                      style: const TextStyle(
+                        color: Color(0xFF777777),
+                        fontSize: 13,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '•',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      '•',
+                      style: TextStyle(
+                        color: Color(0xFF777777),
+                        fontSize: 13,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Lv.${entry.level}',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Lv.${entry.level}',
+                      style: const TextStyle(
+                        color: Color(0xFF777777),
+                        fontSize: 13,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '•',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('🔥', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${entry.streakDays}일',
+                      style: const TextStyle(
+                        color: Color(0xFF777777),
+                        fontSize: 13,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '🔥',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${entry.streakDays}일',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -405,51 +412,51 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     );
   }
 
-  /// 순위 배지
+  /// 순위 배지 - Duolingo flat style
   Widget _buildRankBadge(LeaderboardEntry entry) {
     final medal = entry.medalEmoji;
 
     if (medal != null) {
-      // Top 3는 메달 표시
+      // Top 3는 메달 표시 with flat color and border
       return Container(
-        width: 48,
-        height: 48,
+        width: 52,
+        height: 52,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: _getRankGradient(entry.rank),
+          color: _getRankColor(entry.rank), // Flat color
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(
+            color: _getDarkerRankColor(entry.rank),
+            width: 3,
           ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: _getRankColor(entry.rank).withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Center(
           child: Text(
             medal,
-            style: const TextStyle(fontSize: 24),
+            style: const TextStyle(fontSize: 26),
           ),
         ),
       );
     }
 
-    // 나머지는 순위 숫자
+    // 나머지는 순위 숫자 with Duolingo style
     return Container(
-      width: 48,
-      height: 48,
+      width: 52,
+      height: 52,
       decoration: BoxDecoration(
-        color: AppColors.progressBackground,
-        borderRadius: BorderRadius.circular(24),
+        color: const Color(0xFFF7F7F7), // Light gray
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: const Color(0xFFE5E5E5),
+          width: 2,
+        ),
       ),
       child: Center(
         child: Text(
           '${entry.rank}',
-          style: AppTextStyles.titleLarge.copyWith(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: AppColors.textSecondary,
+            fontSize: 18,
+            color: Color(0xFF777777),
           ),
         ),
       ),
@@ -470,17 +477,17 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     }
   }
 
-  /// 순위별 그라디언트
-  List<Color> _getRankGradient(int rank) {
+  /// 순위별 어두운 색상 (테두리용)
+  Color _getDarkerRankColor(int rank) {
     switch (rank) {
       case 1:
-        return [const Color(0xFFFFD700), const Color(0xFFFFA500)];
+        return const Color(0xFFE0B800); // Darker gold
       case 2:
-        return [const Color(0xFFC0C0C0), const Color(0xFFA8A8A8)];
+        return const Color(0xFFA0A0A0); // Darker silver
       case 3:
-        return [const Color(0xFFCD7F32), const Color(0xFFB8692D)];
+        return const Color(0xFFB86D28); // Darker bronze
       default:
-        return [AppColors.progressBackground, AppColors.progressBackground];
+        return const Color(0xFFE5E5E5);
     }
   }
 }

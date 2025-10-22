@@ -36,41 +36,57 @@ class AchievementsScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // 진행 현황
+          // 진행 현황 - GoMath style
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(AppDimensions.paddingL),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: AppColors.borderLight, width: 1),
+              ),
             ),
             child: Column(
               children: [
                 Text(
                   '${state.unlockedCount} / ${state.totalCount}',
-                  style: AppTextStyles.displaySmall.copyWith(
-                    color: AppColors.primary,
+                  style: const TextStyle(
+                    color: AppColors.successGreen, // GoMath 초록색
                     fontWeight: FontWeight.bold,
+                    fontSize: 32,
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spacingS),
-                LinearProgressIndicator(
-                  value: state.completionRate,
-                  backgroundColor: AppColors.disabled.withOpacity(0.3),
-                  valueColor: const AlwaysStoppedAnimation(AppColors.primary),
-                  minHeight: 8,
+                const SizedBox(height: 12),
+                // GoMath-style progress bar
+                Stack(
+                  children: [
+                    Container(
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: AppColors.borderLight,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    FractionallySizedBox(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: state.completionRate.clamp(0.01, 1.0),
+                      child: Container(
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: AppColors.successGreen, // GoMath 초록색
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppDimensions.spacingS),
+                const SizedBox(height: 8),
                 Text(
                   '${(state.completionRate * 100).toStringAsFixed(1)}% 완료',
-                  style: AppTextStyles.bodyMedium.copyWith(
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -107,6 +123,8 @@ class _AchievementCard extends StatelessWidget {
     switch (achievement.rarity) {
       case AchievementRarity.common:
         return Colors.grey;
+      case AchievementRarity.uncommon:
+        return Colors.green;
       case AchievementRarity.rare:
         return Colors.blue;
       case AchievementRarity.epic:
@@ -118,42 +136,54 @@ class _AchievementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = achievement.currentValue / achievement.targetValue;
+    final progress = achievement.currentValue / achievement.requiredValue;
 
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: achievement.isUnlocked ? AppColors.surface : AppColors.surface.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        color: achievement.isUnlocked
+            ? Colors.white
+            : AppColors.background, // GoMath 배경색
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: achievement.isUnlocked ? _getRarityColor() : AppColors.borderLight,
-          width: achievement.isUnlocked ? 2 : 1,
+          color: achievement.isUnlocked
+              ? _getRarityColor()
+              : AppColors.borderLight,
+          width: achievement.isUnlocked ? 3 : 2,
         ),
       ),
       child: Row(
         children: [
-          // 아이콘
+          // 아이콘 - GoMath style
           Container(
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: achievement.isUnlocked ? _getRarityColor().withOpacity(0.2) : AppColors.disabled.withOpacity(0.2),
+              color: achievement.isUnlocked
+                  ? _getRarityColor()
+                  : AppColors.borderLight,
               shape: BoxShape.circle,
+              border: Border.all(
+                color: achievement.isUnlocked
+                    ? _getRarityColor()
+                    : AppColors.borderLight,
+                width: 3,
+              ),
             ),
             child: Center(
               child: Text(
                 achievement.icon,
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 30,
                   color: achievement.isUnlocked ? null : Colors.grey,
                 ),
               ),
             ),
           ),
 
-          const SizedBox(width: AppDimensions.spacingM),
+          const SizedBox(width: 14),
 
-          // 정보
+          // 정보 - Duolingo typography
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,47 +192,81 @@ class _AchievementCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        achievement.name,
-                        style: AppTextStyles.titleMedium.copyWith(
+                        achievement.title,
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: achievement.isUnlocked ? AppColors.textPrimary : AppColors.textSecondary,
+                          fontSize: 16,
+                          color: achievement.isUnlocked
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary,
                         ),
                       ),
                     ),
                     if (achievement.isUnlocked)
-                      const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.successGreen, // GoMath 초록색
+                        size: 24,
+                      ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spacingXS),
+                const SizedBox(height: 6),
                 Text(
                   achievement.description,
-                  style: AppTextStyles.bodySmall.copyWith(
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
+                    fontSize: 13,
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spacingS),
+                const SizedBox(height: 10),
                 if (!achievement.isUnlocked) ...[
-                  LinearProgressIndicator(
-                    value: progress.clamp(0.0, 1.0),
-                    backgroundColor: AppColors.disabled.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation(_getRarityColor()),
-                    minHeight: 4,
+                  // GoMath progress bar
+                  Stack(
+                    children: [
+                      Container(
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.borderLight,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: progress.clamp(0.01, 1.0),
+                        child: Container(
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: _getRarityColor(),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppDimensions.spacingXS),
+                  const SizedBox(height: 6),
                   Text(
-                    '${achievement.currentValue} / ${achievement.targetValue}',
-                    style: AppTextStyles.bodySmall.copyWith(
+                    '${achievement.currentValue} / ${achievement.requiredValue}',
+                    style: const TextStyle(
                       color: AppColors.textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
-                const SizedBox(height: AppDimensions.spacingXS),
-                Text(
-                  '⭐ +${achievement.xpReward} XP',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Text('⭐', style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 4),
+                    Text(
+                      '+${achievement.xpReward} XP',
+                      style: const TextStyle(
+                        color: AppColors.mathYellow, // GoMath 노란색
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

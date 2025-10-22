@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
-import '../utils/haptic_feedback.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
+import '../../utils/haptic_feedback.dart';
 
 /// 부드러운 애니메이션이 적용된 버튼
 /// 듀오링고 스타일의 3D 효과 + 마이크로 인터렉션
@@ -10,7 +10,8 @@ class AnimatedButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isEnabled;
-  final List<Color> gradientColors;
+  final Color backgroundColor;
+  final Color shadowColor;
   final IconData? icon;
   final double? width;
   final double? height;
@@ -21,7 +22,8 @@ class AnimatedButton extends StatefulWidget {
     required this.text,
     this.onPressed,
     this.isEnabled = true,
-    this.gradientColors = AppColors.greenGradient,
+    this.backgroundColor = AppColors.mathButtonBlue, // GoMath 버튼 색상
+    this.shadowColor = const Color(0xFF2B4BEF), // 어두운 변형
     this.icon,
     this.width,
     this.height,
@@ -94,7 +96,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
         onTapUp: enabled ? (_) => _onTapUp() : null,
         onTapCancel: enabled ? _onTapCancel : null,
         child: AnimatedBuilder(
-        animation: Listenable.merge([_scaleAnimation, _shimmerAnimation]),
+        animation: _scaleAnimation,
         builder: (context, child) {
           return Transform.scale(
             scale: _scaleAnimation.value,
@@ -105,85 +107,44 @@ class _AnimatedButtonState extends State<AnimatedButton>
                 horizontal: AppDimensions.paddingL,
                 vertical: AppDimensions.paddingS,
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
-                boxShadow: [
-                  // 3D 바닥 그림자 (깊이감)
-                  BoxShadow(
-                    color: enabled
-                        ? widget.gradientColors[1].withValues(alpha: _isPressed ? 0.6 : 0.4)
-                        : AppColors.disabled.withValues(alpha: 0.3),
-                    offset: Offset(0, _isPressed ? 3 : 6),
-                    blurRadius: 0,
-                    spreadRadius: 0,
-                  ),
-                  // 부드러운 확산 그림자
-                  BoxShadow(
-                    color: enabled
-                        ? widget.gradientColors[1].withValues(alpha: 0.2)
-                        : AppColors.disabled.withValues(alpha: 0.1),
-                    offset: const Offset(0, 8),
-                    blurRadius: 16,
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
               child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  // 메인 버튼
+                  // Duolingo 3D solid shadow
+                  if (enabled)
+                    Positioned(
+                      top: 6,
+                      left: 0,
+                      right: 0,
+                      bottom: -6,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: widget.shadowColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  // Main button
                   Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: enabled
-                            ? widget.gradientColors
-                            : [AppColors.disabled, AppColors.disabled.withValues(alpha: 0.8)],
+                      color: enabled ? widget.backgroundColor : const Color(0xFFE5E5E5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: enabled ? widget.shadowColor : const Color(0xFFD0D0D0),
+                        width: 3,
                       ),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                     ),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: enabled ? _handleTap : null,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
+                        borderRadius: BorderRadius.circular(16),
                         child: Center(
                           child: _buildButtonContent(),
                         ),
                       ),
                     ),
                   ),
-                  // 쉬머 효과 (활성화된 버튼만)
-                  if (enabled)
-                    Positioned.fill(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
-                        child: AnimatedBuilder(
-                          animation: _shimmerAnimation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(
-                                (widget.width ?? 300) * _shimmerAnimation.value,
-                                0,
-                              ),
-                              child: Container(
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.white.withValues(alpha: 0.3),
-                                      Colors.transparent,
-                                    ],
-                                    stops: const [0.0, 0.5, 1.0],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),

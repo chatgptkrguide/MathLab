@@ -4,7 +4,7 @@ import '../models/league.dart';
 import '../models/user.dart';
 import 'user_provider.dart';
 import '../../shared/utils/logger.dart';
-import '../../shared/services/local_storage_service.dart';
+import '../../data/services/local_storage_service.dart';
 
 /// 주간 리그 참가자 정보
 class LeagueParticipant {
@@ -173,7 +173,7 @@ class LeagueProvider extends StateNotifier<LeagueState> {
   /// 상태 로드
   Future<void> _loadState() async {
     try {
-      final data = await _storage.loadObject(_storageKey);
+      final data = await _storage.loadMap(_storageKey);
       if (data != null) {
         final weekStartDate = DateTime.parse(data['weekStartDate']);
         final weekEndDate = DateTime.parse(data['weekEndDate']);
@@ -220,7 +220,7 @@ class LeagueProvider extends StateNotifier<LeagueState> {
   /// 상태 저장
   Future<void> _saveState() async {
     try {
-      await _storage.saveObject(_storageKey, {
+      await _storage.saveMap(_storageKey, {
         'weekStartDate': state.weekStartDate.toIso8601String(),
         'weekEndDate': state.weekEndDate.toIso8601String(),
         'myWeeklyXP': state.myWeeklyXP,

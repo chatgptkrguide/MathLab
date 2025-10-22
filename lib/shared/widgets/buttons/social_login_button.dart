@@ -28,58 +28,85 @@ class SocialLoginButton extends StatelessWidget {
         await AppHapticFeedback.selectionClick();
         onPressed?.call();
       } : null,
-      child: SizedBox(
+      child: Container(
         width: double.infinity,
         height: 56,
-        child: ElevatedButton(
-          onPressed: enabled ? () async {
-            await AppHapticFeedback.selectionClick();
-            onPressed?.call();
-          } : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _getBackgroundColor(),
-          foregroundColor: _getTextColor(),
-          elevation: 2,
-          shadowColor: Colors.black.withValues(alpha: 0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            side: BorderSide(
-              color: _getBorderColor(),
-              width: 1,
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.paddingL,
-            vertical: AppDimensions.paddingM,
-          ),
-        ),
-        child: isLoading
-            ? SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation(_getTextColor()),
+        margin: const EdgeInsets.symmetric(vertical: AppDimensions.paddingS),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Duolingo 3D solid shadow
+            if (enabled)
+              Positioned(
+                top: 4,
+                left: 0,
+                right: 0,
+                bottom: -4,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _getShadowColor(),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildIcon(),
-                  const SizedBox(width: AppDimensions.spacingM),
-                  Flexible(
-                    child: Text(
-                      _getButtonText(),
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: _getTextColor(),
-                        fontWeight: FontWeight.w600,
+              ),
+            // Main button
+            Container(
+              decoration: BoxDecoration(
+                color: enabled ? _getBackgroundColor() : const Color(0xFFE5E5E5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: enabled ? _getShadowColor() : const Color(0xFFD0D0D0),
+                  width: 3,
+                ),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: enabled ? () async {
+                    await AppHapticFeedback.selectionClick();
+                    onPressed?.call();
+                  } : null,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.paddingL,
+                        vertical: AppDimensions.paddingM,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                      child: isLoading
+                          ? SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation(_getTextColor()),
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildIcon(),
+                                const SizedBox(width: AppDimensions.spacingM),
+                                Flexible(
+                                  child: Text(
+                                    _getButtonText(),
+                                    style: AppTextStyles.titleMedium.copyWith(
+                                      color: _getTextColor(),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
-                ],
+                ),
               ),
+            ),
+          ],
         ),
       ),
     );
@@ -138,14 +165,14 @@ class SocialLoginButton extends StatelessWidget {
     }
   }
 
-  Color _getBorderColor() {
+  Color _getShadowColor() {
     switch (provider) {
       case SocialLoginProvider.google:
-        return AppColors.borderLight;
+        return const Color(0xFFD0D0D0); // Light gray shadow
       case SocialLoginProvider.kakao:
-        return const Color(0xFFFEE500);
+        return const Color(0xFFDDC800); // Darker yellow shadow
       case SocialLoginProvider.apple:
-        return Colors.black;
+        return const Color(0xFF1A1A1A); // Very dark gray shadow
     }
   }
 

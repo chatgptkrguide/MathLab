@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../data/models/models.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
+import '../../../data/models/models.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
 
 /// 일일 보상 다이얼로그
 class DailyRewardDialog extends StatefulWidget {

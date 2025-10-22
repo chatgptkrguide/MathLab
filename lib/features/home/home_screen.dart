@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
+import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/utils.dart';
-import '../../shared/widgets/duolingo_card.dart';
-import '../../shared/widgets/duolingo_circular_progress.dart';
-import '../../shared/widgets/responsive_wrapper.dart';
-import '../../shared/widgets/animated_button.dart';
-import '../../shared/widgets/loading_widgets.dart';
+import '../../shared/widgets/layout/lesson_path_widget.dart';
+import '../../shared/widgets/indicators/loading_widgets.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
@@ -14,7 +12,7 @@ import '../../data/providers/problem_provider.dart';
 import '../problem/problem_screen.dart';
 
 /// 듀오링고 스타일 홈 화면
-/// 완전한 듀오링고 UI/UX 적용
+/// S자 곡선 레슨 경로 적용
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -46,114 +44,146 @@ class HomeScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.mathBlue, // GoMath 파란 배경
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: AppColors.mathBlueGradient, // Figma 디자인 그라디언트
-          ),
-        ),
-        child: SafeArea(
-          child: ResponsiveWrapper(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  _buildHeader(user),
-                  const SizedBox(height: AppDimensions.spacingXXL),
-                  _buildLevelProgress(user),
-                  const SizedBox(height: AppDimensions.spacingXXL),
-                  _buildDailyGoal(user),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  _buildStartButton(context, ref, problems),
-                  const SizedBox(height: AppDimensions.spacingXL),
-                  _buildQuickStats(user),
-                  const SizedBox(height: AppDimensions.spacingXXL),
-                ],
-              ),
+      backgroundColor: AppColors.background, // GoMath 배경색
+      body: Column(
+        children: [
+          _buildHeader(user),
+          Expanded(
+            child: LessonPathWidget(
+              lessons: _generateLessons(user),
+              onLessonTap: (lesson) => _handleLessonTap(context, ref, lesson, problems),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   /// 듀오링고 스타일 헤더
   Widget _buildHeader(User user) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 사용자 정보
-          Flexible(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(
+          AppDimensions.paddingL,
+          AppDimensions.paddingM,
+          AppDimensions.paddingL,
+          AppDimensions.paddingL,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            bottom: BorderSide(
+              color: AppColors.borderLight,
+              width: 1,
+            ),
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '안녕하세요! 👋',
-                  style: AppTextStyles.headlineLarge.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                // 사용자 정보
+                Expanded(
+                  child: Row(
+                    children: [
+                      // 프로필 아바타
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.mathBlue,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.mathBlue.withValues(alpha: 0.7),
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            user.name.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppDimensions.spacingM),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user.name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Level ${user.level}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spacingXS),
-                Text(
-                  '${user.name}님의 수학 학습',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                // 스트릭 & 하트
+                Row(
+                  children: [
+                    _buildDuoStatBadge('🔥', '${user.streakDays}', AppColors.mathOrange),
+                    const SizedBox(width: AppDimensions.spacingS),
+                    _buildDuoStatBadge('❤️', '${user.hearts}', AppColors.mathRed),
+                  ],
                 ),
               ],
             ),
-          ),
-          // 스트릭 표시
-          Flexible(
-            child: _buildStreakDisplay(user.streakDays),
-          ),
-        ],
+            const SizedBox(height: AppDimensions.paddingL),
+            // XP 진행률 바
+            _buildDuoProgressBar(user),
+          ],
+        ),
       ),
     );
   }
 
-  /// 스트릭 표시 (GoMath 스타일)
-  Widget _buildStreakDisplay(int streakDays) {
+  Widget _buildDuoStatBadge(String emoji, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingM,
-        vertical: AppDimensions.paddingS,
+        horizontal: 10,
+        vertical: 6,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: AppColors.orangeGradient,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.borderLight,
+          width: 2,
         ),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.mathOrange.withValues(alpha: 0.3),
-            offset: const Offset(0, 4),
-            blurRadius: 8,
-          ),
-        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 4),
           Text(
-            '🔥',
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(width: AppDimensions.spacingXS),
-          Text(
-            '$streakDays',
-            style: AppTextStyles.titleMedium.copyWith(
-              color: Colors.white,
+            value,
+            style: TextStyle(
+              color: color,
               fontWeight: FontWeight.bold,
+              fontSize: 15,
             ),
           ),
         ],
@@ -161,231 +191,131 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// GoMath 스타일 레벨 진행률
-  Widget _buildLevelProgress(User user) {
-    final levelProgress = user.levelProgress;
+  Widget _buildDuoProgressBar(User user) {
+    final progress = user.levelProgress;
+    final xpNeeded = user.xpToNextLevel;
 
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingXL),
-      child: Column(
-        children: [
-          // 큰 원형 진행률
-          DuolingoCircularProgress(
-            progress: levelProgress,
-            level: user.level,
-            emoji: '🧮', // 수학 이모지
-            size: 120,
-            progressColor: AppColors.mathYellow,
-          ),
-          const SizedBox(height: AppDimensions.spacingL),
-          // 레벨 정보
-          Text(
-            '레벨 ${user.level}',
-            style: AppTextStyles.headlineLarge.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacingS),
-          Text(
-            '다음 레벨까지 ${user.xpToNextLevel} XP',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 일일 목표 (듀오링고 스타일)
-  Widget _buildDailyGoal(User user) {
-    const targetXP = 100;
-    final currentXP = user.xp.remainder(targetXP);
-
-    return DuolingoCard(
-      gradientColors: const [Colors.white, Color(0xFFF8F9FA)],
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: AppColors.greenGradient,
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Center(
-                  child: Text('🎯', style: TextStyle(fontSize: 20)),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Daily Goal',
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
               ),
-              const SizedBox(width: AppDimensions.spacingM),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '오늘의 목표',
-                      style: AppTextStyles.titleLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimensions.spacingXS),
-                    Text(
-                      '$currentXP / $targetXP XP',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacingL),
-          // GoMath 스타일 진행률 바 (틸색)
-          Container(
-            height: 16,
-            decoration: BoxDecoration(
-              color: AppColors.progressBackground,
-              borderRadius: BorderRadius.circular(8),
             ),
-            child: FractionallySizedBox(
+            Text(
+              '$xpNeeded XP to go',
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // 듀오링고 스타일 진행률 바
+        Stack(
+          children: [
+            // 배경 바
+            Container(
+              height: 16,
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            // 진행 바 (GoMath 틸 색상)
+            FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: (currentXP / targetXP).clamp(0.0, 1.0),
+              widthFactor: progress.clamp(0.05, 1.0), // 최소 5% 표시
               child: Container(
+                height: 16,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: AppColors.mathTealGradient,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.mathTeal.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: AppColors.mathTeal,
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 
-  /// 메인 학습 시작 버튼 (GoMath 스타일 - 진한 파란색)
-  Widget _buildStartButton(BuildContext context, WidgetRef ref, List<Problem> problems) {
-    return AnimatedButton(
-      text: '학습 시작하기',
-      onPressed: () async {
-        await AppHapticFeedback.mediumImpact();
-        _startLearning(context, ref, problems);
-      },
-      gradientColors: AppColors.mathButtonGradient,
-      icon: Icons.play_arrow,
-      height: 64,
-      animationDuration: const Duration(milliseconds: 150),
-    );
+  /// 샘플 레슨 데이터 생성 (추후 실제 데이터로 교체)
+  List<LessonNode> _generateLessons(User user) {
+    final currentLevel = user.level;
+
+    return List.generate(20, (index) {
+      final lessonNumber = index + 1;
+      final isLocked = lessonNumber > currentLevel + 2;
+      final isCompleted = lessonNumber < currentLevel;
+      final isCurrent = lessonNumber == currentLevel || lessonNumber == currentLevel + 1;
+
+      return LessonNode(
+        id: 'lesson_$lessonNumber',
+        title: '레슨 $lessonNumber',
+        emoji: _getLessonEmoji(lessonNumber),
+        isLocked: isLocked,
+        isCompleted: isCompleted,
+        isCurrent: isCurrent && !isCompleted,
+        lessonNumber: lessonNumber,
+      );
+    });
   }
 
-  /// 빠른 통계 (GoMath 스타일 - 반응형)
-  Widget _buildQuickStats(User user) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          // 작은 화면에서는 세로 방향으로 배치
-          final isSmallScreen = constraints.maxWidth < 400;
-          final spacing = isSmallScreen
-              ? AppDimensions.spacingS
-              : AppDimensions.spacingM;
-
-          if (isSmallScreen) {
-            return Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: DuolingoStatCard(
-                        emoji: '🔶',
-                        title: 'XP',
-                        value: user.xp.toString(),
-                        iconColor: AppColors.mathOrange,
-                      ),
-                    ),
-                    SizedBox(width: spacing),
-                    Expanded(
-                      child: DuolingoStatCard(
-                        emoji: '⭐',
-                        title: '레벨',
-                        value: user.level.toString(),
-                        iconColor: AppColors.mathYellow,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: spacing),
-                SizedBox(
-                  width: double.infinity,
-                  child: DuolingoStatCard(
-                    emoji: '🔥',
-                    title: '연속',
-                    value: '${user.streakDays}일',
-                    iconColor: AppColors.mathOrange,
-                  ),
-                ),
-              ],
-            );
-          }
-
-          return Row(
-            children: [
-              Expanded(
-                child: DuolingoStatCard(
-                  emoji: '🔶',
-                  title: 'XP',
-                  value: user.xp.toString(),
-                  iconColor: AppColors.mathOrange,
-                ),
-              ),
-              SizedBox(width: spacing),
-              Expanded(
-                child: DuolingoStatCard(
-                  emoji: '⭐',
-                  title: '레벨',
-                  value: user.level.toString(),
-                  iconColor: AppColors.mathYellow,
-                ),
-              ),
-              SizedBox(width: spacing),
-              Expanded(
-                child: DuolingoStatCard(
-                  emoji: '🔥',
-                  title: '연속',
-                  value: '${user.streakDays}일',
-                  iconColor: AppColors.mathOrange,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+  String _getLessonEmoji(int lessonNumber) {
+    const emojis = [
+      '🔢', '➕', '➖', '✖️', '➗',
+      '📐', '📏', '📊', '📈', '🎯',
+      '🧮', '💡', '⭐', '🏆', '🎓',
+      '🔶', '🔷', '🔺', '🔻', '⬛',
+    ];
+    return emojis[lessonNumber % emojis.length];
   }
 
-  // 이벤트 핸들러
+  void _handleLessonTap(
+    BuildContext context,
+    WidgetRef ref,
+    LessonNode lesson,
+    List<Problem> problems,
+  ) async {
+    if (lesson.isLocked) {
+      await AppHapticFeedback.error();
+      _showCustomSnackBar(
+        context,
+        '이전 레슨을 먼저 완료해주세요',
+        AppColors.duolingoOrange,
+      );
+      return;
+    }
 
-  void _startLearning(BuildContext context, WidgetRef ref, List<Problem> problems) async {
-    Logger.ui('학습하기 버튼 클릭', screen: 'HomeScreen', action: 'StartLearning');
+    await AppHapticFeedback.mediumImpact();
+    _startLearning(context, ref, lesson, problems);
+  }
+
+  void _startLearning(
+    BuildContext context,
+    WidgetRef ref,
+    LessonNode lesson,
+    List<Problem> problems,
+  ) async {
+    Logger.ui('레슨 시작', screen: 'HomeScreen', action: 'StartLesson');
 
     if (problems.isEmpty) {
       Logger.warning('문제 데이터 없음', tag: 'HomeScreen');
-      _showCustomSnackBar(context, '문제 데이터를 로드하는 중입니다...', AppColors.duolingoOrange);
+      _showCustomSnackBar(
+        context,
+        '문제 데이터를 로드하는 중입니다...',
+        AppColors.duolingoOrange,
+      );
       return;
     }
 
@@ -395,43 +325,46 @@ class HomeScreen extends ConsumerWidget {
       return;
     }
 
-    Logger.info(
-      '사용자: ${user.name} (레벨: ${user.level})',
-      tag: 'HomeScreen',
-    );
-
+    // 사용자 레벨에 맞는 문제 가져오기
     final recommendedProblems = ref
         .read(problemProvider.notifier)
-        .getRecommendedProblems(user.level, count: GameConstants.recommendedProblemCount);
+        .getRecommendedProblems(
+          lesson.lessonNumber,
+          count: GameConstants.recommendedProblemCount,
+        );
 
     List<Problem> selectedProblems;
     String lessonId;
 
     if (recommendedProblems.isEmpty) {
       Logger.debug('기본 레슨 사용', tag: 'HomeScreen');
-      final lesson1Problems = ref
+      final defaultProblems = ref
           .read(problemProvider.notifier)
           .getProblemsByLesson(GameConstants.defaultLessonId);
-      selectedProblems = lesson1Problems.take(GameConstants.recommendedProblemCount).toList();
+      selectedProblems = defaultProblems
+          .take(GameConstants.recommendedProblemCount)
+          .toList();
       lessonId = GameConstants.defaultLessonId;
     } else {
       selectedProblems = recommendedProblems;
-      lessonId = 'recommended';
+      lessonId = lesson.id;
     }
 
     if (selectedProblems.isEmpty) {
       Logger.error('선택된 문제 없음', tag: 'HomeScreen');
-      _showCustomSnackBar(context, '문제를 찾을 수 없습니다.', AppColors.duolingoRed);
+      _showCustomSnackBar(
+        context,
+        '문제를 찾을 수 없습니다.',
+        AppColors.duolingoRed,
+      );
       return;
     }
 
     Logger.info('문제 ${selectedProblems.length}개 선택 완료', tag: 'HomeScreen');
 
     try {
-      // 햅틱 피드백
       await AppHapticFeedback.success();
 
-      // 학습 화면으로 이동
       final route = MaterialPageRoute(
         builder: (context) => ProblemScreen(
           lessonId: lessonId,
@@ -451,12 +384,20 @@ class HomeScreen extends ConsumerWidget {
         tag: 'HomeScreen',
       );
       if (context.mounted) {
-        _showCustomSnackBar(context, '페이지 이동 중 오류가 발생했습니다.', AppColors.duolingoRed);
+        _showCustomSnackBar(
+          context,
+          '페이지 이동 중 오류가 발생했습니다.',
+          AppColors.duolingoRed,
+        );
       }
     }
   }
 
-  void _showCustomSnackBar(BuildContext context, String message, Color backgroundColor) {
+  void _showCustomSnackBar(
+    BuildContext context,
+    String message,
+    Color backgroundColor,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

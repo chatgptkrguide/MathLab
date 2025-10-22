@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
 
 /// 레벨업 축하 다이얼로그
 /// 화려한 애니메이션과 축하 효과

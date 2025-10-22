@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
 
 /// XP 획득 애니메이션 위젯
 /// 화면에 떠오르는 XP 획득 표시

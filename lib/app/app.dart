@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../shared/themes/app_theme.dart';
+import '../features/onboarding/onboarding_screen.dart';
 import 'main_navigation.dart';
+import 'splash_screen.dart';
 
 /// MathLab 앱의 메인 위젯
 class MathLabApp extends StatelessWidget {
@@ -33,11 +35,12 @@ class MathLabApp extends StatelessWidget {
         );
       },
 
-      // 메인 네비게이션으로 시작
-      home: const MainNavigation(),
+      // 스플래시 화면에서 온보딩 여부 체크
+      home: const SplashScreen(),
 
-      // 라우팅 설정 (향후 확장용)
+      // 라우팅 설정
       routes: {
+        '/onboarding': (context) => const OnboardingScreen(),
         '/home': (context) => const MainNavigation(),
       },
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../data/models/models.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
+import '../../../data/models/models.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
 
 /// 리그 정보 표시 위젯
 class LeagueWidget extends StatelessWidget {

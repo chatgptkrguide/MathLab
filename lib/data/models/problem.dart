@@ -18,6 +18,9 @@ class Problem {
   final String? correctAnswer;
   final String? inputHint;
 
+  // 힌트 시스템
+  final List<String>? hints;
+
   const Problem({
     required this.id,
     required this.lessonId,
@@ -32,6 +35,7 @@ class Problem {
     this.correctAnswerIndex,
     this.correctAnswer,
     this.inputHint,
+    this.hints,
   });
 
   factory Problem.fromJson(Map<String, dynamic> json) {
@@ -52,6 +56,7 @@ class Problem {
       correctAnswerIndex: json['correctAnswerIndex'] as int?,
       correctAnswer: json['correctAnswer'] as String?,
       inputHint: json['inputHint'] as String?,
+      hints: json['hints'] != null ? List<String>.from(json['hints']) : null,
     );
   }
 
@@ -70,6 +75,7 @@ class Problem {
       if (correctAnswerIndex != null) 'correctAnswerIndex': correctAnswerIndex,
       if (correctAnswer != null) 'correctAnswer': correctAnswer,
       if (inputHint != null) 'inputHint': inputHint,
+      if (hints != null) 'hints': hints,
     };
   }
 
@@ -125,6 +131,7 @@ class Problem {
     int? correctAnswerIndex,
     String? correctAnswer,
     String? inputHint,
+    List<String>? hints,
   }) {
     return Problem(
       id: id ?? this.id,
@@ -140,6 +147,7 @@ class Problem {
       correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
       correctAnswer: correctAnswer ?? this.correctAnswer,
       inputHint: inputHint ?? this.inputHint,
+      hints: hints ?? this.hints,
     );
   }
 

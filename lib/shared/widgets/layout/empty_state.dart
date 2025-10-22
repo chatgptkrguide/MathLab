@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
 
 /// 빈 상태 위젯
 /// 데이터가 없을 때 표시하는 일러스트레이션과 메시지

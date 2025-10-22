@@ -3,17 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
-import '../../shared/widgets/responsive_wrapper.dart';
-import '../../shared/widgets/fade_in_widget.dart';
+import '../../shared/widgets/layout/responsive_wrapper.dart';
+import '../../shared/widgets/animations/fade_in_widget.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
 import '../../data/providers/error_note_provider.dart';
 import '../../data/providers/achievement_provider.dart';
+import '../../data/providers/hint_provider.dart';
 import 'widgets/problem_option_button.dart';
 import 'widgets/problem_result_dialog.dart';
 import 'widgets/xp_gain_animation.dart';
+import 'widgets/hint_section.dart';
 
 /// 문제 풀이 화면
 /// 실제 Problem 데이터 기반, 경험치/뱃지 시스템 통합
@@ -57,6 +59,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     super.initState();
     _setupAnimations();
     _stopwatch.start(); // 타이머 시작
+
+    // 첫 문제의 힌트 시스템 초기화
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
+    });
   }
 
   void _setupAnimations() {
@@ -88,6 +95,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   @override
   void dispose() {
     _transitionController.dispose();
+    // 힌트 시스템 종료
+    ref.read(hintProvider.notifier).endProblem();
     super.dispose();
   }
 
@@ -98,38 +107,29 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.mathBlue,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: AppColors.mathBlueGradient,
-          ),
-        ),
-        child: SafeArea(
-          child: ResponsiveWrapper(
-            child: Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: _buildContent(),
-                    ),
+      backgroundColor: AppColors.mathBlue, // GoMath 파란색
+      body: SafeArea(
+        child: ResponsiveWrapper(
+          child: Column(
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: _buildContent(),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  /// 헤더 (뒤로가기 + 진행률 + XP)
+  /// 헤더 (뒤로가기 + 진행률 + XP) - Duolingo style
   Widget _buildHeader() {
     final user = ref.watch(userProvider);
 
@@ -141,31 +141,41 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => _showExitDialog(),
-              ),
+              // Duolingo-style close button
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.paddingM,
-                  vertical: AppDimensions.paddingS,
-                ),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                  padding: EdgeInsets.zero,
+                  onPressed: () => _showExitDialog(),
+                ),
+              ),
+              // Clean XP badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    const Text('🔶', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 6),
                     Text(
-                      '🔶',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Text(
-                      '${user?.xp ?? 0} XP',
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: Colors.white,
+                      '${user?.xp ?? 0}',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                   ],
@@ -173,43 +183,33 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppDimensions.spacingM),
-          // 진행률 바
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: AppDimensions.spacingL),
+          // Duolingo-style progress bar
+          Stack(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '문제 ${_currentProblemIndex + 1}/${widget.problems.length}',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    '${(_progress * 100).round()}%',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              // Background bar
+              Container(
+                height: 16,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              const SizedBox(height: AppDimensions.spacingS),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+              // Progress bar
+              FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: _progress.clamp(0.01, 1.0),
                 child: TweenAnimationBuilder<double>(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOutCubic,
                   tween: Tween(begin: 0.0, end: _progress),
                   builder: (context, value, child) {
-                    return LinearProgressIndicator(
-                      value: value,
-                      backgroundColor: Colors.white.withValues(alpha: 0.3),
-                      valueColor: const AlwaysStoppedAnimation(Colors.white),
-                      minHeight: 8,
+                    return Container(
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     );
                   },
                 ),
@@ -242,6 +242,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                   _buildCategoryBadge(),
                   const SizedBox(height: AppDimensions.spacingL),
                   _buildQuestionText(),
+                  // 힌트 섹션 (답 제출 전에만 표시)
+                  if (!_isAnswerSubmitted)
+                    HintSection(problem: _currentProblem),
                   const SizedBox(height: AppDimensions.spacingXXL),
                   _buildOptions(),
                   if (_isAnswerSubmitted) ...[
@@ -258,18 +261,20 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     );
   }
 
-  /// 카테고리 뱃지
+  /// 카테고리 뱃지 - GoMath flat style
   Widget _buildCategoryBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingM,
-        vertical: AppDimensions.paddingS,
+        horizontal: 16,
+        vertical: 10,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: AppColors.mathButtonGradient,
+        color: AppColors.mathBlue, // GoMath 파란색
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.mathBlue.withValues(alpha: 0.7), // 어두운 파란색 테두리
+          width: 2,
         ),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -278,29 +283,31 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             _currentProblem.typeIcon,
             style: const TextStyle(fontSize: 18),
           ),
-          const SizedBox(width: AppDimensions.spacingS),
+          const SizedBox(width: 8),
           Text(
             _currentProblem.category,
-            style: AppTextStyles.bodyMedium.copyWith(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              fontSize: 15,
             ),
           ),
-          const SizedBox(width: AppDimensions.spacingS),
+          const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
-              vertical: 2,
+              vertical: 3,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: AppColors.mathYellow, // GoMath 노란색
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               '+${_currentProblem.xpReward} XP',
-              style: AppTextStyles.bodySmall.copyWith(
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
             ),
           ),
@@ -400,42 +407,63 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     );
   }
 
-  /// 하단 버튼
+  /// 하단 버튼 - Duolingo style with 3D shadow
   Widget _buildBottomButton() {
+    final enabled = _getButtonAction() != null;
+    final buttonColor = _getButtonColor();
+    final darkerColor = _getDarkerButtonColor();
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        border: Border(
+          top: BorderSide(color: AppColors.borderLight, width: 1),
+        ),
       ),
       child: SafeArea(
         top: false,
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _getButtonAction(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _getButtonColor(),
-              padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingL),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        child: Stack(
+          children: [
+            // Duolingo 3D solid shadow
+            if (enabled)
+              Positioned(
+                top: 6,
+                left: 0,
+                right: 0,
+                bottom: -6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: darkerColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
               ),
-              elevation: 0,
-            ),
-            child: Text(
-              _getButtonText(),
-              style: AppTextStyles.titleLarge.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            // Main button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _getButtonAction(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: buttonColor,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                  disabledBackgroundColor: AppColors.borderLight,
+                ),
+                child: Text(
+                  _getButtonText(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -456,12 +484,21 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   Color _getButtonColor() {
     if (_isAnswerSubmitted) {
-      return _isCorrect ? AppColors.successGreen : AppColors.mathButtonBlue;
+      return _isCorrect ? AppColors.successGreen : AppColors.mathButtonBlue; // GoMath 색상
     }
     if (_selectedAnswerIndex == null) {
-      return AppColors.disabled;
+      return AppColors.borderLight; // 비활성화 회색
     }
-    return AppColors.mathButtonBlue;
+    return AppColors.successGreen; // GoMath 성공 색상
+  }
+
+  Color _getDarkerButtonColor() {
+    if (_isAnswerSubmitted) {
+      return _isCorrect
+          ? AppColors.successGreen.withValues(alpha: 0.8)
+          : const Color(0xFF2B4BEF); // GoMath 버튼 블루 다크
+    }
+    return AppColors.successGreen.withValues(alpha: 0.8); // 어두운 초록색
   }
 
   String _getButtonText() {
@@ -585,6 +622,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     _stopwatch.reset();
     _stopwatch.start();
 
+    // 다음 문제의 힌트 시스템 초기화
+    ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
+
     // 전환 애니메이션
     await _transitionController.reverse();
     await _transitionController.forward();
@@ -681,6 +721,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // 타이머 리셋 및 재시작
     _stopwatch.reset();
     _stopwatch.start();
+
+    // 첫 문제의 힌트 시스템 초기화
+    ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
 
     _transitionController.reset();
     _transitionController.forward();

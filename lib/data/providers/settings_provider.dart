@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/services/local_storage_service.dart';
+import '../../data/services/local_storage_service.dart';
 import '../../shared/utils/logger.dart';
 
 /// 설정 상태
@@ -67,7 +67,7 @@ class SettingsProvider extends StateNotifier<SettingsState> {
   /// 설정 로드
   Future<void> _loadSettings() async {
     try {
-      final data = await _storage.loadObject(_storageKey);
+      final data = await _storage.loadMap(_storageKey);
       if (data != null) {
         state = SettingsState.fromJson(data);
         Logger.info('Settings loaded successfully');
@@ -80,7 +80,7 @@ class SettingsProvider extends StateNotifier<SettingsState> {
   /// 설정 저장
   Future<void> _saveSettings() async {
     try {
-      await _storage.saveObject(_storageKey, state.toJson());
+      await _storage.saveMap(_storageKey, state.toJson());
       Logger.info('Settings saved successfully');
     } catch (e) {
       Logger.error('Failed to save settings', error: e);

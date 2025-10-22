@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_dimensions.dart';
-import '../../shared/constants/app_text_styles.dart';
-import '../../data/models/models.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_dimensions.dart';
+import '../../constants/app_text_styles.dart';
+import '../../../data/models/models.dart';
 import 'package:confetti/confetti.dart';
 
 /// 뱃지 언락 애니메이션 다이얼로그

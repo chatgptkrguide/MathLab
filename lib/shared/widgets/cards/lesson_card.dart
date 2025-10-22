@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-import '../constants/app_dimensions.dart';
-import '../../data/models/models.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_text_styles.dart';
+import '../../constants/app_dimensions.dart';
+import '../../../data/models/models.dart';
 
 /// 레슨 카드 위젯 (데이터 모델 기반)
 /// Lessons 화면에서 각 레슨을 표시하는데 사용
