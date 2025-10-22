@@ -5,6 +5,7 @@ import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/responsive_wrapper.dart';
 import '../../shared/widgets/fade_in_widget.dart';
+import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
@@ -474,7 +475,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   }
 
   /// 답 선택
-  void _selectAnswer(int index) {
+  void _selectAnswer(int index) async {
+    await AppHapticFeedback.selectionClick();
     setState(() {
       _selectedAnswerIndex = index;
     });
@@ -516,6 +518,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _totalCorrect++;
       _totalXPEarned += _currentProblem.xpReward;
 
+      // 정답 햅틱 피드백
+      await AppHapticFeedback.success();
+
       // 사용자 XP 업데이트
       await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward);
 
@@ -527,6 +532,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       // 뱃지 언락 체크
       _checkAchievements();
     } else {
+      // 오답 햅틱 피드백
+      await AppHapticFeedback.error();
+
       // 오답: 오답 노트에 저장
       await ref.read(errorNoteProvider.notifier).addErrorNote(
             userId: userId,

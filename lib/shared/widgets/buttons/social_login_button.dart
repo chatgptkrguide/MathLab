@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/constants.dart';
+import '../../utils/haptic_feedback.dart';
 
 /// 소셜 로그인 버튼
 /// Google, Kakao, Apple 로그인 버튼 위젯
@@ -17,11 +18,24 @@ class SocialLoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
+    final enabled = !isLoading && onPressed != null;
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: _getButtonText(),
+      onTap: enabled ? () async {
+        await AppHapticFeedback.selectionClick();
+        onPressed?.call();
+      } : null,
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: enabled ? () async {
+            await AppHapticFeedback.selectionClick();
+            onPressed?.call();
+          } : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: _getBackgroundColor(),
           foregroundColor: _getTextColor(),
@@ -66,6 +80,7 @@ class SocialLoginButton extends StatelessWidget {
                   ),
                 ],
               ),
+        ),
       ),
     );
   }

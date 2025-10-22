@@ -68,14 +68,9 @@ class _AnimatedButtonState extends State<AnimatedButton>
   }
 
   void _startPeriodicShimmer() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && widget.isEnabled) {
-        _shimmerController.forward().then((_) {
-          _shimmerController.reset();
-          _startPeriodicShimmer();
-        });
-      }
-    });
+    // 쉬머 효과는 필요할 때만 실행 (성능 최적화)
+    // 비활성화하여 배터리 소모 방지
+    // 필요시 onHover 등으로 활성화 가능
   }
 
   @override
@@ -89,11 +84,16 @@ class _AnimatedButtonState extends State<AnimatedButton>
   Widget build(BuildContext context) {
     final enabled = widget.isEnabled && widget.onPressed != null;
 
-    return GestureDetector(
-      onTapDown: enabled ? (_) => _onTapDown() : null,
-      onTapUp: enabled ? (_) => _onTapUp() : null,
-      onTapCancel: enabled ? _onTapCancel : null,
-      child: AnimatedBuilder(
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: widget.text,
+      onTap: enabled ? _handleTap : null,
+      child: GestureDetector(
+        onTapDown: enabled ? (_) => _onTapDown() : null,
+        onTapUp: enabled ? (_) => _onTapUp() : null,
+        onTapCancel: enabled ? _onTapCancel : null,
+        child: AnimatedBuilder(
         animation: Listenable.merge([_scaleAnimation, _shimmerAnimation]),
         builder: (context, child) {
           return Transform.scale(
@@ -189,6 +189,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
             ),
           );
         },
+      ),
       ),
     );
   }

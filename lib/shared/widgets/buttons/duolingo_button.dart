@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_dimensions.dart';
+import '../utils/haptic_feedback.dart';
 
 /// 듀오링고 스타일 3D 효과 버튼
 class DuolingoButton extends StatefulWidget {
@@ -56,11 +57,19 @@ class _DuolingoButtonState extends State<DuolingoButton>
   Widget build(BuildContext context) {
     final enabled = widget.isEnabled && widget.onPressed != null;
 
-    return GestureDetector(
-      onTapDown: enabled ? (_) => _onTapDown() : null,
-      onTapUp: enabled ? (_) => _onTapUp() : null,
-      onTapCancel: enabled ? _onTapCancel : null,
-      child: AnimatedBuilder(
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: widget.text,
+      onTap: enabled ? () async {
+        await AppHapticFeedback.selectionClick();
+        widget.onPressed?.call();
+      } : null,
+      child: GestureDetector(
+        onTapDown: enabled ? (_) => _onTapDown() : null,
+        onTapUp: enabled ? (_) => _onTapUp() : null,
+        onTapCancel: enabled ? _onTapCancel : null,
+        child: AnimatedBuilder(
         animation: _pressAnimation,
         builder: (context, child) {
           return Transform.scale(
@@ -117,6 +126,7 @@ class _DuolingoButtonState extends State<DuolingoButton>
           );
         },
       ),
+      ),
     );
   }
 
@@ -154,24 +164,25 @@ class _DuolingoButtonState extends State<DuolingoButton>
     );
   }
 
-  void _onTapDown() {
+  void _onTapDown() async {
     setState(() {
       _isPressed = true;
     });
-    _animationController.forward();
+    await _animationController.forward();
+    await AppHapticFeedback.lightImpact();
   }
 
-  void _onTapUp() {
+  void _onTapUp() async {
+    await _animationController.reverse();
     setState(() {
       _isPressed = false;
     });
-    _animationController.reverse();
   }
 
-  void _onTapCancel() {
+  void _onTapCancel() async {
+    await _animationController.reverse();
     setState(() {
       _isPressed = false;
     });
-    _animationController.reverse();
   }
 }
