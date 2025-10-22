@@ -39,7 +39,7 @@ class DuolingoCard extends StatelessWidget {
         boxShadow: [
           // 3D 바닥 그림자
           BoxShadow(
-            color: (borderColor ?? AppColors.duolingoGreen).withValues(alpha: 0.3),
+            color: (borderColor ?? AppColors.successGreen).withValues(alpha: 0.3), // GoMath green
             offset: const Offset(0, 4),
             blurRadius: 0,
           ),
@@ -205,13 +205,13 @@ class DuolingoLessonNode extends StatelessWidget {
       backgroundColor = AppColors.disabled;
       gradientColors = [AppColors.disabled, AppColors.disabled];
     } else if (isCompleted) {
-      backgroundColor = AppColors.duolingoYellow;
-      gradientColors = [Color(0xFFFFE082), AppColors.duolingoYellow];
+      backgroundColor = AppColors.mathYellow; // GoMath yellow (gold)
+      gradientColors = [AppColors.mathYellow.withValues(alpha: 0.8), AppColors.mathYellow]; // GoMath gradient
     } else if (isActive) {
-      backgroundColor = AppColors.duolingoGreen;
+      backgroundColor = AppColors.successGreen; // GoMath green
       gradientColors = AppColors.greenGradient;
     } else {
-      backgroundColor = AppColors.duolingoBlue;
+      backgroundColor = AppColors.mathBlue; // GoMath blue
       gradientColors = AppColors.blueGradient;
     }
 
@@ -274,7 +274,7 @@ class DuolingoLessonNode extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: AppColors.duolingoGreen,
+                      color: AppColors.successGreen, // GoMath green
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.white, width: 2),
                     ),
