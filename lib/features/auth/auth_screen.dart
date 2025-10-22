@@ -55,13 +55,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF235390),
+      backgroundColor: AppColors.mathBlue, // GoMath blue
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF235390), Color(0xFF1CB0F6)],
+            colors: AppColors.mathBlueGradient, // GoMath blue gradient
           ),
         ),
         child: SafeArea(
@@ -99,8 +99,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.white, Color(0xFFF0F0F0)],
+            gradient: LinearGradient(
+              colors: [Colors.white, AppColors.background], // White to light gray
             ),
             borderRadius: BorderRadius.circular(60),
             boxShadow: [
@@ -146,7 +146,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (accounts.isEmpty) return const SizedBox.shrink();
 
     return DuolingoCard(
-      gradientColors: const [Colors.white, Color(0xFFF8F9FA)],
+      gradientColors: [Colors.white, AppColors.background], // White to light gray
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -229,7 +229,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   /// 인증 폼
   Widget _buildAuthForm(AuthState authState) {
     return DuolingoCard(
-      gradientColors: const [Colors.white, Color(0xFFF8F9FA)],
+      gradientColors: [Colors.white, AppColors.background], // White to light gray
       child: Form(
         key: _formKey,
         child: Column(
@@ -290,19 +290,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingM),
                 decoration: BoxDecoration(
-                  color: AppColors.duolingoRed.withValues(alpha: 0.1),
+                  color: AppColors.mathRed.withValues(alpha: 0.1), // GoMath red
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  border: Border.all(color: AppColors.duolingoRed.withValues(alpha: 0.3)),
+                  border: Border.all(color: AppColors.mathRed.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: AppColors.duolingoRed, size: 20),
+                    const Icon(Icons.error_outline, color: AppColors.mathRed, size: 20),
                     const SizedBox(width: AppDimensions.spacingS),
                     Expanded(
                       child: Text(
                         authState.error!,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.duolingoRed,
+                          color: AppColors.mathRed, // GoMath red
                         ),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
@@ -411,7 +411,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-              borderSide: BorderSide(color: AppColors.duolingoBlue, width: 2),
+              borderSide: BorderSide(color: AppColors.mathBlue, width: 2), // GoMath blue
             ),
           ),
         ),
@@ -499,7 +499,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                   border: Border.all(
                     color: isSelected
-                        ? AppColors.duolingoBlue
+                        ? AppColors.mathBlue // GoMath blue
                         : AppColors.borderLight,
                   ),
                 ),
@@ -659,7 +659,7 @@ class UserSwitchScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF235390),
+      backgroundColor: AppColors.mathBlue, // GoMath blue
       appBar: AppBar(
         title: const Text('계정 전환', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.transparent,
@@ -667,11 +667,11 @@ class UserSwitchScreen extends ConsumerWidget {
         elevation: 0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF235390), Color(0xFF1CB0F6)],
+            colors: AppColors.mathBlueGradient, // GoMath blue gradient
           ),
         ),
         child: ListView.builder(
