@@ -22,8 +22,8 @@ class AnimatedButton extends StatefulWidget {
     required this.text,
     this.onPressed,
     this.isEnabled = true,
-    this.backgroundColor = AppColors.mathButtonBlue, // GoMath 버튼 색상
-    this.shadowColor = const Color(0xFF2B4BEF), // 어두운 변형
+    this.backgroundColor = AppColors.mathButtonBlue, // GoMath button blue
+    this.shadowColor = const Color(0xFF2B4BEF), // Darker mathButtonBlue (GoMath 20% darker for 3D shadow)
     this.icon,
     this.width,
     this.height,
@@ -127,10 +127,10 @@ class _AnimatedButtonState extends State<AnimatedButton>
                   // Main button
                   Container(
                     decoration: BoxDecoration(
-                      color: enabled ? widget.backgroundColor : const Color(0xFFE5E5E5),
+                      color: enabled ? widget.backgroundColor : AppColors.borderLight, // GoMath disabled gray
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: enabled ? widget.shadowColor : const Color(0xFFD0D0D0),
+                        color: enabled ? widget.shadowColor : AppColors.borderLight.withValues(alpha: 0.8), // Darker border
                         width: 3,
                       ),
                     ),
