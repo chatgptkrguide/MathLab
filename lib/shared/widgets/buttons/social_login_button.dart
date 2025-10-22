@@ -52,10 +52,10 @@ class SocialLoginButton extends StatelessWidget {
             // Main button
             Container(
               decoration: BoxDecoration(
-                color: enabled ? _getBackgroundColor() : const Color(0xFFE5E5E5),
+                color: enabled ? _getBackgroundColor() : AppColors.borderLight, // GoMath disabled gray
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: enabled ? _getShadowColor() : const Color(0xFFD0D0D0),
+                  color: enabled ? _getShadowColor() : AppColors.borderLight.withValues(alpha: 0.8), // Darker border
                   width: 3,
                 ),
               ),
@@ -168,11 +168,11 @@ class SocialLoginButton extends StatelessWidget {
   Color _getShadowColor() {
     switch (provider) {
       case SocialLoginProvider.google:
-        return const Color(0xFFD0D0D0); // Light gray shadow
+        return AppColors.borderLight.withValues(alpha: 0.8); // GoMath gray shadow
       case SocialLoginProvider.kakao:
-        return const Color(0xFFDDC800); // Darker yellow shadow
+        return const Color(0xFFDDC800); // Kakao darker yellow (brand color)
       case SocialLoginProvider.apple:
-        return const Color(0xFF1A1A1A); // Very dark gray shadow
+        return const Color(0xFF1A1A1A); // Apple dark shadow (brand color)
     }
   }
 
