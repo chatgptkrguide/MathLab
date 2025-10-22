@@ -153,7 +153,7 @@ class AchievementCard extends StatelessWidget {
   List<Color> _getRarityGradient() {
     switch (achievement.rarity) {
       case AchievementRarity.common:
-        return [const Color(0xFF78909C), const Color(0xFF607D8B)];
+        return [AppColors.textSecondary, AppColors.textSecondary.withValues(alpha: 0.8)]; // GoMath gray
       case AchievementRarity.uncommon:
         return AppColors.greenGradient;
       case AchievementRarity.rare:
@@ -169,15 +169,15 @@ class AchievementCard extends StatelessWidget {
   Color _getRarityColor() {
     switch (achievement.rarity) {
       case AchievementRarity.common:
-        return const Color(0xFF78909C);
+        return AppColors.textSecondary; // GoMath gray (consistent)
       case AchievementRarity.uncommon:
-        return AppColors.duolingoGreen;
+        return AppColors.successGreen; // GoMath green
       case AchievementRarity.rare:
-        return AppColors.mathBlue;
+        return AppColors.mathBlue; // GoMath blue
       case AchievementRarity.epic:
-        return AppColors.duolingoPurple;
+        return AppColors.mathPurple; // GoMath purple
       case AchievementRarity.legendary:
-        return AppColors.mathOrange;
+        return AppColors.mathOrange; // GoMath orange
     }
   }
 
