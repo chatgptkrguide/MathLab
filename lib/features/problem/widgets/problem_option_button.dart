@@ -69,67 +69,67 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 현재 버튼이 선택되었는지
   bool get _isSelected => widget.selectedIndex == widget.index;
 
-  /// 버튼의 현재 상태를 기반으로 한 색상 - Duolingo flat style
+  /// 버튼의 현재 상태를 기반으로 한 색상 - GoMath flat style
   Color get _backgroundColor {
     if (!widget.isAnswerSubmitted) {
       // 답변 제출 전
-      return _isSelected ? const Color(0xFF1CB0F6) : Colors.white; // Duolingo blue
+      return _isSelected ? AppColors.mathBlue : Colors.white; // GoMath blue
     } else {
       // 답변 제출 후
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? const Color(0xFF58CC02) // Duolingo green
-            : const Color(0xFFFF4B4B); // Duolingo red
+            ? AppColors.successGreen // GoMath green
+            : AppColors.mathRed; // GoMath red
       } else if (widget.isCorrectAnswer) {
-        // 정답 표시
-        return const Color(0xFFD7FFB8); // Light green
+        // 정답 표시 (연한 초록색)
+        return const Color(0xFFD4F4DD); // Light green (successGreen 80% lighter)
       } else {
         return Colors.white;
       }
     }
   }
 
-  /// 테두리 색상 - Duolingo style
+  /// 테두리 색상 - GoMath style
   Color get _borderColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? const Color(0xFF1899D6) : const Color(0xFFE5E5E5); // Duolingo border
+      return _isSelected ? const Color(0xFF4E91C8) : AppColors.borderLight; // GoMath darker blue
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? const Color(0xFF46A302) // Darker green
-            : const Color(0xFFE03B3B); // Darker red
+            ? const Color(0xFF2A8643) // Darker green (successGreen 20% darker)
+            : const Color(0xFFE03B3B); // Darker red (mathRed 20% darker)
       } else if (widget.isCorrectAnswer) {
-        return const Color(0xFF58CC02); // Duolingo green
+        return AppColors.successGreen; // GoMath green
       } else {
-        return const Color(0xFFE5E5E5);
+        return AppColors.borderLight;
       }
     }
   }
 
-  /// 텍스트 색상 - Duolingo style
+  /// 텍스트 색상 - GoMath style
   Color get _textColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? Colors.white : const Color(0xFF4B4B4B); // Duolingo dark gray
+      return _isSelected ? Colors.white : AppColors.textPrimary; // GoMath dark gray
     } else {
       if (_isSelected || widget.isCorrectAnswer) {
         return Colors.white;
       } else {
-        return const Color(0xFF4B4B4B);
+        return AppColors.textPrimary;
       }
     }
   }
 
-  /// 3D 그림자 색상 - Duolingo style
+  /// 3D 그림자 색상 - GoMath style
   Color get _getShadowColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? const Color(0xFF1899D6) : const Color(0xFFE5E5E5); // Darker blue
+      return _isSelected ? const Color(0xFF4E91C8) : AppColors.borderLight; // GoMath darker blue
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? const Color(0xFF46A302) // Darker green
-            : const Color(0xFFE03B3B); // Darker red
+            ? const Color(0xFF2A8643) // Darker green (successGreen 20% darker)
+            : const Color(0xFFE03B3B); // Darker red (mathRed 20% darker)
       }
-      return const Color(0xFFE5E5E5);
+      return AppColors.borderLight;
     }
   }
 
