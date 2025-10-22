@@ -62,10 +62,10 @@ class PrimaryButton extends StatelessWidget {
           Container(
             height: height ?? AppDimensions.buttonHeightL,
             decoration: BoxDecoration(
-              color: enabled ? btnBackgroundColor : const Color(0xFFE5E5E5),
+              color: enabled ? btnBackgroundColor : AppColors.borderLight, // GoMath disabled gray
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: enabled ? btnShadowColor : const Color(0xFFD0D0D0),
+                color: enabled ? btnShadowColor : AppColors.borderLight.withValues(alpha: 0.8), // Darker border
                 width: 3,
               ),
             ),
@@ -92,16 +92,14 @@ class PrimaryButton extends StatelessWidget {
   }
 
   Color _getDarkerColor(Color color) {
-    // GoMath 브랜드 색상 매핑
+    // GoMath 브랜드 색상 매핑 (20% darker for 3D shadow)
     if (color == AppColors.mathButtonBlue) return const Color(0xFF2B4BEF); // Button Blue Dark
     if (color == AppColors.mathTeal) return const Color(0xFF38B9A0); // Teal Dark
     if (color == AppColors.mathOrange) return const Color(0xFFE68600); // Orange Dark
     if (color == AppColors.mathRed) return const Color(0xFFE03B3B); // Red Dark
     if (color == AppColors.mathPurple) return const Color(0xFFBE72EF); // Purple Dark
-
-    // 듀오링고 호환 색상
-    if (color == AppColors.duolingoGreen) return const Color(0xFF46A302); // Green Dark
-    if (color == AppColors.duolingoBlue) return const Color(0xFF4E91C8); // Blue Dark
+    if (color == AppColors.successGreen) return const Color(0xFF2A8643); // Success Green Dark
+    if (color == AppColors.mathBlue) return const Color(0xFF4E91C8); // Math Blue Dark
 
     // Default: darken by 20%
     return Color.fromARGB(
