@@ -105,9 +105,9 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
     return 'D';
   }
 
-  /// 평가 색상
+  /// 평가 색상 (GoMath)
   Color get _gradeColor {
-    if (_accuracyPercentage >= 90) return const Color(0xFFFFD700); // Gold
+    if (_accuracyPercentage >= 90) return AppColors.mathYellow; // Gold (GoMath)
     if (_accuracyPercentage >= 80) return AppColors.successGreen;
     if (_accuracyPercentage >= 70) return AppColors.mathTeal;
     if (_accuracyPercentage >= 60) return AppColors.warningYellow;
@@ -482,7 +482,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
               AppColors.mathTeal,
               AppColors.mathButtonBlue,
               AppColors.successGreen,
-              Color(0xFFFFD700),
+              AppColors.mathYellow, // GoMath gold
             ],
           ),
         ),
