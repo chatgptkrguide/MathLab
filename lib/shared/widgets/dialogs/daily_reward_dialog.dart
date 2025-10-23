@@ -97,10 +97,10 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
       child: Material(
         type: MaterialType.transparency,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 32),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXXXL),
           padding: const EdgeInsets.all(AppDimensions.paddingXXL),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
             boxShadow: [
               BoxShadow(
@@ -145,7 +145,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
                     Text(
                       '${widget.currentStreak}일 연속!',
                       style: AppTextStyles.titleLarge.copyWith(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -226,7 +226,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
                   child: Text(
                     '보상 받기',
                     style: AppTextStyles.titleLarge.copyWith(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -304,7 +304,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
               emoji,
               style: TextStyle(
                 fontSize: 16,
-                color: isToday || isPast ? Colors.white : Colors.grey,
+                color: isToday || isPast ? AppColors.surface : Colors.grey,
               ),
             ),
           ),

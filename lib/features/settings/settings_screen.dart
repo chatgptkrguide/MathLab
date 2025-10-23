@@ -16,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background, // GoMath 배경색
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         title: const Text(
           '설정',
@@ -196,7 +196,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border(
               top: BorderSide(color: AppColors.borderLight, width: 1),
               bottom: BorderSide(color: AppColors.borderLight, width: 1),

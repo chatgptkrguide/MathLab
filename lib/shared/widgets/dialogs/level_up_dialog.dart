@@ -188,10 +188,10 @@ class _LevelUpDialogState extends State<LevelUpDialog>
           child: Material(
             type: MaterialType.transparency,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 32),
+              margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXXXL),
               padding: const EdgeInsets.all(AppDimensions.paddingXXL),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
@@ -263,7 +263,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                               Text(
                                 '${widget.newLevel}',
                                 style: AppTextStyles.headlineLarge.copyWith(
-                                  color: Colors.white,
+                                  color: AppColors.surface,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -378,7 +378,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                             child: Text(
                               '계속하기',
                               style: AppTextStyles.titleLarge.copyWith(
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

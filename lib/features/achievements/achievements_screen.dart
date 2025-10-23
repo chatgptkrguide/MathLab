@@ -39,9 +39,9 @@ class AchievementsScreen extends ConsumerWidget {
           // 진행 현황 - GoMath style
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.paddingXL),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               border: Border(
                 bottom: BorderSide(color: AppColors.borderLight, width: 1),
               ),
@@ -142,7 +142,7 @@ class _AchievementCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: achievement.isUnlocked
-            ? Colors.white
+            ? AppColors.surface
             : AppColors.background, // GoMath 배경색
         borderRadius: BorderRadius.circular(16),
         border: Border.all(

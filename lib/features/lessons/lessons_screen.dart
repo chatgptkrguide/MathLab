@@ -70,14 +70,14 @@ class LessonsScreen extends ConsumerWidget {
           // 햄버거 메뉴 아이콘
           const Icon(
             Icons.menu,
-            color: Colors.white,
+            color: AppColors.surface,
             size: 28,
           ),
           // 학습 경로 텍스트
           Text(
             '학습 경로',
             style: AppTextStyles.headlineMedium.copyWith(
-              color: Colors.white,
+              color: AppColors.surface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -88,7 +88,7 @@ class LessonsScreen extends ConsumerWidget {
               vertical: 6,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -115,7 +115,7 @@ class LessonsScreen extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: AppColors.surface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Row(
@@ -126,7 +126,7 @@ class LessonsScreen extends ConsumerWidget {
             child: Text(
               userName,
               style: AppTextStyles.titleMedium.copyWith(
-                color: Colors.white,
+                color: AppColors.surface,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
@@ -154,7 +154,7 @@ class LessonsScreen extends ConsumerWidget {
         Text(
           value,
           style: AppTextStyles.titleMedium.copyWith(
-            color: Colors.white,
+            color: AppColors.surface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -176,7 +176,7 @@ class LessonsScreen extends ConsumerWidget {
           Text(
             '아직 레슨이 없습니다',
             style: AppTextStyles.headlineMedium.copyWith(
-              color: Colors.white,
+              color: AppColors.surface,
             ),
           ),
         ],
@@ -192,7 +192,7 @@ class LessonsScreen extends ConsumerWidget {
   ) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -235,7 +235,7 @@ class LessonsScreen extends ConsumerWidget {
             gradient: const LinearGradient(
               colors: AppColors.mathButtonGradient,
             ),
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
         ),
         const SizedBox(width: AppDimensions.spacingM),

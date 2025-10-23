@@ -221,7 +221,7 @@ class DuolingoLessonNode extends StatelessWidget {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           boxShadow: [
             // 3D 바닥 그림자
             BoxShadow(
@@ -244,7 +244,7 @@ class DuolingoLessonNode extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: gradientColors,
             ),
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           ),
           child: Stack(
             children: [
@@ -253,7 +253,7 @@ class DuolingoLessonNode extends StatelessWidget {
                   emoji,
                   style: TextStyle(
                     fontSize: 32,
-                    color: isLocked ? Colors.white.withValues(alpha: 0.5) : Colors.white,
+                    color: isLocked ? AppColors.surface.withValues(alpha: 0.5) : AppColors.surface,
                   ),
                 ),
               ),
@@ -262,7 +262,7 @@ class DuolingoLessonNode extends StatelessWidget {
                   child: CustomPaint(
                     painter: ProgressRingPainter(
                       progress: progress,
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: AppColors.surface.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -276,11 +276,11 @@ class DuolingoLessonNode extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.successGreen, // GoMath green
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppColors.surface, width: 2),
                     ),
                     child: const Icon(
                       Icons.check,
-                      color: Colors.white,
+                      color: AppColors.surface,
                       size: 16,
                     ),
                   ),
@@ -294,11 +294,11 @@ class DuolingoLessonNode extends StatelessWidget {
                     height: 20,
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: const Icon(
                       Icons.lock,
-                      color: Colors.white,
+                      color: AppColors.surface,
                       size: 12,
                     ),
                   ),

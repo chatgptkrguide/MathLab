@@ -116,7 +116,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                 child: const Text(
                   '🔥 7일 연속 보너스!',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -380,13 +380,13 @@ class _DayRewardCard extends StatelessWidget {
               child: isClaimed
                   ? const Icon(
                       Icons.check,
-                      color: Colors.white,
+                      color: AppColors.surface,
                       size: 24,
                     )
                   : Text(
                       '${reward.day}',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -439,7 +439,7 @@ class _DayRewardCard extends StatelessWidget {
                     child: const Text(
                       '🔥 보너스',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -464,7 +464,7 @@ class _DayRewardCard extends StatelessWidget {
               child: const Text(
                 '오늘',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),

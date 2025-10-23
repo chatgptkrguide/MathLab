@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app.dart';
+import 'shared/constants/app_colors.dart';
 
 /// MathLab 앱의 진입점
 void main() async {
@@ -19,7 +20,7 @@ void main() async {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
-      systemNavigationBarColor: Colors.white,
+      systemNavigationBarColor: AppColors.surface,
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );

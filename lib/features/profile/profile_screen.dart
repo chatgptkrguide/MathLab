@@ -61,7 +61,7 @@ class ProfileScreen extends ConsumerWidget {
           Text(
             '프로필',
             style: AppTextStyles.headlineMedium.copyWith(
-              color: Colors.white,
+              color: AppColors.surface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -86,7 +86,7 @@ class ProfileScreen extends ConsumerWidget {
         Expanded(
           child: Container(
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(30),
                 topRight: Radius.circular(30),
@@ -145,7 +145,7 @@ class ProfileScreen extends ConsumerWidget {
                       style: const TextStyle(
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.surface,
                       ),
                     ),
                   ),
@@ -159,7 +159,7 @@ class ProfileScreen extends ConsumerWidget {
               child: Text(
                 user?.name ?? '학습자',
                 style: AppTextStyles.headlineLarge.copyWith(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -175,13 +175,13 @@ class ProfileScreen extends ConsumerWidget {
                 vertical: AppDimensions.paddingS,
               ),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: AppColors.surface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Text(
                 user?.currentGrade ?? '중1',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -195,13 +195,13 @@ class ProfileScreen extends ConsumerWidget {
                 Container(
                   width: 1,
                   height: 40,
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: AppColors.surface.withValues(alpha: 0.3),
                 ),
                 _buildTopStat('${user?.xp ?? 0}', 'XP', '🔶'),
                 Container(
                   width: 1,
                   height: 40,
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: AppColors.surface.withValues(alpha: 0.3),
                 ),
                 _buildTopStat('${user?.streakDays ?? 0}', '연속', '🔥'),
               ],
@@ -226,7 +226,7 @@ class ProfileScreen extends ConsumerWidget {
           Text(
             value,
             style: AppTextStyles.headlineSmall.copyWith(
-              color: Colors.white,
+              color: AppColors.surface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -234,7 +234,7 @@ class ProfileScreen extends ConsumerWidget {
           Text(
             label,
             style: AppTextStyles.bodySmall.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: AppColors.surface.withValues(alpha: 0.8),
             ),
           ),
         ],

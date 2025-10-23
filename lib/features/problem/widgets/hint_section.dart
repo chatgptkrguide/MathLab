@@ -47,7 +47,7 @@ class HintSection extends ConsumerWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppDimensions.paddingS),
                   decoration: BoxDecoration(
                     color: AppColors.mathPurple.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
@@ -161,7 +161,7 @@ class HintSection extends ConsumerWidget {
                 Text(
                   '힌트가 잠금 해제되었습니다! (-${HintProvider.hintCost} XP)',
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -189,7 +189,7 @@ class HintSection extends ConsumerWidget {
                 Text(
                   'XP가 부족합니다 (필요: ${HintProvider.hintCost} XP)',
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -233,7 +233,7 @@ class _HintItem extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
         color: isUnlocked
-            ? Colors.white
+            ? AppColors.surface
             : AppColors.disabled.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(
@@ -297,7 +297,7 @@ class _HintItem extends StatelessWidget {
       children: [
         // 자물쇠 아이콘
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppDimensions.paddingS),
           decoration: BoxDecoration(
             color: AppColors.disabled.withOpacity(0.2),
             borderRadius: BorderRadius.circular(AppDimensions.radiusS),
@@ -339,7 +339,7 @@ class _HintItem extends StatelessWidget {
             backgroundColor: canUnlock
                 ? AppColors.mathPurple
                 : AppColors.disabled,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.surface,
             padding: const EdgeInsets.symmetric(
               horizontal: AppDimensions.paddingM,
               vertical: AppDimensions.paddingS,
@@ -357,7 +357,7 @@ class _HintItem extends StatelessWidget {
               Text(
                 '${HintProvider.hintCost}',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -73,7 +73,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   Color get _backgroundColor {
     if (!widget.isAnswerSubmitted) {
       // 답변 제출 전
-      return _isSelected ? AppColors.mathBlue : Colors.white; // GoMath blue
+      return _isSelected ? AppColors.mathBlue : AppColors.surface; // GoMath blue
     } else {
       // 답변 제출 후
       if (_isSelected) {
@@ -82,9 +82,9 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
             : AppColors.mathRed; // GoMath red
       } else if (widget.isCorrectAnswer) {
         // 정답 표시 (연한 초록색)
-        return const Color(0xFFD4F4DD); // Light green (successGreen 80% lighter)
+        return AppColors.highlightGreen; // Light green (successGreen 80% lighter)
       } else {
-        return Colors.white;
+        return AppColors.surface;
       }
     }
   }
@@ -92,12 +92,12 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 테두리 색상 - GoMath style
   Color get _borderColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? const Color(0xFF4E91C8) : AppColors.borderLight; // GoMath darker blue
+      return _isSelected ? AppColors.mathBlueDark : AppColors.borderLight; // GoMath darker blue
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? const Color(0xFF2A8643) // Darker green (successGreen 20% darker)
-            : const Color(0xFFE03B3B); // Darker red (mathRed 20% darker)
+            ? AppColors.duolingoGreenDark // Darker green (successGreen 20% darker)
+            : AppColors.mathRedDark; // Darker red (mathRed 20% darker)
       } else if (widget.isCorrectAnswer) {
         return AppColors.successGreen; // GoMath green
       } else {
@@ -109,10 +109,10 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 텍스트 색상 - GoMath style
   Color get _textColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? Colors.white : AppColors.textPrimary; // GoMath dark gray
+      return _isSelected ? AppColors.surface : AppColors.textPrimary; // GoMath dark gray
     } else {
       if (_isSelected || widget.isCorrectAnswer) {
-        return Colors.white;
+        return AppColors.surface;
       } else {
         return AppColors.textPrimary;
       }
@@ -122,12 +122,12 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 3D 그림자 색상 - GoMath style
   Color get _getShadowColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? const Color(0xFF4E91C8) : AppColors.borderLight; // GoMath darker blue
+      return _isSelected ? AppColors.mathBlueDark : AppColors.borderLight; // GoMath darker blue
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? const Color(0xFF2A8643) // Darker green (successGreen 20% darker)
-            : const Color(0xFFE03B3B); // Darker red (mathRed 20% darker)
+            ? AppColors.duolingoGreenDark // Darker green (successGreen 20% darker)
+            : AppColors.mathRedDark; // Darker red (mathRed 20% darker)
       }
       return AppColors.borderLight;
     }
@@ -141,14 +141,14 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
       // 사용자가 선택한 답
       return Icon(
         widget.isCorrectAnswer ? Icons.check_circle : Icons.cancel,
-        color: Colors.white,
+        color: AppColors.surface,
         size: 24,
       );
     } else if (widget.isCorrectAnswer) {
       // 정답 표시
       return const Icon(
         Icons.check_circle,
-        color: Colors.white,
+        color: AppColors.surface,
         size: 24,
       );
     }
@@ -193,7 +193,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.paddingL),
               decoration: BoxDecoration(
                 color: _backgroundColor,
                 borderRadius: BorderRadius.circular(12),

@@ -62,7 +62,7 @@ enum LeagueTier {
       case LeagueTier.bronze:
         return AppColors.orangeGradient; // GoMath orange gradient
       case LeagueTier.silver:
-        return [const Color(0xFFC0C0C0), const Color(0xFFA8A8A8)]; // Silver metal gradient
+        return [AppColors.levelSilver, const Color(0xFFA8A8A8)]; // Silver metal gradient
       case LeagueTier.gold:
         return [AppColors.mathYellow, AppColors.mathYellow.withValues(alpha: 0.8)]; // GoMath gold gradient
       case LeagueTier.diamond:

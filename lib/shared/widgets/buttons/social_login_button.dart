@@ -146,9 +146,9 @@ class SocialLoginButton extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (provider) {
       case SocialLoginProvider.google:
-        return Colors.white;
+        return AppColors.surface;
       case SocialLoginProvider.kakao:
-        return const Color(0xFFFEE500); // Kakao Yellow
+        return AppColors.kakaoYellow; // Kakao Yellow
       case SocialLoginProvider.apple:
         return Colors.black;
     }
@@ -159,9 +159,9 @@ class SocialLoginButton extends StatelessWidget {
       case SocialLoginProvider.google:
         return Colors.black87;
       case SocialLoginProvider.kakao:
-        return const Color(0xFF191919); // Kakao Brown/Black
+        return AppColors.kakaoBrown; // Kakao Brown/Black
       case SocialLoginProvider.apple:
-        return Colors.white;
+        return AppColors.surface;
     }
   }
 
@@ -170,9 +170,9 @@ class SocialLoginButton extends StatelessWidget {
       case SocialLoginProvider.google:
         return AppColors.borderLight.withValues(alpha: 0.8); // GoMath gray shadow
       case SocialLoginProvider.kakao:
-        return const Color(0xFFDDC800); // Kakao darker yellow (brand color)
+        return AppColors.kakaoYellowDark; // Kakao darker yellow (brand color)
       case SocialLoginProvider.apple:
-        return const Color(0xFF1A1A1A); // Apple dark shadow (brand color)
+        return AppColors.appleDark; // Apple dark shadow (brand color)
     }
   }
 

@@ -100,12 +100,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           height: 120,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, AppColors.background], // White to light gray
+              colors: [AppColors.surface, AppColors.background], // White to light gray
             ),
-            borderRadius: BorderRadius.circular(60),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             boxShadow: [
               BoxShadow(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: AppColors.surface.withValues(alpha: 0.3),
                 blurRadius: 20,
                 spreadRadius: 5,
               ),
@@ -122,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         Text(
           'MathLab',
           style: AppTextStyles.headlineLarge.copyWith(
-            color: Colors.white,
+            color: AppColors.surface,
             fontWeight: FontWeight.bold,
             fontSize: 32,
           ),
@@ -131,7 +131,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         Text(
           '재미있는 수학 학습의 시작',
           style: AppTextStyles.bodyLarge.copyWith(
-            color: Colors.white.withValues(alpha: 0.9),
+            color: AppColors.surface.withValues(alpha: 0.9),
           ),
           textAlign: TextAlign.center,
         ),
@@ -146,7 +146,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (accounts.isEmpty) return const SizedBox.shrink();
 
     return DuolingoCard(
-      gradientColors: [Colors.white, AppColors.background], // White to light gray
+      gradientColors: [AppColors.surface, AppColors.background], // White to light gray
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -173,7 +173,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           child: Text(
             account.avatarText,
             style: AppTextStyles.titleMedium.copyWith(
-              color: Colors.white,
+              color: AppColors.surface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -206,7 +206,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Widget _buildAuthTabs() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: AppColors.surface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: TabBar(
@@ -215,13 +215,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           Tab(text: '로그인'),
           Tab(text: '회원가입'),
         ],
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
+        labelColor: AppColors.surface,
+        unselectedLabelColor: AppColors.surface.withValues(alpha: 0.7),
         indicator: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.3),
+          color: AppColors.surface.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
-        indicatorPadding: const EdgeInsets.all(4),
+        indicatorPadding: const EdgeInsets.all(AppDimensions.paddingXS),
       ),
     );
   }
@@ -229,7 +229,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   /// 인증 폼
   Widget _buildAuthForm(AuthState authState) {
     return DuolingoCard(
-      gradientColors: [Colors.white, AppColors.background], // White to light gray
+      gradientColors: [AppColors.surface, AppColors.background], // White to light gray
       child: Form(
         key: _formKey,
         child: Column(
@@ -506,7 +506,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 child: Text(
                   _getAccountTypeText(type),
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    color: isSelected ? AppColors.surface : AppColors.textPrimary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -661,9 +661,9 @@ class UserSwitchScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.mathBlue, // GoMath blue
       appBar: AppBar(
-        title: const Text('계정 전환', style: TextStyle(color: Colors.white)),
+        title: const Text('계정 전환', style: TextStyle(color: AppColors.surface)),
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.surface),
         elevation: 0,
       ),
       body: Container(
@@ -716,7 +716,7 @@ class UserSwitchScreen extends ConsumerWidget {
                   child: Text(
                     account.avatarText,
                     style: AppTextStyles.titleMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -748,7 +748,7 @@ class UserSwitchScreen extends ConsumerWidget {
                         child: Text(
                           '현재',
                           style: AppTextStyles.labelSmall.copyWith(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

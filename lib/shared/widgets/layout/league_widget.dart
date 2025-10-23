@@ -52,7 +52,7 @@ class LeagueWidget extends StatelessWidget {
                       Text(
                         '${leagueInfo.tier.displayName} 리그',
                         style: AppTextStyles.headlineSmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -60,7 +60,7 @@ class LeagueWidget extends StatelessWidget {
                       Text(
                         '#${leagueInfo.rank} / ${leagueInfo.totalPlayers}명',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: AppColors.surface.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -81,14 +81,14 @@ class LeagueWidget extends StatelessWidget {
                   Text(
                     '다음: ${leagueInfo.tier.nextTier!.displayName}',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppColors.surface.withValues(alpha: 0.9),
                     ),
                   ),
                   const Spacer(),
                   Text(
                     '${leagueInfo.xpToNextTier} XP',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -101,15 +101,15 @@ class LeagueWidget extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: leagueInfo.progressInTier,
                   minHeight: 8,
-                  backgroundColor: Colors.white.withValues(alpha: 0.3),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  backgroundColor: AppColors.surface.withValues(alpha: 0.3),
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.surface),
                 ),
               ),
             ] else
               Text(
                 '최고 티어 달성! 🎉',
                 style: AppTextStyles.bodyLarge.copyWith(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -132,7 +132,7 @@ class LeagueWidget extends StatelessWidget {
       child: Text(
         label,
         style: AppTextStyles.bodySmall.copyWith(
-          color: Colors.white,
+          color: AppColors.surface,
           fontWeight: FontWeight.bold,
         ),
       ),

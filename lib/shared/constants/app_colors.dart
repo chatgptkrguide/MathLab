@@ -8,15 +8,22 @@ class AppColors {
   // GoMath 브랜드 색상 (Figma 디자인 기반)
   static const Color mathBlue = Color(0xFF61A1D8); // 메인 파란색 (상단)
   static const Color mathBlueLight = Color(0xFFA1C9E8); // 밝은 파란색 (하단)
+  static const Color mathBlueDark = Color(0xFF4E91C8); // 어두운 파란색
   static const Color mathButtonBlue = Color(0xFF3B5BFF); // 버튼/카드 파란색
+  static const Color mathButtonBlueDark = Color(0xFF2B4BEF); // 어두운 버튼 파란색
   static const Color mathTeal = Color(0xFF48C9B0); // 진행바 틸색
+  static const Color mathTealDark = Color(0xFF38B9A0); // 어두운 틸색
   static const Color mathOrange = Color(0xFFFF9600); // 스트릭 오렌지
+  static const Color mathOrangeDark = Color(0xFFE68600); // 어두운 오렌지
   static const Color mathYellow = Color(0xFFFFD900); // 별 노란색
   static const Color mathRed = Color(0xFFFF4B4B); // 에러 빨간색
+  static const Color mathRedDark = Color(0xFFE03B3B); // 어두운 빨간색
   static const Color mathPurple = Color(0xFFCE82FF); // 힌트 퍼플
+  static const Color mathPurpleDark = Color(0xFFBE72EF); // 어두운 퍼플
 
   // 듀오링고 스타일 브랜드 색상 (호환성 유지)
   static const Color duolingoGreen = Color(0xFF58CC02); // 듀오링고 메인 그린
+  static const Color duolingoGreenDark = Color(0xFF2A8643); // 어두운 초록색
   static const Color duolingoBlue = mathBlue; // GoMath 파란색으로 매핑
   static const Color duolingoOrange = mathOrange; // 오렌지
   static const Color duolingoRed = mathRed; // 레드
@@ -50,9 +57,21 @@ class AppColors {
   static const Color xpGold = Color(0xFFFFD700);
   static const Color streakOrange = Color(0xFFFF6B35);
   static const Color levelBronze = Color(0xFFCD7F32);
+  static const Color levelBronzeDark = Color(0xFFB86D28);
   static const Color levelSilver = Color(0xFFC0C0C0);
+  static const Color levelSilverDark = Color(0xFFA0A0A0);
   static const Color levelGold = Color(0xFFFFD700);
+  static const Color levelGoldDark = Color(0xFFE5C200);
   static const Color levelDiamond = Color(0xFFB9F2FF);
+
+  // 하이라이트 색상
+  static const Color highlightGreen = Color(0xFFD4F4DD); // 밝은 초록 하이라이트
+
+  // 소셜 로그인 색상
+  static const Color kakaoYellow = Color(0xFFFEE500);
+  static const Color kakaoYellowDark = Color(0xFFDDC800);
+  static const Color kakaoBrown = Color(0xFF191919);
+  static const Color appleDark = Color(0xFF1A1A1A);
 
   // 진행률 색상 (Figma 디자인)
   static const Color progressBackground = Color(0xFFE5E5E5);

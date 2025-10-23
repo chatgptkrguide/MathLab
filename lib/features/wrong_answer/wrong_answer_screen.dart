@@ -75,12 +75,12 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.error,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       ),
                       child: Text(
                         '${state.needsReviewCount}',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -212,7 +212,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
               Text(
                 '복습 완료! 계속 노력하세요!',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -558,12 +558,12 @@ class _WrongAnswerCard extends StatelessWidget {
                       ),
                       child: Row(
                         children: const [
-                          Icon(Icons.check, color: Colors.white, size: 14),
+                          Icon(Icons.check, color: AppColors.surface, size: 14),
                           SizedBox(width: 2),
                           Text(
                             '완료',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -584,7 +584,7 @@ class _WrongAnswerCard extends StatelessWidget {
                       child: Text(
                         _getUrgencyText(),
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),

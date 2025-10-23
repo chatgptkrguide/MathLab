@@ -59,13 +59,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: AppColors.surface),
             onPressed: () => Navigator.pop(context),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -91,7 +91,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: AppColors.surface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Row(
@@ -101,7 +101,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             child: Text(
               '소인수분해',
               style: AppTextStyles.titleMedium.copyWith(
-                color: Colors.white,
+                color: AppColors.surface,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
@@ -126,7 +126,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         Text(
           value,
           style: AppTextStyles.titleMedium.copyWith(
-            color: Colors.white,
+            color: AppColors.surface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -138,7 +138,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Widget _buildContent() {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -350,7 +350,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Widget _buildWeekRow(List<int?> days, List<int> completedDays) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingXS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: days.map((day) {
@@ -371,7 +371,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               child: Text(
                 '$day',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: isCompleted ? Colors.white : AppColors.textPrimary,
+                  color: isCompleted ? AppColors.surface : AppColors.textPrimary,
                   fontWeight: isCompleted ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

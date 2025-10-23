@@ -33,7 +33,7 @@ class CustomBottomNavigation extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, AppColors.background], // White to light gray (GoMath)
+            colors: [AppColors.surface, AppColors.background], // White to light gray (GoMath)
           ),
           boxShadow: [
             BoxShadow(
@@ -125,7 +125,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   scale: isSelected ? 1.1 : 1.0,
                   child: Icon(
                     icon,
-                    color: Colors.white,
+                    color: AppColors.surface,
                     size: 26, // 약간 작게 조정
                   ),
                 ),

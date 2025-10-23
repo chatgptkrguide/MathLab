@@ -23,7 +23,7 @@ class AnimatedButton extends StatefulWidget {
     this.onPressed,
     this.isEnabled = true,
     this.backgroundColor = AppColors.mathButtonBlue, // GoMath button blue
-    this.shadowColor = const Color(0xFF2B4BEF), // Darker mathButtonBlue (GoMath 20% darker for 3D shadow)
+    this.shadowColor = AppColors.mathButtonBlueDark, // Darker mathButtonBlue (GoMath 20% darker for 3D shadow)
     this.icon,
     this.width,
     this.height,
@@ -163,7 +163,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
         children: [
           Icon(
             widget.icon,
-            color: Colors.white,
+            color: AppColors.surface,
             size: AppDimensions.iconM,
           ),
           const SizedBox(width: AppDimensions.spacingS),
@@ -172,7 +172,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
             style: AppTextStyles.buttonText.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.surface,
             ),
           ),
         ],
@@ -184,7 +184,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
       style: AppTextStyles.buttonText.copyWith(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: AppColors.surface,
       ),
     );
   }

@@ -62,7 +62,7 @@ class AchievementCard extends StatelessWidget {
             Text(
               achievement.title,
               style: AppTextStyles.titleSmall.copyWith(
-                color: isUnlocked ? Colors.white : AppColors.textPrimary,
+                color: isUnlocked ? AppColors.surface : AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -116,7 +116,7 @@ class AchievementCard extends StatelessWidget {
               Text(
                 _formatDate(achievement.unlockedAt!),
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppColors.surface.withValues(alpha: 0.9),
                 ),
               ),
             ],
@@ -133,7 +133,7 @@ class AchievementCard extends StatelessWidget {
       height: 56,
       decoration: BoxDecoration(
         color: isUnlocked
-            ? Colors.white.withValues(alpha: 0.3)
+            ? AppColors.surface.withValues(alpha: 0.3)
             : AppColors.disabled.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),

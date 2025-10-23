@@ -50,7 +50,7 @@ class OnboardingPage extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(AppDimensions.paddingXL),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: AppColors.surface.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Text(
@@ -69,7 +69,7 @@ class OnboardingPage extends StatelessWidget {
                 child: Text(
                   data.title,
                   style: AppTextStyles.headlineLarge.copyWith(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontWeight: FontWeight.bold,
                     height: 1.3,
                   ),
@@ -85,7 +85,7 @@ class OnboardingPage extends StatelessWidget {
                 child: Text(
                   data.description,
                   style: AppTextStyles.bodyLarge.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: AppColors.surface.withOpacity(0.9),
                     height: 1.6,
                   ),
                   textAlign: TextAlign.center,
@@ -105,10 +105,10 @@ class OnboardingPage extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.all(AppDimensions.paddingL),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: AppColors.surface.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: AppColors.surface.withOpacity(0.3),
                           width: 2,
                         ),
                       ),
@@ -118,7 +118,7 @@ class OnboardingPage extends StatelessWidget {
                             child: Text(
                               data.features![index],
                               style: AppTextStyles.bodyLarge.copyWith(
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

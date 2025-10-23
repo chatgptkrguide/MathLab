@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import '../shared/constants/app_colors.dart';
 import '../shared/themes/app_theme.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import 'main_navigation.dart';
@@ -28,7 +29,7 @@ class MathLabApp extends StatelessWidget {
             statusBarColor: Colors.transparent,
             statusBarIconBrightness: Brightness.dark,
             statusBarBrightness: Brightness.light,
-            systemNavigationBarColor: Colors.white,
+            systemNavigationBarColor: AppColors.surface,
             systemNavigationBarIconBrightness: Brightness.dark,
           ),
           child: child!,

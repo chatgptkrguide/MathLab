@@ -124,7 +124,7 @@ class _XPAnimationWidgetState extends State<XPAnimationWidget>
                     Text(
                       '+${widget.xp} XP',
                       style: AppTextStyles.titleLarge.copyWith(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

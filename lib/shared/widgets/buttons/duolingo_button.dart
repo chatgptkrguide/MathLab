@@ -21,7 +21,7 @@ class DuolingoButton extends StatefulWidget {
     this.onPressed,
     this.isEnabled = true,
     this.backgroundColor = AppColors.mathButtonBlue, // GoMath 버튼 색상
-    this.shadowColor = const Color(0xFF2B4BEF), // 어두운 변형
+    this.shadowColor = AppColors.mathButtonBlueDark, // 어두운 변형
     this.icon,
     this.width,
     this.height,
@@ -139,7 +139,7 @@ class _DuolingoButtonState extends State<DuolingoButton>
         children: [
           Icon(
             widget.icon,
-            color: Colors.white,
+            color: AppColors.surface,
             size: AppDimensions.iconM,
           ),
           const SizedBox(width: AppDimensions.spacingS),
@@ -148,7 +148,7 @@ class _DuolingoButtonState extends State<DuolingoButton>
             style: AppTextStyles.buttonText.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.surface,
             ),
           ),
         ],
@@ -160,7 +160,7 @@ class _DuolingoButtonState extends State<DuolingoButton>
       style: AppTextStyles.buttonText.copyWith(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: AppColors.surface,
       ),
     );
   }

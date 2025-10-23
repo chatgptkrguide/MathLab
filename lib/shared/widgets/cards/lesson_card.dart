@@ -66,7 +66,7 @@ class LessonCard extends StatelessWidget {
                   Text(
                     lesson.title,
                     style: AppTextStyles.titleMedium.copyWith(
-                      color: isLocked ? AppColors.disabled : Colors.white,
+                      color: isLocked ? AppColors.disabled : AppColors.surface,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 2,
@@ -95,14 +95,14 @@ class LessonCard extends StatelessWidget {
                 top: AppDimensions.paddingS,
                 right: AppDimensions.paddingS,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(AppDimensions.paddingXS),
                   decoration: BoxDecoration(
                     color: AppColors.successGreen,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.check,
-                    color: Colors.white,
+                    color: AppColors.surface,
                     size: 16,
                   ),
                 ),
@@ -121,7 +121,7 @@ class LessonCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isLocked
             ? AppColors.disabled.withValues(alpha: 0.2)
-            : Colors.white.withValues(alpha: 0.3),
+            : AppColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Center(
@@ -146,7 +146,7 @@ class LessonCard extends StatelessWidget {
               style: AppTextStyles.bodySmall.copyWith(
                 color: isLocked
                     ? AppColors.disabled
-                    : Colors.white.withValues(alpha: 0.9),
+                    : AppColors.surface.withValues(alpha: 0.9),
               ),
             ),
             Text(
@@ -154,7 +154,7 @@ class LessonCard extends StatelessWidget {
               style: AppTextStyles.bodySmall.copyWith(
                 color: isLocked
                     ? AppColors.disabled
-                    : Colors.white,
+                    : AppColors.surface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -167,9 +167,9 @@ class LessonCard extends StatelessWidget {
             value: progress.clamp(0.0, 1.0),
             backgroundColor: isLocked
                 ? AppColors.disabled.withValues(alpha: 0.2)
-                : Colors.white.withValues(alpha: 0.3),
+                : AppColors.surface.withValues(alpha: 0.3),
             valueColor: AlwaysStoppedAnimation(
-              isLocked ? AppColors.disabled : Colors.white,
+              isLocked ? AppColors.disabled : AppColors.surface,
             ),
             minHeight: 6,
           ),

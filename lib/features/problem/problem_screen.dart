@@ -146,11 +146,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppColors.surface.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                  icon: const Icon(Icons.close, color: AppColors.surface, size: 20),
                   padding: EdgeInsets.zero,
                   onPressed: () => _showExitDialog(),
                 ),
@@ -162,7 +162,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -191,7 +191,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
               Container(
                 height: 16,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: AppColors.surface.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -207,7 +207,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                     return Container(
                       height: 16,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(12),
                       ),
                     );
@@ -225,7 +225,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   Widget _buildContent() {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -287,7 +287,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
           Text(
             _currentProblem.category,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.surface,
               fontWeight: FontWeight.bold,
               fontSize: 15,
             ),
@@ -305,7 +305,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             child: Text(
               '+${_currentProblem.xpReward} XP',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.surface,
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
               ),
@@ -416,7 +416,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border(
           top: BorderSide(color: AppColors.borderLight, width: 1),
         ),
@@ -456,7 +456,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 child: Text(
                   _getButtonText(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -496,7 +496,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     if (_isAnswerSubmitted) {
       return _isCorrect
           ? AppColors.successGreen.withValues(alpha: 0.8)
-          : const Color(0xFF2B4BEF); // Darker mathButtonBlue (GoMath 20% darker)
+          : AppColors.mathButtonBlueDark; // Darker mathButtonBlue (GoMath 20% darker)
     }
     return AppColors.successGreen.withValues(alpha: 0.8); // 어두운 초록색
   }

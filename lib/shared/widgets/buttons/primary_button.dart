@@ -93,13 +93,13 @@ class PrimaryButton extends StatelessWidget {
 
   Color _getDarkerColor(Color color) {
     // GoMath 브랜드 색상 매핑 (20% darker for 3D shadow)
-    if (color == AppColors.mathButtonBlue) return const Color(0xFF2B4BEF); // Button Blue Dark
-    if (color == AppColors.mathTeal) return const Color(0xFF38B9A0); // Teal Dark
-    if (color == AppColors.mathOrange) return const Color(0xFFE68600); // Orange Dark
-    if (color == AppColors.mathRed) return const Color(0xFFE03B3B); // Red Dark
-    if (color == AppColors.mathPurple) return const Color(0xFFBE72EF); // Purple Dark
-    if (color == AppColors.successGreen) return const Color(0xFF2A8643); // Success Green Dark
-    if (color == AppColors.mathBlue) return const Color(0xFF4E91C8); // Math Blue Dark
+    if (color == AppColors.mathButtonBlue) return AppColors.mathButtonBlueDark; // Button Blue Dark
+    if (color == AppColors.mathTeal) return AppColors.mathTealDark; // Teal Dark
+    if (color == AppColors.mathOrange) return AppColors.mathOrangeDark; // Orange Dark
+    if (color == AppColors.mathRed) return AppColors.mathRedDark; // Red Dark
+    if (color == AppColors.mathPurple) return AppColors.mathPurpleDark; // Purple Dark
+    if (color == AppColors.successGreen) return AppColors.duolingoGreenDark; // Success Green Dark
+    if (color == AppColors.mathBlue) return AppColors.mathBlueDark; // Math Blue Dark
 
     // Default: darken by 20%
     return Color.fromARGB(
@@ -121,7 +121,7 @@ class PrimaryButton extends StatelessWidget {
             height: AppDimensions.iconM,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(Colors.white),
+              valueColor: AlwaysStoppedAnimation(AppColors.surface),
             ),
           ),
           const SizedBox(width: AppDimensions.spacingS),
@@ -154,7 +154,7 @@ class PrimaryButton extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(
-        color: Colors.white,
+        color: AppColors.surface,
         fontWeight: FontWeight.bold,
         fontSize: 17,
       ),

@@ -71,7 +71,7 @@ class HomeScreen extends ConsumerWidget {
           AppDimensions.paddingL,
         ),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           border: Border(
             bottom: BorderSide(
               color: AppColors.borderLight,
@@ -104,7 +104,7 @@ class HomeScreen extends ConsumerWidget {
                           child: Text(
                             user.name.substring(0, 1).toUpperCase(),
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -166,7 +166,7 @@ class HomeScreen extends ConsumerWidget {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.borderLight,
@@ -403,7 +403,7 @@ class HomeScreen extends ConsumerWidget {
         content: Text(
           message,
           style: AppTextStyles.bodyMedium.copyWith(
-            color: Colors.white,
+            color: AppColors.surface,
             fontWeight: FontWeight.w500,
           ),
         ),

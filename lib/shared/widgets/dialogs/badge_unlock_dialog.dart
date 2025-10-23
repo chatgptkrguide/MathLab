@@ -293,7 +293,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
         child: Container(
           padding: const EdgeInsets.all(AppDimensions.paddingXXL),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
             boxShadow: [
               BoxShadow(
@@ -335,7 +335,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                 child: Text(
                   _rarityText,
                   style: AppTextStyles.titleMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -424,7 +424,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                   child: Text(
                     '확인',
                     style: AppTextStyles.titleLarge.copyWith(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,

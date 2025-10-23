@@ -84,7 +84,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
             pinned: true,
             backgroundColor: myLeagueInfo.tier.color,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: AppColors.surface),
               onPressed: () async {
                 await AppHapticFeedback.lightImpact();
                 if (mounted) Navigator.of(context).pop();
@@ -116,7 +116,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                         Text(
                           '${myLeagueInfo.tier.displayName} 리그',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
@@ -129,13 +129,13 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                             vertical: AppDimensions.paddingS,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
+                            color: AppColors.surface.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                           ),
                           child: Text(
                             '${state.myRank}위 / ${myLeagueInfo.totalPlayers}명',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -146,7 +146,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                         Text(
                           '주간 XP: ${state.myWeeklyXP}',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontSize: 16,
                           ),
                         ),
@@ -157,14 +157,14 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                           children: [
                             const Icon(
                               Icons.timer,
-                              color: Colors.white,
+                              color: AppColors.surface,
                               size: 16,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               '남은 시간: $_remainingTime',
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 fontSize: 14,
                               ),
                             ),
@@ -283,8 +283,8 @@ class _ParticipantCard extends StatelessWidget {
 
   Color _getRankColor() {
     if (rank == 1) return AppColors.mathYellow; // 금 (GoMath)
-    if (rank == 2) return const Color(0xFFC0C0C0); // 은 (표준 메달 색상)
-    if (rank == 3) return const Color(0xFFCD7F32); // 동 (표준 메달 색상)
+    if (rank == 2) return AppColors.levelSilver; // 은 (표준 메달 색상)
+    if (rank == 3) return AppColors.levelBronze; // 동 (표준 메달 색상)
     return AppColors.textSecondary;
   }
 
@@ -379,7 +379,7 @@ class _ParticipantCard extends StatelessWidget {
                         child: const Text(
                           '나',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),

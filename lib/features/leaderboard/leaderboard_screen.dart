@@ -89,7 +89,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           Text(
             '리더보드',
             style: AppTextStyles.headlineLarge.copyWith(
-              color: Colors.white,
+              color: AppColors.surface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -102,20 +102,20 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Widget _buildPeriodTabs() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(AppDimensions.paddingXS),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.25),
+        color: AppColors.surface.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: Colors.white, // Duolingo flat white
+          color: AppColors.surface, // Duolingo flat white
           borderRadius: BorderRadius.circular(12),
         ),
         dividerColor: Colors.transparent,
         labelColor: AppColors.mathBlue, // GoMath blue text when selected
-        unselectedLabelColor: Colors.white,
+        unselectedLabelColor: AppColors.surface,
         labelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 15,
@@ -150,7 +150,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               bottom: -6,
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A8643), // Darker green (successGreen 20% darker)
+                  color: AppColors.duolingoGreenDark, // Darker green (successGreen 20% darker)
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
@@ -162,7 +162,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 color: AppColors.successGreen, // GoMath green
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFF2A8643), // Darker green
+                  color: AppColors.duolingoGreenDark, // Darker green
                   width: 3,
                 ),
               ),
@@ -173,10 +173,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(28),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                       border: Border.all(
-                        color: const Color(0xFF2A8643), // Darker green
+                        color: AppColors.duolingoGreenDark, // Darker green
                         width: 3,
                       ),
                     ),
@@ -200,7 +200,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                         const Text(
                           '나의 순위',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -209,7 +209,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                         Text(
                           entry.userName,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
@@ -226,7 +226,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       Text(
                         '${entry.xp} XP',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
@@ -235,7 +235,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       Text(
                         'Lv.${entry.level}',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -255,7 +255,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Widget _buildLeaderboardList(List<LeaderboardEntry> entries) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -281,11 +281,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Widget _buildLeaderboardCard(LeaderboardEntry entry, bool isTopThree) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? const Color(0xFFD4F4DD) // Light green highlight (successGreen 80% lighter)
-            : Colors.white,
+            ? AppColors.highlightGreen // Light green highlight (successGreen 80% lighter)
+            : AppColors.surface,
         border: Border.all(
           color: entry.isCurrentUser
               ? AppColors.successGreen // GoMath green border for current user
@@ -333,7 +333,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                         child: const Text(
                           '나',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -423,7 +423,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         height: 52,
         decoration: BoxDecoration(
           color: _getRankColor(entry.rank), // Flat color
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: Border.all(
             color: _getDarkerRankColor(entry.rank),
             width: 3,
@@ -444,7 +444,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       height: 52,
       decoration: BoxDecoration(
         color: AppColors.background, // Light gray
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         border: Border.all(
           color: AppColors.borderLight,
           width: 2,
@@ -469,9 +469,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       case 1:
         return AppColors.mathYellow; // 금 (GoMath)
       case 2:
-        return const Color(0xFFC0C0C0); // 은 (표준 메달 색상)
+        return AppColors.levelSilver; // 은 (표준 메달 색상)
       case 3:
-        return const Color(0xFFCD7F32); // 동 (표준 메달 색상)
+        return AppColors.levelBronze; // 동 (표준 메달 색상)
       default:
         return AppColors.textSecondary;
     }
@@ -481,11 +481,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Color _getDarkerRankColor(int rank) {
     switch (rank) {
       case 1:
-        return const Color(0xFFE5C200); // Darker gold (mathYellow 20% darker)
+        return AppColors.levelGoldDark; // Darker gold (mathYellow 20% darker)
       case 2:
-        return const Color(0xFFA0A0A0); // Darker silver (표준 메달 색상)
+        return AppColors.levelSilverDark; // Darker silver (표준 메달 색상)
       case 3:
-        return const Color(0xFFB86D28); // Darker bronze (표준 메달 색상)
+        return AppColors.levelBronzeDark; // Darker bronze (표준 메달 색상)
       default:
         return AppColors.borderLight;
     }

@@ -19,10 +19,10 @@ class AppTheme {
         secondary: AppColors.accentCyan,
         surface: AppColors.surface,
         error: AppColors.errorRed,
-        onPrimary: Colors.white,
+        onPrimary: AppColors.surface,
         onSecondary: AppColors.textPrimary,
         onSurface: AppColors.textPrimary,
-        onError: Colors.white,
+        onError: AppColors.surface,
       ),
 
       // 앱바 테마
@@ -56,7 +56,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryBlue,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.surface,
           elevation: AppDimensions.cardElevation,
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
@@ -75,7 +75,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryBlue,
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surface,
           side: const BorderSide(color: AppColors.primaryBlue, width: 2),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
@@ -94,7 +94,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryBlue,
-          backgroundColor: Colors.white.withValues(alpha: 0.1),
+          backgroundColor: AppColors.surface.withValues(alpha: 0.1),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
             vertical: AppDimensions.paddingM,
@@ -219,7 +219,7 @@ class AppTheme {
       // 스낵바 테마
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.surface),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),

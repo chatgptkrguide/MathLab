@@ -54,7 +54,7 @@ class LessonPathWidget extends StatelessWidget {
   /// 레슨 노드 빌드 (듀오링고 스타일)
   Widget _buildLessonNode(LessonNode lesson, bool isLeft, bool isCenter, bool isRight) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingS),
       child: Align(
         alignment: isLeft
             ? Alignment.centerLeft
@@ -90,7 +90,7 @@ class LessonPathWidget extends StatelessWidget {
                   color: _getColor(lesson),
                   shape: BoxShape.circle,
                   border: lesson.isCompleted
-                      ? Border.all(color: Colors.white, width: 4)
+                      ? Border.all(color: AppColors.surface, width: 4)
                       : null,
                 ),
                 child: Stack(
@@ -122,7 +122,7 @@ class LessonPathWidget extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.lock_rounded,
-                          color: Colors.white,
+                          color: AppColors.surface,
                           size: 36,
                         ),
                       ),
@@ -138,11 +138,11 @@ class LessonPathWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppColors.mathYellow, // GoMath 골드
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: AppColors.surface, width: 2),
                           ),
                           child: const Icon(
                             Icons.stars_rounded,
-                            color: Colors.white,
+                            color: AppColors.surface,
                             size: 18,
                           ),
                         ),
@@ -157,11 +157,11 @@ class LessonPathWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppColors.mathYellow, // GoMath 골드
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: AppColors.surface, width: 2),
                           ),
                           child: const Icon(
                             Icons.star_rounded,
-                            color: Colors.white,
+                            color: AppColors.surface,
                             size: 20,
                           ),
                         ),
@@ -219,16 +219,16 @@ class LessonPathWidget extends StatelessWidget {
 
   /// 3D 그림자용 더 어두운 색상 (GoMath)
   Color _getDarkerColor(LessonNode lesson) {
-    if (lesson.isCompleted) return const Color(0xFF2A8643); // 어두운 그린
-    if (lesson.isCurrent) return const Color(0xFF4E91C8); // 어두운 블루
+    if (lesson.isCompleted) return AppColors.duolingoGreenDark; // 어두운 그린
+    if (lesson.isCurrent) return AppColors.mathBlueDark; // 어두운 블루
 
     final darkColors = [
-      const Color(0xFF2A8643), // 어두운 그린 (successGreen 20% darker)
-      const Color(0xFF4E91C8), // 어두운 블루 (mathBlue 20% darker)
-      const Color(0xFFE68600), // 어두운 오렌지 (mathOrange 20% darker)
-      const Color(0xFFBE72EF), // 어두운 퍼플 (mathPurple 20% darker)
-      const Color(0xFFE03B3B), // 어두운 레드 (mathRed 20% darker)
-      const Color(0xFF38B9A0), // 어두운 틸 (mathTeal 20% darker)
+      AppColors.duolingoGreenDark, // 어두운 그린 (successGreen 20% darker)
+      AppColors.mathBlueDark, // 어두운 블루 (mathBlue 20% darker)
+      AppColors.mathOrangeDark, // 어두운 오렌지 (mathOrange 20% darker)
+      AppColors.mathPurpleDark, // 어두운 퍼플 (mathPurple 20% darker)
+      AppColors.mathRedDark, // 어두운 레드 (mathRed 20% darker)
+      AppColors.mathTealDark, // 어두운 틸 (mathTeal 20% darker)
     ];
     return darkColors[lesson.lessonNumber % darkColors.length];
   }

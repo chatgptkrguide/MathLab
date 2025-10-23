@@ -153,7 +153,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   child: Text(
                     '건너뛰기',
                     style: AppTextStyles.titleMedium.copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: AppColors.surface.withValues(alpha: 0.8),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -187,7 +187,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     child: ElevatedButton(
                       onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.surface,
                         foregroundColor: AppColors.mathBlue,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppDimensions.paddingL,
@@ -219,14 +219,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXS),
       height: 8,
       width: isActive ? 32 : 8,
       decoration: BoxDecoration(
         color: isActive
-            ? Colors.white
-            : Colors.white.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(4),
+            ? AppColors.surface
+            : AppColors.surface.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
     );
   }

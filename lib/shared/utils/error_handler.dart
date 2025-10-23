@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../constants/app_colors.dart';
 
 /// 앱 전역 에러 핸들러
 ///
@@ -126,7 +127,7 @@ class AppErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.white),
+            const Icon(Icons.error_outline, color: AppColors.surface),
             const SizedBox(width: 8),
             Expanded(child: Text(message)),
           ],
@@ -136,7 +137,7 @@ class AppErrorHandler {
         duration: const Duration(seconds: 4),
         action: SnackBarAction(
           label: '확인',
-          textColor: Colors.white,
+          textColor: AppColors.surface,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
@@ -153,7 +154,7 @@ class AppErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_outline, color: Colors.white),
+            const Icon(Icons.check_circle_outline, color: AppColors.surface),
             const SizedBox(width: 8),
             Expanded(child: Text(message)),
           ],
@@ -173,7 +174,7 @@ class AppErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.info_outline, color: Colors.white),
+            const Icon(Icons.info_outline, color: AppColors.surface),
             const SizedBox(width: 8),
             Expanded(child: Text(message)),
           ],

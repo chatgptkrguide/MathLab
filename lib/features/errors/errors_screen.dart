@@ -82,7 +82,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
@@ -116,11 +116,11 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: AppColors.surface.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
+              icon: const Icon(Icons.close, color: AppColors.surface),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -128,7 +128,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
             child: Text(
               '오답 노트',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.surface,
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
@@ -274,7 +274,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.borderLight,
@@ -411,7 +411,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
         horizontal: AppDimensions.paddingL,
         vertical: AppDimensions.spacingM,
       ),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(AppDimensions.paddingXS),
       decoration: BoxDecoration(
         color: AppColors.background, // GoMath 배경색
         borderRadius: BorderRadius.circular(16),
@@ -430,7 +430,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
           fontSize: 15,
         ),
         indicator: BoxDecoration(
-          color: Colors.white, // Duolingo flat white
+          color: AppColors.surface, // Duolingo flat white
           borderRadius: BorderRadius.circular(12),
         ),
         dividerColor: Colors.transparent,
@@ -493,7 +493,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
         child: Container(
           padding: const EdgeInsets.all(AppDimensions.paddingL),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: AppColors.borderLight,
@@ -613,7 +613,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
       child: Text(
         text,
         style: const TextStyle(
-          color: Colors.white,
+          color: AppColors.surface,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),

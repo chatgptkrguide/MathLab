@@ -145,7 +145,7 @@ class _XPGainAnimationState extends State<XPGainAnimation>
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingS),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: AppColors.surface.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
                 child: const Text(
@@ -162,14 +162,14 @@ class _XPGainAnimationState extends State<XPGainAnimation>
                   Text(
                     '+${widget.xpAmount} XP',
                     style: AppTextStyles.headlineMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     '경험치 획득!',
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppColors.surface.withValues(alpha: 0.9),
                     ),
                   ),
                 ],

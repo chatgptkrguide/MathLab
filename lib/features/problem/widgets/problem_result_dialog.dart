@@ -148,7 +148,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
               ),
               padding: const EdgeInsets.all(AppDimensions.paddingXXL),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
@@ -207,7 +207,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                         style: const TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.surface,
                         ),
                       ),
                     ),
@@ -314,13 +314,13 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                                     children: [
                                       const Icon(
                                         Icons.check_circle,
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                       ),
                                       const SizedBox(width: AppDimensions.spacingS),
                                       Text(
                                         '완료',
                                         style: AppTextStyles.bodyLarge.copyWith(
-                                          color: Colors.white,
+                                          color: AppColors.surface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -340,7 +340,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                                     vertical: AppDimensions.paddingL,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.surface,
                                     borderRadius: BorderRadius.circular(
                                         AppDimensions.radiusL),
                                     border: Border.all(
@@ -384,7 +384,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                                   vertical: AppDimensions.paddingL,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.surface,
                                   borderRadius: BorderRadius.circular(
                                       AppDimensions.radiusL),
                                   border: Border.all(
@@ -442,13 +442,13 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                                   children: [
                                     const Icon(
                                       Icons.check_circle,
-                                      color: Colors.white,
+                                      color: AppColors.surface,
                                     ),
                                     const SizedBox(width: AppDimensions.spacingS),
                                     Text(
                                       '완료',
                                       style: AppTextStyles.bodyLarge.copyWith(
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
