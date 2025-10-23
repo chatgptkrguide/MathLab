@@ -214,26 +214,33 @@ class HomeScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            // 진행 바 (GoMath 틸 색상)
-            FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: progress.clamp(0.05, 1.0),
-              child: Container(
-                height: 14,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.mathTeal, AppColors.mathTealDark],
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.mathTeal.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+            // 진행 바 with animation (GoMath 틸 색상)
+            TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              tween: Tween(begin: 0.0, end: progress),
+              builder: (context, value, child) {
+                return FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: value.clamp(0.05, 1.0),
+                  child: Container(
+                    height: 14,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.mathTeal.withValues(alpha: 0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ],
         ),
