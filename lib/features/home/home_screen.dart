@@ -352,30 +352,12 @@ class HomeScreen extends ConsumerWidget {
       return;
     }
 
-    // 사용자 레벨에 맞는 문제 가져오기
-    final recommendedProblems = ref
+    // lesson001의 모든 문제 가져오기 (3개)
+    final selectedProblems = ref
         .read(problemProvider.notifier)
-        .getRecommendedProblems(
-          lesson.lessonNumber,
-          count: GameConstants.recommendedProblemCount,
-        );
+        .getProblemsByLesson('lesson001');
 
-    List<Problem> selectedProblems;
-    String lessonId;
-
-    if (recommendedProblems.isEmpty) {
-      Logger.debug('기본 레슨 사용', tag: 'HomeScreen');
-      final defaultProblems = ref
-          .read(problemProvider.notifier)
-          .getProblemsByLesson(GameConstants.defaultLessonId);
-      selectedProblems = defaultProblems
-          .take(GameConstants.recommendedProblemCount)
-          .toList();
-      lessonId = GameConstants.defaultLessonId;
-    } else {
-      selectedProblems = recommendedProblems;
-      lessonId = lesson.id;
-    }
+    final lessonId = 'lesson001';
 
     if (selectedProblems.isEmpty) {
       Logger.error('선택된 문제 없음', tag: 'HomeScreen');
