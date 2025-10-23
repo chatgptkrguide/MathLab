@@ -6,9 +6,11 @@ import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/animations/fade_in_widget.dart';
 import '../../shared/widgets/cards/achievement_card.dart';
+import '../../shared/widgets/buttons/animated_button.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/achievement_provider.dart';
+import '../auth/auth_screen.dart';
 
 /// 프로필/계정 화면 (업적 시스템 통합)
 /// 사용자 정보, 학습 통계, 업적을 표시
@@ -114,6 +116,8 @@ class ProfileScreen extends ConsumerWidget {
 
   /// 프로필 섹션 (파란 배경 영역)
   Widget _buildProfileSection(User? user) {
+    final isGuest = user?.name == '게스트';
+
     return FadeInWidget(
       duration: const Duration(milliseconds: 600),
       child: Padding(
@@ -121,65 +125,59 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           children: [
             // 프로필 사진
-            Stack(
-              children: [
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: AppColors.mathButtonGradient,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: AppColors.mathButtonGradient,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.mathButtonBlue.withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
-                  child: Center(
-                    child: Text(
-                      (user?.name != null && user!.name.isNotEmpty) ? user.name[0] : '학',
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.surface,
-                      ),
-                    ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  (user?.name != null && user!.name.isNotEmpty) ? user.name[0] : '학',
+                  style: const TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.surface,
                   ),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: AppDimensions.spacingL),
             // 이름
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-              child: Text(
-                user?.name ?? '학습자',
-                style: AppTextStyles.headlineLarge.copyWith(
-                  color: AppColors.surface,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+            Text(
+              user?.name ?? '학습자',
+              style: AppTextStyles.headlineLarge.copyWith(
+                color: AppColors.surface,
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
               ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
             const SizedBox(height: AppDimensions.spacingS),
-            // 학년
+            // 학년 또는 게스트 표시
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.paddingM,
-                vertical: AppDimensions.paddingS,
+                vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surface.withValues(alpha: 0.3),
+                color: AppColors.surface.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Text(
-                user?.currentGrade ?? '중1',
+                isGuest ? '게스트 모드' : (user?.currentGrade ?? '중1'),
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.surface,
                   fontWeight: FontWeight.w600,
@@ -194,14 +192,14 @@ class ProfileScreen extends ConsumerWidget {
                 _buildTopStat('${user?.level ?? 1}', '레벨', '⭐'),
                 Container(
                   width: 1,
-                  height: 40,
-                  color: AppColors.surface.withValues(alpha: 0.3),
+                  height: 36,
+                  color: AppColors.surface.withValues(alpha: 0.25),
                 ),
                 _buildTopStat('${user?.xp ?? 0}', 'XP', '🔶'),
                 Container(
                   width: 1,
-                  height: 40,
-                  color: AppColors.surface.withValues(alpha: 0.3),
+                  height: 36,
+                  color: AppColors.surface.withValues(alpha: 0.25),
                 ),
                 _buildTopStat('${user?.streakDays ?? 0}', '연속', '🔥'),
               ],
@@ -244,6 +242,8 @@ class ProfileScreen extends ConsumerWidget {
 
   /// 통계 섹션 (흰색 배경 영역 - 반응형)
   Widget _buildStatisticsSection(User? user) {
+    final isGuest = user?.name == '게스트';
+
     return FadeInWidget(
       duration: const Duration(milliseconds: 600),
       delay: const Duration(milliseconds: 200),
@@ -251,6 +251,63 @@ class ProfileScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // 게스트 로그인 안내 (게스트인 경우에만)
+          if (isGuest) ...[
+            Container(
+              padding: const EdgeInsets.all(AppDimensions.paddingL),
+              decoration: BoxDecoration(
+                color: AppColors.mathYellow.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                border: Border.all(
+                  color: AppColors.mathYellow.withValues(alpha: 0.3),
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Text('🎯', style: TextStyle(fontSize: 24)),
+                      const SizedBox(width: AppDimensions.spacingM),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '로그인하고 학습 기록을 저장하세요',
+                              style: AppTextStyles.titleMedium.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '소셜 로그인으로 간편하게 시작할 수 있어요',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppDimensions.spacingM),
+                  Builder(
+                    builder: (context) => AnimatedButton(
+                      text: '로그인하러 가기',
+                      onPressed: () => _navigateToLogin(context),
+                      backgroundColor: AppColors.mathYellow,
+                      shadowColor: AppColors.mathYellowDark,
+                      textColor: AppColors.textPrimary,
+                      width: double.infinity,
+                      height: 48,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacingXL),
+          ],
           Text(
             '학습 통계',
             style: AppTextStyles.headlineSmall.copyWith(
@@ -289,6 +346,44 @@ class ProfileScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _navigateToLogin(BuildContext context) async {
+    final shouldNavigate = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
+        title: const Text('로그인'),
+        content: const Text(
+          '로그인 화면으로 이동하시겠습니까?\n현재 게스트 계정의 학습 기록은 유지됩니다.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              '취소',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              '이동',
+              style: TextStyle(color: AppColors.mathYellow),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldNavigate == true && context.mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AuthScreen()),
+      );
+    }
   }
 
   /// 통계 카드
