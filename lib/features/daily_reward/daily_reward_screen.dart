@@ -356,8 +356,14 @@ class _DayRewardCard extends StatelessWidget {
         boxShadow: [
           if (isCurrentDay)
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.2),
-              blurRadius: 10,
+              color: AppColors.primary.withValues(alpha: 0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            )
+          else if (!isLocked)
+            BoxShadow(
+              color: AppColors.borderLight.withValues(alpha: 0.1),
+              blurRadius: 4,
               offset: const Offset(0, 2),
             ),
         ],

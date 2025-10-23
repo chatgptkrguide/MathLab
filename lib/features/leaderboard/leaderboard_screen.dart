@@ -293,6 +293,15 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           width: entry.isCurrentUser ? 3 : 2,
         ),
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: entry.isCurrentUser
+                ? AppColors.successGreen.withValues(alpha: 0.15)
+                : AppColors.borderLight.withValues(alpha: 0.1),
+            blurRadius: entry.isCurrentUser ? 8 : 4,
+            offset: Offset(0, entry.isCurrentUser ? 3 : 2),
+          ),
+        ],
       ),
       child: Row(
         children: [

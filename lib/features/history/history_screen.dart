@@ -232,6 +232,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        border: Border.all(
+          color: AppColors.borderLight,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.borderLight.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
