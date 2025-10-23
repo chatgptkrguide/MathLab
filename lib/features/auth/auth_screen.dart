@@ -74,6 +74,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     const SizedBox(height: AppDimensions.spacingXXL),
                     _buildHeader(),
                     const SizedBox(height: AppDimensions.spacingXXL),
+
+                    // 비회원 시작 버튼 (상단 배치)
+                    _buildGuestButton(),
+                    const SizedBox(height: AppDimensions.spacingXL),
+
                     _buildAccountSelector(),
                     const SizedBox(height: AppDimensions.spacingXL),
                     _buildAuthTabs(),
@@ -136,6 +141,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+
+  /// 비회원 시작 버튼 (상단 눈에 띄게)
+  Widget _buildGuestButton() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mathYellow.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: AnimatedButton(
+        text: '비회원으로 시작하기',
+        onPressed: _continueAsGuest,
+        backgroundColor: AppColors.mathYellow,
+        textColor: AppColors.textPrimary,
+        icon: Icons.login_outlined,
+        height: 56,
+      ),
     );
   }
 
@@ -322,7 +351,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingM),
                   child: Text(
-                    '또는',
+                    '소셜 로그인',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -358,22 +387,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 onPressed: _signInWithApple,
                 isLoading: authState.isLoading,
               ),
-              const SizedBox(height: AppDimensions.spacingM),
             ],
-
-            const SizedBox(height: AppDimensions.spacingL),
-
-            // 게스트로 계속하기
-            TextButton(
-              onPressed: _continueAsGuest,
-              child: Text(
-                '게스트로 계속하기',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
           ],
         ),
       ),

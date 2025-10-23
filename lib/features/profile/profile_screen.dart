@@ -249,6 +249,7 @@ class ProfileScreen extends ConsumerWidget {
       delay: const Duration(milliseconds: 200),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             '학습 통계',
@@ -257,26 +258,30 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppDimensions.spacingL),
-          // 통계 카드들 (반응형 그리드)
+          // 통계 카드들 (반응형 2x2 그리드)
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallScreen = constraints.maxWidth < 400;
-              return GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: isSmallScreen
-                    ? AppDimensions.spacingS
-                    : AppDimensions.spacingM,
-                crossAxisSpacing: isSmallScreen
-                    ? AppDimensions.spacingS
-                    : AppDimensions.spacingM,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: isSmallScreen ? 1.2 : 1.3,
+              final spacing = isSmallScreen ? AppDimensions.spacingS : AppDimensions.spacingM;
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildStatCard('레벨', '${user?.level ?? 1}', '⭐'),
-                  _buildStatCard('총 XP', '${user?.xp ?? 0}', '🔶'),
-                  _buildStatCard('연속일', '${user?.streakDays ?? 0}일', '🔥'),
-                  _buildStatCard('하트', '${user?.hearts ?? 5}개', '❤️'),
+                  Row(
+                    children: [
+                      Expanded(child: _buildStatCard('레벨', '${user?.level ?? 1}', '⭐')),
+                      SizedBox(width: spacing),
+                      Expanded(child: _buildStatCard('총 XP', '${user?.xp ?? 0}', '🔶')),
+                    ],
+                  ),
+                  SizedBox(height: spacing),
+                  Row(
+                    children: [
+                      Expanded(child: _buildStatCard('연속일', '${user?.streakDays ?? 0}일', '🔥')),
+                      SizedBox(width: spacing),
+                      Expanded(child: _buildStatCard('하트', '${user?.hearts ?? 5}개', '❤️')),
+                    ],
+                  ),
                 ],
               );
             },
@@ -376,23 +381,29 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppDimensions.spacingM),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: AppDimensions.spacingM,
-                crossAxisSpacing: AppDimensions.spacingM,
-                childAspectRatio: 0.85,
-              ),
-              itemCount: unlocked.length,
-              itemBuilder: (context, index) {
-                return FadeInWidget(
-                  delay: Duration(milliseconds: 50 * index),
-                  child: AchievementCard(
-                    achievement: unlocked[index],
-                    onTap: () => _showAchievementDetail(unlocked[index]),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // 화면 크기에 따라 열 개수 조정
+                final crossAxisCount = constraints.maxWidth < 360 ? 2 : 3;
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: AppDimensions.spacingS,
+                    crossAxisSpacing: AppDimensions.spacingS,
+                    childAspectRatio: 0.9,
                   ),
+                  itemCount: unlocked.length,
+                  itemBuilder: (context, index) {
+                    return FadeInWidget(
+                      delay: Duration(milliseconds: 50 * index),
+                      child: AchievementCard(
+                        achievement: unlocked[index],
+                        onTap: () => _showAchievementDetail(unlocked[index]),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -409,23 +420,29 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppDimensions.spacingM),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: AppDimensions.spacingM,
-                crossAxisSpacing: AppDimensions.spacingM,
-                childAspectRatio: 0.85,
-              ),
-              itemCount: locked.length,
-              itemBuilder: (context, index) {
-                return FadeInWidget(
-                  delay: Duration(milliseconds: 50 * (unlocked.length + index)),
-                  child: AchievementCard(
-                    achievement: locked[index],
-                    onTap: () => _showAchievementDetail(locked[index]),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // 화면 크기에 따라 열 개수 조정
+                final crossAxisCount = constraints.maxWidth < 360 ? 2 : 3;
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: AppDimensions.spacingS,
+                    crossAxisSpacing: AppDimensions.spacingS,
+                    childAspectRatio: 0.9,
                   ),
+                  itemCount: locked.length,
+                  itemBuilder: (context, index) {
+                    return FadeInWidget(
+                      delay: Duration(milliseconds: 50 * (unlocked.length + index)),
+                      child: AchievementCard(
+                        achievement: locked[index],
+                        onTap: () => _showAchievementDetail(locked[index]),
+                      ),
+                    );
+                  },
                 );
               },
             ),

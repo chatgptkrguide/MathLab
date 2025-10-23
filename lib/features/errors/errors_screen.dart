@@ -170,65 +170,21 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 통계 카드 그리드 (4열)
+  /// 통계 카드 그리드 (2x2 그리드로 변경 - 가독성 향상)
   Widget _buildStatsGrid(Map<String, int> errorStats) {
     return FadeInWidget(
       duration: const Duration(milliseconds: 600),
       child: Padding(
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isSmallScreen = constraints.maxWidth < 500;
-
-            if (isSmallScreen) {
-              // 작은 화면에서는 2x2 그리드
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          '총 오답',
-                          errorStats['total']?.toString() ?? '0',
-                          AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.spacingS),
-                      Expanded(
-                        child: _buildStatCard(
-                          '미복습',
-                          errorStats['unreviewed']?.toString() ?? '0',
-                          AppColors.errorRed,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppDimensions.spacingS),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          '1회 복습',
-                          errorStats['reviewedOnce']?.toString() ?? '0',
-                          AppColors.warningOrange,
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.spacingS),
-                      Expanded(
-                        child: _buildStatCard(
-                          '2회 이상',
-                          errorStats['reviewedTwice']?.toString() ?? '0',
-                          AppColors.successGreen,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }
-
-            // 일반 화면에서는 4열 가로 배치
-            return Row(
+        padding: const EdgeInsets.fromLTRB(
+          AppDimensions.paddingL,
+          AppDimensions.paddingM,
+          AppDimensions.paddingL,
+          AppDimensions.paddingL,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
               children: [
                 Expanded(
                   child: _buildStatCard(
@@ -237,7 +193,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                     AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(width: AppDimensions.spacingS),
+                const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
                   child: _buildStatCard(
                     '미복습',
@@ -245,7 +201,11 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                     AppColors.errorRed,
                   ),
                 ),
-                const SizedBox(width: AppDimensions.spacingS),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacingM),
+            Row(
+              children: [
                 Expanded(
                   child: _buildStatCard(
                     '1회 복습',
@@ -253,7 +213,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                     AppColors.warningOrange,
                   ),
                 ),
-                const SizedBox(width: AppDimensions.spacingS),
+                const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
                   child: _buildStatCard(
                     '2회 이상',
@@ -262,41 +222,45 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                   ),
                 ),
               ],
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// 통계 카드 - GoMath flat style
+  /// 통계 카드 - GoMath flat style (더 넉넉한 여백)
   Widget _buildStatCard(String label, String value, Color valueColor) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingM),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingL,
+        vertical: AppDimensions.paddingL + 4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.borderLight,
           width: 2,
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             value,
             style: TextStyle(
               color: valueColor,
               fontWeight: FontWeight.bold,
-              fontSize: 28,
+              fontSize: 32,
             ),
           ),
-          const SizedBox(height: AppDimensions.spacingXS),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             style: const TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,

@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../shared/constants/app_colors.dart';
 import '../shared/themes/app_theme.dart';
 import '../features/onboarding/onboarding_screen.dart';
-import 'main_navigation.dart';
+import 'auth_wrapper.dart';
 import 'splash_screen.dart';
 
 /// MathLab 앱의 메인 위젯
@@ -42,7 +42,7 @@ class MathLabApp extends StatelessWidget {
       // 라우팅 설정
       routes: {
         '/onboarding': (context) => const OnboardingScreen(),
-        '/home': (context) => const MainNavigation(),
+        '/home': (context) => const AuthWrapper(),
       },
 
       // 글로벌 설정
