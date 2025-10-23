@@ -57,7 +57,7 @@ class AchievementsScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // GoMath-style progress bar
+                // GoMath-style progress bar with animation
                 Stack(
                   children: [
                     Container(
@@ -67,16 +67,35 @@ class AchievementsScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: state.completionRate.clamp(0.01, 1.0),
-                      child: Container(
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: AppColors.successGreen, // GoMath 초록색
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
+                    TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutCubic,
+                      tween: Tween(begin: 0.0, end: state.completionRate),
+                      builder: (context, value, child) {
+                        return FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: value.clamp(0.01, 1.0),
+                          child: Container(
+                            height: 12,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.successGreen,
+                                  AppColors.duolingoGreenDark,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.successGreen.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

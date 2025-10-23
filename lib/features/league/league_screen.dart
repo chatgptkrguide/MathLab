@@ -198,6 +198,18 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                           : AppColors.borderLight,
                   width: 2,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (myLeagueInfo.canPromote
+                            ? AppColors.success
+                            : myLeagueInfo.relegationRisk
+                                ? AppColors.error
+                                : AppColors.borderLight)
+                        .withValues(alpha: 0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
