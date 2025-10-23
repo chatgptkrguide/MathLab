@@ -1,16 +1,13 @@
-import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
-import '../../shared/widgets/widgets.dart';
-import '../../shared/widgets/layout/responsive_wrapper.dart';
-import '../../shared/widgets/buttons/social_login_button.dart';
+import '../../shared/widgets/buttons/animated_button.dart';
 import '../../shared/utils/haptic_feedback.dart';
-import '../../data/models/user_account.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../data/models/models.dart';
 
-/// 로그인/회원가입 화면
-/// 듀오링고 스타일의 매력적인 인증 화면
+/// 듀오링고 스타일 인증 화면
+/// 깔끔하고 직관적한 시작 화면
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
@@ -19,74 +16,78 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen>
-    with TickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _nameController = TextEditingController();
-
-  late TabController _tabController;
-  bool _isSignUp = false;
-  String _selectedGrade = '중1';
-  AccountType _selectedAccountType = AccountType.student;
-
-  final List<String> _grades = ['중1', '중2', '중3', '고1', '고2', '고3'];
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      setState(() {
-        _isSignUp = _tabController.index == 1;
-      });
-    });
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _emailController.dispose();
-    _nameController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
     return Scaffold(
-      backgroundColor: AppColors.mathBlue, // GoMath blue
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: AppColors.mathBlueGradient, // GoMath blue gradient
+            colors: AppColors.mathBlueGradient,
           ),
         ),
         child: SafeArea(
-          child: ResponsiveWrapper(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(AppDimensions.paddingXL),
-                child: Column(
-                  children: [
-                    const SizedBox(height: AppDimensions.spacingXXL),
-                    _buildHeader(),
-                    const SizedBox(height: AppDimensions.spacingXXL),
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Column(
+                children: [
+                  // 상단 여백
+                  const SizedBox(height: AppDimensions.spacingXXL * 2),
 
-                    // 비회원 시작 버튼 (상단 배치)
-                    _buildGuestButton(),
-                    const SizedBox(height: AppDimensions.spacingXL),
+                  // 로고 및 일러스트레이션
+                  Expanded(
+                    flex: 3,
+                    child: _buildHeroSection(),
+                  ),
 
-                    _buildAccountSelector(),
-                    const SizedBox(height: AppDimensions.spacingXL),
-                    _buildAuthTabs(),
-                    const SizedBox(height: AppDimensions.spacingXL),
-                    _buildAuthForm(authState),
-                    const SizedBox(height: AppDimensions.spacingXXL),
-                  ],
-                ),
+                  // 버튼 영역
+                  Expanded(
+                    flex: 2,
+                    child: _buildActionSection(),
+                  ),
+                ],
               ),
             ),
           ),
@@ -95,707 +96,572 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
-  /// 헤더 (로고 + 환영 메시지)
-  Widget _buildHeader() {
+  /// 히어로 섹션 (로고 + 일러스트레이션)
+  Widget _buildHeroSection() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // 로고 대신 수학 이모지 + 타이틀
+        // 메인 로고/아이콘
         Container(
-          width: 120,
-          height: 120,
+          width: 160,
+          height: 160,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.surface, AppColors.background], // White to light gray
+            color: AppColors.surface.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.surface.withValues(alpha: 0.4),
+              width: 3,
             ),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             boxShadow: [
               BoxShadow(
-                color: AppColors.surface.withValues(alpha: 0.3),
-                blurRadius: 20,
+                color: AppColors.surface.withValues(alpha: 0.2),
+                blurRadius: 30,
                 spreadRadius: 5,
               ),
             ],
           ),
-          child: const Center(
-            child: Text(
-              '🧮',
-              style: TextStyle(fontSize: 48),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'π',
+                  style: TextStyle(
+                    fontSize: 70,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.surface,
+                    shadows: [
+                      Shadow(
+                        color: AppColors.mathButtonBlue.withValues(alpha: 0.5),
+                        blurRadius: 15,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '∫ dx',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.surface.withValues(alpha: 0.9),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        const SizedBox(height: AppDimensions.spacingL),
+
+        const SizedBox(height: AppDimensions.spacingXL),
+
+        // 앱 이름
         Text(
           'MathLab',
-          style: AppTextStyles.headlineLarge.copyWith(
+          style: AppTextStyles.displayLarge.copyWith(
             color: AppColors.surface,
             fontWeight: FontWeight.bold,
-            fontSize: 32,
+            fontSize: 48,
+            letterSpacing: 2,
+            shadows: [
+              Shadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                offset: const Offset(0, 3),
+                blurRadius: 8,
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: AppDimensions.spacingS),
+
+        const SizedBox(height: AppDimensions.spacingM),
+
+        // 서브 타이틀
         Text(
-          '재미있는 수학 학습의 시작',
-          style: AppTextStyles.bodyLarge.copyWith(
+          '매일 성장하는 수학 학습',
+          style: AppTextStyles.titleLarge.copyWith(
             color: AppColors.surface.withValues(alpha: 0.9),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  /// 비회원 시작 버튼 (상단 눈에 띄게)
-  Widget _buildGuestButton() {
+  /// 액션 섹션 (버튼들)
+  Widget _buildActionSection() {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.mathYellow.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingXL,
       ),
-      child: AnimatedButton(
-        text: '비회원으로 시작하기',
-        onPressed: _continueAsGuest,
-        backgroundColor: AppColors.mathYellow,
-        textColor: AppColors.textPrimary,
-        icon: Icons.login_outlined,
-        height: 56,
-      ),
-    );
-  }
-
-  /// 기존 계정 선택
-  Widget _buildAccountSelector() {
-    final accounts = ref.watch(availableAccountsProvider);
-
-    if (accounts.isEmpty) return const SizedBox.shrink();
-
-    return DuolingoCard(
-      gradientColors: [AppColors.surface, AppColors.background], // White to light gray
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            '기존 계정으로 계속하기',
-            style: AppTextStyles.titleMedium.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // 메인 CTA - 시작하기 (게스트 로그인)
+          AnimatedButton(
+            text: '시작하기',
+            onPressed: _startAsGuest,
+            backgroundColor: AppColors.mathYellow,
+            shadowColor: AppColors.mathOrange,
+            textColor: AppColors.textPrimary,
+            height: 64,
+            icon: Icons.rocket_launch_rounded,
           ),
-          const SizedBox(height: AppDimensions.spacingM),
-          ...accounts.map((account) => _buildAccountItem(account)),
-        ],
-      ),
-    );
-  }
 
-  /// 계정 아이템
-  Widget _buildAccountItem(UserAccount account) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Color(int.parse(account.accountColor.replaceFirst('#', '0xFF'))),
-          child: Text(
-            account.avatarText,
-            style: AppTextStyles.titleMedium.copyWith(
-              color: AppColors.surface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(
-          account.displayName,
-          style: AppTextStyles.titleMedium,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
-        subtitle: Text(
-          '${account.email} • ${account.accountTypeText}',
-          style: AppTextStyles.bodySmall,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () async {
-          await AppHapticFeedback.lightImpact();
-          await ref.read(authProvider.notifier).signIn(account.email);
-        },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        ),
-      ),
-    );
-  }
+          const SizedBox(height: AppDimensions.spacingL),
 
-  /// 인증 탭
-  Widget _buildAuthTabs() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        tabs: const [
-          Tab(text: '로그인'),
-          Tab(text: '회원가입'),
-        ],
-        labelColor: AppColors.surface,
-        unselectedLabelColor: AppColors.surface.withValues(alpha: 0.7),
-        indicator: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        ),
-        indicatorPadding: const EdgeInsets.all(AppDimensions.paddingXS),
-      ),
-    );
-  }
-
-  /// 인증 폼
-  Widget _buildAuthForm(AuthState authState) {
-    return DuolingoCard(
-      gradientColors: [AppColors.surface, AppColors.background], // White to light gray
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              _isSignUp ? '새 계정 만들기' : '계정에 로그인',
-              style: AppTextStyles.titleLarge.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppDimensions.spacingXL),
-
-            // 이메일 입력
-            _buildInputField(
-              controller: _emailController,
-              label: '이메일',
-              hint: 'your@email.com',
-              icon: Icons.email_outlined,
-              keyboardType: TextInputType.emailAddress,
-              validator: _validateEmail,
-            ),
-
-            if (_isSignUp) ...[
-              const SizedBox(height: AppDimensions.spacingL),
-              // 이름 입력
-              _buildInputField(
-                controller: _nameController,
-                label: '이름',
-                hint: '홍길동',
-                icon: Icons.person_outline,
-                validator: _validateName,
-              ),
-
-              const SizedBox(height: AppDimensions.spacingL),
-              // 학년 선택
-              _buildGradeSelector(),
-
-              const SizedBox(height: AppDimensions.spacingL),
-              // 계정 타입 선택
-              _buildAccountTypeSelector(),
-            ],
-
-            const SizedBox(height: AppDimensions.spacingXXL),
-
-            // 제출 버튼
-            AnimatedButton(
-              text: _isSignUp ? '계정 만들기' : '로그인',
-              onPressed: authState.isLoading ? null : _handleAuth,
-              isEnabled: !authState.isLoading,
-              backgroundColor: AppColors.successGreen, // GoMath green
-              height: 56,
-            ),
-
-            if (authState.error != null) ...[
-              const SizedBox(height: AppDimensions.spacingL),
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.paddingM),
-                decoration: BoxDecoration(
-                  color: AppColors.mathRed.withValues(alpha: 0.1), // GoMath red
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  border: Border.all(color: AppColors.mathRed.withValues(alpha: 0.3)),
+          // 소셜 로그인 버튼들
+          Row(
+            children: [
+              Expanded(
+                child: _buildSocialButton(
+                  icon: '🔵',
+                  label: 'Google',
+                  onPressed: _signInWithGoogle,
                 ),
-                child: Row(
+              ),
+              const SizedBox(width: AppDimensions.spacingM),
+              Expanded(
+                child: _buildSocialButton(
+                  icon: '💬',
+                  label: 'Kakao',
+                  onPressed: _signInWithKakao,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppDimensions.spacingXL),
+
+          // 계정이 있는 경우 로그인 링크
+          TextButton(
+            onPressed: _showLoginDialog,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.paddingL,
+                vertical: AppDimensions.paddingM,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '계정이 있으신가요?',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.surface.withValues(alpha: 0.8),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '로그인',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.surface,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: AppDimensions.spacingM),
+        ],
+      ),
+    );
+  }
+
+  /// 소셜 로그인 버튼
+  Widget _buildSocialButton({
+    required String icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: AppColors.surface.withValues(alpha: 0.2),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: AppDimensions.paddingL,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            border: Border.all(
+              color: AppColors.surface.withValues(alpha: 0.3),
+              width: 2,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: AppDimensions.spacingS),
+              Text(
+                label,
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.surface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 게스트로 시작
+  Future<void> _startAsGuest() async {
+    await AppHapticFeedback.mediumImpact();
+
+    try {
+      final authNotifier = ref.read(authProvider.notifier);
+      await authNotifier.continueAsGuest();
+
+      if (mounted) {
+        // 성공적으로 게스트 계정 생성됨
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '환영합니다! 지금 바로 학습을 시작해보세요 🎉',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            backgroundColor: AppColors.mathTeal,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '오류가 발생했습니다. 다시 시도해주세요.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+              ),
+            ),
+            backgroundColor: AppColors.mathRed,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Google 로그인
+  Future<void> _signInWithGoogle() async {
+    await AppHapticFeedback.lightImpact();
+
+    try {
+      final authNotifier = ref.read(authProvider.notifier);
+      final success = await authNotifier.signInWithGoogle();
+
+      if (mounted && success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Google 계정으로 로그인했습니다! 👋',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            backgroundColor: AppColors.mathBlue,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            ),
+          ),
+        );
+      } else if (mounted && !success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Google 로그인에 실패했습니다.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+              ),
+            ),
+            backgroundColor: AppColors.mathRed,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '로그인 중 오류가 발생했습니다.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+              ),
+            ),
+            backgroundColor: AppColors.mathRed,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Kakao 로그인
+  Future<void> _signInWithKakao() async {
+    await AppHapticFeedback.lightImpact();
+
+    try {
+      final authNotifier = ref.read(authProvider.notifier);
+      final success = await authNotifier.signInWithKakao();
+
+      if (mounted && success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Kakao 계정으로 로그인했습니다! 👋',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            backgroundColor: AppColors.mathYellow,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            ),
+          ),
+        );
+      } else if (mounted && !success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Kakao 로그인에 실패했습니다.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+              ),
+            ),
+            backgroundColor: AppColors.mathRed,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '로그인 중 오류가 발생했습니다.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.surface,
+              ),
+            ),
+            backgroundColor: AppColors.mathRed,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 기존 계정 로그인 다이얼로그
+  Future<void> _showLoginDialog() async {
+    await AppHapticFeedback.lightImpact();
+
+    final authState = ref.read(authProvider);
+    final accounts = authState.accounts;
+
+    if (accounts.isEmpty) {
+      // 계정이 없으면 소셜 로그인 안내
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+            ),
+            title: Row(
+              children: [
+                const Text('ℹ️', style: TextStyle(fontSize: 28)),
+                const SizedBox(width: AppDimensions.spacingM),
+                Expanded(
+                  child: Text(
+                    '저장된 계정 없음',
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Google 또는 Kakao 계정으로 로그인하여\n학습 진행상황을 저장하세요.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  '확인',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.mathBlue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
+    // 계정 선택 다이얼로그
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          ),
+          title: Text(
+            '계정 선택',
+            style: AppTextStyles.headlineSmall.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: accounts.length,
+              itemBuilder: (context, index) {
+                final account = accounts[index];
+                return _buildAccountTile(account);
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                '취소',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  /// 계정 타일
+  Widget _buildAccountTile(Account account) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          await AppHapticFeedback.selectionClick();
+          final authNotifier = ref.read(authProvider.notifier);
+          await authNotifier.switchAccount(account.id);
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.paddingM),
+          margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: AppColors.borderLight,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+          ),
+          child: Row(
+            children: [
+              // 프로필 아이콘
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: AppColors.blueGradient,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    account.name.isNotEmpty
+                        ? account.name[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: AppColors.surface,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacingM),
+              // 계정 정보
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.error_outline, color: AppColors.mathRed, size: 20),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Expanded(
-                      child: Text(
-                        authState.error!,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.mathRed, // GoMath red
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      account.name,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      account.email ?? '게스트 계정',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-
-            const SizedBox(height: AppDimensions.spacingXL),
-
-            // 구분선
-            Row(
-              children: [
-                const Expanded(child: Divider()),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingM),
-                  child: Text(
-                    '소셜 로그인',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-                const Expanded(child: Divider()),
-              ],
-            ),
-
-            const SizedBox(height: AppDimensions.spacingXL),
-
-            // 소셜 로그인 버튼들
-            SocialLoginButton(
-              provider: SocialLoginProvider.google,
-              onPressed: _signInWithGoogle,
-              isLoading: authState.isLoading,
-            ),
-
-            const SizedBox(height: AppDimensions.spacingM),
-
-            SocialLoginButton(
-              provider: SocialLoginProvider.kakao,
-              onPressed: _signInWithKakao,
-              isLoading: authState.isLoading,
-            ),
-
-            const SizedBox(height: AppDimensions.spacingM),
-
-            // Apple 로그인은 iOS에서만 표시
-            if (Platform.isIOS) ...[
-              SocialLoginButton(
-                provider: SocialLoginProvider.apple,
-                onPressed: _signInWithApple,
-                isLoading: authState.isLoading,
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 입력 필드
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacingS),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            prefixIcon: Icon(icon),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-              borderSide: BorderSide(color: AppColors.mathBlue, width: 2), // GoMath blue
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 학년 선택
-  Widget _buildGradeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '학년',
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacingS),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.borderLight),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          ),
-          child: DropdownButtonFormField<String>(
-            value: _selectedGrade,
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.all(AppDimensions.paddingL),
-              prefixIcon: Icon(Icons.school_outlined),
-            ),
-            items: _grades.map((grade) {
-              return DropdownMenuItem(
-                value: grade,
-                child: Text(grade),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  _selectedGrade = value;
-                });
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 계정 타입 선택
-  Widget _buildAccountTypeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '계정 유형',
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacingS),
-        Wrap(
-          spacing: AppDimensions.spacingS,
-          children: AccountType.values.map((type) {
-            final isSelected = _selectedAccountType == type;
-
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedAccountType = type;
-                });
-                AppHapticFeedback.lightImpact();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.paddingL,
-                  vertical: AppDimensions.paddingS,
-                ),
+              // 로그인 타입 아이콘
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.paddingS),
                 decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? const LinearGradient(colors: AppColors.blueGradient)
-                      : null,
-                  color: isSelected ? null : AppColors.background,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.mathBlue // GoMath blue
-                        : AppColors.borderLight,
-                  ),
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
-                  _getAccountTypeText(type),
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: isSelected ? AppColors.surface : AppColors.textPrimary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
+                  _getLoginTypeIcon(account.loginType),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  // 이벤트 핸들러들
-
-  void _handleAuth() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    await AppHapticFeedback.mediumImpact();
-
-    final email = _emailController.text.trim();
-    final name = _nameController.text.trim();
-
-    bool success = false;
-
-    if (_isSignUp) {
-      success = await ref.read(authProvider.notifier).signUp(
-        email: email,
-        displayName: name,
-        grade: _selectedGrade,
-        accountType: _selectedAccountType,
-      );
-    } else {
-      success = await ref.read(authProvider.notifier).signIn(email);
-    }
-
-    if (success) {
-      await AppHapticFeedback.success();
-      if (mounted) {
-        Navigator.of(context).pop(); // 인증 성공 시 메인 화면으로
-      }
-    } else {
-      await AppHapticFeedback.error();
-    }
-  }
-
-  void _continueAsGuest() async {
-    await AppHapticFeedback.lightImpact();
-
-    // 게스트 계정 생성
-    final success = await ref.read(authProvider.notifier).signUp(
-      email: 'guest@mathlab.com',
-      displayName: '게스트',
-      grade: _selectedGrade,
-      accountType: AccountType.student,
-    );
-
-    if (success && mounted) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  // ==================== 소셜 로그인 핸들러 ====================
-
-  void _signInWithGoogle() async {
-    await AppHapticFeedback.mediumImpact();
-
-    final success = await ref.read(authProvider.notifier).signInWithGoogle();
-
-    if (success) {
-      await AppHapticFeedback.success();
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } else {
-      await AppHapticFeedback.error();
-    }
-  }
-
-  void _signInWithKakao() async {
-    await AppHapticFeedback.mediumImpact();
-
-    final success = await ref.read(authProvider.notifier).signInWithKakao();
-
-    if (success) {
-      await AppHapticFeedback.success();
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } else {
-      await AppHapticFeedback.error();
-    }
-  }
-
-  void _signInWithApple() async {
-    await AppHapticFeedback.mediumImpact();
-
-    final success = await ref.read(authProvider.notifier).signInWithApple();
-
-    if (success) {
-      await AppHapticFeedback.success();
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } else {
-      await AppHapticFeedback.error();
-    }
-  }
-
-  // 유틸리티 메서드들
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return '이메일을 입력해주세요';
-    }
-    if (!value.contains('@')) {
-      return '올바른 이메일 형식이 아닙니다';
-    }
-    return null;
-  }
-
-  String? _validateName(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return '이름을 입력해주세요';
-    }
-    if (value.trim().length < 2) {
-      return '이름은 2글자 이상이어야 합니다';
-    }
-    return null;
-  }
-
-  String _getAccountTypeText(AccountType type) {
-    switch (type) {
-      case AccountType.student:
-        return '학생 👨‍🎓';
-      case AccountType.parent:
-        return '학부모 👨‍👩‍👧‍👦';
-      case AccountType.teacher:
-        return '선생님 👨‍🏫';
-      case AccountType.admin:
-        return '관리자 👨‍💼';
-    }
-  }
-}
-
-/// 사용자 전환 화면 (프로필에서 접근)
-class UserSwitchScreen extends ConsumerWidget {
-  const UserSwitchScreen({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-
-    return Scaffold(
-      backgroundColor: AppColors.mathBlue, // GoMath blue
-      appBar: AppBar(
-        title: const Text('계정 전환', style: TextStyle(color: AppColors.surface)),
-        backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: AppColors.surface),
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: AppColors.mathBlueGradient, // GoMath blue gradient
+            ],
           ),
         ),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(AppDimensions.paddingL),
-          itemCount: authState.availableAccounts.length + 1,
-          itemBuilder: (context, index) {
-            if (index == authState.availableAccounts.length) {
-              // 새 계정 추가 버튼
-              return Container(
-                margin: const EdgeInsets.only(top: AppDimensions.spacingL),
-                child: AnimatedButton(
-                  text: '새 계정 추가',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AuthScreen(),
-                      ),
-                    );
-                  },
-                  backgroundColor: AppColors.mathPurple, // GoMath purple
-                  icon: Icons.add,
-                ),
-              );
-            }
-
-            final account = authState.availableAccounts[index];
-            final isCurrent = account.id == authState.currentAccount?.id;
-
-            return DuolingoCard(
-              margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
-              onTap: isCurrent
-                  ? null
-                  : () async {
-                      await AppHapticFeedback.selectionClick();
-                      await ref.read(authProvider.notifier).switchAccount(account.id);
-                      Navigator.of(context).pop();
-                    },
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Color(int.parse(account.accountColor.replaceFirst('#', '0xFF'))),
-                  radius: 24,
-                  child: Text(
-                    account.avatarText,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.surface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  account.displayName,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                subtitle: Text(
-                  '${account.email}\n${account.accountTypeText}',
-                  style: AppTextStyles.bodySmall,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-                trailing: isCurrent
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppDimensions.paddingS,
-                          vertical: AppDimensions.spacingXS,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: AppColors.greenGradient),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                        ),
-                        child: Text(
-                          '현재',
-                          style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.surface,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )
-                    : const Icon(Icons.arrow_forward_ios, size: 16),
-                isThreeLine: true,
-              ),
-            );
-          },
-        ),
       ),
     );
   }
 
-  /// 슬라이드 업 애니메이션으로 페이지 이동
-  static PageRoute slideUpRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const AuthScreen(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-
-        var tween = Tween(begin: begin, end: end).chain(
-          CurveTween(curve: curve),
-        );
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 300),
-    );
+  /// 로그인 타입 아이콘
+  String _getLoginTypeIcon(LoginType type) {
+    switch (type) {
+      case LoginType.google:
+        return '🔵';
+      case LoginType.kakao:
+        return '💬';
+      case LoginType.guest:
+        return '👤';
+    }
   }
 }
