@@ -333,35 +333,38 @@ class _HintItem extends StatelessWidget {
         ),
         const SizedBox(width: AppDimensions.spacingM),
         // 잠금 해제 버튼
-        ElevatedButton(
-          onPressed: canUnlock ? onUnlock : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: canUnlock
-                ? AppColors.mathPurple
-                : AppColors.disabled,
-            foregroundColor: AppColors.surface,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.paddingM,
-              vertical: AppDimensions.paddingS,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-            ),
-            elevation: 0,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('🔶', style: TextStyle(fontSize: 14)),
-              const SizedBox(width: 4),
-              Text(
-                '${HintProvider.hintCost}',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.surface,
-                  fontWeight: FontWeight.bold,
-                ),
+        SizedBox(
+          width: 80,
+          child: ElevatedButton(
+            onPressed: canUnlock ? onUnlock : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: canUnlock
+                  ? AppColors.mathPurple
+                  : AppColors.disabled,
+              foregroundColor: AppColors.surface,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.paddingM,
+                vertical: AppDimensions.paddingS,
               ),
-            ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+              ),
+              elevation: 0,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🔶', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 4),
+                Text(
+                  '${HintProvider.hintCost}',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.surface,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
