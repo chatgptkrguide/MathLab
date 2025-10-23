@@ -59,125 +59,82 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 듀오링고 스타일 헤더 (개선된 디자인)
+  /// 듀오링고 스타일 헤더 (더 깔끔하게 개선)
   Widget _buildHeader(User user) {
     return SafeArea(
       bottom: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(
-          AppDimensions.paddingL,
-          AppDimensions.paddingL,
-          AppDimensions.paddingL,
-          AppDimensions.paddingL + 4,
-        ),
+        padding: const EdgeInsets.all(AppDimensions.paddingL),
         decoration: BoxDecoration(
           color: AppColors.surface,
           boxShadow: [
             BoxShadow(
-              color: AppColors.borderLight.withValues(alpha: 0.5),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: AppColors.borderLight.withValues(alpha: 0.3),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
-        clipBehavior: Clip.none, // 별/원 짤림 방지
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 사용자 정보
+                // 프로필 아바타
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: AppColors.mathButtonGradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      user.name.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(
+                        color: AppColors.surface,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 프로필 아바타 (더 크게)
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: AppColors.blueGradient,
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.mathBlue.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                      Text(
+                        user.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
-                        child: Center(
-                          child: Text(
-                            user.name.substring(0, 1).toUpperCase(),
-                            style: const TextStyle(
-                              color: AppColors.surface,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: AppDimensions.spacingM + 4),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              user.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.5,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.mathTeal.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Level ${user.level}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.mathTeal,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 2),
+                      Text(
+                        'Level ${user.level}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
                 ),
-                // 스트릭 & 하트 (여백 추가)
-                Padding(
-                  padding: const EdgeInsets.only(left: AppDimensions.spacingS),
-                  child: Row(
-                    children: [
-                      _buildDuoStatBadge('🔥', '${user.streakDays}', AppColors.mathOrange),
-                      const SizedBox(width: AppDimensions.spacingS),
-                      _buildDuoStatBadge('❤️', '${user.hearts}', AppColors.mathRed),
-                    ],
-                  ),
-                ),
+                // 스트릭 & 하트
+                _buildDuoStatBadge('🔥', '${user.streakDays}', AppColors.mathOrange),
+                const SizedBox(width: AppDimensions.spacingS),
+                _buildDuoStatBadge('❤️', '${user.hearts}', AppColors.mathRed),
               ],
             ),
-            const SizedBox(height: AppDimensions.paddingL + 4),
+            const SizedBox(height: AppDimensions.paddingM),
             // XP 진행률 바
             _buildDuoProgressBar(user),
           ],
@@ -223,50 +180,58 @@ class HomeScreen extends ConsumerWidget {
     final xpNeeded = user.xpToNextLevel;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Daily Goal',
-              style: TextStyle(
-                fontSize: 13,
+            Text(
+              '레벨 ${user.level + 1}까지',
+              style: const TextStyle(
+                fontSize: 12,
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
             Text(
-              '$xpNeeded XP to go',
+              '$xpNeeded XP',
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         // 듀오링고 스타일 진행률 바
         Stack(
           children: [
             // 배경 바
             Container(
-              height: 16,
+              height: 14,
               decoration: BoxDecoration(
                 color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             // 진행 바 (GoMath 틸 색상)
             FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: progress.clamp(0.05, 1.0), // 최소 5% 표시
+              widthFactor: progress.clamp(0.05, 1.0),
               child: Container(
-                height: 16,
+                height: 14,
                 decoration: BoxDecoration(
-                  color: AppColors.mathTeal,
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.mathTeal.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
               ),
             ),
