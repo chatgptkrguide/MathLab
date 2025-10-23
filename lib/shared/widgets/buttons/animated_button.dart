@@ -12,6 +12,7 @@ class AnimatedButton extends StatefulWidget {
   final bool isEnabled;
   final Color backgroundColor;
   final Color shadowColor;
+  final Color textColor;
   final IconData? icon;
   final double? width;
   final double? height;
@@ -24,6 +25,7 @@ class AnimatedButton extends StatefulWidget {
     this.isEnabled = true,
     this.backgroundColor = AppColors.mathButtonBlue, // GoMath button blue
     this.shadowColor = AppColors.mathButtonBlueDark, // Darker mathButtonBlue (GoMath 20% darker for 3D shadow)
+    this.textColor = AppColors.surface, // 기본값: 흰색
     this.icon,
     this.width,
     this.height,
@@ -163,7 +165,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
         children: [
           Icon(
             widget.icon,
-            color: AppColors.surface,
+            color: widget.textColor,
             size: AppDimensions.iconM,
           ),
           const SizedBox(width: AppDimensions.spacingS),
@@ -172,7 +174,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
             style: AppTextStyles.buttonText.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.surface,
+              color: widget.textColor,
             ),
           ),
         ],
@@ -184,7 +186,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
       style: AppTextStyles.buttonText.copyWith(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: AppColors.surface,
+        color: widget.textColor,
       ),
     );
   }
