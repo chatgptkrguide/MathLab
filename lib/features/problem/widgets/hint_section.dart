@@ -30,14 +30,14 @@ class HintSection extends ConsumerWidget {
 
     return FadeInWidget(
       child: Container(
-        margin: const EdgeInsets.only(top: AppDimensions.spacingL),
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
+        margin: const EdgeInsets.only(top: AppDimensions.spacingM),
+        padding: const EdgeInsets.all(AppDimensions.paddingM),
         decoration: BoxDecoration(
-          color: AppColors.mathPurple.withOpacity(0.05),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
-            color: AppColors.mathPurple.withOpacity(0.2),
-            width: 2,
+            color: AppColors.borderLight,
+            width: 1.5,
           ),
         ),
         child: Column(
@@ -46,18 +46,8 @@ class HintSection extends ConsumerWidget {
             // 헤더
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.paddingS),
-                  decoration: BoxDecoration(
-                    color: AppColors.mathPurple.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  ),
-                  child: const Text(
-                    '💡',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.spacingM),
+                const Text('💡', style: TextStyle(fontSize: 24)),
+                const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,12 +56,10 @@ class HintSection extends ConsumerWidget {
                         '힌트',
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.mathPurple,
                         ),
                       ),
-                      const SizedBox(height: 2),
                       Text(
-                        '${_getUnlockedCount(ref)}/${problem.hints!.length} 잠금 해제',
+                        '${_getUnlockedCount(ref)}/${problem.hints!.length} 사용',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -82,20 +70,19 @@ class HintSection extends ConsumerWidget {
                 // 현재 XP 표시
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.paddingM,
-                    vertical: AppDimensions.paddingS,
+                    horizontal: 10,
+                    vertical: 6,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.mathOrange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('🔶', style: TextStyle(fontSize: 16)),
+                      const Text('🔶', style: TextStyle(fontSize: 14)),
                       const SizedBox(width: 4),
                       Text(
-                        '$userXP XP',
+                        '$userXP',
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.mathOrange,
@@ -107,7 +94,7 @@ class HintSection extends ConsumerWidget {
               ],
             ),
 
-            const SizedBox(height: AppDimensions.spacingL),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // 힌트 리스트
             ...List.generate(
@@ -248,44 +235,44 @@ class _HintItem extends StatelessWidget {
   }
 
   Widget _buildUnlockedHint() {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 힌트 번호
+        // 체크 아이콘
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 4,
+          width: 24,
+          height: 24,
+          decoration: const BoxDecoration(
+            color: AppColors.successGreen,
+            shape: BoxShape.circle,
           ),
-          decoration: BoxDecoration(
-            color: AppColors.successGreen.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+          child: const Icon(
+            Icons.check,
+            color: AppColors.surface,
+            size: 16,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+        ),
+        const SizedBox(width: AppDimensions.spacingS),
+        // 힌트 내용
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.check_circle,
-                color: AppColors.successGreen,
-                size: 16,
-              ),
-              const SizedBox(width: 4),
               Text(
                 '힌트 ${hintIndex + 1}',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.successGreen,
-                  fontWeight: FontWeight.bold,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                hintText,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  height: 1.4,
                 ),
               ),
             ],
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacingM),
-        // 힌트 내용
-        Text(
-          hintText,
-          style: AppTextStyles.bodyMedium.copyWith(
-            height: 1.5,
           ),
         ),
       ],
@@ -294,21 +281,23 @@ class _HintItem extends StatelessWidget {
 
   Widget _buildLockedHint() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 자물쇠 아이콘
         Container(
-          padding: const EdgeInsets.all(AppDimensions.paddingS),
+          width: 24,
+          height: 24,
           decoration: BoxDecoration(
-            color: AppColors.disabled.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+            color: AppColors.borderLight,
+            shape: BoxShape.circle,
           ),
           child: const Icon(
-            Icons.lock,
+            Icons.lock_outline,
             color: AppColors.textSecondary,
-            size: 20,
+            size: 14,
           ),
         ),
-        const SizedBox(width: AppDimensions.spacingM),
+        const SizedBox(width: AppDimensions.spacingS),
         // 힌트 정보
         Expanded(
           child: Column(
@@ -316,14 +305,14 @@ class _HintItem extends StatelessWidget {
             children: [
               Text(
                 '힌트 ${hintIndex + 1}',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
-                '잠금 해제하려면 ${HintProvider.hintCost} XP가 필요합니다',
+                '${HintProvider.hintCost} XP 필요',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -331,35 +320,31 @@ class _HintItem extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: AppDimensions.spacingM),
         // 잠금 해제 버튼
         SizedBox(
-          width: 80,
+          height: 32,
           child: ElevatedButton(
             onPressed: canUnlock ? onUnlock : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: canUnlock
-                  ? AppColors.mathPurple
+                  ? AppColors.mathOrange
                   : AppColors.disabled,
               foregroundColor: AppColors.surface,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.paddingM,
-                vertical: AppDimensions.paddingS,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                borderRadius: BorderRadius.circular(8),
               ),
               elevation: 0,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('🔶', style: TextStyle(fontSize: 14)),
+                const Text('🔶', style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
                 Text(
                   '${HintProvider.hintCost}',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.surface,
+                  style: const TextStyle(
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
