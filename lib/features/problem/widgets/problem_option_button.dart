@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
+import '../../../shared/widgets/math/math_text.dart';
 
 /// 문제 선택지 버튼
 ///
@@ -230,7 +231,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                   const SizedBox(width: 14),
                   // 선택지 텍스트
                   Expanded(
-                    child: Text(
+                    child: MathText(
                       widget.optionText,
                       style: TextStyle(
                         color: _textColor,
@@ -238,8 +239,8 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                         fontSize: 16,
                         height: 1.4,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                      fontSize: 16,
+                      color: _textColor,
                     ),
                   ),
                   // 정답/오답 아이콘

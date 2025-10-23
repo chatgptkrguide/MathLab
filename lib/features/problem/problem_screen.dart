@@ -5,6 +5,7 @@ import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/animations/fade_in_widget.dart';
+import '../../shared/widgets/math/math_text.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
@@ -319,12 +320,13 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   /// 문제 텍스트
   Widget _buildQuestionText() {
     return FadeInWidget(
-      child: Text(
+      child: MathText(
         _currentProblem.question,
         style: AppTextStyles.headlineMedium.copyWith(
           fontWeight: FontWeight.bold,
           height: 1.4,
         ),
+        fontSize: 20,
       ),
     );
   }
