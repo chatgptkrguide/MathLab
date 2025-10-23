@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_account.dart';
 import '../services/local_storage_service.dart';
 import '../services/social_auth_service.dart';
+import '../services/firebase_auth_service.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/logger.dart';
 
@@ -15,6 +16,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   final LocalStorageService _storage = LocalStorageService();
   final SocialAuthService _socialAuth = SocialAuthService();
+  final FirebaseAuthService _firebaseAuth = FirebaseAuthService();
 
   /// 초기화
   Future<void> _initialize() async {
@@ -232,19 +234,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   // ==================== 소셜 로그인 ====================
 
-  /// Google 로그인
+  /// Google 로그인 (Firebase 통합)
   Future<bool> signInWithGoogle() async {
     try {
       state = state.copyWith(isLoading: true);
-      Logger.info('Google 로그인 시도', tag: 'AuthProvider');
+      Logger.info('Google Firebase 로그인 시도', tag: 'AuthProvider');
 
-      final result = await _socialAuth.signInWithGoogle();
+      // Firebase Auth를 통한 Google 로그인
+      final userCredential = await _firebaseAuth.signInWithGoogle();
 
-      if (result == null) {
+      if (userCredential == null) {
         state = state.copyWith(isLoading: false);
         Logger.info('Google 로그인 취소됨', tag: 'AuthProvider');
         return false;
       }
+
+      final firebaseUser = userCredential.user!;
 
       // Google 계정으로 기존 계정이 있는지 확인
       final existingAccounts = await _loadAccounts();
@@ -252,7 +257,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       try {
         existingAccount = existingAccounts.firstWhere(
-          (acc) => acc.email == result.email,
+          (acc) => acc.email == firebaseUser.email,
         );
       } catch (e) {
         // 기존 계정 없음
@@ -260,12 +265,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (existingAccount != null) {
         // 기존 계정으로 로그인
-        return await signIn(existingAccount.email);
+        return await signIn(existingAccount.email!);
       } else {
         // 새 계정 생성
         return await signUp(
-          email: result.email,
-          displayName: result.displayName,
+          email: firebaseUser.email!,
+          displayName: firebaseUser.displayName ?? firebaseUser.email!,
           grade: GameConstants.defaultGrade,
           accountType: AccountType.student,
         );
@@ -345,32 +350,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Apple 로그인
+  /// Apple 로그인 (Firebase 통합)
   Future<bool> signInWithApple() async {
     try {
       state = state.copyWith(isLoading: true);
-      Logger.info('Apple 로그인 시도', tag: 'AuthProvider');
+      Logger.info('Apple Firebase 로그인 시도', tag: 'AuthProvider');
 
-      final result = await _socialAuth.signInWithApple();
+      // Firebase Auth를 통한 Apple 로그인
+      final userCredential = await _firebaseAuth.signInWithApple();
 
-      if (result == null) {
+      if (userCredential == null) {
         state = state.copyWith(isLoading: false);
         Logger.info('Apple 로그인 취소됨', tag: 'AuthProvider');
         return false;
       }
+
+      final firebaseUser = userCredential.user!;
 
       // Apple 계정으로 기존 계정이 있는지 확인
       final existingAccounts = await _loadAccounts();
       UserAccount? existingAccount;
 
       try {
-        if (result.email.isNotEmpty) {
+        if (firebaseUser.email != null && firebaseUser.email!.isNotEmpty) {
           existingAccount = existingAccounts.firstWhere(
-            (acc) => acc.email == result.email,
+            (acc) => acc.email == firebaseUser.email,
           );
         } else {
           existingAccount = existingAccounts.firstWhere(
-            (acc) => acc.id == 'apple_${result.userId}',
+            (acc) => acc.id == 'apple_${firebaseUser.uid}',
           );
         }
       } catch (e) {
@@ -383,8 +391,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         // 새 계정 생성
         return await signUp(
-          email: result.email.isNotEmpty ? result.email : 'apple_${result.userId}@mathlab.com',
-          displayName: result.displayName,
+          email: firebaseUser.email?.isNotEmpty == true
+              ? firebaseUser.email!
+              : 'apple_${firebaseUser.uid}@mathlab.com',
+          displayName: firebaseUser.displayName ?? 'Apple 사용자',
           grade: GameConstants.defaultGrade,
           accountType: AccountType.student,
         );
@@ -408,6 +418,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signOut() async {
     try {
       await _storage.remove('currentAccountId');
+
+      // Firebase 로그아웃
+      await _firebaseAuth.signOut();
 
       // 소셜 로그인도 함께 로그아웃
       await _socialAuth.signOutAll();

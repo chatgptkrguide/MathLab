@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'app/app.dart';
 import 'shared/constants/app_colors.dart';
 
@@ -8,6 +9,9 @@ import 'shared/constants/app_colors.dart';
 void main() async {
   // Flutter 위젯 바인딩 초기화
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase 초기화
+  await Firebase.initializeApp();
 
   // 시스템 UI 설정
   await SystemChrome.setPreferredOrientations([
