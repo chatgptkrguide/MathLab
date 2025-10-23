@@ -32,15 +32,19 @@ class EmptyState extends StatelessWidget {
       builder: (context, constraints) {
         final availableHeight = height ?? constraints.maxHeight;
         final availableWidth = constraints.maxWidth;
+        final paddingValue = isSmallScreen ? 32.0 : 48.0;
+        final minHeightValue = (availableHeight > paddingValue)
+            ? availableHeight - paddingValue
+            : 200.0;
 
         return Container(
-          height: availableHeight > 0 ? availableHeight : null,
-          width: availableWidth,
+          height: availableHeight.isFinite && availableHeight > 0 ? availableHeight : null,
+          width: availableWidth.isFinite ? availableWidth : null,
           padding: EdgeInsets.all(isSmallScreen ? AppDimensions.paddingM : AppDimensions.paddingL),
           child: SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: availableHeight > 0 ? availableHeight - (isSmallScreen ? 32 : 48) : 200,
+                minHeight: minHeightValue,
               ),
               child: IntrinsicHeight(
                 child: Column(

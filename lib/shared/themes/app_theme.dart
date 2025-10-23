@@ -67,13 +67,16 @@ class AppTheme {
           ),
           textStyle: AppTextStyles.buttonText,
           minimumSize: const Size(double.infinity, AppDimensions.buttonHeightL),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.standard,
         ),
       ),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryBlue,
-          side: const BorderSide(color: AppColors.primaryBlue),
+          backgroundColor: Colors.white,
+          side: const BorderSide(color: AppColors.primaryBlue, width: 2),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
             vertical: AppDimensions.paddingM,
@@ -83,12 +86,15 @@ class AppTheme {
           ),
           textStyle: AppTextStyles.buttonText,
           minimumSize: const Size(double.infinity, AppDimensions.buttonHeightL),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.standard,
         ),
       ),
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryBlue,
+          backgroundColor: Colors.white.withValues(alpha: 0.1),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
             vertical: AppDimensions.paddingM,
@@ -97,6 +103,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
           textStyle: AppTextStyles.buttonText,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.standard,
         ),
       ),
 

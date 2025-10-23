@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 로고 - 수학 기호와 주판
+                  // 로고 - 모던한 수학 심볼
                   Stack(
                     alignment: Alignment.center,
                     children: [
@@ -109,72 +109,99 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 180,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                             colors: [
-                              AppColors.mathButtonBlue, // GoMath primary blue
-                              AppColors.mathPurple, // GoMath purple
+                              Colors.white.withValues(alpha: 0.3),
+                              Colors.white.withValues(alpha: 0.1),
                             ],
                           ),
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            width: 3,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: Colors.white.withValues(alpha: 0.2),
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
                           ],
                         ),
                       ),
-                      // 주판 이모지
-                      const Text(
-                        '🧮',
-                        style: TextStyle(fontSize: 90),
+                      // 중심 수식 기호
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // π 기호
+                          Text(
+                            'π',
+                            style: TextStyle(
+                              fontSize: 80,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: AppColors.mathButtonBlue.withValues(alpha: 0.5),
+                                  blurRadius: 15,
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 작은 수식
+                          Text(
+                            '∫ f(x) dx',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontStyle: FontStyle.italic,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
                       ),
-                      // 수학 기호들
+                      // 궤도 효과 (작은 기호들)
                       Positioned(
-                        top: 10,
-                        right: 20,
-                        child: Text(
-                          '➕',
-                          style: TextStyle(
-                            fontSize: 30,
-                            shadows: [
-                              Shadow(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                blurRadius: 10,
-                              ),
-                            ],
+                        top: 20,
+                        right: 30,
+                        child: Transform.rotate(
+                          angle: 0.3,
+                          child: Text(
+                            '∑',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white.withValues(alpha: 0.7),
+                            ),
                           ),
                         ),
                       ),
                       Positioned(
-                        bottom: 15,
-                        left: 15,
+                        bottom: 25,
+                        left: 25,
+                        child: Transform.rotate(
+                          angle: -0.2,
+                          child: Text(
+                            '√',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 35,
+                        left: 35,
                         child: Text(
-                          '✖️',
+                          '∞',
                           style: TextStyle(
                             fontSize: 28,
-                            shadows: [
-                              Shadow(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 15,
-                        left: 25,
-                        child: Text(
-                          '➗',
-                          style: TextStyle(
-                            fontSize: 26,
-                            shadows: [
-                              Shadow(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                blurRadius: 10,
-                              ),
-                            ],
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white.withValues(alpha: 0.6),
                           ),
                         ),
                       ),

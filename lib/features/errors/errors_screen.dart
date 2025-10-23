@@ -75,34 +75,33 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     return Scaffold(
       backgroundColor: AppColors.mathBlue, // GoMath 파란색
       body: SafeArea(
-          child: ResponsiveWrapper(
-            child: Column(
-              children: [
-                _buildGoMathHeader(context),
-                Expanded(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildHeader(),
-                        _buildStatsGrid(errorStats),
-                        _buildActionButtons(filteredNotes),
-                        _buildFilterTabs(),
-                        Expanded(child: _buildErrorNotesList(userErrorNotes, filteredNotes)),
-                        if (filteredNotes.isEmpty)
-                          Flexible(child: _buildTips()),
-                      ],
+        child: ResponsiveWrapper(
+          child: Column(
+            children: [
+              _buildGoMathHeader(context),
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
                     ),
                   ),
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      _buildStatsGrid(errorStats),
+                      _buildActionButtons(filteredNotes),
+                      _buildFilterTabs(),
+                      Expanded(child: _buildErrorNotesList(userErrorNotes, filteredNotes)),
+                      if (filteredNotes.isEmpty)
+                        Flexible(child: _buildTips()),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -575,7 +574,6 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
             ),
           ),
         ),
-      ),
     );
   }
 
