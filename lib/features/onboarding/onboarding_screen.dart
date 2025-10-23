@@ -51,8 +51,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final List<OnboardingPageData> _pages = const [
     OnboardingPageData(
       emoji: '📚',
-      title: 'MathLab에 오신 것을\n환영합니다!',
-      description: '매일 짧은 시간 동안 꾸준히 학습하며\n수학 실력을 키워보세요',
+      title: 'GoMath에 오신 것을\n환영합니다!',
+      description: '매일 5분, 수학이 쉬워지는\n즐거운 학습 여정을 시작해요',
       gradient: AppColors.mathBlueGradient,
     ),
     OnboardingPageData(

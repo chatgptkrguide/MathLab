@@ -332,7 +332,7 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('개인정보 처리방침'),
         content: const SingleChildScrollView(
           child: Text(
-            'MathLab 개인정보 처리방침\n\n'
+            'GoMath 개인정보 처리방침\n\n'
             '1. 수집하는 개인정보\n'
             '- 이메일 주소, 닉네임, 프로필 사진\n'
             '- 학습 진행 상황 및 통계 데이터\n\n'
@@ -344,7 +344,7 @@ class SettingsScreen extends ConsumerWidget {
             '4. 개인정보의 제3자 제공\n'
             '- 원칙적으로 제3자에게 제공하지 않습니다\n\n'
             '5. 개인정보 보호책임자\n'
-            '- 이메일: privacy@mathlab.com\n\n'
+            '- 이메일: privacy@gomath.com\n\n'
             '※ 본 방침은 2024년 1월 1일부터 시행됩니다.',
             style: TextStyle(fontSize: 14),
           ),
@@ -366,9 +366,9 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('이용약관'),
         content: const SingleChildScrollView(
           child: Text(
-            'MathLab 이용약관\n\n'
+            'GoMath 이용약관\n\n'
             '제1조 (목적)\n'
-            '본 약관은 MathLab이 제공하는 서비스의 이용과 관련하여 '
+            '본 약관은 GoMath가 제공하는 서비스의 이용과 관련하여 '
             '회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.\n\n'
             '제2조 (서비스의 내용)\n'
             '1. 온라인 수학 학습 콘텐츠 제공\n'

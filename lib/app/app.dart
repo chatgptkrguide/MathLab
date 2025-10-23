@@ -7,14 +7,14 @@ import '../features/onboarding/onboarding_screen.dart';
 import 'auth_wrapper.dart';
 import 'splash_screen.dart';
 
-/// MathLab 앱의 메인 위젯
+/// GoMath 앱의 메인 위젯
 class MathLabApp extends StatelessWidget {
   const MathLabApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MathLab',
+      title: 'GoMath',
       debugShowCheckedModeBanner: false,
 
       // 테마 설정
