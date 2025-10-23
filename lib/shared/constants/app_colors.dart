@@ -16,6 +16,7 @@ class AppColors {
   static const Color mathOrange = Color(0xFFFF9600); // 스트릭 오렌지
   static const Color mathOrangeDark = Color(0xFFE68600); // 어두운 오렌지
   static const Color mathYellow = Color(0xFFFFD900); // 별 노란색
+  static const Color mathYellowDark = Color(0xFFECC700); // 어두운 노란색
   static const Color mathRed = Color(0xFFFF4B4B); // 에러 빨간색
   static const Color mathRedDark = Color(0xFFE03B3B); // 어두운 빨간색
   static const Color mathPurple = Color(0xFFCE82FF); // 힌트 퍼플

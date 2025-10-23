@@ -210,54 +210,33 @@ class _SplashScreenState extends State<SplashScreen>
 
                   const SizedBox(height: AppDimensions.spacingXXL),
 
-                  // 앱 이름 with shadow
+                  // 앱 이름
                   Text(
-                    'MathLab',
+                    'GoMath',
                     style: AppTextStyles.displayLarge.copyWith(
                       color: AppColors.surface,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 3,
-                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                      fontSize: 52,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          offset: const Offset(0, 4),
-                          blurRadius: 10,
+                          color: Colors.black.withValues(alpha: 0.25),
+                          offset: const Offset(0, 3),
+                          blurRadius: 8,
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: AppDimensions.spacingM),
+                  const SizedBox(height: AppDimensions.spacingS),
 
-                  // 서브 타이틀 with gradient effect
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingL,
-                      vertical: AppDimensions.paddingS,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.surface.withValues(alpha: 0.3),
-                          AppColors.surface.withValues(alpha: 0.1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('🎯', style: TextStyle(fontSize: 20)),
-                        const SizedBox(width: 8),
-                        Text(
-                          '매일 성장하는 수학 학습',
-                          style: AppTextStyles.titleMedium.copyWith(
-                            color: AppColors.surface,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                  // 서브 타이틀
+                  Text(
+                    '매일 5분, 수학이 쉬워진다',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.surface.withValues(alpha: 0.9),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
                     ),
                   ),
 

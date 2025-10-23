@@ -184,36 +184,45 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppDimensions.spacingL),
+          const SizedBox(height: AppDimensions.spacingM),
           // Duolingo-style progress bar
           Stack(
             children: [
               // Background bar
               Container(
-                height: 16,
+                height: 12,
                 decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.surface.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              // Progress bar
-              FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: _progress.clamp(0.01, 1.0),
-                child: TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOutCubic,
-                  tween: Tween(begin: 0.0, end: _progress),
-                  builder: (context, value, child) {
-                    return Container(
-                      height: 16,
+              // Progress bar with animation
+              TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOutCubic,
+                tween: Tween(begin: 0.0, end: _progress),
+                builder: (context, value, child) {
+                  return FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: value.clamp(0.05, 1.0),
+                    child: Container(
+                      height: 12,
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [AppColors.mathYellow, AppColors.mathYellowDark],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mathYellow.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
