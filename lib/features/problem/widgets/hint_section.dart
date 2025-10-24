@@ -21,8 +21,29 @@ class HintSection extends ConsumerStatefulWidget {
   ConsumerState<HintSection> createState() => _HintSectionState();
 }
 
-class _HintSectionState extends ConsumerState<HintSection> {
+class _HintSectionState extends ConsumerState<HintSection>
+    with SingleTickerProviderStateMixin {
   bool _isExpanded = false; // 기본적으로 접혀있음
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +82,11 @@ class _HintSectionState extends ConsumerState<HintSection> {
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               child: Row(
                 children: [
-                  const Text('💡', style: TextStyle(fontSize: 24)),
+                  // 펄스 애니메이션이 적용된 lightbulb
+                  ScaleTransition(
+                    scale: _pulseAnimation,
+                    child: const Text('💡', style: TextStyle(fontSize: 24)),
+                  ),
                   const SizedBox(width: AppDimensions.spacingS),
                   Expanded(
                     child: Column(
@@ -237,7 +262,7 @@ class _HintSectionState extends ConsumerState<HintSection> {
 }
 
 /// 개별 힌트 아이템
-class _HintItem extends StatelessWidget {
+class _HintItem extends StatefulWidget {
   final Problem problem;
   final int hintIndex;
   final String hintText;
@@ -255,68 +280,109 @@ class _HintItem extends StatelessWidget {
   });
 
   @override
+  State<_HintItem> createState() => _HintItemState();
+}
+
+class _HintItemState extends State<_HintItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _buttonController;
+  late Animation<double> _buttonAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _buttonController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _buttonAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _buttonController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _buttonController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: isUnlocked
+        color: widget.isUnlocked
             ? AppColors.surface
-            : AppColors.disabled.withOpacity(0.1),
+            : AppColors.disabled.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(
-          color: isUnlocked
-              ? AppColors.mathPurple.withOpacity(0.3)
+          color: widget.isUnlocked
+              ? AppColors.mathPurple.withValues(alpha: 0.3)
               : AppColors.borderLight,
-          width: isUnlocked ? 2 : 1,
+          width: widget.isUnlocked ? 2 : 1,
         ),
       ),
-      child: isUnlocked ? _buildUnlockedHint() : _buildLockedHint(),
+      child: widget.isUnlocked ? _buildUnlockedHint() : _buildLockedHint(),
     );
   }
 
   Widget _buildUnlockedHint() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 체크 아이콘
-        Container(
-          width: 24,
-          height: 24,
-          decoration: const BoxDecoration(
-            color: AppColors.successGreen,
-            shape: BoxShape.circle,
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(20 * (1 - value), 0),
+            child: child,
           ),
-          child: const Icon(
-            Icons.check,
-            color: AppColors.surface,
-            size: 16,
+        );
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 체크 아이콘
+          Container(
+            width: 24,
+            height: 24,
+            decoration: const BoxDecoration(
+              color: AppColors.successGreen,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.check,
+              color: AppColors.surface,
+              size: 16,
+            ),
           ),
-        ),
-        const SizedBox(width: AppDimensions.spacingS),
-        // 힌트 내용
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '힌트 ${hintIndex + 1}',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
+          const SizedBox(width: AppDimensions.spacingS),
+          // 힌트 내용
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '힌트 ${widget.hintIndex + 1}',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                hintText,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  height: 1.4,
+                const SizedBox(height: 4),
+                Text(
+                  widget.hintText,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    height: 1.4,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -345,7 +411,7 @@ class _HintItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '힌트 ${hintIndex + 1}',
+                '힌트 ${widget.hintIndex + 1}',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.w600,
@@ -361,34 +427,41 @@ class _HintItem extends StatelessWidget {
             ],
           ),
         ),
-        // 잠금 해제 버튼
-        ElevatedButton(
-          onPressed: canUnlock ? onUnlock : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: canUnlock
-                ? AppColors.mathOrange
-                : AppColors.disabled,
-            foregroundColor: AppColors.surface,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            minimumSize: const Size(0, 32),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            elevation: 0,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('🔶', style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 4),
-              Text(
-                '${HintProvider.hintCost}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
+        // 잠금 해제 버튼 (Scale animation)
+        ScaleTransition(
+          scale: _buttonAnimation,
+          child: ElevatedButton(
+            onPressed: widget.canUnlock ? () async {
+              await _buttonController.forward();
+              await _buttonController.reverse();
+              widget.onUnlock();
+            } : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: widget.canUnlock
+                  ? AppColors.mathOrange
+                  : AppColors.disabled,
+              foregroundColor: AppColors.surface,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              minimumSize: const Size(0, 32),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-            ],
+              elevation: 0,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🔶', style: TextStyle(fontSize: 12)),
+                const SizedBox(width: 4),
+                Text(
+                  '${HintProvider.hintCost}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
