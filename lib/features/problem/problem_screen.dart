@@ -79,7 +79,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   void _setupAnimations() {
     _transitionController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
 
@@ -91,7 +91,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.3, 0),
+      begin: const Offset(1.0, 0.0), // 오른쪽에서 시작
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
@@ -704,6 +704,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   /// 다음 문제
   void _nextProblem() async {
+    // 페이드 아웃 애니메이션
+    await _transitionController.reverse(from: 1.0);
+
+    // 상태 업데이트
     setState(() {
       _currentProblemIndex++;
       _selectedAnswerIndex = null;
@@ -721,9 +725,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // 다음 문제의 힌트 시스템 초기화
     ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
 
-    // 전환 애니메이션
-    await _transitionController.reverse();
-    await _transitionController.forward();
+    // 페이드 인 애니메이션
+    await _transitionController.forward(from: 0.0);
   }
 
   /// 결과 확인
