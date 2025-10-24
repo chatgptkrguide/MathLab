@@ -95,10 +95,17 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   }
 
   @override
+  void deactivate() {
+    // 힌트 시스템 종료 (dispose 전에 호출됨)
+    if (mounted) {
+      ref.read(hintProvider.notifier).endProblem();
+    }
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _transitionController.dispose();
-    // 힌트 시스템 종료
-    ref.read(hintProvider.notifier).endProblem();
     super.dispose();
   }
 
@@ -108,10 +115,12 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        _showExitDialog();
-        return false; // 뒤로가기 막고 다이얼로그 표시
+    return PopScope(
+      canPop: false, // 뒤로가기 막기
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _showExitDialog(); // 뒤로가기 시 다이얼로그 표시
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.mathBlue, // GoMath 파란색

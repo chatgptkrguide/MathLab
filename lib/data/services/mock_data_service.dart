@@ -358,10 +358,11 @@ class MockDataService {
   /// 기초 산술 문제 생성
   List<Problem> generateBasicArithmeticProblems(int count) {
     final problems = <Problem>[];
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
       problems.add(Problem(
-        id: 'basic_${DateTime.now().millisecondsSinceEpoch}_$i',
+        id: 'basic_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
         question: i % 3 == 0
@@ -387,10 +388,11 @@ class MockDataService {
   /// 대수 문제 생성
   List<Problem> generateAlgebraProblems(int count) {
     final problems = <Problem>[];
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
       problems.add(Problem(
-        id: 'algebra_${DateTime.now().millisecondsSinceEpoch}_$i',
+        id: 'algebra_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
         question: 'x + ${3 + i} = ${10 + i}일 때, x = ?',
@@ -417,10 +419,11 @@ class MockDataService {
   /// 기하 문제 생성
   List<Problem> generateGeometryProblems(int count) {
     final problems = <Problem>[];
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
       problems.add(Problem(
-        id: 'geometry_${DateTime.now().millisecondsSinceEpoch}_$i',
+        id: 'geometry_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
         question: '한 변의 길이가 ${4 + i}cm인 정사각형의 넓이는?',
@@ -447,6 +450,7 @@ class MockDataService {
   /// 통계 문제 생성
   List<Problem> generateStatisticsProblems(int count) {
     final problems = <Problem>[];
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
       final nums = [5 + i, 7 + i, 9 + i, 11 + i];
@@ -454,7 +458,7 @@ class MockDataService {
       final avg = sum ~/ nums.length;
 
       problems.add(Problem(
-        id: 'stats_${DateTime.now().millisecondsSinceEpoch}_$i',
+        id: 'stats_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
         question: '다음 수의 평균을 구하시오: ${nums.join(', ')}',
