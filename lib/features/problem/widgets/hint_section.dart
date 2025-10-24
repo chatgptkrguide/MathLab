@@ -8,8 +8,8 @@ import '../../../shared/utils/haptic_feedback.dart';
 import '../../../shared/widgets/animations/fade_in_widget.dart';
 
 /// 힌트 섹션 위젯
-/// 문제 풀이 중 힌트를 표시하고 잠금 해제하는 UI
-class HintSection extends ConsumerWidget {
+/// 문제 풀이 중 힌트를 표시하고 잠금 해제하는 UI (접기/펼치기 가능)
+class HintSection extends ConsumerStatefulWidget {
   final Problem problem;
 
   const HintSection({
@@ -18,9 +18,16 @@ class HintSection extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HintSection> createState() => _HintSectionState();
+}
+
+class _HintSectionState extends ConsumerState<HintSection> {
+  bool _isExpanded = false; // 기본적으로 접혀있음
+
+  @override
+  Widget build(BuildContext context) {
     // 힌트가 없으면 표시하지 않음
-    if (problem.hints == null || problem.hints!.isEmpty) {
+    if (widget.problem.hints == null || widget.problem.hints!.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -43,76 +50,104 @@ class HintSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 헤더
-            Row(
-              children: [
-                const Text('💡', style: TextStyle(fontSize: 24)),
-                const SizedBox(width: AppDimensions.spacingS),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '힌트',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
+            // 헤더 (클릭 가능)
+            InkWell(
+              onTap: () async {
+                await AppHapticFeedback.selectionClick();
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+              child: Row(
+                children: [
+                  const Text('💡', style: TextStyle(fontSize: 24)),
+                  const SizedBox(width: AppDimensions.spacingS),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '힌트',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${_getUnlockedCount(ref)}/${problem.hints!.length} 사용',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                        Text(
+                          '${_getUnlockedCount()}/${widget.problem.hints!.length} 사용',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                // 현재 XP 표시
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.mathOrange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Text('🔶', style: TextStyle(fontSize: 14)),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$userXP',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.mathOrange,
+                  // 현재 XP 표시
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.mathOrange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('🔶', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$userXP',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.mathOrange,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: AppDimensions.spacingS),
+                  // 펼침/접기 아이콘
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 300),
+                    child: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
-            const SizedBox(height: AppDimensions.spacingM),
+            // 힌트 리스트 (애니메이션)
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: _isExpanded
+                  ? Column(
+                      children: [
+                        const SizedBox(height: AppDimensions.spacingM),
+                        ...List.generate(
+                          widget.problem.hints!.length,
+                          (index) {
+                            // hintState를 통해 unlock 여부 확인
+                            final hintKey = '${widget.problem.id}_$index';
+                            final isUnlocked = hintState.unlockedHints.contains(hintKey);
 
-            // 힌트 리스트
-            ...List.generate(
-              problem.hints!.length,
-              (index) {
-                // hintState를 통해 unlock 여부 확인
-                final hintKey = '${problem.id}_$index';
-                final isUnlocked = hintState.unlockedHints.contains(hintKey);
-
-                return _HintItem(
-                  problem: problem,
-                  hintIndex: index,
-                  hintText: problem.hints![index],
-                  isUnlocked: isUnlocked,
-                  canUnlock: userXP >= HintProvider.hintCost,
-                  onUnlock: () => _unlockHint(context, ref, index),
-                );
-              },
+                            return _HintItem(
+                              problem: widget.problem,
+                              hintIndex: index,
+                              hintText: widget.problem.hints![index],
+                              isUnlocked: isUnlocked,
+                              canUnlock: userXP >= HintProvider.hintCost,
+                              onUnlock: () => _unlockHint(context, index),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         ),
@@ -120,12 +155,12 @@ class HintSection extends ConsumerWidget {
     );
   }
 
-  int _getUnlockedCount(WidgetRef ref) {
+  int _getUnlockedCount() {
     final hintState = ref.watch(hintProvider);
     int count = 0;
-    for (int i = 0; i < problem.hints!.length; i++) {
+    for (int i = 0; i < widget.problem.hints!.length; i++) {
       // hintState를 통해 unlock 여부 확인
-      final hintKey = '${problem.id}_$i';
+      final hintKey = '${widget.problem.id}_$i';
       if (hintState.unlockedHints.contains(hintKey)) {
         count++;
       }
@@ -135,12 +170,11 @@ class HintSection extends ConsumerWidget {
 
   Future<void> _unlockHint(
     BuildContext context,
-    WidgetRef ref,
     int hintIndex,
   ) async {
     final success = await ref
         .read(hintProvider.notifier)
-        .unlockHint(problem, hintIndex);
+        .unlockHint(widget.problem, hintIndex);
 
     if (success) {
       await AppHapticFeedback.success();

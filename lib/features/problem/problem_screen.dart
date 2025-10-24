@@ -60,6 +60,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _hintSectionKey = GlobalKey();
 
+  // 더블 클릭 관련
+  DateTime? _lastSubmitClickTime;
+  bool _isButtonPulsing = false;
+
   @override
   void initState() {
     super.initState();
@@ -464,47 +468,51 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       ),
       child: SafeArea(
         top: false,
-        child: Stack(
-          children: [
-            // Duolingo 3D solid shadow
-            if (enabled)
-              Positioned(
-                top: 6,
-                left: 0,
-                right: 0,
-                bottom: -6,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: darkerColor,
-                    borderRadius: BorderRadius.circular(16),
+        child: AnimatedOpacity(
+          opacity: _isButtonPulsing ? 0.5 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          child: Stack(
+            children: [
+              // Duolingo 3D solid shadow
+              if (enabled)
+                Positioned(
+                  top: 6,
+                  left: 0,
+                  right: 0,
+                  bottom: -6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: darkerColor,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              // Main button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _getButtonAction(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonColor,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: AppColors.borderLight,
+                  ),
+                  child: Text(
+                    _getButtonText(),
+                    style: const TextStyle(
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
               ),
-            // Main button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _getButtonAction(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                  disabledBackgroundColor: AppColors.borderLight,
-                ),
-                child: Text(
-                  _getButtonText(),
-                  style: const TextStyle(
-                    color: AppColors.surface,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -515,12 +523,43 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       return null; // 답을 선택하지 않으면 비활성화
     }
     if (!_isAnswerSubmitted) {
-      return _submitAnswer;
+      return _handleSubmitClick; // 더블 클릭 핸들러
     }
     if (_isLastProblem) {
       return _showResults;
     }
     return _nextProblem;
+  }
+
+  /// 제출 버튼 클릭 핸들러 (더블 클릭 필요)
+  void _handleSubmitClick() async {
+    final now = DateTime.now();
+
+    if (_lastSubmitClickTime == null ||
+        now.difference(_lastSubmitClickTime!).inMilliseconds > 500) {
+      // 첫 번째 클릭 또는 시간 초과 -> 깜빡임 시작
+      await AppHapticFeedback.lightImpact();
+      setState(() {
+        _lastSubmitClickTime = now;
+        _isButtonPulsing = true;
+      });
+
+      // 500ms 후에 깜빡임 중지
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          setState(() {
+            _isButtonPulsing = false;
+          });
+        }
+      });
+    } else {
+      // 두 번째 클릭 (500ms 이내) -> 정답 제출
+      setState(() {
+        _lastSubmitClickTime = null;
+        _isButtonPulsing = false;
+      });
+      _submitAnswer();
+    }
   }
 
   Color _getButtonColor() {
