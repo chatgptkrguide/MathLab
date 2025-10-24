@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
@@ -46,13 +47,23 @@ class ProblemOptionButton extends StatefulWidget {
 }
 
 class _ProblemOptionButtonState extends State<ProblemOptionButton>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
+
+  late AnimationController _celebrationController;
+  late Animation<double> _celebrationAnimation;
+
+  bool _hasPlayedAnimation = false;
 
   @override
   void initState() {
     super.initState();
+
+    // 버튼 클릭 애니메이션
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 150),
       vsync: this,
@@ -63,12 +74,67 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
         curve: Curves.easeInOut,
       ),
     );
+
+    // 오답 흔들기 애니메이션
+    _shakeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _shakeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.elasticIn,
+      ),
+    );
+
+    // 정답 축하 애니메이션
+    _celebrationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _celebrationAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(
+        parent: _celebrationController,
+        curve: Curves.elasticOut,
+      ),
+    );
   }
 
   @override
   void dispose() {
     _scaleController.dispose();
+    _shakeController.dispose();
+    _celebrationController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ProblemOptionButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // 답변 제출 후 애니메이션 재생
+    if (!oldWidget.isAnswerSubmitted && widget.isAnswerSubmitted && !_hasPlayedAnimation) {
+      _hasPlayedAnimation = true;
+
+      if (_isSelected) {
+        if (widget.isCorrectAnswer) {
+          // 정답: 축하 애니메이션
+          _celebrationController.forward().then((_) {
+            _celebrationController.reverse();
+          });
+        } else {
+          // 오답: 흔들기 애니메이션
+          _shakeController.forward().then((_) {
+            _shakeController.reverse();
+          });
+        }
+      }
+    }
+
+    // 새 문제로 넘어갈 때 애니메이션 상태 초기화
+    if (oldWidget.isAnswerSubmitted && !widget.isAnswerSubmitted) {
+      _hasPlayedAnimation = false;
+    }
   }
 
   /// 현재 버튼이 선택되었는지
@@ -174,13 +240,30 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
     return AnimatedOpacity(
       opacity: widget.isPulsing ? 0.6 : 1.0,
       duration: const Duration(milliseconds: 200),
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: GestureDetector(
-          onTap: _handleTap,
-          child: Stack(
-          clipBehavior: Clip.none,
-          children: [
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_shakeAnimation, _celebrationAnimation]),
+        builder: (context, child) {
+          // 오답 흔들기 효과
+          final shakeOffset = _isSelected && widget.isAnswerSubmitted && !widget.isCorrectAnswer
+              ? math.sin(_shakeAnimation.value * math.pi * 4) * 8
+              : 0.0;
+
+          // 정답 축하 효과 (스케일)
+          final celebrationScale = _isSelected && widget.isAnswerSubmitted && widget.isCorrectAnswer
+              ? _celebrationAnimation.value
+              : 1.0;
+
+          return Transform.translate(
+            offset: Offset(shakeOffset, 0),
+            child: Transform.scale(
+              scale: celebrationScale,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: GestureDetector(
+                  onTap: _handleTap,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
             // Duolingo-style 3D solid shadow
             if (_isSelected && !widget.isAnswerSubmitted)
               Positioned(
@@ -260,8 +343,12 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
             ),
           ],
         ),
-      ),
-      ),
-    );
-  }
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
 }
