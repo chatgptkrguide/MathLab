@@ -165,10 +165,19 @@ class PracticeProvider extends StateNotifier<PracticeState> {
       return;
     }
 
-    // 오답 노트에서 문제 추출
-    final problems = errorNotes
-        .map((note) => note.problem)
-        .toList();
+    // 오답 노트에서 문제 재구성
+    final problems = errorNotes.map((note) => Problem(
+      id: note.problemId,
+      lessonId: note.lessonId,
+      question: note.question,
+      type: ProblemType.multipleChoice, // 기본 타입
+      explanation: note.explanation,
+      category: note.category,
+      difficulty: note.difficulty,
+      tags: note.tags,
+      xpReward: note.difficulty * 5, // 난이도 기반 XP
+      correctAnswer: note.correctAnswer,
+    )).toList();
 
     final session = PracticeSession(
       id: 'practice_error_${DateTime.now().millisecondsSinceEpoch}',
@@ -214,8 +223,11 @@ class PracticeProvider extends StateNotifier<PracticeState> {
 
     final session = state.currentSession!;
     final problem = state.currentProblem!;
-    final isCorrect = answer.trim().toLowerCase() ==
-                      problem.correctAnswer.trim().toLowerCase();
+
+    // Null-safety 처리: correctAnswer가 null이면 오답 처리
+    final isCorrect = problem.correctAnswer != null &&
+                      answer.trim().toLowerCase() ==
+                      problem.correctAnswer!.trim().toLowerCase();
 
     // 정답 시 경험치 부여
     if (isCorrect && problem.xpReward > 0) {

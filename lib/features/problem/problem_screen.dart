@@ -48,6 +48,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   int _totalXPEarned = 0;
   final List<ProblemResult> _results = [];
 
+  // 연속 정답 스트릭
+  int _currentStreak = 0;
+  int _maxStreak = 0;
+  bool _showStreakAnimation = false;
+
   // 시간 측정
   final Stopwatch _stopwatch = Stopwatch();
 
@@ -169,7 +174,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       child: Column(
         children: [
-          // 뒤로가기 + XP
+          // 뒤로가기 + 스트릭 + XP
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -187,6 +192,62 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                   onPressed: () => _showExitDialog(),
                 ),
               ),
+              // 연속 정답 스트릭 뱃지
+              if (_currentStreak > 0)
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.elasticOut,
+                  tween: Tween(
+                    begin: _showStreakAnimation ? 0.8 : 1.0,
+                    end: _showStreakAnimation ? 1.2 : 1.0,
+                  ),
+                  builder: (context, scale, child) {
+                    return Transform.scale(
+                      scale: scale,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _currentStreak >= 10
+                              ? AppColors.mathPurple
+                              : _currentStreak >= 5
+                                  ? AppColors.mathOrange
+                                  : AppColors.mathYellow,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_currentStreak >= 10
+                                      ? AppColors.mathPurple
+                                      : _currentStreak >= 5
+                                          ? AppColors.mathOrange
+                                          : AppColors.mathYellow)
+                                  .withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('🔥', style: TextStyle(fontSize: 18)),
+                            const SizedBox(width: 6),
+                            Text(
+                              '$_currentStreak',
+                              style: const TextStyle(
+                                color: AppColors.surface,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               // Clean XP badge
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -638,24 +699,58 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     await ref.read(problemResultsProvider.notifier).addResult(result);
 
     if (_isCorrect) {
-      // 정답: XP 획득
+      // 정답: 연속 스트릭 증가
+      _currentStreak++;
+      if (_currentStreak > _maxStreak) {
+        _maxStreak = _currentStreak;
+      }
+
+      // 스트릭 보너스 XP 계산
+      int bonusXP = 0;
+      if (_currentStreak >= 10) {
+        bonusXP = 20; // 10연속 정답
+      } else if (_currentStreak >= 5) {
+        bonusXP = 10; // 5연속 정답
+      } else if (_currentStreak >= 3) {
+        bonusXP = 5; // 3연속 정답
+      }
+
       _totalCorrect++;
-      _totalXPEarned += _currentProblem.xpReward;
+      _totalXPEarned += _currentProblem.xpReward + bonusXP;
 
       // 정답 햅틱 피드백
       await AppHapticFeedback.success();
 
-      // 사용자 XP 업데이트
-      await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward);
+      // 사용자 XP 업데이트 (보너스 포함)
+      await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
 
-      // XP 획득 애니메이션 표시
+      // XP 획득 애니메이션 표시 (보너스 포함)
       if (mounted) {
-        _showXPGainAnimation(_currentProblem.xpReward);
+        _showXPGainAnimation(_currentProblem.xpReward + bonusXP);
+      }
+
+      // 스트릭 애니메이션 표시
+      if (bonusXP > 0) {
+        setState(() {
+          _showStreakAnimation = true;
+        });
+
+        // 2초 후 애니메이션 종료
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          if (mounted) {
+            setState(() {
+              _showStreakAnimation = false;
+            });
+          }
+        });
       }
 
       // 뱃지 언락 체크
       _checkAchievements();
     } else {
+      // 오답: 스트릭 초기화
+      _currentStreak = 0;
+
       // 오답 햅틱 피드백
       await AppHapticFeedback.error();
 
@@ -881,6 +976,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _lastSelectedIndex = null;
       _lastSelectTime = null;
       _pulsingIndex = null;
+      // 스트릭 초기화
+      _currentStreak = 0;
+      _maxStreak = 0;
+      _showStreakAnimation = false;
     });
 
     // 타이머 리셋 및 재시작

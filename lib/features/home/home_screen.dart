@@ -139,10 +139,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             color: AppColors.surface,
           ),
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Row(
-              children: [
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Row(
+                children: [
                 // 프로필 아바타 (개선: 그림자 추가)
                 Container(
                   width: 48,
@@ -255,58 +255,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: ScaleTransition(
                 scale: _challengeScaleAnimation,
                 child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.paddingM,
-                  vertical: AppDimensions.paddingS,
-                ),
-                decoration: BoxDecoration(
-                  gradient: dailyChallengeState.allCompleted
-                      ? const LinearGradient(colors: AppColors.goldGradient)
-                      : LinearGradient(
-                          colors: [
-                            AppColors.primary.withOpacity(0.8),
-                            AppColors.primary,
-                          ],
-                        ),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '🎯',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Text(
-                      dailyChallengeState.allCompleted
-                          ? '일일 챌린지 완료! 🎉'
-                          : '일일 챌린지 (${dailyChallengeState.completedCount}/${dailyChallengeState.challenges.length})',
-                      style: const TextStyle(
-                        color: AppColors.surface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    if (!dailyChallengeState.allCompleted) ...[
-                      const Spacer(),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        color: AppColors.surface,
-                        size: 14,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingM,
+                    vertical: AppDimensions.paddingS,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: dailyChallengeState.allCompleted
+                        ? const LinearGradient(colors: AppColors.goldGradient)
+                        : LinearGradient(
+                            colors: [
+                              AppColors.primary.withOpacity(0.8),
+                              AppColors.primary,
+                            ],
+                          ),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
                       ),
                     ],
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '🎯',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(width: AppDimensions.spacingS),
+                      Text(
+                        dailyChallengeState.allCompleted
+                            ? '일일 챌린지 완료! 🎉'
+                            : '일일 챌린지 (${dailyChallengeState.completedCount}/${dailyChallengeState.challenges.length})',
+                        style: const TextStyle(
+                          color: AppColors.surface,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (!dailyChallengeState.allCompleted) ...[
+                        const Spacer(),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppColors.surface,
+                          size: 14,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
-                ),
             ),
             const SizedBox(height: 8),
           ],
