@@ -56,6 +56,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
+  // 스크롤 컨트롤러 (힌트로 스크롤하기 위해)
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _hintSectionKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -106,6 +110,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   @override
   void dispose() {
     _transitionController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -142,6 +147,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             ),
           ),
         ),
+        // Floating hint button (답 제출 전에만 표시)
+        floatingActionButton: _buildFloatingHintButton(),
       ),
     );
   }
@@ -261,6 +268,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
         children: [
           Expanded(
             child: SingleChildScrollView(
+              controller: _scrollController, // 스크롤 컨트롤러 추가
               padding: const EdgeInsets.all(AppDimensions.paddingXL),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +278,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                   _buildQuestionText(),
                   // 힌트 섹션 (답 제출 전에만 표시)
                   if (!_isAnswerSubmitted)
-                    HintSection(problem: _currentProblem),
+                    Container(
+                      key: _hintSectionKey, // GlobalKey 추가
+                      child: HintSection(problem: _currentProblem),
+                    ),
                   const SizedBox(height: AppDimensions.spacingXXL),
                   _buildOptions(),
                   if (_isAnswerSubmitted) ...[
@@ -735,6 +746,69 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 힌트 섹션으로 스크롤
+  void _scrollToHint() {
+    final context = _hintSectionKey.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutCubic,
+        alignment: 0.2, // 화면 상단에서 20% 위치에 표시
+      );
+      AppHapticFeedback.lightImpact(); // 가벼운 햅틱 피드백
+    }
+  }
+
+  /// Floating hint button - GoMath 스타일
+  Widget? _buildFloatingHintButton() {
+    // 답 제출 후에는 힌트 버튼 숨김
+    if (_isAnswerSubmitted) {
+      return null;
+    }
+
+    // 힌트가 없는 문제는 버튼 표시 안 함
+    final hints = _currentProblem.hints;
+    if (hints == null || hints.isEmpty) {
+      return null;
+    }
+
+    final hintState = ref.watch(hintProvider);
+
+    // 잠금 해제된 힌트 개수 계산
+    int unlockedCount = 0;
+    for (int i = 0; i < hints.length; i++) {
+      final hintKey = '${_currentProblem.id}_$i';
+      if (hintState.unlockedHints.contains(hintKey)) {
+        unlockedCount++;
+      }
+    }
+
+    return FloatingActionButton(
+      onPressed: _scrollToHint,
+      backgroundColor: AppColors.mathYellow,
+      foregroundColor: AppColors.textPrimary,
+      elevation: 4,
+      child: Badge(
+        isLabelVisible: true,
+        label: Text(
+          '$unlockedCount/${hints.length}',
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: unlockedCount > 0
+            ? AppColors.successGreen
+            : AppColors.mathOrange,
+        child: const Icon(
+          Icons.lightbulb,
+          size: 28,
+        ),
       ),
     );
   }
