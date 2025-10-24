@@ -101,8 +101,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   @override
   void deactivate() {
     // 힌트 시스템 종료 (dispose 전에 호출됨)
+    // Future로 래핑하여 위젯 트리 빌드 완료 후에 실행
     if (mounted) {
-      ref.read(hintProvider.notifier).endProblem();
+      Future(() {
+        ref.read(hintProvider.notifier).endProblem();
+      });
     }
     super.deactivate();
   }
