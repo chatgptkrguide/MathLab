@@ -9,6 +9,7 @@ import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
+import '../../data/providers/lesson_provider.dart';
 import '../problem/problem_screen.dart';
 
 /// 듀오링고 스타일 홈 화면
@@ -20,6 +21,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
     final problems = ref.watch(problemProvider);
+    final lessons = ref.watch(lessonProvider);
 
     if (user == null) {
       return Scaffold(
@@ -62,8 +64,8 @@ class HomeScreen extends ConsumerWidget {
           // LessonPath를 Sliver로 감싸기
           SliverToBoxAdapter(
             child: LessonPathWidget(
-              lessons: _generateLessons(user),
-              onLessonTap: (lesson) => _handleLessonTap(context, ref, lesson, problems),
+              lessons: _convertLessonsToNodes(lessons),
+              onLessonTap: (lessonNode) => _handleLessonTap(context, ref, lessonNode, lessons, problems),
             ),
           ),
         ],
@@ -269,45 +271,29 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 샘플 레슨 데이터 생성 (추후 실제 데이터로 교체)
-  List<LessonNode> _generateLessons(User user) {
-    final currentLevel = user.level;
-
-    return List.generate(20, (index) {
-      final lessonNumber = index + 1;
-      final isLocked = lessonNumber > currentLevel + 2;
-      final isCompleted = lessonNumber < currentLevel;
-      final isCurrent = lessonNumber == currentLevel || lessonNumber == currentLevel + 1;
-
+  /// Lesson을 LessonNode로 변환
+  List<LessonNode> _convertLessonsToNodes(List<Lesson> lessons) {
+    return lessons.map((lesson) {
       return LessonNode(
-        id: 'lesson_$lessonNumber',
-        title: '레슨 $lessonNumber',
-        emoji: _getLessonEmoji(lessonNumber),
-        isLocked: isLocked,
-        isCompleted: isCompleted,
-        isCurrent: isCurrent && !isCompleted,
-        lessonNumber: lessonNumber,
+        id: lesson.id,
+        title: lesson.title,
+        emoji: lesson.icon,
+        isLocked: !lesson.isUnlocked,
+        isCompleted: lesson.isCompleted,
+        isCurrent: lesson.isUnlocked && !lesson.isCompleted,
+        lessonNumber: lesson.order,
       );
-    });
-  }
-
-  String _getLessonEmoji(int lessonNumber) {
-    const emojis = [
-      '🔢', '➕', '➖', '✖️', '➗',
-      '📐', '📏', '📊', '📈', '🎯',
-      '🧮', '💡', '⭐', '🏆', '🎓',
-      '🔶', '🔷', '🔺', '🔻', '⬛',
-    ];
-    return emojis[lessonNumber % emojis.length];
+    }).toList();
   }
 
   void _handleLessonTap(
     BuildContext context,
     WidgetRef ref,
-    LessonNode lesson,
+    LessonNode lessonNode,
+    List<Lesson> lessons,
     List<Problem> problems,
   ) async {
-    if (lesson.isLocked) {
+    if (lessonNode.isLocked) {
       await AppHapticFeedback.error();
       _showCustomSnackBar(
         context,
@@ -318,16 +304,23 @@ class HomeScreen extends ConsumerWidget {
     }
 
     await AppHapticFeedback.mediumImpact();
+
+    // LessonNode에서 실제 Lesson 찾기
+    final lesson = lessons.firstWhere(
+      (l) => l.id == lessonNode.id,
+      orElse: () => lessons.first,
+    );
+
     _startLearning(context, ref, lesson, problems);
   }
 
   void _startLearning(
     BuildContext context,
     WidgetRef ref,
-    LessonNode lesson,
+    Lesson lesson,
     List<Problem> problems,
   ) async {
-    Logger.ui('레슨 시작', screen: 'HomeScreen', action: 'StartLesson');
+    Logger.ui('레슨 시작: ${lesson.title}', screen: 'HomeScreen', action: 'StartLesson');
 
     if (problems.isEmpty) {
       Logger.warning('문제 데이터 없음', tag: 'HomeScreen');
@@ -345,15 +338,13 @@ class HomeScreen extends ConsumerWidget {
       return;
     }
 
-    // lesson001의 모든 문제 가져오기 (3개)
+    // 클릭한 레슨의 모든 문제 가져오기
     final selectedProblems = ref
         .read(problemProvider.notifier)
-        .getProblemsByLesson('lesson001');
-
-    final lessonId = 'lesson001';
+        .getProblemsByLesson(lesson.id);
 
     if (selectedProblems.isEmpty) {
-      Logger.error('선택된 문제 없음', tag: 'HomeScreen');
+      Logger.error('선택된 문제 없음: ${lesson.id}', tag: 'HomeScreen');
       _showCustomSnackBar(
         context,
         '문제를 찾을 수 없습니다.',
@@ -369,7 +360,7 @@ class HomeScreen extends ConsumerWidget {
 
       final route = MaterialPageRoute(
         builder: (context) => ProblemScreen(
-          lessonId: lessonId,
+          lessonId: lesson.id,
           problems: selectedProblems,
         ),
       );
