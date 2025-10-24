@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
+// TODO: Flutter 3.24.5 호환 수학 렌더링 라이브러리로 교체 필요
+// import 'package:flutter_math_fork/flutter_math.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
 /// 수학 수식 렌더링 위젯
-/// LaTeX 문법을 지원하여 수학 표현식을 아름답게 표시
+/// 현재는 Text fallback 사용 (향후 LaTeX 렌더링 추가 예정)
 class MathText extends StatelessWidget {
   final String text;
   final TextStyle? style;
@@ -52,24 +53,13 @@ class MathText extends StatelessWidget {
   }
 
   Widget _buildMathWidget() {
-    // 한국어 수학 표기를 LaTeX로 변환
-    final latex = _convertToLatex(text);
-
-    try {
-      return Math.tex(
-        latex,
-        textStyle: style ?? TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
-        mathStyle: MathStyle.display,
-        textScaleFactor: 1.2,
-      );
-    } catch (e) {
-      // LaTeX 파싱 실패 시 일반 텍스트로 폴백
-      return Text(
-        text,
-        style: style ?? AppTextStyles.bodyLarge.copyWith(fontSize: fontSize, color: color),
-        textAlign: textAlign,
-      );
-    }
+    // TODO: flutter_math_fork 대신 호환 가능한 수학 렌더링 라이브러리 사용
+    // 현재는 일반 텍스트로 표시 (수학 기호는 유니코드로 표시됨)
+    return Text(
+      text,
+      style: style ?? AppTextStyles.bodyLarge.copyWith(fontSize: fontSize, color: color),
+      textAlign: textAlign,
+    );
   }
 
   String _convertToLatex(String text) {
@@ -125,18 +115,11 @@ class InlineMath extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    try {
-      return Math.tex(
-        expression,
-        textStyle: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
-        mathStyle: MathStyle.text,
-      );
-    } catch (e) {
-      return Text(
-        expression,
-        style: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
-      );
-    }
+    // TODO: flutter_math_fork 대신 호환 가능한 수학 렌더링 라이브러리 사용
+    return Text(
+      expression,
+      style: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
+    );
   }
 }
 
@@ -155,22 +138,13 @@ class DisplayMath extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    try {
-      return Center(
-        child: Math.tex(
-          expression,
-          textStyle: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
-          mathStyle: MathStyle.display,
-        ),
-      );
-    } catch (e) {
-      return Center(
-        child: Text(
-          expression,
-          style: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
+    // TODO: flutter_math_fork 대신 호환 가능한 수학 렌더링 라이브러리 사용
+    return Center(
+      child: Text(
+        expression,
+        style: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 }
