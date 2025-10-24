@@ -3,6 +3,7 @@ import '../models/models.dart';
 import '../services/local_storage_service.dart';
 import '../services/mock_data_service.dart';
 import 'error_note_provider.dart';
+import 'user_provider.dart';
 import '../../shared/utils/logger.dart';
 
 /// 연습 모드 상태
@@ -215,6 +216,12 @@ class PracticeProvider extends StateNotifier<PracticeState> {
     final problem = state.currentProblem!;
     final isCorrect = answer.trim().toLowerCase() ==
                       problem.correctAnswer.trim().toLowerCase();
+
+    // 정답 시 경험치 부여
+    if (isCorrect && problem.xpReward > 0) {
+      await _ref.read(userProvider.notifier).addXP(problem.xpReward);
+      Logger.info('XP +${problem.xpReward} 획득 (연습 모드)', tag: 'PracticeProvider');
+    }
 
     // 통계 업데이트
     final newSession = session.copyWith(

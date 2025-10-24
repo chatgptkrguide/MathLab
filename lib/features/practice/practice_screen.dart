@@ -59,7 +59,7 @@ class PracticeCategoryScreen extends ConsumerWidget {
                     const SizedBox(width: AppDimensions.spacingM),
                     Expanded(
                       child: Text(
-                        '연습 모드에서는 XP와 하트가 소모되지 않아요!\n자유롭게 연습하세요.',
+                        '연습 모드에서도 경험치를 획득할 수 있어요!\n하트는 소모되지 않으니 자유롭게 연습하세요.',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textPrimary,
                         ),

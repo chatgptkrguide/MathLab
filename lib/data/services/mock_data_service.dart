@@ -372,7 +372,7 @@ class MockDataService {
         category: '기초산술',
         difficulty: 1 + (i % 3),
         tags: ['사칙연산'],
-        xpReward: 0, // 연습 모드는 XP 없음
+        xpReward: 10, // 연습 모드 XP 보상
         options: _generateOptions(i),
         correctAnswerIndex: 0,
         correctAnswer: _calculateAnswer(i),
@@ -397,7 +397,7 @@ class MockDataService {
         category: '대수',
         difficulty: 2 + (i % 3),
         tags: ['일차방정식'],
-        xpReward: 0,
+        xpReward: 10,
         options: [
           '${7 + (i % 5)}',
           '${6 + (i % 5)}',
@@ -427,7 +427,7 @@ class MockDataService {
         category: '기하',
         difficulty: 2 + (i % 3),
         tags: ['도형', '넓이'],
-        xpReward: 0,
+        xpReward: 10,
         options: [
           '${(4 + i) * (4 + i)}cm²',
           '${(4 + i) * 4}cm²',
@@ -461,7 +461,7 @@ class MockDataService {
         category: '통계',
         difficulty: 2 + (i % 3),
         tags: ['평균'],
-        xpReward: 0,
+        xpReward: 10,
         options: [
           '$avg',
           '${avg + 1}',
