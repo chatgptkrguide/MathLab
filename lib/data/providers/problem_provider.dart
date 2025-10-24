@@ -474,13 +474,17 @@ final learningSessionProvider = StateNotifierProvider<LearningSessionNotifier, L
 
 /// 편의 프로바이더들
 final currentProblemProvider = Provider<Problem?>((ref) {
-  final sessionNotifier = ref.watch(learningSessionProvider.notifier);
-  return sessionNotifier.currentProblem;
+  final session = ref.watch(learningSessionProvider);
+  if (session == null || session.currentProblemIndex >= session.problems.length) {
+    return null;
+  }
+  return session.problems[session.currentProblemIndex];
 });
 
 final sessionProgressProvider = Provider<double>((ref) {
-  final sessionNotifier = ref.watch(learningSessionProvider.notifier);
-  return sessionNotifier.progress;
+  final session = ref.watch(learningSessionProvider);
+  if (session == null || session.problems.isEmpty) return 0.0;
+  return session.currentProblemIndex / session.problems.length;
 });
 
 final isSessionActiveProvider = Provider<bool>((ref) {
