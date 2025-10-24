@@ -321,35 +321,33 @@ class _HintItem extends StatelessWidget {
           ),
         ),
         // 잠금 해제 버튼
-        SizedBox(
-          height: 32,
-          child: ElevatedButton(
-            onPressed: canUnlock ? onUnlock : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: canUnlock
-                  ? AppColors.mathOrange
-                  : AppColors.disabled,
-              foregroundColor: AppColors.surface,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
+        ElevatedButton(
+          onPressed: canUnlock ? onUnlock : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: canUnlock
+                ? AppColors.mathOrange
+                : AppColors.disabled,
+            foregroundColor: AppColors.surface,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            minimumSize: const Size(0, 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('🔶', style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 4),
-                Text(
-                  '${HintProvider.hintCost}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
+            elevation: 0,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🔶', style: TextStyle(fontSize: 12)),
+              const SizedBox(width: 4),
+              Text(
+                '${HintProvider.hintCost}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
