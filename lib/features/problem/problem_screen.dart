@@ -10,6 +10,7 @@ import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
+import '../../data/providers/lesson_provider.dart';
 import '../../data/providers/error_note_provider.dart';
 import '../../data/providers/achievement_provider.dart';
 import '../../data/providers/hint_provider.dart';
@@ -596,6 +597,12 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             userAnswer: _currentProblem.options![_selectedAnswerIndex!],
           );
     }
+
+    // 레슨 진행률 업데이트
+    await ref.read(lessonProvider.notifier).onProblemSolved(
+      _currentProblem.id,
+      _isCorrect,
+    );
   }
 
   /// XP 획득 애니메이션
