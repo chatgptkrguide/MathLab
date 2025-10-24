@@ -99,16 +99,20 @@ class HintSection extends ConsumerWidget {
             // 힌트 리스트
             ...List.generate(
               problem.hints!.length,
-              (index) => _HintItem(
-                problem: problem,
-                hintIndex: index,
-                hintText: problem.hints![index],
-                isUnlocked: ref
-                    .read(hintProvider.notifier)
-                    .isHintUnlocked(problem.id, index),
-                canUnlock: userXP >= HintProvider.hintCost,
-                onUnlock: () => _unlockHint(context, ref, index),
-              ),
+              (index) {
+                // hintState를 통해 unlock 여부 확인
+                final hintKey = '${problem.id}_$index';
+                final isUnlocked = hintState.unlockedHints.contains(hintKey);
+
+                return _HintItem(
+                  problem: problem,
+                  hintIndex: index,
+                  hintText: problem.hints![index],
+                  isUnlocked: isUnlocked,
+                  canUnlock: userXP >= HintProvider.hintCost,
+                  onUnlock: () => _unlockHint(context, ref, index),
+                );
+              },
             ),
           ],
         ),
@@ -117,9 +121,12 @@ class HintSection extends ConsumerWidget {
   }
 
   int _getUnlockedCount(WidgetRef ref) {
+    final hintState = ref.watch(hintProvider);
     int count = 0;
     for (int i = 0; i < problem.hints!.length; i++) {
-      if (ref.read(hintProvider.notifier).isHintUnlocked(problem.id, i)) {
+      // hintState를 통해 unlock 여부 확인
+      final hintKey = '${problem.id}_$i';
+      if (hintState.unlockedHints.contains(hintKey)) {
         count++;
       }
     }
