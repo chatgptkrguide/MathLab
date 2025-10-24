@@ -16,11 +16,61 @@ import '../daily_challenge/daily_challenge_screen.dart';
 
 /// 듀오링고 스타일 홈 화면
 /// S자 곡선 레슨 경로 적용
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _headerController;
+  late AnimationController _challengeController;
+  late Animation<double> _headerFadeAnimation;
+  late Animation<double> _challengeScaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 헤더 페이드인 애니메이션
+    _headerController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _headerFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _headerController,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    // 챌린지 버튼 스케일 애니메이션
+    _challengeController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _challengeScaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(
+        parent: _challengeController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // 초기 애니메이션 시작
+    _headerController.forward();
+  }
+
+  @override
+  void dispose() {
+    _headerController.dispose();
+    _challengeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     final problems = ref.watch(problemProvider);
     final lessons = ref.watch(lessonProvider);
@@ -59,7 +109,7 @@ class HomeScreen extends ConsumerWidget {
             backgroundColor: AppColors.surface,
             leading: const SizedBox.shrink(),
             flexibleSpace: FlexibleSpaceBar(
-              background: _buildHeaderBackground(context, ref, user),
+              background: _buildHeaderBackground(context, user),
             ),
           ),
 
@@ -76,17 +126,19 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// 듀오링고 스타일 헤더 배경
-  Widget _buildHeaderBackground(BuildContext context, WidgetRef ref, User user) {
+  Widget _buildHeaderBackground(BuildContext context, User user) {
     final dailyChallengeState = ref.watch(dailyChallengeProvider);
 
     return SafeArea(
       bottom: false,
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-        ),
-        child: Column(
+      child: FadeTransition(
+        opacity: _headerFadeAnimation,
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.paddingL),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+          ),
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Row(
@@ -147,20 +199,51 @@ class HomeScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                // 스트릭 & 하트
-                _buildDuoStatBadge('🔥', '${user.streakDays}', AppColors.mathOrange),
+                // 스트릭 & 하트 (staggered animation)
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOut,
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(20 * (1 - value), 0),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _buildDuoStatBadge('🔥', '${user.streakDays}', AppColors.mathOrange),
+                ),
                 const SizedBox(width: AppDimensions.spacingS),
-                _buildDuoStatBadge('❤️', '${user.hearts}', AppColors.mathRed),
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOut,
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(20 * (1 - value), 0),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _buildDuoStatBadge('❤️', '${user.hearts}', AppColors.mathRed),
+                ),
               ],
             ),
             const SizedBox(height: AppDimensions.paddingM),
             // XP 진행률 바
             _buildDuoProgressBar(user),
             const SizedBox(height: AppDimensions.paddingM),
-            // Daily Challenge 버튼
+            // Daily Challenge 버튼 with scale animation
             GestureDetector(
               onTap: () async {
                 await AppHapticFeedback.lightImpact();
+                await _challengeController.forward();
+                await _challengeController.reverse();
+
                 if (context.mounted) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -169,7 +252,9 @@ class HomeScreen extends ConsumerWidget {
                   );
                 }
               },
-              child: Container(
+              child: ScaleTransition(
+                scale: _challengeScaleAnimation,
+                child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.paddingM,
                   vertical: AppDimensions.paddingS,
@@ -221,6 +306,7 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+                ),
             ),
             const SizedBox(height: 8),
           ],
@@ -296,7 +382,7 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        // 듀오링고 스타일 진행률 바 (개선: 높이 증가, 애니메이션 강화)
+        // 듀오링고 스타일 진행률 바 with shimmer animation
         Stack(
           children: [
             // 배경 바
@@ -316,21 +402,56 @@ class HomeScreen extends ConsumerWidget {
                 return FractionallySizedBox(
                   alignment: Alignment.centerLeft,
                   widthFactor: value.clamp(0.05, 1.0),
-                  child: Container(
-                    height: 16,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.mathTeal, AppColors.mathTealDark],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.mathTeal.withValues(alpha: 0.4),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
+                  child: Stack(
+                    children: [
+                      // 진행 바 배경
+                      Container(
+                        height: 16,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mathTeal.withValues(alpha: 0.4),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      // Shimmer overlay
+                      TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 1500),
+                        curve: Curves.easeInOut,
+                        tween: Tween(begin: -1.0, end: 2.0),
+                        onEnd: () {
+                          // Restart animation by updating state
+                        },
+                        builder: (context, shimmerValue, child) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Transform.translate(
+                              offset: Offset(shimmerValue * 100, 0),
+                              child: Container(
+                                height: 16,
+                                width: 50,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      AppColors.surface.withValues(alpha: 0.3),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 );
               },
