@@ -416,11 +416,57 @@ final learningStatsProvider = StateNotifierProvider<LearningStatsNotifier, Learn
 
 /// 편의 프로바이더들
 final dailyStatsProvider = Provider<DailyStats>((ref) {
-  final statsNotifier = ref.watch(learningStatsProvider.notifier);
-  return statsNotifier.getDailyStats();
+  final stats = ref.watch(learningStatsProvider);
+
+  if (stats == null) {
+    return DailyStats(
+      date: DateTime.now(),
+      problemsSolved: 0,
+      correctAnswers: 0,
+      xpEarned: 0,
+      studyTimeMinutes: 0,
+      sessions: 0,
+    );
+  }
+
+  // 임시로 전체 통계의 일부를 일일 통계로 사용
+  // 실제로는 날짜별 세분화된 데이터가 필요
+  return DailyStats(
+    date: DateTime.now(),
+    problemsSolved: stats.totalProblems,
+    correctAnswers: stats.correctAnswers,
+    xpEarned: stats.totalXP,
+    studyTimeMinutes: stats.totalStudyTime,
+    sessions: stats.totalSessions,
+  );
 });
 
 final weeklyStatsProvider = Provider<WeeklyStats>((ref) {
-  final statsNotifier = ref.watch(learningStatsProvider.notifier);
-  return statsNotifier.getWeeklyStats();
+  final stats = ref.watch(learningStatsProvider);
+
+  // 주의 시작일 계산 헬퍼
+  DateTime getWeekStart(DateTime date) {
+    final weekday = date.weekday;
+    return date.subtract(Duration(days: weekday - 1));
+  }
+
+  if (stats == null) {
+    return WeeklyStats(
+      weekStartDate: getWeekStart(DateTime.now()),
+      totalProblems: 0,
+      totalXP: 0,
+      averageAccuracy: 0.0,
+      studyDays: 0,
+      longestStreak: 0,
+    );
+  }
+
+  return WeeklyStats(
+    weekStartDate: getWeekStart(DateTime.now()),
+    totalProblems: stats.totalProblems,
+    totalXP: stats.totalXP,
+    averageAccuracy: stats.accuracy,
+    studyDays: stats.currentStreak.clamp(0, 7),
+    longestStreak: stats.maxStreak,
+  );
 });

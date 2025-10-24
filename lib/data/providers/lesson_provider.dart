@@ -222,31 +222,50 @@ final lessonProvider = StateNotifierProvider<LessonNotifier, List<Lesson>>((ref)
 
 /// 편의 프로바이더들
 final lessonsByGradeProvider = Provider.family<List<Lesson>, String>((ref, grade) {
-  final notifier = ref.watch(lessonProvider.notifier);
-  return notifier.getLessonsByGrade(grade);
+  final lessons = ref.watch(lessonProvider);
+  return lessons.where((lesson) => lesson.grade == grade).toList()
+    ..sort((a, b) => a.order.compareTo(b.order));
 });
 
 final unlockedLessonsProvider = Provider<List<Lesson>>((ref) {
-  final notifier = ref.watch(lessonProvider.notifier);
-  return notifier.unlockedLessons;
+  final lessons = ref.watch(lessonProvider);
+  return lessons.where((lesson) => lesson.isUnlocked).toList()
+    ..sort((a, b) => a.order.compareTo(b.order));
 });
 
 final completedLessonsProvider = Provider<List<Lesson>>((ref) {
-  final notifier = ref.watch(lessonProvider.notifier);
-  return notifier.completedLessons;
+  final lessons = ref.watch(lessonProvider);
+  return lessons.where((lesson) => lesson.isCompleted).toList();
 });
 
 final nextAvailableLessonProvider = Provider<Lesson?>((ref) {
-  final notifier = ref.watch(lessonProvider.notifier);
-  return notifier.nextAvailableLesson;
+  final lessons = ref.watch(lessonProvider);
+  final availableLessons = lessons
+      .where((lesson) => lesson.isUnlocked && !lesson.isCompleted)
+      .toList();
+
+  if (availableLessons.isEmpty) return null;
+
+  availableLessons.sort((a, b) => a.order.compareTo(b.order));
+  return availableLessons.first;
 });
 
 final overallProgressProvider = Provider<double>((ref) {
-  final notifier = ref.watch(lessonProvider.notifier);
-  return notifier.overallProgress;
+  final lessons = ref.watch(lessonProvider);
+  if (lessons.isEmpty) return 0.0;
+
+  final totalProblems = lessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
+  final completedProblems = lessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
+
+  return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
 });
 
 final gradeProgressProvider = Provider.family<double, String>((ref, grade) {
-  final notifier = ref.watch(lessonProvider.notifier);
-  return notifier.getGradeProgress(grade);
+  final gradeLessons = ref.watch(lessonsByGradeProvider(grade));
+  if (gradeLessons.isEmpty) return 0.0;
+
+  final totalProblems = gradeLessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
+  final completedProblems = gradeLessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
+
+  return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
 });

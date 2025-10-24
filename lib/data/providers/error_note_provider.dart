@@ -274,16 +274,46 @@ final errorNoteProvider = StateNotifierProvider<ErrorNoteNotifier, List<ErrorNot
 
 /// 편의 프로바이더들
 final errorNoteStatsProvider = Provider.family<ErrorNoteStats, String>((ref, userId) {
-  final notifier = ref.watch(errorNoteProvider.notifier);
-  return notifier.getErrorNoteStats(userId);
+  final errorNotes = ref.watch(errorNoteProvider);
+  final userNotes = errorNotes.where((note) => note.userId == userId).toList();
+
+  return ErrorNoteStats(
+    totalErrors: userNotes.length,
+    unreviewed: userNotes.where((note) => note.reviewCount == 0).length,
+    reviewedOnce: userNotes.where((note) => note.reviewCount == 1).length,
+    reviewedTwice: userNotes.where((note) => note.reviewCount >= 2).length,
+    mastered: userNotes.where((note) => note.status == ErrorStatus.mastered).length,
+    needingReview: userNotes.where((note) => note.needsReview).length,
+  );
 });
 
 final reviewNeededNotesProvider = Provider.family<List<ErrorNote>, String>((ref, userId) {
-  final notifier = ref.watch(errorNoteProvider.notifier);
-  return notifier.getErrorNotesNeedingReview(userId);
+  final errorNotes = ref.watch(errorNoteProvider);
+  return errorNotes
+      .where((note) => note.userId == userId && note.needsReview)
+      .toList();
 });
 
 final scheduledReviewNotesProvider = Provider.family<List<ErrorNote>, String>((ref, userId) {
-  final notifier = ref.watch(errorNoteProvider.notifier);
-  return notifier.getScheduledReviewNotes(userId);
+  final errorNotes = ref.watch(errorNoteProvider);
+  final now = DateTime.now();
+
+  // 복습 스케줄에 따라 필터링
+  final scheduledNotes = errorNotes.where((note) {
+    return note.userId == userId && now.isAfter(note.nextReviewDate);
+  }).toList();
+
+  // 우선순위 정렬 (오래된 것, 복습 횟수 적은 것 우선)
+  scheduledNotes.sort((a, b) {
+    final urgencyA = now.difference(a.nextReviewDate).inDays;
+    final urgencyB = now.difference(b.nextReviewDate).inDays;
+
+    if (urgencyA != urgencyB) {
+      return urgencyB.compareTo(urgencyA); // 더 긴급한 것 우선
+    }
+
+    return a.reviewCount.compareTo(b.reviewCount); // 복습 적은 것 우선
+  });
+
+  return scheduledNotes;
 });
