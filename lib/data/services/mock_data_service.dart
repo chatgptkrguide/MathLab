@@ -354,4 +354,141 @@ class MockDataService {
       ),
     ];
   }
+
+  /// 기초 산술 문제 생성
+  List<Problem> generateBasicArithmeticProblems(int count) {
+    final problems = <Problem>[];
+
+    for (int i = 0; i < count; i++) {
+      problems.add(Problem(
+        id: 'basic_${DateTime.now().millisecondsSinceEpoch}_$i',
+        lessonId: 'practice',
+        type: ProblemType.multipleChoice,
+        question: i % 3 == 0
+            ? '${5 + i} + ${3 + i} = ?'
+            : i % 3 == 1
+                ? '${15 + i} - ${7 + i} = ?'
+                : '${3 + (i % 4)} × ${2 + (i % 3)} = ?',
+        category: '기초산술',
+        difficulty: 1 + (i % 3),
+        tags: ['사칙연산'],
+        xpReward: 0, // 연습 모드는 XP 없음
+        options: _generateOptions(i),
+        correctAnswerIndex: 0,
+        correctAnswer: _calculateAnswer(i),
+        explanation: '사칙연산의 기본 규칙을 적용합니다.',
+        hints: ['차근차근 계산해보세요'],
+      ));
+    }
+
+    return problems;
+  }
+
+  /// 대수 문제 생성
+  List<Problem> generateAlgebraProblems(int count) {
+    final problems = <Problem>[];
+
+    for (int i = 0; i < count; i++) {
+      problems.add(Problem(
+        id: 'algebra_${DateTime.now().millisecondsSinceEpoch}_$i',
+        lessonId: 'practice',
+        type: ProblemType.multipleChoice,
+        question: 'x + ${3 + i} = ${10 + i}일 때, x = ?',
+        category: '대수',
+        difficulty: 2 + (i % 3),
+        tags: ['일차방정식'],
+        xpReward: 0,
+        options: [
+          '${7 + (i % 5)}',
+          '${6 + (i % 5)}',
+          '${8 + (i % 5)}',
+          '${9 + (i % 5)}',
+        ],
+        correctAnswerIndex: 0,
+        correctAnswer: '${7 + (i % 5)}',
+        explanation: '양변에서 상수항을 빼서 x의 값을 구합니다.',
+        hints: ['등식의 성질을 이용하세요', '양변에서 같은 수를 빼세요'],
+      ));
+    }
+
+    return problems;
+  }
+
+  /// 기하 문제 생성
+  List<Problem> generateGeometryProblems(int count) {
+    final problems = <Problem>[];
+
+    for (int i = 0; i < count; i++) {
+      problems.add(Problem(
+        id: 'geometry_${DateTime.now().millisecondsSinceEpoch}_$i',
+        lessonId: 'practice',
+        type: ProblemType.multipleChoice,
+        question: '한 변의 길이가 ${4 + i}cm인 정사각형의 넓이는?',
+        category: '기하',
+        difficulty: 2 + (i % 3),
+        tags: ['도형', '넓이'],
+        xpReward: 0,
+        options: [
+          '${(4 + i) * (4 + i)}cm²',
+          '${(4 + i) * 4}cm²',
+          '${(4 + i) * 2}cm²',
+          '${(4 + i) + 4}cm²',
+        ],
+        correctAnswerIndex: 0,
+        correctAnswer: '${(4 + i) * (4 + i)}cm²',
+        explanation: '정사각형의 넓이 = 한 변 × 한 변',
+        hints: ['정사각형은 네 변의 길이가 모두 같습니다', '넓이 = 가로 × 세로'],
+      ));
+    }
+
+    return problems;
+  }
+
+  /// 통계 문제 생성
+  List<Problem> generateStatisticsProblems(int count) {
+    final problems = <Problem>[];
+
+    for (int i = 0; i < count; i++) {
+      final nums = [5 + i, 7 + i, 9 + i, 11 + i];
+      final sum = nums.reduce((a, b) => a + b);
+      final avg = sum ~/ nums.length;
+
+      problems.add(Problem(
+        id: 'stats_${DateTime.now().millisecondsSinceEpoch}_$i',
+        lessonId: 'practice',
+        type: ProblemType.multipleChoice,
+        question: '다음 수의 평균을 구하시오: ${nums.join(', ')}',
+        category: '통계',
+        difficulty: 2 + (i % 3),
+        tags: ['평균'],
+        xpReward: 0,
+        options: [
+          '$avg',
+          '${avg + 1}',
+          '${avg - 1}',
+          '${avg + 2}',
+        ],
+        correctAnswerIndex: 0,
+        correctAnswer: '$avg',
+        explanation: '평균 = (모든 수의 합) ÷ (개수)',
+        hints: ['모든 수를 더한 후 개수로 나누세요'],
+      ));
+    }
+
+    return problems;
+  }
+
+  List<String> _generateOptions(int seed) {
+    final base = seed + 5;
+    return [
+      '$base',
+      '${base + 1}',
+      '${base - 1}',
+      '${base + 2}',
+    ];
+  }
+
+  String _calculateAnswer(int index) {
+    return '${index + 5}';
+  }
 }
