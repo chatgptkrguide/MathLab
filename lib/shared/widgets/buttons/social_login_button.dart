@@ -6,13 +6,13 @@ import '../../utils/haptic_feedback.dart';
 /// Google, Kakao, Apple 로그인 버튼 위젯
 class SocialLoginButton extends StatelessWidget {
   final SocialLoginProvider provider;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
 
   const SocialLoginButton({
     super.key,
     required this.provider,
-    required this.onPressed,
+    this.onPressed,
     this.isLoading = false,
   });
 

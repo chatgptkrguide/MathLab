@@ -9,3 +9,4 @@ export 'problem.dart';
 export 'leaderboard_entry.dart';
 export 'league.dart';
 export 'daily_reward.dart';
+export 'app_settings.dart';

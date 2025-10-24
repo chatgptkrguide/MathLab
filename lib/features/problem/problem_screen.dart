@@ -107,23 +107,29 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.mathBlue, // GoMath 파란색
-      body: SafeArea(
-        child: ResponsiveWrapper(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: _buildContent(),
+    return WillPopScope(
+      onWillPop: () async {
+        _showExitDialog();
+        return false; // 뒤로가기 막고 다이얼로그 표시
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.mathBlue, // GoMath 파란색
+        body: SafeArea(
+          child: ResponsiveWrapper(
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: _buildContent(),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -182,13 +182,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           // Google 로그인
           SocialLoginButton(
             provider: SocialLoginProvider.google,
-            onPressed: _isLoading ? null : _handleGoogleLogin,
+            onPressed: _isLoading ? null : () => _handleGoogleLogin(),
           ),
           const SizedBox(height: AppDimensions.spacingM),
           // Kakao 로그인
           SocialLoginButton(
             provider: SocialLoginProvider.kakao,
-            onPressed: _isLoading ? null : _handleKakaoLogin,
+            onPressed: _isLoading ? null : () => _handleKakaoLogin(),
           ),
         ],
       ),

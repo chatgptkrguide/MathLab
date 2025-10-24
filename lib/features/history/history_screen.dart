@@ -202,23 +202,49 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         Row(
           children: [
             Expanded(
-              child: _buildChallengeCard(
+              child: _buildChallengeCardWithAnimation(
                 icon: '🔥',
                 label: 'Current Streak',
                 value: '$currentStreak Days',
+                delay: 0,
               ),
             ),
             const SizedBox(width: AppDimensions.spacingM),
             Expanded(
-              child: _buildChallengeCard(
+              child: _buildChallengeCardWithAnimation(
                 icon: '📅',
                 label: 'Remaining',
                 value: '${remaining > 0 ? remaining : 0} Days',
+                delay: 100,
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  /// 애니메이션이 있는 챌린지 카드 래퍼
+  Widget _buildChallengeCardWithAnimation({
+    required String icon,
+    required String label,
+    required String value,
+    required int delay,
+  }) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 400 + delay),
+      curve: Curves.easeOutBack,
+      tween: Tween(begin: 0.8, end: 1.0),
+      builder: (context, scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: _buildChallengeCard(
+            icon: icon,
+            label: label,
+            value: value,
+          ),
+        );
+      },
     );
   }
 
@@ -238,9 +264,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.borderLight.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: AppColors.borderLight.withValues(alpha: 0.2),  // 개선: 0.1 → 0.2
+            blurRadius: 8,  // 개선: 4 → 8
+            offset: const Offset(0, 4),  // 개선: (0, 2) → (0, 4)
           ),
         ],
       ),

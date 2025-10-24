@@ -21,6 +21,8 @@ class AppColors {
   static const Color mathRedDark = Color(0xFFE03B3B); // 어두운 빨간색
   static const Color mathPurple = Color(0xFFCE82FF); // 힌트 퍼플
   static const Color mathPurpleDark = Color(0xFFBE72EF); // 어두운 퍼플
+  static const Color mathGreen = Color(0xFF58CC02); // 초록색
+  static const Color mathGreenDark = Color(0xFF2A8643); // 어두운 초록색
 
   // 듀오링고 스타일 브랜드 색상 (호환성 유지)
   static const Color duolingoGreen = Color(0xFF58CC02); // 듀오링고 메인 그린

@@ -3,37 +3,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
+import '../../shared/utils/logger.dart';
 import 'user_provider.dart';
 import 'problem_provider.dart';
 
 /// 레슨 상태 관리
 class LessonNotifier extends StateNotifier<List<Lesson>> {
-  LessonNotifier(this._ref) : super([]) {
+  LessonNotifier(this._ref) : super(_dataService.getSampleLessons()) {
+    Logger.info('[LessonProvider] 레슨 ${state.length}개로 초기화', tag: 'LessonProvider');
     _loadLessons();
   }
 
   final Ref _ref;
-  final MockDataService _dataService = MockDataService();
+  static final MockDataService _dataService = MockDataService();
 
   /// 레슨 데이터 로드
   Future<void> _loadLessons() async {
+    Logger.info('[LessonProvider] 레슨 데이터 로드 시작', tag: 'LessonProvider');
     final prefs = await SharedPreferences.getInstance();
     final lessonsJson = prefs.getStringList('lessons');
 
     if (lessonsJson != null && lessonsJson.isNotEmpty) {
       // 저장된 레슨이 있으면 로드
+      Logger.info('[LessonProvider] 저장된 레슨 ${lessonsJson.length}개 발견', tag: 'LessonProvider');
       final lessons = lessonsJson
           .map((json) => Lesson.fromJson(jsonDecode(json)))
           .toList();
       state = lessons;
+      Logger.info('[LessonProvider] 레슨 ${lessons.length}개 로드 완료', tag: 'LessonProvider');
     } else {
-      // 없으면 기본 레슨들 로드
-      state = _dataService.getSampleLessons();
+      // 샘플 레슨을 저장
+      Logger.info('[LessonProvider] 저장된 레슨 없음, 샘플 레슨 저장', tag: 'LessonProvider');
       await _saveLessons();
+      Logger.info('[LessonProvider] 샘플 레슨 ${state.length}개 저장 완료', tag: 'LessonProvider');
     }
 
     // 첫 번째 레슨은 항상 잠금 해제
     await _unlockFirstLesson();
+    Logger.info('[LessonProvider] 레슨 로드 완료', tag: 'LessonProvider');
   }
 
   /// 레슨 데이터 저장

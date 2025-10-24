@@ -63,10 +63,6 @@ class _DuolingoButtonState extends State<DuolingoButton>
       button: true,
       enabled: enabled,
       label: widget.text,
-      onTap: enabled ? () async {
-        await AppHapticFeedback.selectionClick();
-        widget.onPressed?.call();
-      } : null,
       child: GestureDetector(
         onTapDown: enabled ? (_) => _onTapDown() : null,
         onTapUp: enabled ? (_) => _onTapUp() : null,

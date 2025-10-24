@@ -73,70 +73,21 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     final errorStats = _getErrorStats(userErrorNotes);
 
     return Scaffold(
-      backgroundColor: AppColors.mathBlue, // GoMath 파란색
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: ResponsiveWrapper(
           child: Column(
             children: [
-              _buildGoMathHeader(context),
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildHeader(),
-                      _buildStatsGrid(errorStats),
-                      _buildActionButtons(filteredNotes),
-                      _buildFilterTabs(),
-                      Expanded(child: _buildErrorNotesList(userErrorNotes, filteredNotes)),
-                      if (filteredNotes.isEmpty)
-                        Flexible(child: _buildTips()),
-                    ],
-                  ),
-                ),
-              ),
+              _buildHeader(),
+              _buildStatsGrid(errorStats),
+              _buildActionButtons(filteredNotes),
+              _buildFilterTabs(),
+              Expanded(child: _buildErrorNotesList(userErrorNotes, filteredNotes)),
+              if (filteredNotes.isEmpty)
+                Flexible(child: _buildTips()),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// Duolingo 스타일 헤더 (뒤로가기 + 제목)
-  Widget _buildGoMathHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.close, color: AppColors.surface),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              '오답 노트',
-              style: const TextStyle(
-                color: AppColors.surface,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(width: 48), // 대칭을 위한 공간
-        ],
       ),
     );
   }
@@ -447,7 +398,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 오답 노트 카드 - Duolingo flat style
+  /// 오답 노트 카드 - Duolingo flat style (개선: 그림자 추가)
   Widget _buildErrorNoteCard(ErrorNote errorNote) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
@@ -463,6 +414,13 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
               color: AppColors.borderLight,
               width: 2,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.borderLight.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

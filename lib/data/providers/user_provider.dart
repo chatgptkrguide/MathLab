@@ -267,6 +267,27 @@ class UserNotifier extends StateNotifier<User?> {
     await _saveUser();
   }
 
+  /// 게스트 사용자 생성
+  Future<void> createGuestUser() async {
+    Logger.info('게스트 사용자 생성 시작', tag: 'UserProvider');
+
+    // 게스트 ID 생성 (현재 시간 기반)
+    final guestId = 'guest_${DateTime.now().millisecondsSinceEpoch}';
+
+    // 샘플 사용자 기반으로 게스트 생성
+    state = _dataService.getSampleUser().copyWith(
+      id: guestId,
+      name: '게스트',
+    );
+
+    await _saveUser();
+
+    // 하트 재생 타이머 시작
+    _startHeartRegeneration();
+
+    Logger.info('게스트 사용자 생성 완료: $guestId', tag: 'UserProvider');
+  }
+
   /// 사용자 초기화 (테스트용)
   Future<void> resetUser() async {
     Logger.warning('사용자 데이터 초기화 시작', tag: 'UserProvider');

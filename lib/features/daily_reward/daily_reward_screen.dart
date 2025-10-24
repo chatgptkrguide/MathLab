@@ -324,7 +324,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
   }
 }
 
-/// 일별 보상 카드
+/// 일별 보상 카드 (개선: 애니메이션 추가)
 class _DayRewardCard extends StatelessWidget {
   final dynamic reward;
   final bool isCurrentDay;
@@ -340,34 +340,41 @@ class _DayRewardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
-        color: isCurrentDay ? AppColors.primary.withOpacity(0.1) : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: isCurrentDay
-              ? AppColors.primary
-              : isClaimed
-                  ? AppColors.success.withOpacity(0.5)
-                  : AppColors.borderLight,
-          width: isCurrentDay ? 2 : 1,
-        ),
-        boxShadow: [
-          if (isCurrentDay)
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            )
-          else if (!isLocked)
-            BoxShadow(
-              color: AppColors.borderLight.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 300 + (reward.day * 50)),
+      curve: Curves.easeOutBack,
+      tween: Tween(begin: 0.8, end: 1.0),
+      builder: (context, scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: Container(
+            padding: const EdgeInsets.all(AppDimensions.paddingL),
+            decoration: BoxDecoration(
+              color: isCurrentDay ? AppColors.primary.withOpacity(0.1) : AppColors.surface,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+              border: Border.all(
+                color: isCurrentDay
+                    ? AppColors.primary
+                    : isClaimed
+                        ? AppColors.success.withOpacity(0.5)
+                        : AppColors.borderLight,
+                width: isCurrentDay ? 2 : 1,
+              ),
+              boxShadow: [
+                if (isCurrentDay)
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                else if (!isLocked)
+                  BoxShadow(
+                    color: AppColors.borderLight.withValues(alpha: 0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+              ],
             ),
-        ],
-      ),
       child: Row(
         children: [
           // Day 번호
@@ -490,6 +497,9 @@ class _DayRewardCard extends StatelessWidget {
             ),
         ],
       ),
+          ),
+        );
+      },
     );
   }
 }

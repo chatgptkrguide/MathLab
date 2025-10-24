@@ -1,124 +1,167 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/services/local_storage_service.dart';
+import '../models/models.dart';
+import '../services/local_storage_service.dart';
 import '../../shared/utils/logger.dart';
 
-/// 설정 상태
-class SettingsState {
-  final bool notificationsEnabled;
-  final bool soundEnabled;
-  final bool hapticEnabled;
-  final bool darkModeEnabled;
-  final String language;
-
-  const SettingsState({
-    this.notificationsEnabled = true,
-    this.soundEnabled = true,
-    this.hapticEnabled = true,
-    this.darkModeEnabled = false,
-    this.language = 'ko',
-  });
-
-  SettingsState copyWith({
-    bool? notificationsEnabled,
-    bool? soundEnabled,
-    bool? hapticEnabled,
-    bool? darkModeEnabled,
-    String? language,
-  }) {
-    return SettingsState(
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-      soundEnabled: soundEnabled ?? this.soundEnabled,
-      hapticEnabled: hapticEnabled ?? this.hapticEnabled,
-      darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
-      language: language ?? this.language,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'notificationsEnabled': notificationsEnabled,
-      'soundEnabled': soundEnabled,
-      'hapticEnabled': hapticEnabled,
-      'darkModeEnabled': darkModeEnabled,
-      'language': language,
-    };
-  }
-
-  factory SettingsState.fromJson(Map<String, dynamic> json) {
-    return SettingsState(
-      notificationsEnabled: json['notificationsEnabled'] ?? true,
-      soundEnabled: json['soundEnabled'] ?? true,
-      hapticEnabled: json['hapticEnabled'] ?? true,
-      darkModeEnabled: json['darkModeEnabled'] ?? false,
-      language: json['language'] ?? 'ko',
-    );
-  }
-}
-
-/// 설정 Provider
-class SettingsProvider extends StateNotifier<SettingsState> {
-  final LocalStorageService _storage = LocalStorageService();
-  static const String _storageKey = 'settings';
-
-  SettingsProvider() : super(const SettingsState()) {
+/// 앱 설정 상태 관리
+class SettingsNotifier extends StateNotifier<AppSettings> {
+  SettingsNotifier() : super(const AppSettings()) {
     _loadSettings();
   }
 
-  /// 설정 로드
+  final LocalStorageService _storage = LocalStorageService();
+  static const String _settingsKey = 'app_settings';
+
+  /// 앱 시작 시 설정 로드
   Future<void> _loadSettings() async {
     try {
-      final data = await _storage.loadMap(_storageKey);
-      if (data != null) {
-        state = SettingsState.fromJson(data);
-        Logger.info('Settings loaded successfully');
+      Logger.info('설정 로드 시작', tag: 'SettingsProvider');
+
+      final settings = await _storage.loadObject<AppSettings>(
+        key: _settingsKey,
+        fromJson: AppSettings.fromJson,
+      );
+
+      if (settings != null) {
+        state = settings;
+        Logger.info('설정 로드 성공: ${settings.toString()}', tag: 'SettingsProvider');
+      } else {
+        // 기본 설정 사용
+        Logger.info('기본 설정 사용', tag: 'SettingsProvider');
       }
-    } catch (e) {
-      Logger.error('Failed to load settings', error: e);
+    } catch (e, stackTrace) {
+      Logger.error(
+        '설정 로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SettingsProvider',
+      );
     }
   }
 
   /// 설정 저장
   Future<void> _saveSettings() async {
     try {
-      await _storage.saveMap(_storageKey, state.toJson());
-      Logger.info('Settings saved successfully');
-    } catch (e) {
-      Logger.error('Failed to save settings', error: e);
+      await _storage.saveObject<AppSettings>(
+        key: _settingsKey,
+        data: state,
+        toJson: (settings) => settings.toJson(),
+      );
+      Logger.debug('설정 저장 완료', tag: 'SettingsProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '설정 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SettingsProvider',
+      );
     }
   }
 
-  /// 알림 토글
-  Future<void> toggleNotifications() async {
-    state = state.copyWith(notificationsEnabled: !state.notificationsEnabled);
+  /// 알림 설정 변경
+  Future<void> setNotificationsEnabled(bool enabled) async {
+    state = state.copyWith(notificationsEnabled: enabled);
     await _saveSettings();
+    Logger.info('알림 설정 변경: $enabled', tag: 'SettingsProvider');
   }
 
-  /// 사운드 토글
-  Future<void> toggleSound() async {
-    state = state.copyWith(soundEnabled: !state.soundEnabled);
+  /// 사운드 설정 변경
+  Future<void> setSoundEnabled(bool enabled) async {
+    state = state.copyWith(soundEnabled: enabled);
     await _saveSettings();
+    Logger.info('사운드 설정 변경: $enabled', tag: 'SettingsProvider');
   }
 
-  /// 햅틱 피드백 토글
-  Future<void> toggleHaptic() async {
-    state = state.copyWith(hapticEnabled: !state.hapticEnabled);
+  /// 진동 설정 변경
+  Future<void> setVibrationEnabled(bool enabled) async {
+    state = state.copyWith(vibrationEnabled: enabled);
     await _saveSettings();
+    Logger.info('진동 설정 변경: $enabled', tag: 'SettingsProvider');
   }
 
-  /// 다크모드 토글
-  Future<void> toggleDarkMode() async {
-    state = state.copyWith(darkModeEnabled: !state.darkModeEnabled);
-    await _saveSettings();
-  }
-
-  /// 언어 변경
+  /// 언어 설정 변경
   Future<void> setLanguage(String language) async {
     state = state.copyWith(language: language);
     await _saveSettings();
+    Logger.info('언어 설정 변경: $language', tag: 'SettingsProvider');
+  }
+
+  /// 일일 목표 XP 변경
+  Future<void> setDailyGoalXP(int xp) async {
+    state = state.copyWith(dailyGoalXP: xp);
+    await _saveSettings();
+    Logger.info('일일 목표 변경: $xp XP', tag: 'SettingsProvider');
+  }
+
+  /// 리마인더 설정 변경
+  Future<void> setReminderEnabled(bool enabled) async {
+    state = state.copyWith(reminderEnabled: enabled);
+    await _saveSettings();
+    Logger.info('리마인더 설정 변경: $enabled', tag: 'SettingsProvider');
+  }
+
+  /// 리마인더 시간 설정
+  Future<void> setReminderTime(String time) async {
+    state = state.copyWith(reminderTime: time);
+    await _saveSettings();
+    Logger.info('리마인더 시간 설정: $time', tag: 'SettingsProvider');
+  }
+
+  /// 다크모드 설정 변경
+  Future<void> setDarkModeEnabled(bool enabled) async {
+    state = state.copyWith(darkModeEnabled: enabled);
+    await _saveSettings();
+    Logger.info('다크모드 설정 변경: $enabled', tag: 'SettingsProvider');
+  }
+
+  /// 설정 초기화
+  Future<void> resetSettings() async {
+    Logger.warning('설정 초기화 시작', tag: 'SettingsProvider');
+
+    state = const AppSettings();
+    await _saveSettings();
+
+    Logger.info('설정 초기화 완료', tag: 'SettingsProvider');
   }
 }
 
-/// Provider 정의
-final settingsProvider = StateNotifierProvider<SettingsProvider, SettingsState>((ref) {
-  return SettingsProvider();
+/// 설정 프로바이더
+final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
+  return SettingsNotifier();
+});
+
+/// 개별 설정 감시 프로바이더들
+final notificationsEnabledProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.notificationsEnabled;
+});
+
+final soundEnabledProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.soundEnabled;
+});
+
+final vibrationEnabledProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.vibrationEnabled;
+});
+
+final languageProvider = Provider<String>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.language;
+});
+
+final dailyGoalXPProvider = Provider<int>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.dailyGoalXP;
+});
+
+final reminderEnabledProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.reminderEnabled;
+});
+
+final darkModeEnabledProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return settings.darkModeEnabled;
 });

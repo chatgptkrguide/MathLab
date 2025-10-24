@@ -44,11 +44,23 @@ class HomeScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background, // GoMath 배경색
-      body: Column(
-        children: [
-          _buildHeader(user),
-          Expanded(
+      backgroundColor: AppColors.background,
+      body: CustomScrollView(
+        slivers: [
+          // SliverAppBar - 스크롤 시 축소되는 헤더
+          SliverAppBar(
+            expandedHeight: 180,
+            floating: false,
+            pinned: true,
+            backgroundColor: AppColors.surface,
+            leading: const SizedBox.shrink(),
+            flexibleSpace: FlexibleSpaceBar(
+              background: _buildHeaderBackground(user),
+            ),
+          ),
+
+          // LessonPath를 Sliver로 감싸기
+          SliverToBoxAdapter(
             child: LessonPathWidget(
               lessons: _generateLessons(user),
               onLessonTap: (lesson) => _handleLessonTap(context, ref, lesson, problems),
@@ -59,27 +71,21 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// 듀오링고 스타일 헤더 (더 깔끔하게 개선)
-  Widget _buildHeader(User user) {
+  /// 듀오링고 스타일 헤더 배경
+  Widget _buildHeaderBackground(User user) {
     return SafeArea(
       bottom: false,
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.borderLight.withValues(alpha: 0.3),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Row(
               children: [
-                // 프로필 아바타
+                // 프로필 아바타 (개선: 그림자 추가)
                 Container(
                   width: 48,
                   height: 48,
@@ -90,6 +96,13 @@ class HomeScreen extends ConsumerWidget {
                       end: Alignment.bottomRight,
                     ),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.mathButtonBlue.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(
@@ -137,6 +150,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: AppDimensions.paddingM),
             // XP 진행률 바
             _buildDuoProgressBar(user),
+            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -156,6 +170,13 @@ class HomeScreen extends ConsumerWidget {
           color: AppColors.borderLight,
           width: 2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.15),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -202,21 +223,21 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6),
-        // 듀오링고 스타일 진행률 바
+        const SizedBox(height: 8),
+        // 듀오링고 스타일 진행률 바 (개선: 높이 증가, 애니메이션 강화)
         Stack(
           children: [
             // 배경 바
             Container(
-              height: 14,
+              height: 16,
               decoration: BoxDecoration(
                 color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             // 진행 바 with animation (GoMath 틸 색상)
             TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 600),
+              duration: const Duration(milliseconds: 800),
               curve: Curves.easeOutCubic,
               tween: Tween(begin: 0.0, end: progress),
               builder: (context, value, child) {
@@ -224,16 +245,16 @@ class HomeScreen extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   widthFactor: value.clamp(0.05, 1.0),
                   child: Container(
-                    height: 14,
+                    height: 16,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [AppColors.mathTeal, AppColors.mathTealDark],
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.mathTeal.withValues(alpha: 0.3),
-                          blurRadius: 4,
+                          color: AppColors.mathTeal.withValues(alpha: 0.4),
+                          blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
                       ],

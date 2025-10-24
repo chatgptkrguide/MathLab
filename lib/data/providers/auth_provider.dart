@@ -437,6 +437,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// 로그아웃 (signOut의 별칭)
+  Future<void> logout() => signOut();
+
   /// 계정 삭제
   Future<void> deleteAccount(String accountId) async {
     final accounts = state.availableAccounts;

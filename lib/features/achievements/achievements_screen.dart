@@ -15,115 +15,123 @@ class AchievementsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        title: const Text(
-          '업적',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () async {
-            await AppHapticFeedback.lightImpact();
-            if (context.mounted) Navigator.of(context).pop();
-          },
-        ),
-      ),
-      body: Column(
-        children: [
-          // 진행 현황 - GoMath style
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppDimensions.paddingXL),
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              border: Border(
-                bottom: BorderSide(color: AppColors.borderLight, width: 1),
-              ),
+      body: CustomScrollView(
+        slivers: [
+          // SliverAppBar - 스크롤 가능한 헤더
+          SliverAppBar(
+            expandedHeight: 200,
+            floating: false,
+            pinned: true,
+            backgroundColor: AppColors.surface,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+              onPressed: () async {
+                await AppHapticFeedback.lightImpact();
+                if (context.mounted) Navigator.of(context).pop();
+              },
             ),
-            child: Column(
-              children: [
-                Text(
-                  '${state.unlockedCount} / ${state.totalCount}',
-                  style: const TextStyle(
-                    color: AppColors.successGreen, // GoMath 초록색
-                    fontWeight: FontWeight.bold,
-                    fontSize: 32,
-                  ),
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text(
+                '업적',
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
                 ),
-                const SizedBox(height: 12),
-                // GoMath-style progress bar with animation
-                Stack(
-                  children: [
-                    Container(
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderLight,
-                        borderRadius: BorderRadius.circular(12),
+              ),
+              background: SafeArea(
+                child: Container(
+                  padding: const EdgeInsets.all(AppDimensions.paddingXL),
+                  decoration: const BoxDecoration(
+                    color: AppColors.surface,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const SizedBox(height: 60), // AppBar 높이 고려
+                      Text(
+                        '${state.unlockedCount} / ${state.totalCount}',
+                        style: const TextStyle(
+                          color: AppColors.successGreen,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32,
+                        ),
                       ),
-                    ),
-                    TweenAnimationBuilder<double>(
-                      duration: const Duration(milliseconds: 800),
-                      curve: Curves.easeOutCubic,
-                      tween: Tween(begin: 0.0, end: state.completionRate),
-                      builder: (context, value, child) {
-                        return FractionallySizedBox(
-                          alignment: Alignment.centerLeft,
-                          widthFactor: value.clamp(0.01, 1.0),
-                          child: Container(
+                      const SizedBox(height: 12),
+                      // GoMath-style progress bar with animation
+                      Stack(
+                        children: [
+                          Container(
                             height: 12,
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  AppColors.successGreen,
-                                  AppColors.duolingoGreenDark,
-                                ],
-                              ),
+                              color: AppColors.borderLight,
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.successGreen.withValues(alpha: 0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${(state.completionRate * 100).toStringAsFixed(1)}% 완료',
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                          TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 800),
+                            curve: Curves.easeOutCubic,
+                            tween: Tween(begin: 0.0, end: state.completionRate),
+                            builder: (context, value, child) {
+                              return FractionallySizedBox(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: value.clamp(0.01, 1.0),
+                                child: Container(
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        AppColors.successGreen,
+                                        AppColors.duolingoGreenDark,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.successGreen.withValues(alpha: 0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${(state.completionRate * 100).toStringAsFixed(1)}% 완료',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
 
           // 업적 리스트
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(AppDimensions.paddingL),
-              itemCount: state.achievements.length,
-              itemBuilder: (context, index) {
-                final achievement = state.achievements[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
-                  child: _AchievementCard(achievement: achievement),
-                );
-              },
+          SliverPadding(
+            padding: const EdgeInsets.all(AppDimensions.paddingL),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final achievement = state.achievements[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
+                    child: _AchievementCard(achievement: achievement),
+                  );
+                },
+                childCount: state.achievements.length,
+              ),
             ),
           ),
         ],
