@@ -27,6 +27,9 @@ class ProblemOptionButton extends StatefulWidget {
   /// 탭 콜백
   final VoidCallback onTap;
 
+  /// 깜빡임 효과 (더블 클릭 대기 중)
+  final bool isPulsing;
+
   const ProblemOptionButton({
     super.key,
     required this.optionText,
@@ -35,6 +38,7 @@ class ProblemOptionButton extends StatefulWidget {
     required this.isAnswerSubmitted,
     required this.isCorrectAnswer,
     required this.onTap,
+    this.isPulsing = false,
   });
 
   @override
@@ -167,11 +171,14 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: GestureDetector(
-        onTap: _handleTap,
-        child: Stack(
+    return AnimatedOpacity(
+      opacity: widget.isPulsing ? 0.6 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: GestureDetector(
+          onTap: _handleTap,
+          child: Stack(
           clipBehavior: Clip.none,
           children: [
             // Duolingo-style 3D solid shadow
@@ -253,6 +260,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
             ),
           ],
         ),
+      ),
       ),
     );
   }

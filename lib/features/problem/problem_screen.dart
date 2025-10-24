@@ -60,9 +60,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _hintSectionKey = GlobalKey();
 
-  // 더블 클릭 관련
-  DateTime? _lastSubmitClickTime;
-  bool _isButtonPulsing = false;
+  // 더블 클릭 관련 (객관식 답 선택용)
+  int? _lastSelectedIndex;
+  DateTime? _lastSelectTime;
+  int? _pulsingIndex;
 
   @override
   void initState() {
@@ -299,7 +300,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
               ),
             ),
           ),
-          _buildBottomButton(),
+          if (_buildBottomButton() != null) _buildBottomButton()!,
         ],
       ),
     );
@@ -395,6 +396,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 isAnswerSubmitted: _isAnswerSubmitted,
                 isCorrectAnswer: isCorrectAnswer,
                 onTap: () => _selectAnswer(index),
+                isPulsing: _pulsingIndex == index,
               ),
             ),
           );
@@ -453,7 +455,12 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   }
 
   /// 하단 버튼 - Duolingo style with 3D shadow
-  Widget _buildBottomButton() {
+  Widget? _buildBottomButton() {
+    // 객관식 문제이고 답 제출 전이면 버튼 숨김
+    if (_currentProblem.type == ProblemType.multipleChoice && !_isAnswerSubmitted) {
+      return null;
+    }
+
     final enabled = _getButtonAction() != null;
     final buttonColor = _getButtonColor();
     final darkerColor = _getDarkerButtonColor();
@@ -468,10 +475,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       ),
       child: SafeArea(
         top: false,
-        child: AnimatedOpacity(
-          opacity: _isButtonPulsing ? 0.5 : 1.0,
-          duration: const Duration(milliseconds: 200),
-          child: Stack(
+        child: Stack(
             children: [
               // Duolingo 3D solid shadow
               if (enabled)
@@ -512,54 +516,28 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 ),
               ),
             ],
-          ),
         ),
       ),
     );
   }
 
   VoidCallback? _getButtonAction() {
-    if (!_isAnswerSubmitted && _selectedAnswerIndex == null) {
-      return null; // 답을 선택하지 않으면 비활성화
+    // 답 제출 후에는 다음 문제 또는 결과 확인
+    if (_isAnswerSubmitted) {
+      if (_isLastProblem) {
+        return _showResults;
+      }
+      return _nextProblem;
     }
-    if (!_isAnswerSubmitted) {
-      return _handleSubmitClick; // 더블 클릭 핸들러
-    }
-    if (_isLastProblem) {
-      return _showResults;
-    }
-    return _nextProblem;
-  }
 
-  /// 제출 버튼 클릭 핸들러 (더블 클릭 필요)
-  void _handleSubmitClick() async {
-    final now = DateTime.now();
-
-    if (_lastSubmitClickTime == null ||
-        now.difference(_lastSubmitClickTime!).inMilliseconds > 500) {
-      // 첫 번째 클릭 또는 시간 초과 -> 깜빡임 시작
-      await AppHapticFeedback.lightImpact();
-      setState(() {
-        _lastSubmitClickTime = now;
-        _isButtonPulsing = true;
-      });
-
-      // 500ms 후에 깜빡임 중지
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _isButtonPulsing = false;
-          });
-        }
-      });
-    } else {
-      // 두 번째 클릭 (500ms 이내) -> 정답 제출
-      setState(() {
-        _lastSubmitClickTime = null;
-        _isButtonPulsing = false;
-      });
-      _submitAnswer();
+    // 객관식: 제출 버튼 없음 (더블 클릭으로 자동 제출)
+    if (_currentProblem.type == ProblemType.multipleChoice) {
+      return null;
     }
+
+    // 주관식/계산: 제출 버튼 표시 (아직 구현 안 됨)
+    // TODO: 주관식 입력이 있을 때만 활성화
+    return null;
   }
 
   Color _getButtonColor() {
@@ -591,12 +569,41 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     return '다음 문제';
   }
 
-  /// 답 선택
+  /// 답 선택 (객관식 더블 클릭 자동 제출)
   void _selectAnswer(int index) async {
-    await AppHapticFeedback.selectionClick();
-    setState(() {
-      _selectedAnswerIndex = index;
-    });
+    final now = DateTime.now();
+
+    // 같은 답을 500ms 이내에 다시 선택하면 자동 제출
+    if (_lastSelectedIndex == index &&
+        _lastSelectTime != null &&
+        now.difference(_lastSelectTime!).inMilliseconds <= 500) {
+      // 두 번째 클릭 -> 자동 제출
+      await AppHapticFeedback.success();
+      setState(() {
+        _pulsingIndex = null;
+        _lastSelectedIndex = null;
+        _lastSelectTime = null;
+      });
+      _submitAnswer();
+    } else {
+      // 첫 클릭 또는 다른 답 선택
+      await AppHapticFeedback.selectionClick();
+      setState(() {
+        _selectedAnswerIndex = index;
+        _lastSelectedIndex = index;
+        _lastSelectTime = now;
+        _pulsingIndex = index;
+      });
+
+      // 500ms 후에 깜빡임 중지
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted && _pulsingIndex == index) {
+          setState(() {
+            _pulsingIndex = null;
+          });
+        }
+      });
+    }
   }
 
   /// 답 제출
@@ -702,6 +709,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _selectedAnswerIndex = null;
       _isAnswerSubmitted = false;
       _isCorrect = false;
+      _lastSelectedIndex = null;
+      _lastSelectTime = null;
+      _pulsingIndex = null;
     });
 
     // 타이머 리셋 및 재시작
@@ -865,6 +875,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _totalCorrect = 0;
       _totalXPEarned = 0;
       _results.clear();
+      _lastSelectedIndex = null;
+      _lastSelectTime = null;
+      _pulsingIndex = null;
     });
 
     // 타이머 리셋 및 재시작
