@@ -381,6 +381,17 @@ class UserNotifier extends StateNotifier<User?> {
 
     Logger.info('하트 복구 완료: ${GameConstants.maxHearts}개', tag: 'UserProvider');
   }
+
+  /// 레벨 설정 (레벨 테스트 결과 반영)
+  Future<void> setLevel(int level) async {
+    if (state == null) return;
+
+    final clampedLevel = level.clamp(1, 100); // 1-100 사이로 제한
+    state = state!.copyWith(level: clampedLevel);
+    await _saveUser();
+
+    Logger.info('레벨 설정 완료: Level $clampedLevel', tag: 'UserProvider');
+  }
 }
 
 /// 사용자 정보 프로바이더
