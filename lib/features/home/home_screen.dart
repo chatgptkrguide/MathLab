@@ -10,7 +10,9 @@ import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
 import '../../data/providers/lesson_provider.dart';
+import '../../data/providers/daily_challenge_provider.dart';
 import '../problem/problem_screen.dart';
+import '../daily_challenge/daily_challenge_screen.dart';
 
 /// 듀오링고 스타일 홈 화면
 /// S자 곡선 레슨 경로 적용
@@ -51,13 +53,13 @@ class HomeScreen extends ConsumerWidget {
         slivers: [
           // SliverAppBar - 스크롤 시 축소되는 헤더
           SliverAppBar(
-            expandedHeight: 180,
+            expandedHeight: 220,
             floating: false,
             pinned: true,
             backgroundColor: AppColors.surface,
             leading: const SizedBox.shrink(),
             flexibleSpace: FlexibleSpaceBar(
-              background: _buildHeaderBackground(user),
+              background: _buildHeaderBackground(context, ref, user),
             ),
           ),
 
@@ -74,7 +76,9 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// 듀오링고 스타일 헤더 배경
-  Widget _buildHeaderBackground(User user) {
+  Widget _buildHeaderBackground(BuildContext context, WidgetRef ref, User user) {
+    final dailyChallengeState = ref.watch(dailyChallengeProvider);
+
     return SafeArea(
       bottom: false,
       child: Container(
@@ -152,6 +156,72 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: AppDimensions.paddingM),
             // XP 진행률 바
             _buildDuoProgressBar(user),
+            const SizedBox(height: AppDimensions.paddingM),
+            // Daily Challenge 버튼
+            GestureDetector(
+              onTap: () async {
+                await AppHapticFeedback.lightImpact();
+                if (context.mounted) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const DailyChallengeScreen(),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingM,
+                  vertical: AppDimensions.paddingS,
+                ),
+                decoration: BoxDecoration(
+                  gradient: dailyChallengeState.allCompleted
+                      ? const LinearGradient(colors: AppColors.goldGradient)
+                      : LinearGradient(
+                          colors: [
+                            AppColors.primary.withOpacity(0.8),
+                            AppColors.primary,
+                          ],
+                        ),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '🎯',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(width: AppDimensions.spacingS),
+                    Text(
+                      dailyChallengeState.allCompleted
+                          ? '일일 챌린지 완료! 🎉'
+                          : '일일 챌린지 (${dailyChallengeState.completedCount}/${dailyChallengeState.challenges.length})',
+                      style: const TextStyle(
+                        color: AppColors.surface,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (!dailyChallengeState.allCompleted) ...[
+                      const Spacer(),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: AppColors.surface,
+                        size: 14,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 8),
           ],
         ),
