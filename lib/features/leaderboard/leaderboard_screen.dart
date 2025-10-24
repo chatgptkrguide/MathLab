@@ -45,12 +45,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    final entries = ref
-        .read(leaderboardProvider.notifier)
-        .getLeaderboard(_selectedPeriod);
-    final currentUserEntry = ref
-        .read(leaderboardProvider.notifier)
-        .getCurrentUserEntry(_selectedPeriod);
+    final leaderboardState = ref.watch(leaderboardProvider);
+
+    // 선택된 기간에 맞는 리더보드 데이터 가져오기
+    final entries = _getEntriesForPeriod(leaderboardState, _selectedPeriod);
+    final currentUserEntry = _getCurrentUserEntryForPeriod(entries);
 
     return Scaffold(
       backgroundColor: AppColors.mathBlue, // GoMath blue
@@ -507,6 +506,32 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         return AppColors.levelBronzeDark; // Darker bronze (표준 메달 색상)
       default:
         return AppColors.borderLight;
+    }
+  }
+
+  /// 기간별 리더보드 엔트리 가져오기
+  List<LeaderboardEntry> _getEntriesForPeriod(
+    LeaderboardState state,
+    LeaderboardPeriod period,
+  ) {
+    switch (period) {
+      case LeaderboardPeriod.weekly:
+        return state.weeklyEntries;
+      case LeaderboardPeriod.monthly:
+        return state.monthlyEntries;
+      case LeaderboardPeriod.allTime:
+        return state.allTimeEntries;
+    }
+  }
+
+  /// 현재 사용자 엔트리 찾기
+  LeaderboardEntry? _getCurrentUserEntryForPeriod(
+    List<LeaderboardEntry> entries,
+  ) {
+    try {
+      return entries.firstWhere((entry) => entry.isCurrentUser);
+    } catch (e) {
+      return null;
     }
   }
 }
