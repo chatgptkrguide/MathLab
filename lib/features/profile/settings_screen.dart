@@ -148,21 +148,13 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             const Divider(height: 1),
-            // 로그인/로그아웃 버튼
-            if (isGuest)
-              ListTile(
-                leading: const Icon(Icons.login, color: AppColors.mathGreen),
-                title: const Text('로그인'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _handleLogin(context, ref),
-              )
-            else
-              ListTile(
-                leading: const Icon(Icons.logout, color: AppColors.mathRed),
-                title: const Text('로그아웃'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _handleLogout(context, ref),
-              ),
+            // 로그인/로그아웃 버튼 - 강조된 디자인
+            Padding(
+              padding: const EdgeInsets.all(AppDimensions.paddingM),
+              child: isGuest
+                  ? _buildLoginButton(context, ref)
+                  : _buildLogoutButton(context, ref),
+            ),
           ],
         ),
       ),
@@ -322,6 +314,119 @@ class SettingsScreen extends ConsumerWidget {
               ),
               trailing: const Icon(Icons.chevron_right, color: AppColors.mathRed),
               onTap: () => _showResetDialog(context, ref),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 로그인 버튼 (강조된 디자인)
+  Widget _buildLoginButton(BuildContext context, WidgetRef ref) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.0, end: 1.05),
+      duration: const Duration(milliseconds: 1000),
+      curve: Curves.easeInOut,
+      builder: (context, scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: child,
+        );
+      },
+      onEnd: () {
+        // 애니메이션 반복을 위한 상태 관리가 필요하지만 여기서는 간단하게 처리
+      },
+      child: InkWell(
+        onTap: () => _handleLogin(context, ref),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.paddingL,
+            vertical: AppDimensions.paddingM,
+          ),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.mathGreen, AppColors.mathTeal],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.mathGreen.withValues(alpha: 0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.login,
+                color: AppColors.surface,
+                size: 28,
+              ),
+              const SizedBox(width: AppDimensions.spacingM),
+              Text(
+                '로그인하고 데이터 동기화하기',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.surface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacingS),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.surface,
+                size: 24,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 로그아웃 버튼 (덜 강조된 디자인)
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+    return InkWell(
+      onTap: () => _handleLogout(context, ref),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.paddingL,
+          vertical: AppDimensions.paddingM,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          border: Border.all(
+            color: AppColors.mathRed.withValues(alpha: 0.3),
+            width: 2,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.logout,
+              color: AppColors.mathRed,
+              size: 24,
+            ),
+            const SizedBox(width: AppDimensions.spacingM),
+            Text(
+              '로그아웃',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.mathRed,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacingS),
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.mathRed,
+              size: 20,
             ),
           ],
         ),
