@@ -134,22 +134,22 @@ class LessonsScreen extends ConsumerWidget {
             ),
           ),
           // 스트릭
-          _buildStatItem('🔥', streakDays.toString()),
+          _buildStatItem(Icons.local_fire_department, streakDays.toString()),
           const SizedBox(width: AppDimensions.spacingM),
           // XP
-          _buildStatItem('🔶', xp.toString()),
+          _buildStatItem(Icons.diamond_outlined, xp.toString()),
           const SizedBox(width: AppDimensions.spacingM),
           // 레벨
-          _buildStatItem('⭐', level.toString()),
+          _buildStatItem(Icons.star, level.toString()),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String emoji, String value) {
+  Widget _buildStatItem(IconData icon, String value) {
     return Row(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
+        Icon(icon, color: AppColors.mathYellow, size: 20),
         const SizedBox(width: 4),
         Text(
           value,
@@ -168,9 +168,10 @@ class LessonsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            '📚',
-            style: const TextStyle(fontSize: 64),
+          Icon(
+            Icons.menu_book,
+            color: AppColors.surface.withValues(alpha: 0.5),
+            size: 64,
           ),
           const SizedBox(height: AppDimensions.spacingL),
           Text(
@@ -317,7 +318,7 @@ class LessonsScreen extends ConsumerWidget {
         ),
         title: Row(
           children: [
-            Text('🔒', style: const TextStyle(fontSize: 24)),
+            const Icon(Icons.lock, color: AppColors.warningOrange, size: 24),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
               '잠긴 레슨',
@@ -362,7 +363,7 @@ class LessonsScreen extends ConsumerWidget {
         ),
         title: Row(
           children: [
-            Text('📝', style: const TextStyle(fontSize: 24)),
+            const Icon(Icons.edit_note, color: AppColors.mathBlue, size: 24),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
               '문제 준비 중',

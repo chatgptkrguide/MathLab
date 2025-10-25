@@ -382,7 +382,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
       return EmptyState(
         icon: '📈',
         title: '오답이 없습니다!',
-        message: '완벽한 학습을 이어가고 계시네요 🎉\n\n앞으로도 꾸준히 학습해보세요.',
+        message: '완벽한 학습을 이어가고 계시네요.\n\n앞으로도 꾸준히 학습해보세요.',
         actionText: '학습하러 가기',
         onActionPressed: () {
           // 학습 화면으로 이동 (Lessons 탭으로 변경)
@@ -392,7 +392,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     }
 
     return EmptyState(
-      icon: '✅',
+      icon: Icons.check_circle,
       title: '$selectedTab 문제가 없습니다',
       message: '다른 탭을 확인해보세요.',
     );
@@ -694,7 +694,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
         ),
         title: Row(
           children: [
-            Text('📚', style: const TextStyle(fontSize: 24)),
+            const Icon(Icons.menu_book, color: AppColors.primary, size: 24),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
               '맞춤 복습 세트',

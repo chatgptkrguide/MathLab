@@ -108,20 +108,20 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               maxLines: 1,
             ),
           ),
-          _buildStatItem('🔥', streakDays.toString()),
+          _buildStatItem(Icons.local_fire_department, streakDays.toString()),
           const SizedBox(width: AppDimensions.spacingM),
-          _buildStatItem('🔶', xp.toString()),
+          _buildStatItem(Icons.diamond_outlined, xp.toString()),
           const SizedBox(width: AppDimensions.spacingM),
-          _buildStatItem('⭐', level.toString()),
+          _buildStatItem(Icons.star, level.toString()),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String emoji, String value) {
+  Widget _buildStatItem(IconData icon, String value) {
     return Row(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
+        Icon(icon, color: AppColors.mathYellow, size: 20),
         const SizedBox(width: 4),
         Text(
           value,
@@ -203,7 +203,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           children: [
             Expanded(
               child: _buildChallengeCardWithAnimation(
-                icon: '🔥',
+                icon: Icons.local_fire_department,
                 label: 'Current Streak',
                 value: '$currentStreak Days',
                 delay: 0,
@@ -212,7 +212,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: _buildChallengeCardWithAnimation(
-                icon: '📅',
+                icon: Icons.calendar_today,
                 label: 'Remaining',
                 value: '${remaining > 0 ? remaining : 0} Days',
                 delay: 100,
@@ -226,7 +226,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   /// 애니메이션이 있는 챌린지 카드 래퍼
   Widget _buildChallengeCardWithAnimation({
-    required String icon,
+    required IconData icon,
     required String label,
     required String value,
     required int delay,
@@ -249,7 +249,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   Widget _buildChallengeCard({
-    required String icon,
+    required IconData icon,
     required String label,
     required String value,
   }) {
@@ -272,7 +272,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       ),
       child: Column(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 36)),
+          Icon(icon, color: AppColors.mathBlue, size: 36),
           const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,

@@ -6,7 +6,7 @@ import '../../constants/app_dimensions.dart';
 /// 데이터가 없을 때 표시하는 일러스트레이션과 메시지
 /// 완전한 반응형 처리로 오버플로우 방지
 class EmptyState extends StatelessWidget {
-  final String icon;
+  final IconData icon;
   final String title;
   final String message;
   final String? actionText;
@@ -51,13 +51,11 @@ class EmptyState extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // 이모지 아이콘
-                    Text(
+                    // 아이콘
+                    Icon(
                       icon,
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 32 : 48,
-                        height: 1.0,
-                      ),
+                      size: isSmallScreen ? 48 : 64,
+                      color: Colors.grey.shade400,
                     ),
 
                     SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingL),
