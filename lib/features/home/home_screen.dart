@@ -213,7 +213,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     );
                   },
-                  child: _buildDuoStatBadge('🔥', '${user.streakDays}', AppColors.mathOrange),
+                  child: _buildDuoStatBadge(Icons.local_fire_department, '${user.streakDays}', AppColors.mathOrange),
                 ),
                 const SizedBox(width: AppDimensions.spacingS),
                 TweenAnimationBuilder<double>(
@@ -229,7 +229,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     );
                   },
-                  child: _buildDuoStatBadge('❤️', '${user.hearts}', AppColors.mathRed),
+                  child: _buildDuoStatBadge(Icons.favorite, '${user.hearts}', AppColors.mathRed),
                 ),
               ],
             ),
@@ -280,14 +280,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        '🎯',
-                        style: TextStyle(fontSize: 18),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.emoji_events,
+                          color: AppColors.surface,
+                          size: 18,
+                        ),
                       ),
                       const SizedBox(width: AppDimensions.spacingS),
                       Text(
                         dailyChallengeState.allCompleted
-                            ? '일일 챌린지 완료! 🎉'
+                            ? '일일 챌린지 완료!'
                             : '일일 챌린지 (${dailyChallengeState.completedCount}/${dailyChallengeState.challenges.length})',
                         style: const TextStyle(
                           color: AppColors.surface,
@@ -316,7 +325,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildDuoStatBadge(String emoji, String value, Color color) {
+  Widget _buildDuoStatBadge(IconData icon, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -340,7 +349,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 16)),
+          Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 14,
+            ),
+          ),
           const SizedBox(width: 4),
           Text(
             value,
