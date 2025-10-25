@@ -4,6 +4,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/cards/achievement_card.dart';
+import '../../shared/widgets/animations/animations.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
@@ -13,13 +14,21 @@ import 'widgets/profile_header_content.dart';
 import 'widgets/profile_stat_card.dart';
 import 'widgets/guest_login_prompt.dart';
 
-/// 프로필/계정 화면 (업적 시스템 통합)
+/// 프로필/계정 화면 (업적 시스템 통합 + 간소화)
 /// CustomScrollView + SliverAppBar로 스크롤 동작 개선
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  bool _showUnlockedAchievements = true;
+  bool _showLockedAchievements = false;
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     final achievementsState = ref.watch(achievementProvider);
     final achievements = achievementsState.achievements;
@@ -36,9 +45,9 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.mathBlue,
       body: CustomScrollView(
         slivers: [
-          // SliverAppBar - 스크롤 시 축소되는 헤더
+          // SliverAppBar - 스크롤 시 축소되는 헤더 (높이 감소)
           SliverAppBar(
-            expandedHeight: 360,
+            expandedHeight: 300,
             floating: false,
             pinned: true,
             backgroundColor: AppColors.surface,
@@ -148,18 +157,36 @@ class ProfileScreen extends ConsumerWidget {
             child: SizedBox(height: AppDimensions.spacingL),
           ),
 
-          // 달성한 업적
+          // 달성한 업적 (접기/펴기)
           if (unlockedAchievements.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.paddingXL,
                 ),
-                child: Text(
-                  '달성 완료',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _showUnlockedAchievements = !_showUnlockedAchievements;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '달성 완료',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Icon(
+                        _showUnlockedAchievements
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -167,45 +194,64 @@ class ProfileScreen extends ConsumerWidget {
             const SliverToBoxAdapter(
               child: SizedBox(height: AppDimensions.spacingM),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.paddingXL,
-              ),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: AppDimensions.spacingM,
-                  crossAxisSpacing: AppDimensions.spacingM,
-                  childAspectRatio: 0.85,
+            if (_showUnlockedAchievements)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingXL,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return AchievementCard(
-                      achievement: unlockedAchievements[index],
-                      onTap: () => _showAchievementDetail(context, unlockedAchievements[index]),
-                    );
-                  },
-                  childCount: unlockedAchievements.length,
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: AppDimensions.spacingM,
+                    crossAxisSpacing: AppDimensions.spacingM,
+                    childAspectRatio: 0.85,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return AchievementCard(
+                        achievement: unlockedAchievements[index],
+                        onTap: () => _showAchievementDetail(unlockedAchievements[index]),
+                      );
+                    },
+                    childCount: unlockedAchievements.length,
+                  ),
                 ),
               ),
-            ),
             const SliverToBoxAdapter(
-              child: SizedBox(height: AppDimensions.spacingXL),
+              child: SizedBox(height: AppDimensions.spacingL),
             ),
           ],
 
-          // 진행 중인 업적
+          // 진행 중인 업적 (접기/펴기)
           if (lockedAchievements.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.paddingXL,
                 ),
-                child: Text(
-                  '진행 중',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _showLockedAchievements = !_showLockedAchievements;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '진행 중',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Icon(
+                        _showLockedAchievements
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -213,28 +259,29 @@ class ProfileScreen extends ConsumerWidget {
             const SliverToBoxAdapter(
               child: SizedBox(height: AppDimensions.spacingM),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.paddingXL,
-              ),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: AppDimensions.spacingM,
-                  crossAxisSpacing: AppDimensions.spacingM,
-                  childAspectRatio: 0.85,
+            if (_showLockedAchievements)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingXL,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return AchievementCard(
-                      achievement: lockedAchievements[index],
-                      onTap: () => _showAchievementDetail(context, lockedAchievements[index]),
-                    );
-                  },
-                  childCount: lockedAchievements.length,
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: AppDimensions.spacingM,
+                    crossAxisSpacing: AppDimensions.spacingM,
+                    childAspectRatio: 0.85,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return AchievementCard(
+                        achievement: lockedAchievements[index],
+                        onTap: () => _showAchievementDetail(lockedAchievements[index]),
+                      );
+                    },
+                    childCount: lockedAchievements.length,
+                  ),
                 ),
               ),
-            ),
           ],
 
           // 하단 여백
@@ -247,9 +294,10 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   /// 업적 상세 정보 다이얼로그
-  void _showAchievementDetail(BuildContext context, Achievement achievement) async {
+  void _showAchievementDetail(Achievement achievement) async {
     await AppHapticFeedback.lightImpact();
 
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) => Dialog(

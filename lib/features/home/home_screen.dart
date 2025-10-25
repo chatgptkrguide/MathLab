@@ -5,6 +5,7 @@ import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/utils.dart';
 import '../../shared/widgets/layout/lesson_path_widget.dart';
 import '../../shared/widgets/indicators/loading_widgets.dart';
+import '../../shared/widgets/animations/animations.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
@@ -103,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         slivers: [
           // SliverAppBar - 스크롤 시 축소되는 헤더
           SliverAppBar(
-            expandedHeight: 220,
+            expandedHeight: 180,
             floating: false,
             pinned: true,
             backgroundColor: AppColors.surface,
@@ -134,7 +135,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: FadeTransition(
         opacity: _headerFadeAnimation,
         child: Container(
-          padding: const EdgeInsets.all(AppDimensions.paddingL),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.paddingL,
+            vertical: AppDimensions.paddingM,
+          ),
           decoration: const BoxDecoration(
             color: AppColors.surface,
           ),
@@ -143,10 +147,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             children: [
               Row(
                 children: [
-                // 프로필 아바타 (개선: 그림자 추가)
+                // 프로필 아바타 (간소화)
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: AppColors.mathButtonGradient,
@@ -233,17 +237,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               ],
             ),
-            const SizedBox(height: AppDimensions.paddingM),
+            const SizedBox(height: AppDimensions.spacingM),
             // XP 진행률 바
             _buildDuoProgressBar(user),
-            const SizedBox(height: AppDimensions.paddingM),
-            // Daily Challenge 버튼 with scale animation
-            GestureDetector(
+            const SizedBox(height: AppDimensions.spacingM),
+            // Daily Challenge 버튼 (간소화)
+            AnimatedButton(
               onTap: () async {
-                await AppHapticFeedback.lightImpact();
-                await _challengeController.forward();
-                await _challengeController.reverse();
-
                 if (context.mounted) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -252,72 +252,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   );
                 }
               },
-              child: ScaleTransition(
-                scale: _challengeScaleAnimation,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.paddingM,
-                    vertical: AppDimensions.paddingS,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: dailyChallengeState.allCompleted
-                        ? const LinearGradient(colors: AppColors.goldGradient)
-                        : LinearGradient(
-                            colors: [
-                              AppColors.primary.withOpacity(0.8),
-                              AppColors.primary,
-                            ],
-                          ),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingM,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  gradient: dailyChallengeState.allCompleted
+                      ? const LinearGradient(colors: AppColors.goldGradient)
+                      : const LinearGradient(
+                          colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                        ),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.emoji_events, color: AppColors.surface, size: 18),
+                    const SizedBox(width: AppDimensions.spacingS),
+                    Text(
+                      dailyChallengeState.allCompleted
+                          ? '챌린지 완료! ✨'
+                          : '일일 챌린지',
+                      style: const TextStyle(
+                        color: AppColors.surface,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: AppColors.surface.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.emoji_events,
-                          color: AppColors.surface,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.spacingS),
-                      Text(
-                        dailyChallengeState.allCompleted
-                            ? '일일 챌린지 완료!'
-                            : '일일 챌린지 (${dailyChallengeState.completedCount}/${dailyChallengeState.challenges.length})',
-                        style: const TextStyle(
-                          color: AppColors.surface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      if (!dailyChallengeState.allCompleted) ...[
-                        const Spacer(),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          color: AppColors.surface,
-                          size: 14,
-                        ),
-                      ],
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -327,48 +294,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildDuoStatBadge(IconData icon, String value, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 14,
-            ),
-          ),
+          Icon(icon, color: color, size: 16),
           const SizedBox(width: 4),
           Text(
             value,
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: 13,
             ),
           ),
         ],
@@ -386,9 +327,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '레벨 ${user.level + 1}까지',
+              'Lv ${user.level}',
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
@@ -396,89 +337,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             Text(
               '$xpNeeded XP',
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        // 듀오링고 스타일 진행률 바 with shimmer animation
-        Stack(
-          children: [
-            // 배경 바
-            Container(
-              height: 16,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            // 진행 바 with animation (GoMath 틸 색상)
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeOutCubic,
-              tween: Tween(begin: 0.0, end: progress),
-              builder: (context, value, child) {
-                return FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: value.clamp(0.05, 1.0),
-                  child: Stack(
-                    children: [
-                      // 진행 바 배경
-                      Container(
-                        height: 16,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [AppColors.mathTeal, AppColors.mathTealDark],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.mathTeal.withValues(alpha: 0.4),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Shimmer overlay
-                      TweenAnimationBuilder<double>(
-                        duration: const Duration(milliseconds: 1500),
-                        curve: Curves.easeInOut,
-                        tween: Tween(begin: -1.0, end: 2.0),
-                        onEnd: () {
-                          // Restart animation by updating state
-                        },
-                        builder: (context, shimmerValue, child) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Transform.translate(
-                              offset: Offset(shimmerValue * 100, 0),
-                              child: Container(
-                                height: 16,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      AppColors.surface.withValues(alpha: 0.3),
-                                      Colors.transparent,
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+        const SizedBox(height: 6),
+        AnimatedProgressBar(
+          progress: progress,
+          height: 10,
+          backgroundColor: AppColors.borderLight,
+          gradient: const LinearGradient(
+            colors: [AppColors.mathTeal, AppColors.mathTealDark],
+          ),
+          borderRadius: BorderRadius.circular(8),
+          duration: const Duration(milliseconds: 600),
         ),
       ],
     );

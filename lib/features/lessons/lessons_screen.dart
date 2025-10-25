@@ -4,8 +4,9 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
-import '../../shared/widgets/animations/fade_in_widget.dart';
+import '../../shared/widgets/animations/animations.dart';
 import '../../shared/widgets/cards/lesson_card.dart';
+import '../../shared/utils/page_transitions.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/lesson_provider.dart';
@@ -60,42 +61,37 @@ class LessonsScreen extends ConsumerWidget {
     );
   }
 
-  /// 헤더 (GoMath 스타일)
+  /// 헤더 (간소화)
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingL,
+        vertical: AppDimensions.paddingM,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 햄버거 메뉴 아이콘
-          const Icon(
-            Icons.menu,
-            color: AppColors.surface,
-            size: 28,
-          ),
           // 학습 경로 텍스트
           Text(
             '학습 경로',
-            style: AppTextStyles.headlineMedium.copyWith(
+            style: AppTextStyles.headlineSmall.copyWith(
               color: AppColors.surface,
               fontWeight: FontWeight.bold,
             ),
           ),
           // GoMath 로고
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               'GoMATH',
-              style: AppTextStyles.titleSmall.copyWith(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.mathButtonBlue,
                 fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
               ),
             ),
           ),
@@ -104,7 +100,7 @@ class LessonsScreen extends ConsumerWidget {
     );
   }
 
-  /// 사용자 통계 (상단)
+  /// 사용자 통계 (간소화)
   Widget _buildUserStats({
     required String userName,
     required int streakDays,
@@ -113,49 +109,39 @@ class LessonsScreen extends ConsumerWidget {
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingL,
+        vertical: AppDimensions.paddingM,
+      ),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        color: AppColors.surface.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 사용자 이름
-          Expanded(
-            child: Text(
-              userName,
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.surface,
-                fontWeight: FontWeight.w600,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          // 스트릭
-          _buildStatItem(Icons.local_fire_department, streakDays.toString()),
-          const SizedBox(width: AppDimensions.spacingM),
-          // XP
-          _buildStatItem(Icons.diamond_outlined, xp.toString()),
-          const SizedBox(width: AppDimensions.spacingM),
           // 레벨
-          _buildStatItem(Icons.star, level.toString()),
+          _buildStatItem(Icons.star, 'Lv $level', AppColors.mathYellow),
+          // 스트릭
+          _buildStatItem(Icons.local_fire_department, '$streakDays일', AppColors.mathOrange),
+          // XP
+          _buildStatItem(Icons.diamond, '$xp XP', AppColors.mathTeal),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(IconData icon, String value) {
+  Widget _buildStatItem(IconData icon, String value, Color color) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.mathYellow, size: 20),
+        Icon(icon, color: color, size: 18),
         const SizedBox(width: 4),
         Text(
           value,
-          style: AppTextStyles.titleMedium.copyWith(
+          style: TextStyle(
             color: AppColors.surface,
             fontWeight: FontWeight.bold,
+            fontSize: 13,
           ),
         ),
       ],
@@ -297,10 +283,10 @@ class LessonsScreen extends ConsumerWidget {
       return;
     }
 
-    // 문제 풀이 화면으로 이동
+    // 문제 풀이 화면으로 이동 (부드러운 전환 효과)
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ProblemScreen(
+      AppPageTransitions.slideAndFade(
+        ProblemScreen(
           lessonId: lesson.id,
           problems: problems,
         ),
@@ -308,92 +294,154 @@ class LessonsScreen extends ConsumerWidget {
     );
   }
 
-  /// 잠긴 레슨 다이얼로그
+  /// 잠긴 레슨 다이얼로그 (개선된 디자인)
   void _showLockedDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: true,
+      builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          borderRadius: BorderRadius.circular(24),
         ),
-        title: Row(
-          children: [
-            const Icon(Icons.lock, color: AppColors.warningOrange, size: 24),
-            const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              '잠긴 레슨',
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 아이콘
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.warningOrange.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.lock_outline,
+                  color: AppColors.warningOrange,
+                  size: 32,
+                ),
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          '이전 레슨을 완료하면\n이 레슨을 시작할 수 있습니다.',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              '확인',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.mathButtonBlue,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: AppDimensions.spacingL),
+              // 제목
+              Text(
+                '잠긴 레슨',
+                style: AppTextStyles.headlineSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+              const SizedBox(height: AppDimensions.spacingM),
+              // 설명
+              Text(
+                '이전 레슨을 완료하면\n이 레슨을 시작할 수 있습니다.',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppDimensions.spacingL),
+              // 확인 버튼
+              AnimatedButton(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: AppColors.mathButtonGradient,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '확인',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  /// 문제 없음 다이얼로그
+  /// 문제 없음 다이얼로그 (개선된 디자인)
   void _showNoProblemsDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: true,
+      builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          borderRadius: BorderRadius.circular(24),
         ),
-        title: Row(
-          children: [
-            const Icon(Icons.edit_note, color: AppColors.mathBlue, size: 24),
-            const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              '문제 준비 중',
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 아이콘
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.mathBlue.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.edit_note,
+                  color: AppColors.mathBlue,
+                  size: 32,
+                ),
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          '이 레슨의 문제가 아직 준비되지 않았습니다.\n곧 추가될 예정입니다!',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              '확인',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.mathButtonBlue,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: AppDimensions.spacingL),
+              // 제목
+              Text(
+                '문제 준비 중',
+                style: AppTextStyles.headlineSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+              const SizedBox(height: AppDimensions.spacingM),
+              // 설명
+              Text(
+                '이 레슨의 문제가 아직 준비되지 않았습니다.\n곧 추가될 예정입니다!',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppDimensions.spacingL),
+              // 확인 버튼
+              AnimatedButton(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '확인',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
