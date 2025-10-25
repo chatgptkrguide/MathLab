@@ -42,7 +42,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isGuest = user?.name == '게스트';
 
     return Scaffold(
-      backgroundColor: AppColors.mathBlue,
+      backgroundColor: AppColors.surface,
       body: CustomScrollView(
         slivers: [
           // SliverAppBar - 스크롤 시 축소되는 헤더
@@ -92,11 +92,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
 
-          // 흰색 배경 시작 영역
+          // 흰색 배경 시작 영역 - 곡선 전환
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
                 color: AppColors.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
               ),
               child: const SizedBox(height: AppDimensions.paddingXL),
             ),
