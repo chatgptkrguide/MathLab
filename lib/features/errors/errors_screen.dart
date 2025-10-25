@@ -380,7 +380,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
 
     if (allNotes.isEmpty) {
       return EmptyState(
-        icon: '📈',
+        icon: Icons.trending_up,
         title: '오답이 없습니다!',
         message: '완벽한 학습을 이어가고 계시네요.\n\n앞으로도 꾸준히 학습해보세요.',
         actionText: '학습하러 가기',
