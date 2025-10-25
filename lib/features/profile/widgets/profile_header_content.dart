@@ -29,11 +29,11 @@ class ProfileHeaderContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 30), // 줄임
+            const SizedBox(height: 24), // 30 → 24
             // 프로필 사진
             Container(
-              width: 70, // 80 → 70
-              height: 70,
+              width: 64, // 70 → 64
+              height: 64,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: AppColors.mathButtonGradient,
@@ -42,8 +42,8 @@ class ProfileHeaderContent extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    blurRadius: 10, // 12 → 10
+                    offset: const Offset(0, 4), // 6 → 4
                   ),
                 ],
               ),
@@ -53,27 +53,27 @@ class ProfileHeaderContent extends StatelessWidget {
                       ? user!.name[0]
                       : '학',
                   style: const TextStyle(
-                    fontSize: 32, // 36 → 32
+                    fontSize: 28, // 32 → 28
                     fontWeight: FontWeight.bold,
                     color: AppColors.surface,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12), // spacingM → 12
+            const SizedBox(height: 10), // 12 → 10
             // 이름
             Text(
               user?.name ?? '학습자',
               style: AppTextStyles.headlineLarge.copyWith(
                 color: AppColors.surface,
                 fontWeight: FontWeight.bold,
-                fontSize: 22, // 24 → 22
+                fontSize: 20, // 22 → 20
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4), // 6 → 4
             // 학년 또는 게스트 표시
             Container(
               padding: const EdgeInsets.symmetric(
@@ -89,11 +89,11 @@ class ProfileHeaderContent extends StatelessWidget {
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.surface,
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: 12, // 13 → 12
                 ),
               ),
             ),
-            const SizedBox(height: 14), // 16 → 14
+            const SizedBox(height: 10), // 14 → 10
             // 통계 (Level, XP, Streak)
             Padding(
               padding:
@@ -129,7 +129,7 @@ class ProfileHeaderContent extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 14), // 16 → 14
+            const SizedBox(height: 10), // 14 → 10
           ],
         ),
       ),
