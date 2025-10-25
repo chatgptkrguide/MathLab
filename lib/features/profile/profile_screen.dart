@@ -45,9 +45,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       backgroundColor: AppColors.mathBlue,
       body: CustomScrollView(
         slivers: [
-          // SliverAppBar - 스크롤 시 축소되는 헤더 (높이 감소)
+          // SliverAppBar - 스크롤 시 축소되는 헤더
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: 280,
             floating: false,
             pinned: true,
             backgroundColor: AppColors.surface,
@@ -74,12 +74,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.mathBlue.withValues(alpha: 0.2),
+                        color: AppColors.surface.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       ),
                       child: const Icon(
                         Icons.settings,
-                        color: AppColors.mathBlue,
+                        color: AppColors.surface,
                         size: 24,
                       ),
                     ),

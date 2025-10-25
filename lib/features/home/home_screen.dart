@@ -242,7 +242,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             _buildDuoProgressBar(user),
             const SizedBox(height: AppDimensions.spacingM),
             // Daily Challenge 버튼 (간소화)
-            AnimatedButton(
+            InteractiveButton(
               onTap: () async {
                 if (context.mounted) {
                   Navigator.of(context).push(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../utils/haptic_feedback.dart';
 
-/// 부드러운 피드백이 있는 애니메이션 버튼
+/// 부드러운 피드백이 있는 인터랙티브 버튼
 /// 탭 시 스케일 애니메이션 + 햅틱 피드백
-class AnimatedButton extends StatefulWidget {
+class InteractiveButton extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
   final BorderRadius? borderRadius;
@@ -14,7 +14,7 @@ class AnimatedButton extends StatefulWidget {
   final bool enableHaptic;
   final double scaleValue;
 
-  const AnimatedButton({
+  const InteractiveButton({
     super.key,
     required this.child,
     this.onTap,
@@ -28,10 +28,10 @@ class AnimatedButton extends StatefulWidget {
   });
 
   @override
-  State<AnimatedButton> createState() => _AnimatedButtonState();
+  State<InteractiveButton> createState() => _InteractiveButtonState();
 }
 
-class _AnimatedButtonState extends State<AnimatedButton>
+class _InteractiveButtonState extends State<InteractiveButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;

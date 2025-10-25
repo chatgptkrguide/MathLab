@@ -341,7 +341,7 @@ class LessonsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppDimensions.spacingL),
               // 확인 버튼
-              AnimatedButton(
+              InteractiveButton(
                 onTap: () => Navigator.of(context).pop(),
                 child: Container(
                   width: double.infinity,
@@ -417,7 +417,7 @@ class LessonsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppDimensions.spacingL),
               // 확인 버튼
-              AnimatedButton(
+              InteractiveButton(
                 onTap: () => Navigator.of(context).pop(),
                 child: Container(
                   width: double.infinity,

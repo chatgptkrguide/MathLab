@@ -27,12 +27,13 @@ class ProfileHeaderContent extends StatelessWidget {
       child: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 50), // AppBar 높이 고려 (줄임)
+            const SizedBox(height: 30), // 줄임
             // 프로필 사진
             Container(
-              width: 80,
-              height: 80,
+              width: 70, // 80 → 70
+              height: 70,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: AppColors.mathButtonGradient,
@@ -52,21 +53,21 @@ class ProfileHeaderContent extends StatelessWidget {
                       ? user!.name[0]
                       : '학',
                   style: const TextStyle(
-                    fontSize: 36,
+                    fontSize: 32, // 36 → 32
                     fontWeight: FontWeight.bold,
                     color: AppColors.surface,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: AppDimensions.spacingM),
+            const SizedBox(height: 12), // spacingM → 12
             // 이름
             Text(
               user?.name ?? '학습자',
               style: AppTextStyles.headlineLarge.copyWith(
                 color: AppColors.surface,
                 fontWeight: FontWeight.bold,
-                fontSize: 24,
+                fontSize: 22, // 24 → 22
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
@@ -92,7 +93,7 @@ class ProfileHeaderContent extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppDimensions.spacingL),
+            const SizedBox(height: 14), // 16 → 14
             // 통계 (Level, XP, Streak)
             Padding(
               padding:
@@ -107,7 +108,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   ),
                   Container(
                     width: 1,
-                    height: 36,
+                    height: 28, // 32 → 28
                     color: AppColors.surface.withValues(alpha: 0.25),
                   ),
                   ProfileStatBadge(
@@ -117,7 +118,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   ),
                   Container(
                     width: 1,
-                    height: 36,
+                    height: 28,
                     color: AppColors.surface.withValues(alpha: 0.25),
                   ),
                   ProfileStatBadge(
@@ -128,7 +129,7 @@ class ProfileHeaderContent extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: AppDimensions.spacingL),
+            const SizedBox(height: 14), // 16 → 14
           ],
         ),
       ),
