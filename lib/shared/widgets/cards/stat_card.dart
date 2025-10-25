@@ -6,7 +6,7 @@ import '../../constants/app_dimensions.dart';
 /// 통계 카드 위젯
 /// XP, 레벨, 연속 등의 통계 정보를 표시하는데 사용
 class StatCard extends StatelessWidget {
-  final String icon;
+  final IconData icon;
   final String label;
   final String value;
   final Color? iconColor;
@@ -51,12 +51,10 @@ class StatCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-                  child: Text(
+                  child: Icon(
                     icon,
-                    style: AppTextStyles.emojiLarge.copyWith(
-                      color: iconColor,
-                      fontSize: isVerySmall ? 16 : 24,
-                    ),
+                    color: iconColor ?? AppColors.mathOrange,
+                    size: isVerySmall ? 20 : 28,
                   ),
                 ),
                 SizedBox(height: isVerySmall ? 2 : AppDimensions.spacingXS),
