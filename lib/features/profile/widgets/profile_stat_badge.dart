@@ -5,13 +5,13 @@ import '../../../shared/constants/constants.dart';
 class ProfileStatBadge extends StatelessWidget {
   final String value;
   final String label;
-  final String emoji;
+  final IconData icon;
 
   const ProfileStatBadge({
     super.key,
     required this.value,
     required this.label,
-    required this.emoji,
+    required this.icon,
   });
 
   @override
@@ -20,9 +20,10 @@ class ProfileStatBadge extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            emoji,
-            style: const TextStyle(fontSize: 20),
+          Icon(
+            icon,
+            color: AppColors.mathYellow,
+            size: 20,
           ),
           const SizedBox(height: 4),
           Text(

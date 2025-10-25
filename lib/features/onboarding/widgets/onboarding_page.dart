@@ -34,7 +34,7 @@ class OnboardingPage extends StatelessWidget {
             children: [
               const Spacer(flex: 2),
 
-              // 이모지 아이콘
+              // 아이콘
               FadeInWidget(
                 delay: const Duration(milliseconds: 100),
                 child: TweenAnimationBuilder<double>(
@@ -53,9 +53,10 @@ class OnboardingPage extends StatelessWidget {
                       color: AppColors.surface.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Text(
-                      data.emoji,
-                      style: const TextStyle(fontSize: 80),
+                    child: Icon(
+                      data.icon,
+                      size: 80,
+                      color: AppColors.surface,
                     ),
                   ),
                 ),

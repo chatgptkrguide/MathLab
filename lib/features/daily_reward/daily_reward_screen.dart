@@ -76,7 +76,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
         ),
         backgroundColor: AppColors.background,
         title: const Text(
-          '🎉 보상 획득!',
+          '보상 획득!',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -88,7 +88,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
           children: [
             if (currentReward.type == RewardType.xp) ...[
               _buildRewardItem(
-                icon: '⭐',
+                icon: Icons.star,
                 label: 'XP',
                 value: '+${currentReward.amount}',
                 color: AppColors.primary,
@@ -97,7 +97,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
             ],
             if (currentReward.type == RewardType.hearts) ...[
               _buildRewardItem(
-                icon: '❤️',
+                icon: Icons.favorite,
                 label: '하트',
                 value: '+${currentReward.amount}',
                 color: AppColors.error,
@@ -114,7 +114,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: const Text(
-                  '🔥 7일 연속 보너스!',
+                  '7일 연속 보너스!',
                   style: TextStyle(
                     color: AppColors.surface,
                     fontWeight: FontWeight.bold,
@@ -143,7 +143,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
   }
 
   Widget _buildRewardItem({
-    required String icon,
+    required IconData icon,
     required String label,
     required String value,
     required Color color,
@@ -160,9 +160,10 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
         children: [
           Row(
             children: [
-              Text(
+              Icon(
                 icon,
-                style: const TextStyle(fontSize: 24),
+                size: 24,
+                color: color,
               ),
               const SizedBox(width: AppDimensions.spacingS),
               Text(
@@ -450,7 +451,7 @@ class _DayRewardCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: const Text(
-                      '🔥 보너스',
+                      '보너스',
                       style: TextStyle(
                         color: AppColors.surface,
                         fontSize: 12,

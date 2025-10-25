@@ -50,35 +50,35 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   // 온보딩 페이지 데이터
   final List<OnboardingPageData> _pages = const [
     OnboardingPageData(
-      emoji: '📚',
+      icon: Icons.menu_book,
       title: 'GoMath에 오신 것을\n환영합니다!',
       description: '매일 5분, 수학이 쉬워지는\n즐거운 학습 여정을 시작해요',
       gradient: AppColors.mathBlueGradient,
     ),
     OnboardingPageData(
-      emoji: '🔶',
+      icon: Icons.diamond_outlined,
       title: 'XP와 레벨 시스템',
       description: '문제를 풀면서 XP를 획득하고\nBronze부터 Diamond까지 레벨업하세요',
       gradient: AppColors.mathOrangeGradient,
       features: [
-        '✨ 문제당 최대 15 XP 획득',
-        '🏆 5개 레벨: Bronze → Diamond',
-        '📈 꾸준한 성장 추적',
+        '문제당 최대 15 XP 획득',
+        '5개 레벨: Bronze → Diamond',
+        '꾸준한 성장 추적',
       ],
     ),
     OnboardingPageData(
-      emoji: '🔥',
+      icon: Icons.local_fire_department,
       title: '스트릭과 하트',
       description: '매일 학습하며 스트릭을 유지하고\n하트를 관리하세요',
       gradient: AppColors.mathPurpleGradient,
       features: [
-        '🔥 연속 학습 스트릭 추적',
-        '❤️ 하트 5개로 시작',
-        '⏱️ 30분마다 하트 1개 재생',
+        '연속 학습 스트릭 추적',
+        '하트 5개로 시작',
+        '30분마다 하트 1개 재생',
       ],
     ),
     OnboardingPageData(
-      emoji: '🏅',
+      icon: Icons.emoji_events,
       title: '주간 리그 경쟁',
       description: '50명과 함께 주간 리그에서\n경쟁하며 승급을 노리세요',
       gradient: [
@@ -86,24 +86,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         AppColors.mathOrange, // GoMath 오렌지
       ],
       features: [
-        '🥇 상위 20% 승급',
-        '📉 하위 20% 강등',
-        '⏰ 매주 월요일 초기화',
+        '상위 20% 승급',
+        '하위 20% 강등',
+        '매주 월요일 초기화',
       ],
     ),
     OnboardingPageData(
-      emoji: '💡',
+      icon: Icons.lightbulb,
       title: '힌트와 오답 노트',
       description: '막힐 때는 힌트를 사용하고\n틀린 문제는 복습하세요',
       gradient: AppColors.mathPurpleGradient,
       features: [
-        '💡 힌트 1개당 10 XP',
-        '📝 오답 자동 저장',
-        '📅 망각 곡선 기반 복습',
+        '힌트 1개당 10 XP',
+        '오답 자동 저장',
+        '망각 곡선 기반 복습',
       ],
     ),
     OnboardingPageData(
-      emoji: '🎯',
+      icon: Icons.flag,
       title: '지금 바로 시작하세요!',
       description: '매일 5분으로 수학 실력을\n쌓아가는 여정을 시작해보세요',
       gradient: AppColors.mathBlueGradient,
@@ -258,7 +258,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ),
         title: Row(
           children: [
-            const Text('⚠️', style: TextStyle(fontSize: 24)),
+            const Icon(Icons.warning, color: AppColors.warningOrange, size: 24),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
               '튜토리얼 건너뛰기',
@@ -326,7 +326,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
 /// 온보딩 페이지 데이터
 class OnboardingPageData {
-  final String emoji;
+  final IconData icon;
   final String title;
   final String description;
   final List<Color> gradient;
@@ -334,7 +334,7 @@ class OnboardingPageData {
   final bool isLast;
 
   const OnboardingPageData({
-    required this.emoji,
+    required this.icon,
     required this.title,
     required this.description,
     required this.gradient,

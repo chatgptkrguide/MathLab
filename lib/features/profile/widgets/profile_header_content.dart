@@ -103,7 +103,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   ProfileStatBadge(
                     value: '${user?.level ?? 1}',
                     label: '레벨',
-                    emoji: '⭐',
+                    icon: Icons.star,
                   ),
                   Container(
                     width: 1,
@@ -113,7 +113,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   ProfileStatBadge(
                     value: '${user?.xp ?? 0}',
                     label: 'XP',
-                    emoji: '🔶',
+                    icon: Icons.diamond_outlined,
                   ),
                   Container(
                     width: 1,
@@ -123,7 +123,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   ProfileStatBadge(
                     value: '${user?.streakDays ?? 0}',
                     label: '연속',
-                    emoji: '🔥',
+                    icon: Icons.local_fire_department,
                   ),
                 ],
               ),
