@@ -68,9 +68,9 @@ class LeagueWidget extends StatelessWidget {
                 ),
                 // 상태 배지
                 if (leagueInfo.canPromote)
-                  _buildStatusBadge('승급권', Colors.green)
+                  _buildStatusBadge('승급권', AppColors.successGreen)
                 else if (leagueInfo.relegationRisk)
-                  _buildStatusBadge('강등권', Colors.red),
+                  _buildStatusBadge('강등권', AppColors.error),
               ],
             ),
             const SizedBox(height: AppDimensions.spacingL),
@@ -106,12 +106,22 @@ class LeagueWidget extends StatelessWidget {
                 ),
               ),
             ] else
-              Text(
-                '최고 티어 달성! 🎉',
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.surface,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.celebration,
+                    color: AppColors.surface,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '최고 티어 달성!',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
           ],
         ),

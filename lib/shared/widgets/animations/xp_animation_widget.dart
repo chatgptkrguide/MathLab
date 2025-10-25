@@ -116,9 +116,10 @@ class _XPAnimationWidgetState extends State<XPAnimationWidget>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      '🔶',
-                      style: const TextStyle(fontSize: 20),
+                    const Icon(
+                      Icons.diamond_outlined,
+                      color: AppColors.surface,
+                      size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -268,9 +269,10 @@ class _ComboAnimationWidgetState extends State<ComboAnimationWidget>
               opacity: _fadeAnimation.value,
               child: Column(
                 children: [
-                  Text(
-                    '🔥',
-                    style: const TextStyle(fontSize: 48),
+                  const Icon(
+                    Icons.local_fire_department,
+                    color: AppColors.mathOrange,
+                    size: 48,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -280,7 +282,7 @@ class _ComboAnimationWidgetState extends State<ComboAnimationWidget>
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withValues(alpha: 0.3),
+                          color: AppColors.cardShadow.withValues(alpha: 0.3),
                           offset: const Offset(0, 2),
                           blurRadius: 4,
                         ),

@@ -129,7 +129,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                             vertical: AppDimensions.paddingS,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.surface.withOpacity(0.3),
+                            color: AppColors.surface.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                           ),
                           child: Text(
@@ -185,9 +185,9 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
               padding: const EdgeInsets.all(AppDimensions.paddingM),
               decoration: BoxDecoration(
                 color: myLeagueInfo.canPromote
-                    ? AppColors.success.withOpacity(0.1)
+                    ? AppColors.success.withValues(alpha: 0.1)
                     : myLeagueInfo.relegationRisk
-                        ? AppColors.error.withOpacity(0.1)
+                        ? AppColors.error.withValues(alpha: 0.1)
                         : AppColors.surface,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
@@ -229,10 +229,10 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
                   Expanded(
                     child: Text(
                       myLeagueInfo.canPromote
-                          ? '🎉 상위 20% 안에 들었어요! 이대로 유지하면 승급할 수 있어요.'
+                          ? '상위 20% 안에 들었어요! 이대로 유지하면 승급할 수 있어요.'
                           : myLeagueInfo.relegationRisk
-                              ? '⚠️ 하위 20%입니다. 조금만 더 열심히 하면 강등을 피할 수 있어요!'
-                              : '💪 열심히 학습해서 상위권에 진입하세요!',
+                              ? '하위 20%입니다. 조금만 더 열심히 하면 강등을 피할 수 있어요!'
+                              : '열심히 학습해서 상위권에 진입하세요!',
                       style: TextStyle(
                         color: myLeagueInfo.canPromote
                             ? AppColors.success
@@ -317,16 +317,16 @@ class _ParticipantCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
         color: isMe
-            ? AppColors.primary.withOpacity(0.1)
+            ? AppColors.primary.withValues(alpha: 0.1)
             : AppColors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
           color: isMe
               ? AppColors.primary
               : isPromotionZone
-                  ? AppColors.success.withOpacity(0.3)
+                  ? AppColors.success.withValues(alpha: 0.3)
                   : isRelegationZone
-                      ? AppColors.error.withOpacity(0.3)
+                      ? AppColors.error.withValues(alpha: 0.3)
                       : AppColors.borderLight,
           width: isMe ? 2 : 1,
         ),
@@ -339,8 +339,8 @@ class _ParticipantCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: rank <= 3
-                  ? _getRankColor().withOpacity(0.2)
-                  : AppColors.disabled.withOpacity(0.2),
+                  ? _getRankColor().withValues(alpha: 0.2)
+                  : AppColors.disabled.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Center(

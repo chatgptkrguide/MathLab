@@ -197,7 +197,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
         FadeTransition(
           opacity: _backdropAnimation,
           child: Container(
-            color: Colors.black.withValues(alpha: 0.8),
+            color: AppColors.cardShadow.withValues(alpha: 0.8),
           ),
         ),
 
@@ -297,7 +297,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
             borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: AppColors.cardShadow.withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -307,13 +307,24 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
             mainAxisSize: MainAxisSize.min,
             children: [
               // 축하 메시지
-              Text(
-                '🎉 업적 달성!',
-                style: AppTextStyles.headlineMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: _rarityColor,
-                ),
-                textAlign: TextAlign.center,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.celebration,
+                    color: _rarityColor,
+                    size: 28,
+                  ),
+                  const SizedBox(width: AppDimensions.spacingS),
+                  Text(
+                    '업적 달성!',
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: _rarityColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
               const SizedBox(height: AppDimensions.spacingM),
 
@@ -380,9 +391,10 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      '🔶',
-                      style: TextStyle(fontSize: 24),
+                    const Icon(
+                      Icons.diamond_outlined,
+                      color: AppColors.mathBlue,
+                      size: 24,
                     ),
                     const SizedBox(width: AppDimensions.spacingS),
                     Text(

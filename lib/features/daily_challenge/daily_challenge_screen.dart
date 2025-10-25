@@ -76,7 +76,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen>
                 color: AppColors.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: AppColors.cardShadow.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -134,15 +134,24 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen>
                         borderRadius:
                             BorderRadius.circular(AppDimensions.radiusM),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            '🎉',
-                            style: TextStyle(fontSize: 20),
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: AppColors.surface.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.celebration,
+                              color: AppColors.surface,
+                              size: 16,
+                            ),
                           ),
-                          SizedBox(width: AppDimensions.spacingS),
-                          Text(
+                          const SizedBox(width: AppDimensions.spacingS),
+                          const Text(
                             '오늘의 챌린지 완료!',
                             style: TextStyle(
                               color: AppColors.surface,
@@ -226,7 +235,7 @@ class _ChallengeCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppDimensions.paddingL),
             decoration: BoxDecoration(
               color: challenge.isCompleted
-                  ? AppColors.success.withOpacity(0.1)
+                  ? AppColors.success.withValues(alpha: 0.1)
                   : AppColors.surface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
@@ -263,7 +272,7 @@ class _ChallengeCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: challenge.isCompleted
                             ? AppColors.success
-                            : AppColors.primary.withOpacity(0.1),
+                            : AppColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: challenge.isCompleted
@@ -320,19 +329,20 @@ class _ChallengeCard extends StatelessWidget {
                         vertical: AppDimensions.paddingS,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius:
                             BorderRadius.circular(AppDimensions.radiusM),
                         border: Border.all(
-                          color: AppColors.primary.withOpacity(0.3),
+                          color: AppColors.primary.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            '⭐',
-                            style: TextStyle(fontSize: 16),
+                          const Icon(
+                            Icons.diamond_outlined,
+                            color: AppColors.primary,
+                            size: 16,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -391,7 +401,7 @@ class _ChallengeCard extends StatelessWidget {
                                   value: progress,
                                   minHeight: 12,
                                   backgroundColor:
-                                      AppColors.disabled.withOpacity(0.2),
+                                      AppColors.disabled.withValues(alpha: 0.2),
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     challenge.isCompleted
                                         ? AppColors.success

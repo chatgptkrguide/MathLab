@@ -29,7 +29,7 @@ class LevelUpDialog extends StatefulWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black87,
+      barrierColor: AppColors.cardShadow.withValues(alpha: 0.87),
       transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, animation, secondaryAnimation) {
         return LevelUpDialog(
@@ -195,7 +195,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: AppColors.cardShadow.withValues(alpha: 0.3),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
@@ -256,9 +256,10 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                           ),
                           child: Column(
                             children: [
-                              Text(
-                                '⭐',
-                                style: const TextStyle(fontSize: 48),
+                              const Icon(
+                                Icons.stars,
+                                color: AppColors.surface,
+                                size: 48,
                               ),
                               Text(
                                 '${widget.newLevel}',
@@ -297,9 +298,10 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '🔶',
-                          style: const TextStyle(fontSize: 24),
+                        const Icon(
+                          Icons.diamond_outlined,
+                          color: AppColors.mathTeal,
+                          size: 24,
                         ),
                         const SizedBox(width: AppDimensions.spacingS),
                         Text(
@@ -332,7 +334,11 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('❤️', style: const TextStyle(fontSize: 20)),
+                            const Icon(
+                              Icons.favorite,
+                              color: AppColors.error,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               '하트 완전 회복',

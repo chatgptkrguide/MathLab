@@ -28,7 +28,7 @@ class DailyRewardDialog extends StatefulWidget {
       context: context,
       barrierDismissible: false,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black87,
+      barrierColor: AppColors.cardShadow.withValues(alpha: 0.87),
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) {
         return DailyRewardDialog(
@@ -104,7 +104,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
             borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: AppColors.cardShadow.withValues(alpha: 0.3),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -137,9 +137,10 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      '🔥',
-                      style: const TextStyle(fontSize: 24),
+                    const Icon(
+                      Icons.local_fire_department,
+                      color: AppColors.surface,
+                      size: 24,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -304,7 +305,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
               emoji,
               style: TextStyle(
                 fontSize: 16,
-                color: isToday || isPast ? AppColors.surface : Colors.grey,
+                color: isToday || isPast ? AppColors.surface : AppColors.disabled,
               ),
             ),
           ),
