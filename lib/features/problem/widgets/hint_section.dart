@@ -82,12 +82,24 @@ class _HintSectionState extends ConsumerState<HintSection>
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               child: Row(
                 children: [
-                  // 펄스 애니메이션이 적용된 lightbulb
+                  // 펄스 애니메이션이 적용된 lightbulb 아이콘
                   ScaleTransition(
                     scale: _pulseAnimation,
-                    child: const Text('💡', style: TextStyle(fontSize: 24)),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.mathOrange.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.lightbulb_outline,
+                        color: AppColors.mathOrange,
+                        size: 24,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: AppDimensions.spacingS),
+                  const SizedBox(width: AppDimensions.spacingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,10 +108,12 @@ class _HintSectionState extends ConsumerState<HintSection>
                           '힌트',
                           style: AppTextStyles.titleMedium.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
+                        const SizedBox(height: 2),
                         Text(
-                          '${_getUnlockedCount()}/${widget.problem.hints!.length} 사용',
+                          '${_getUnlockedCount()}/${widget.problem.hints!.length} 사용됨',
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -110,22 +124,38 @@ class _HintSectionState extends ConsumerState<HintSection>
                   // 현재 XP 표시
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.mathOrange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.mathOrange.withOpacity(0.1),
+                          AppColors.mathOrange.withOpacity(0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.mathOrange.withOpacity(0.3),
+                        width: 1.5,
+                      ),
                     ),
                     child: Row(
                       children: [
-                        const Text('🔶', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.diamond_outlined,
+                          color: AppColors.mathOrange,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
                         Text(
                           '$userXP',
                           style: AppTextStyles.bodyMedium.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.mathOrange,
+                            fontSize: 15,
                           ),
                         ),
                       ],
@@ -209,13 +239,19 @@ class _HintSectionState extends ConsumerState<HintSection>
           SnackBar(
             content: Row(
               children: [
-                const Text('💡', style: TextStyle(fontSize: 20)),
+                const Icon(
+                  Icons.lightbulb,
+                  color: AppColors.surface,
+                  size: 20,
+                ),
                 const SizedBox(width: AppDimensions.spacingS),
-                Text(
-                  '힌트가 잠금 해제되었습니다! (-${HintProvider.hintCost} XP)',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.surface,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    '힌트가 잠금 해제되었습니다! (-${HintProvider.hintCost} XP)',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -237,13 +273,19 @@ class _HintSectionState extends ConsumerState<HintSection>
           SnackBar(
             content: Row(
               children: [
-                const Text('❌', style: TextStyle(fontSize: 20)),
+                const Icon(
+                  Icons.error_outline,
+                  color: AppColors.surface,
+                  size: 20,
+                ),
                 const SizedBox(width: AppDimensions.spacingS),
-                Text(
-                  'XP가 부족합니다 (필요: ${HintProvider.hintCost} XP)',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.surface,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    'XP가 부족합니다 (필요: ${HintProvider.hintCost} XP)',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -388,23 +430,23 @@ class _HintItemState extends State<_HintItem>
 
   Widget _buildLockedHint() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // 자물쇠 아이콘
         Container(
-          width: 24,
-          height: 24,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
-            color: AppColors.borderLight,
+            color: AppColors.disabled.withOpacity(0.3),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.lock_outline,
             color: AppColors.textSecondary,
-            size: 14,
+            size: 18,
           ),
         ),
-        const SizedBox(width: AppDimensions.spacingS),
+        const SizedBox(width: AppDimensions.spacingM),
         // 힌트 정보
         Expanded(
           child: Column(
@@ -412,56 +454,103 @@ class _HintItemState extends State<_HintItem>
             children: [
               Text(
                 '힌트 ${widget.hintIndex + 1}',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                '${HintProvider.hintCost} XP 필요',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.diamond_outlined,
+                    color: AppColors.textSecondary,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${HintProvider.hintCost} XP 필요',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        // 잠금 해제 버튼 (Scale animation)
+        // 잠금 해제 버튼 (Duolingo 스타일 3D 버튼)
         ScaleTransition(
           scale: _buttonAnimation,
-          child: ElevatedButton(
-            onPressed: widget.canUnlock ? () async {
-              await _buttonController.forward();
-              await _buttonController.reverse();
-              widget.onUnlock();
-            } : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: widget.canUnlock
-                  ? AppColors.mathOrange
-                  : AppColors.disabled,
-              foregroundColor: AppColors.surface,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              minimumSize: const Size(0, 32),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('🔶', style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 4),
-                Text(
-                  '${HintProvider.hintCost}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // 3D 그림자
+              if (widget.canUnlock)
+                Positioned(
+                  top: 3,
+                  left: 0,
+                  right: 0,
+                  bottom: -3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.mathOrangeDark,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ],
-            ),
+              // 메인 버튼
+              Container(
+                decoration: BoxDecoration(
+                  color: widget.canUnlock
+                      ? AppColors.mathOrange
+                      : AppColors.disabled,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: widget.canUnlock
+                        ? AppColors.mathOrangeDark
+                        : AppColors.disabled.withOpacity(0.8),
+                    width: 2,
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: widget.canUnlock ? () async {
+                      await _buttonController.forward();
+                      await _buttonController.reverse();
+                      widget.onUnlock();
+                    } : null,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.diamond,
+                            color: AppColors.surface,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${HintProvider.hintCost}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.surface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
