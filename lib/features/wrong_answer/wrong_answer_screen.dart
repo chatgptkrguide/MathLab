@@ -207,13 +207,19 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
         SnackBar(
           content: Row(
             children: [
-              const Text('✅', style: TextStyle(fontSize: 20)),
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.surface,
+                size: 20,
+              ),
               const SizedBox(width: AppDimensions.spacingS),
-              Text(
-                '복습 완료! 계속 노력하세요!',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.surface,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  '복습 완료! 계속 노력하세요!',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.surface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

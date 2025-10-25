@@ -283,7 +283,11 @@ class _AchievementCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Text('⭐', style: TextStyle(fontSize: 14)),
+                    const Icon(
+                      Icons.diamond,
+                      color: AppColors.mathYellow,
+                      size: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '+${achievement.xpReward} XP',

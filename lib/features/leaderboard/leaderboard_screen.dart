@@ -389,7 +389,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text('🔥', style: TextStyle(fontSize: 12)),
+                    const Icon(
+                      Icons.local_fire_department,
+                      color: AppColors.mathRed,
+                      size: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${entry.streakDays}일',

@@ -30,7 +30,19 @@ class GuestLoginPrompt extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text('🎯', style: TextStyle(fontSize: 24)),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.mathYellow.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_add_outlined,
+                  color: AppColors.mathYellow,
+                  size: 28,
+                ),
+              ),
               const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Column(

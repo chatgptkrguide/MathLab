@@ -386,7 +386,13 @@ class ProfileScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('⭐', style: TextStyle(fontSize: 20)),
+                    Icon(
+                      Icons.diamond,
+                      color: achievement.isUnlocked
+                          ? AppColors.surface
+                          : AppColors.mathYellow,
+                      size: 24,
+                    ),
                     const SizedBox(width: AppDimensions.spacingS),
                     Text(
                       '+${achievement.xpReward} XP',

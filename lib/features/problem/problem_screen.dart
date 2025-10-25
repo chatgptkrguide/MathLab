@@ -232,7 +232,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('🔥', style: TextStyle(fontSize: 18)),
+                            const Icon(
+                              Icons.local_fire_department,
+                              color: AppColors.surface,
+                              size: 20,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               '$_currentStreak',
@@ -261,7 +265,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔶', style: TextStyle(fontSize: 18)),
+                    const Icon(
+                      Icons.diamond_outlined,
+                      color: AppColors.mathOrange,
+                      size: 20,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       '${user?.xp ?? 0}',
