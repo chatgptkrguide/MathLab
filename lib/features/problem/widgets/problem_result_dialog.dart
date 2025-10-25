@@ -116,11 +116,11 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
 
   /// 평가 메시지
   String get _message {
-    if (_accuracyPercentage >= 90) return '완벽해요! 🌟';
-    if (_accuracyPercentage >= 80) return '훌륭해요! 👏';
-    if (_accuracyPercentage >= 70) return '잘했어요! 👍';
-    if (_accuracyPercentage >= 60) return '괜찮아요! 💪';
-    return '조금 더 연습해봐요! 📚';
+    if (_accuracyPercentage >= 90) return '완벽해요!';
+    if (_accuracyPercentage >= 80) return '훌륭해요!';
+    if (_accuracyPercentage >= 70) return '잘했어요!';
+    if (_accuracyPercentage >= 60) return '괜찮아요!';
+    return '조금 더 연습해봐요!';
   }
 
   @override
@@ -131,7 +131,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
         FadeTransition(
           opacity: _fadeAnimation,
           child: Container(
-            color: Colors.black.withValues(alpha: 0.7),
+            color: AppColors.cardShadow.withValues(alpha: 0.7),
           ),
         ),
         // 결과 다이얼로그
@@ -152,7 +152,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: AppColors.cardShadow.withValues(alpha: 0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -230,17 +230,17 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                       _buildStatItem(
                         '정답률',
                         '$_accuracyPercentage%',
-                        '📊',
+                        Icons.bar_chart,
                       ),
                       _buildStatItem(
                         '정답',
                         '$_correctCount/$_totalCount',
-                        '✅',
+                        Icons.check_circle,
                       ),
                       _buildStatItem(
                         '획득 XP',
                         '+${widget.totalXPEarned}',
-                        '🔶',
+                        Icons.diamond_outlined,
                       ),
                     ],
                   ),
@@ -491,12 +491,13 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
   }
 
   /// 통계 항목 위젯
-  Widget _buildStatItem(String label, String value, String emoji) {
+  Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Text(
-          emoji,
-          style: const TextStyle(fontSize: 32),
+        Icon(
+          icon,
+          color: AppColors.primary,
+          size: 32,
         ),
         const SizedBox(height: AppDimensions.spacingS),
         Text(

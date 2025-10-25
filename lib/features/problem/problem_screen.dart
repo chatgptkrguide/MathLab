@@ -496,9 +496,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
           children: [
             Row(
               children: [
-                Text(
-                  _isCorrect ? '✅' : '💡',
-                  style: const TextStyle(fontSize: 24),
+                Icon(
+                  _isCorrect ? Icons.check_circle : Icons.lightbulb,
+                  color: _isCorrect ? AppColors.successGreen : AppColors.warningOrange,
+                  size: 24,
                 ),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
@@ -863,7 +864,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
         ),
         title: Row(
           children: [
-            Text('⚠️', style: const TextStyle(fontSize: 24)),
+            const Icon(Icons.warning, color: AppColors.warningOrange, size: 24),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
               '학습 중단',

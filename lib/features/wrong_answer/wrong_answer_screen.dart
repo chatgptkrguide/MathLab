@@ -294,9 +294,10 @@ class _ReviewNeededTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              '🎉',
-              style: TextStyle(fontSize: 64),
+            const Icon(
+              Icons.celebration,
+              color: AppColors.mathYellow,
+              size: 64,
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
@@ -408,9 +409,10 @@ class _MasteredTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              '💪',
-              style: TextStyle(fontSize: 64),
+            const Icon(
+              Icons.emoji_events,
+              color: AppColors.mathYellow,
+              size: 64,
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
