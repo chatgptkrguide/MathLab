@@ -62,6 +62,7 @@ class MathText extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   String _convertToLatex(String text) {
     String result = text;
 

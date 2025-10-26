@@ -1,5 +1,4 @@
 // MathLab 앱의 기본 위젯 테스트
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mathlab/app/app.dart';
