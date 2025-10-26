@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../constants/app_dimensions.dart';
-import '../../constants/app_ui_constants.dart';
 
 /// 커스텀 하단 네비게이션 바
 /// 새 디자인에 맞게 홈 탭이 둥근 원형으로 구현
@@ -22,7 +21,7 @@ class CustomBottomNavigation extends StatelessWidget {
       container: true,
       label: '하단 네비게이션',
       child: Container(
-        height: AppUIConstants.navBarBaseHeight + MediaQuery.of(context).padding.bottom,
+        height: AppDimensions.navBarBaseHeight + MediaQuery.of(context).padding.bottom,
         padding: EdgeInsets.only(
           left: AppDimensions.paddingM,
           right: AppDimensions.paddingM,
@@ -37,9 +36,9 @@ class CustomBottomNavigation extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.cardShadow.withValues(alpha: AppUIConstants.shadowOpacity),
-              blurRadius: AppUIConstants.shadowBlurRadius,
-              offset: AppUIConstants.shadowOffset,
+              color: AppColors.cardShadow.withValues(alpha: AppDimensions.shadowOpacity),
+              blurRadius: AppDimensions.shadowBlurRadius,
+              offset: AppDimensions.shadowOffset,
             ),
           ],
         ),

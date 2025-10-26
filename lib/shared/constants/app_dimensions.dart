@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 /// MathLab 앱의 크기 및 간격 상수 정의
 class AppDimensions {
   AppDimensions._(); // private constructor
@@ -85,4 +87,15 @@ class AppDimensions {
   static const Duration animationFast = Duration(milliseconds: 150);
   static const Duration animationNormal = Duration(milliseconds: 300);
   static const Duration animationSlow = Duration(milliseconds: 500);
+
+  // Navigation Bar (from AppUIConstants)
+  static const double navBarBaseHeight = 90.0;
+  static const double navBarIconSize = 20.0;
+  static const double navBarSpecialIconSize = 26.0;
+  static const double navBarSpecialButtonSize = 60.0;
+
+  // Shadow (from AppUIConstants)
+  static const double shadowOpacity = 0.15;
+  static const double shadowBlurRadius = 16.0;
+  static const shadowOffset = Offset(0, -4);
 }
