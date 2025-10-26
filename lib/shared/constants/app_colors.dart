@@ -41,6 +41,7 @@ class AppColors {
   static const Color accentCyan = duolingoBlue;
   static const Color warningOrange = duolingoOrange;
   static const Color warningYellow = mathYellow;
+  static const Color warning = duolingoOrange; // 경고 색상 (오렌지)
   static const Color success = duolingoGreen; // 성공 색상
   static const Color successGreen = duolingoGreen;
   static const Color error = mathRed; // 에러 색상

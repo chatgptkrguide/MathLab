@@ -77,6 +77,19 @@ app.*.map.json
 # Web
 /mathlab/web/canvaskit/
 
+# Web build artifacts (should only be in build/web)
+/canvaskit/
+/assets/AssetManifest.*
+/assets/FontManifest.json
+/assets/NOTICES
+/assets/packages/
+/assets/shaders/
+/flutter_bootstrap.js
+/flutter_service_worker.js
+/flutter.js
+/main.dart.js
+/version.json
+
 # Design files (large PNG files)
 *.png
 *.jpg
@@ -86,3 +99,5 @@ app.*.map.json
 # Exceptions for small icons
 !**/assets/icons/*.png
 !**/assets/images/*.png
+!web/icons/*.png
+!web/favicon.png

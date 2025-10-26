@@ -342,7 +342,7 @@ class _DayRewardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 300 + (reward.day * 50)),
+      duration: Duration(milliseconds: (300 + reward.day * 50).toInt()),
       curve: Curves.easeOutBack,
       tween: Tween(begin: 0.8, end: 1.0),
       builder: (context, scale, child) {

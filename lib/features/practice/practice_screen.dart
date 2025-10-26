@@ -422,18 +422,18 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     const SizedBox(height: AppDimensions.paddingXL),
 
                     // 객관식 선택지
-                    if (problem.type == ProblemType.multipleChoice) ...[
+                    if (problem.type == ProblemType.multipleChoice && problem.options != null) ...[
                       ...List.generate(
-                        problem.options.length,
+                        problem.options!.length,
                         (index) => Padding(
                           padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
                           child: _OptionButton(
-                            option: problem.options[index],
+                            option: problem.options![index],
                             index: index,
-                            isSelected: _userAnswer == problem.options[index],
+                            isSelected: _userAnswer == problem.options![index],
                             onTap: () {
                               setState(() {
-                                _userAnswer = problem.options[index];
+                                _userAnswer = problem.options![index];
                               });
                               AppHapticFeedback.selection();
                             },

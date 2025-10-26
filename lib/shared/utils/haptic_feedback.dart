@@ -41,6 +41,11 @@ class AppHapticFeedback {
     }
   }
 
+  /// 선택 햅틱 (호환성 유지)
+  static Future<void> selection() async {
+    await selectionClick();
+  }
+
   /// 성공 햅틱 (정답, 완료)
   static Future<void> success() async {
     await mediumImpact();
