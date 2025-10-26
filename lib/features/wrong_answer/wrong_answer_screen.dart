@@ -119,7 +119,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
               color: AppColors.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -495,9 +495,9 @@ class _WrongAnswerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
           color: isMastered
-              ? AppColors.success.withOpacity(0.5)
+              ? AppColors.success.withValues(alpha: 0.5)
               : showUrgency && wrongAnswer.urgency > 0
-                  ? _getUrgencyColor().withOpacity(0.5)
+                  ? _getUrgencyColor().withValues(alpha: 0.5)
                   : AppColors.borderLight,
           width: isMastered || (showUrgency && wrongAnswer.urgency > 0) ? 2 : 1,
         ),
@@ -519,7 +519,7 @@ class _WrongAnswerCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(
@@ -540,7 +540,7 @@ class _WrongAnswerCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.disabled.withOpacity(0.3),
+                      color: AppColors.disabled.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(

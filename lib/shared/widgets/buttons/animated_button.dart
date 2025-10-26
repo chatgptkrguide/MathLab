@@ -41,8 +41,10 @@ class _AnimatedButtonState extends State<AnimatedButton>
   late AnimationController _scaleController;
   late AnimationController _shimmerController;
   late Animation<double> _scaleAnimation;
+  // ignore: unused_field
   late Animation<double> _shimmerAnimation;
 
+  // ignore: unused_field
   bool _isPressed = false;
 
   @override

@@ -89,7 +89,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.mathOrange.withOpacity(0.15),
+                        color: AppColors.mathOrange.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -130,15 +130,15 @@ class _HintSectionState extends ConsumerState<HintSection>
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.mathOrange.withOpacity(0.1),
-                          AppColors.mathOrange.withOpacity(0.05),
+                          AppColors.mathOrange.withValues(alpha: 0.1),
+                          AppColors.mathOrange.withValues(alpha: 0.05),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.mathOrange.withOpacity(0.3),
+                        color: AppColors.mathOrange.withValues(alpha: 0.3),
                         width: 1.5,
                       ),
                     ),
@@ -437,7 +437,7 @@ class _HintItemState extends State<_HintItem>
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: AppColors.disabled.withOpacity(0.3),
+            color: AppColors.disabled.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -509,7 +509,7 @@ class _HintItemState extends State<_HintItem>
                   border: Border.all(
                     color: widget.canUnlock
                         ? AppColors.mathOrangeDark
-                        : AppColors.disabled.withOpacity(0.8),
+                        : AppColors.disabled.withValues(alpha: 0.8),
                     width: 2,
                   ),
                 ),

@@ -34,7 +34,7 @@ class GuestLoginPrompt extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.mathYellow.withOpacity(0.2),
+                  color: AppColors.mathYellow.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

@@ -4,14 +4,12 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/cards/achievement_card.dart';
-import '../../shared/widgets/animations/animations.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/achievement_provider.dart';
 import 'settings_screen.dart';
 import 'widgets/profile_header_content.dart';
-import 'widgets/profile_stat_card.dart';
 import 'widgets/guest_login_prompt.dart';
 
 /// 프로필/계정 화면 (업적 시스템 통합 + 간소화)

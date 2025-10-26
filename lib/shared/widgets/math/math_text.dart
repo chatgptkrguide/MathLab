@@ -78,7 +78,7 @@ class MathText extends StatelessWidget {
         // 간단한 분수만 처리
         .replaceAllMapped(
           RegExp(r'(\d+)/(\d+)'),
-          (match) => r'\frac{' + match.group(1)! + '}{' + match.group(2)! + '}',
+          (match) => '\\frac{${match.group(1)!}}{${match.group(2)!}}',
         )
 
         // 지수 표현

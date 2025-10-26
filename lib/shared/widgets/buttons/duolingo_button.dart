@@ -35,6 +35,7 @@ class _DuolingoButtonState extends State<DuolingoButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _pressAnimation;
+  // ignore: unused_field
   bool _isPressed = false;
 
   @override

@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
-import '../../../shared/constants/app_text_styles.dart';
 import '../../../shared/widgets/math/math_text.dart';
 
 /// 문제 선택지 버튼
