@@ -204,7 +204,7 @@ class LessonCard extends StatelessWidget {
       case '기하':
         return AppColors.mathTeal;
       case '통계':
-        return AppColors.duolingoPurple;
+        return AppColors.mathPurple;
       default:
         return AppColors.mathBlue;
     }

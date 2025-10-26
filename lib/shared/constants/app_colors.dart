@@ -30,7 +30,6 @@ class AppColors {
   static const Color duolingoBlue = mathBlue; // GoMath 파란색으로 매핑
   static const Color duolingoOrange = mathOrange; // 오렌지
   static const Color duolingoRed = mathRed; // 레드
-  static const Color duolingoPurple = Color(0xFFCE82FF); // 듀오링고 퍼플
   static const Color duolingoYellow = mathYellow; // 노란색
 
   // 기본 색상들 (호환성)
@@ -46,7 +45,6 @@ class AppColors {
   static const Color successGreen = duolingoGreen;
   static const Color error = mathRed; // 에러 색상
   static const Color errorRed = duolingoRed;
-  static const Color purpleAccent = duolingoPurple;
 
   // 중성 색상 (접근성 향상)
   static const Color background = Color(0xFFF8F9FA);
@@ -89,7 +87,7 @@ class AppColors {
   static const List<Color> mathTealGradient = [Color(0xFF48C9B0), Color(0xFF38B9A0)]; // 진행바
   static const List<Color> mathOrangeGradient = [Color(0xFFFFB74D), mathOrange]; // 오렌지
   static const List<Color> mathYellowGradient = [Color(0xFFFFF59D), mathYellow]; // 노란색
-  static const List<Color> mathPurpleGradient = [Color(0xFFE1BEE7), duolingoPurple]; // 퍼플
+  static const List<Color> mathPurpleGradient = [Color(0xFFE1BEE7), mathPurple]; // 퍼플
 
   // 기존 그라디언트 (호환성)
   static const List<Color> greenGradient = [Color(0xFF89E219), Color(0xFF58CC02)];
