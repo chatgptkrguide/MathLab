@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
-import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/utils.dart';
 import '../../shared/widgets/layout/lesson_path_widget.dart';
 import '../../shared/widgets/indicators/loading_widgets.dart';
 import '../../shared/widgets/animations/animations.dart';
-import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
@@ -27,9 +25,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
   late AnimationController _headerController;
-  late AnimationController _challengeController;
   late Animation<double> _headerFadeAnimation;
-  late Animation<double> _challengeScaleAnimation;
 
   @override
   void initState() {
@@ -47,18 +43,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
     );
 
-    // 챌린지 버튼 스케일 애니메이션
-    _challengeController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _challengeScaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(
-        parent: _challengeController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
     // 초기 애니메이션 시작
     _headerController.forward();
   }
@@ -66,7 +50,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     _headerController.dispose();
-    _challengeController.dispose();
     super.dispose();
   }
 

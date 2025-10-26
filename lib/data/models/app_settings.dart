@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// 앱 설정 모델
 class AppSettings {
   /// 알림 설정

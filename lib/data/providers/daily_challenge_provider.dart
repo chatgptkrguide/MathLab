@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/daily_challenge.dart';
-import '../models/user.dart';
 import 'user_provider.dart';
 import '../../shared/utils/logger.dart';
 import '../services/local_storage_service.dart';

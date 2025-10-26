@@ -1,7 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'dart:io' show Platform;
 import '../../shared/utils/logger.dart';
 
 /// 소셜 로그인 서비스

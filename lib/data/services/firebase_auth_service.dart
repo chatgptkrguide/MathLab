@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import '../../shared/utils/logger.dart';
 import 'social_auth_service.dart';
 

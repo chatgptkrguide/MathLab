@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/level_test.dart';
-import '../models/user.dart';
 import 'user_provider.dart';
 import '../../shared/utils/logger.dart';
 import '../services/local_storage_service.dart';
