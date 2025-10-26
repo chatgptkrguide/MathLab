@@ -49,8 +49,8 @@ class ProfileHeaderContent extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  (user!.name.isNotEmpty)
-                      ? user.name[0]
+                  (user?.name?.isNotEmpty == true)
+                      ? user!.name[0]
                       : '학',
                   style: const TextStyle(
                     fontSize: 28, // 32 → 28
