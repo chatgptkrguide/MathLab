@@ -50,7 +50,7 @@ class OnboardingPage extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(AppDimensions.paddingXL),
                     decoration: BoxDecoration(
-                      color: AppColors.surface.withOpacity(0.2),
+                      color: AppColors.surface.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -86,7 +86,7 @@ class OnboardingPage extends StatelessWidget {
                 child: Text(
                   data.description,
                   style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.surface.withOpacity(0.9),
+                    color: AppColors.surface.withValues(alpha: 0.9),
                     height: 1.6,
                   ),
                   textAlign: TextAlign.center,
@@ -106,10 +106,10 @@ class OnboardingPage extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.all(AppDimensions.paddingL),
                       decoration: BoxDecoration(
-                        color: AppColors.surface.withOpacity(0.15),
+                        color: AppColors.surface.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                         border: Border.all(
-                          color: AppColors.surface.withOpacity(0.3),
+                          color: AppColors.surface.withValues(alpha: 0.3),
                           width: 2,
                         ),
                       ),

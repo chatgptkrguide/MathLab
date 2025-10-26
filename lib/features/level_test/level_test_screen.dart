@@ -107,7 +107,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
             LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              backgroundColor: AppColors.disabled.withOpacity(0.2),
+              backgroundColor: AppColors.disabled.withValues(alpha: 0.2),
               valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
             const SizedBox(height: AppDimensions.paddingL),
@@ -130,7 +130,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                       vertical: AppDimensions.paddingS,
                     ),
                     decoration: BoxDecoration(
-                      color: _getDifficultyColor(question.difficulty).withOpacity(0.1),
+                      color: _getDifficultyColor(question.difficulty).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       border: Border.all(
                         color: _getDifficultyColor(question.difficulty),
@@ -297,7 +297,7 @@ class _OptionButton extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.surface : AppColors.primary.withOpacity(0.1),
+                color: isSelected ? AppColors.surface : AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected ? AppColors.surface : AppColors.primary,
@@ -490,9 +490,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

@@ -225,7 +225,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       decoration: BoxDecoration(
         color: isActive
             ? AppColors.surface
-            : AppColors.surface.withOpacity(0.3),
+            : AppColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
     );

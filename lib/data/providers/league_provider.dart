@@ -126,9 +126,9 @@ class LeagueState {
     final minutes = duration.inMinutes % 60;
 
     if (days > 0) {
-      return '$days일 ${hours}시간';
+      return '$days일 $hours시간';
     } else if (hours > 0) {
-      return '$hours시간 ${minutes}분';
+      return '$hours시간 $minutes분';
     } else {
       return '$minutes분';
     }

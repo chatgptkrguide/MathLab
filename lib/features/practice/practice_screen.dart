@@ -43,10 +43,10 @@ class PracticeCategoryScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingL),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -134,7 +134,7 @@ class _CategoryCard extends ConsumerWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: _getCategoryColor(category).withOpacity(0.1),
+                color: _getCategoryColor(category).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Center(
@@ -338,7 +338,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             LinearProgressIndicator(
               value: state.progress,
               minHeight: 8,
-              backgroundColor: AppColors.disabled.withOpacity(0.2),
+              backgroundColor: AppColors.disabled.withValues(alpha: 0.2),
               valueColor: const AlwaysStoppedAnimation<Color>(AppColors.successGreen),
             ),
             const SizedBox(height: AppDimensions.paddingL),
@@ -361,7 +361,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                       vertical: AppDimensions.paddingS,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.successGreen.withOpacity(0.1),
+                      color: AppColors.successGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       border: Border.all(color: AppColors.successGreen),
                     ),
@@ -543,7 +543,7 @@ class _OptionButton extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.surface : AppColors.successGreen.withOpacity(0.1),
+                color: isSelected ? AppColors.surface : AppColors.successGreen.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected ? AppColors.surface : AppColors.successGreen,
@@ -605,7 +605,7 @@ class PracticeResultScreen extends ConsumerWidget {
                       width: 120,
                       height: 120,
                       decoration: BoxDecoration(
-                        color: AppColors.successGreen.withOpacity(0.1),
+                        color: AppColors.successGreen.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: AppColors.successGreen,
@@ -730,9 +730,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

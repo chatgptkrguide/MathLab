@@ -85,7 +85,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.mathButtonBlue.withOpacity(0.4),
+                color: AppColors.mathButtonBlue.withValues(alpha: 0.4),
                 blurRadius: 30,
                 offset: const Offset(0, 15),
               ),
@@ -116,7 +116,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         Text(
           '매일 5분, 수학이 쉬워진다',
           style: AppTextStyles.titleMedium.copyWith(
-            color: AppColors.surface.withOpacity(0.9),
+            color: AppColors.surface.withValues(alpha: 0.9),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -149,7 +149,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           Expanded(
             child: Container(
               height: 1,
-              color: AppColors.surface.withOpacity(0.3),
+              color: AppColors.surface.withValues(alpha: 0.3),
             ),
           ),
           Padding(
@@ -157,7 +157,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             child: Text(
               '또는',
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.surface.withOpacity(0.7),
+                color: AppColors.surface.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -165,7 +165,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           Expanded(
             child: Container(
               height: 1,
-              color: AppColors.surface.withOpacity(0.3),
+              color: AppColors.surface.withValues(alpha: 0.3),
             ),
           ),
         ],
