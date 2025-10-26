@@ -49,7 +49,7 @@ class ProfileHeaderContent extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  (user?.name?.isNotEmpty == true)
+                  (user?.name.isNotEmpty == true)
                       ? user!.name[0]
                       : '학',
                   style: const TextStyle(
