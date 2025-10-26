@@ -83,20 +83,20 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor = AppColors.borderLight;
+    Color borderLight = AppColors.borderLight;
     Color backgroundColor = AppColors.surface;
     Widget? suffixIcon;
 
     if (widget.showResult) {
       if (widget.isCorrect) {
-        borderColor = AppColors.duolingoGreen;
+        borderLight = AppColors.duolingoGreen;
         backgroundColor = AppColors.duolingoGreen.withValues(alpha: 0.1);
         suffixIcon = const Icon(
           Icons.check_circle,
           color: AppColors.duolingoGreen,
         );
       } else {
-        borderColor = AppColors.duolingoRed;
+        borderLight = AppColors.duolingoRed;
         backgroundColor = AppColors.duolingoRed.withValues(alpha: 0.1);
         suffixIcon = const Icon(
           Icons.cancel,
@@ -127,7 +127,7 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                     color: backgroundColor,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     border: Border.all(
-                      color: borderColor,
+                      color: borderLight,
                       width: 2,
                     ),
                     boxShadow: widget.showResult && widget.isCorrect

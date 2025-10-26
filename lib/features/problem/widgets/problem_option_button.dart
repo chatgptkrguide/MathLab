@@ -160,7 +160,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   }
 
   /// 테두리 색상 - GoMath style
-  Color get _borderColor {
+  Color get _borderLight {
     if (!widget.isAnswerSubmitted) {
       return _isSelected ? AppColors.mathBlueDark : AppColors.borderLight; // GoMath darker blue
     } else {
@@ -288,7 +288,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                 color: _backgroundColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _borderColor,
+                  color: _borderLight,
                   width: 3,
                 ),
               ),

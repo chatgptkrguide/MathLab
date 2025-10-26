@@ -101,7 +101,7 @@ class SettingsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: AppColors.borderColor),
+          border: Border.all(color: AppColors.borderLight),
           boxShadow: [
             BoxShadow(
               color: AppColors.borderLight.withValues(alpha: 0.15),
@@ -169,7 +169,7 @@ class SettingsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: AppColors.borderColor),
+          border: Border.all(color: AppColors.borderLight),
           boxShadow: [
             BoxShadow(
               color: AppColors.borderLight.withValues(alpha: 0.15),
@@ -226,7 +226,7 @@ class SettingsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: AppColors.borderColor),
+          border: Border.all(color: AppColors.borderLight),
           boxShadow: [
             BoxShadow(
               color: AppColors.borderLight.withValues(alpha: 0.15),
@@ -277,7 +277,7 @@ class SettingsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: AppColors.borderColor),
+          border: Border.all(color: AppColors.borderLight),
           boxShadow: [
             BoxShadow(
               color: AppColors.borderLight.withValues(alpha: 0.15),

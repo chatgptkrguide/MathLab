@@ -8,7 +8,7 @@ import '../../constants/app_dimensions.dart';
 class DuolingoCard extends StatelessWidget {
   final Widget child;
   final List<Color>? gradientColors;
-  final Color? borderColor;
+  final Color? borderLight;
   final VoidCallback? onTap;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
@@ -18,7 +18,7 @@ class DuolingoCard extends StatelessWidget {
     super.key,
     required this.child,
     this.gradientColors,
-    this.borderColor,
+    this.borderLight,
     this.onTap,
     this.padding,
     this.margin,
@@ -38,7 +38,7 @@ class DuolingoCard extends StatelessWidget {
         boxShadow: [
           // 3D 바닥 그림자
           BoxShadow(
-            color: (borderColor ?? AppColors.successGreen).withValues(alpha: 0.3), // GoMath green
+            color: (borderLight ?? AppColors.successGreen).withValues(alpha: 0.3), // GoMath green
             offset: const Offset(0, 4),
             blurRadius: 0,
           ),
@@ -61,8 +61,8 @@ class DuolingoCard extends StatelessWidget {
               : null,
           color: gradientColors == null ? AppColors.surface : null,
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          border: borderColor != null
-              ? Border.all(color: borderColor!, width: 2)
+          border: borderLight != null
+              ? Border.all(color: borderLight!, width: 2)
               : Border.all(color: AppColors.borderLight.withValues(alpha: 0.3), width: 1),
         ),
         child: Material(

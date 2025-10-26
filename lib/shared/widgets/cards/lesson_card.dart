@@ -37,7 +37,7 @@ class LessonCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: Border.all(
             color: isLocked
-                ? AppColors.borderColor
+                ? AppColors.borderLight
                 : Colors.transparent,
             width: 1,
           ),

@@ -40,7 +40,7 @@ class AchievementCard extends StatelessWidget {
           border: Border.all(
             color: isUnlocked
                 ? Colors.transparent
-                : AppColors.borderColor,
+                : AppColors.borderLight,
             width: 1,
           ),
           boxShadow: isUnlocked

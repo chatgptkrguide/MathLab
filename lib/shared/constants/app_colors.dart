@@ -53,8 +53,7 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF1A1A1A); // 더 진한 검정 (대비 향상)
   static const Color textSecondary = Color(0xFF4A4A4A); // 더 진한 회색 (가독성 향상)
-  static const Color borderLight = Color(0xFFDADCE0);
-  static const Color borderColor = Color(0xFFDADCE0); // 경계선 색상
+  static const Color borderLight = Color(0xFFDADCE0); // 경계선 색상
   static const Color disabled = Color(0xFF9AA0A6);
 
   // 게이미피케이션 색상

@@ -22,7 +22,7 @@ class ProfileStatCard extends StatelessWidget {
         color: AppColors.background,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.borderColor,
+          color: AppColors.borderLight,
           width: 1,
         ),
         boxShadow: [
