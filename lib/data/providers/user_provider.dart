@@ -192,7 +192,7 @@ class UserNotifier extends StateNotifier<User?> {
     // 레벨업 햅틱 피드백
     try {
       // await AppHapticFeedback.levelUp();
-    } catch (e, stackTrace) {
+    } catch (e) {
       Logger.warning(
         '햅틱 피드백 실패',
         tag: 'UserProvider',

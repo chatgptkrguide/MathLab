@@ -12,8 +12,6 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
     _loadProblems();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
-
   /// 문제 데이터 로드
   Future<void> _loadProblems() async {
     try {
