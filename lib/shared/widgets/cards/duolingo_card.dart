@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
@@ -198,20 +197,15 @@ class DuolingoLessonNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor;
     List<Color> gradientColors;
 
     if (isLocked) {
-      backgroundColor = AppColors.disabled;
       gradientColors = [AppColors.disabled, AppColors.disabled];
     } else if (isCompleted) {
-      backgroundColor = AppColors.mathYellow; // GoMath yellow (gold)
       gradientColors = [AppColors.mathYellow.withValues(alpha: 0.8), AppColors.mathYellow]; // GoMath gradient
     } else if (isActive) {
-      backgroundColor = AppColors.successGreen; // GoMath green
       gradientColors = AppColors.greenGradient;
     } else {
-      backgroundColor = AppColors.mathBlue; // GoMath blue
       gradientColors = AppColors.blueGradient;
     }
 

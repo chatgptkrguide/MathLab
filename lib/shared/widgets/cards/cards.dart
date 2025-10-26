@@ -1,4 +1,4 @@
-/// 카드 위젯 Barrel 파일
+// 카드 위젯 Barrel 파일
 export 'achievement_card.dart';
 export 'duolingo_card.dart';
 export 'lesson_card.dart';

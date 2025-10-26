@@ -104,9 +104,9 @@ class PrimaryButton extends StatelessWidget {
     // Default: darken by 20%
     return Color.fromARGB(
       (color.a * 255.0).round() & 0xff,
-      (color.red * 0.8).round(),
-      (color.green * 0.8).round(),
-      (color.blue * 0.8).round(),
+      ((color.r * 255.0).round() & 0xff * 0.8).round(),
+      ((color.g * 255.0).round() & 0xff * 0.8).round(),
+      ((color.b * 255.0).round() & 0xff * 0.8).round(),
     );
   }
 

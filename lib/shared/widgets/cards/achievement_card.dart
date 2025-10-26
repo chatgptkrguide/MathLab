@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_text_styles.dart';
 import '../../constants/app_dimensions.dart';
 import '../../../data/models/models.dart';
 
@@ -177,6 +176,7 @@ class AchievementCard extends StatelessWidget {
   }
 
   /// 날짜 포맷
+  // ignore: unused_element
   String _formatDate(DateTime date) {
     return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
   }
