@@ -90,73 +90,147 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
 
-          // 흰색 배경 시작 영역 - 곡선 전환
+          // 흰색 배경 시작 영역 - 부드러운 곡선 전환
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
                 ),
               ),
-              child: const SizedBox(height: AppDimensions.paddingXL),
-            ),
-          ),
-
-          // 게스트 로그인 안내 (게스트인 경우에만)
-          if (isGuest)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppDimensions.paddingXL,
-                  0,
-                  AppDimensions.paddingXL,
-                  AppDimensions.spacingXL,
-                ),
-                child: const GuestLoginPrompt(),
-              ),
-            ),
-
-          // 업적 섹션
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.paddingXL,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Text(
-                    '업적',
-                    style: AppTextStyles.headlineSmall.copyWith(
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(height: AppDimensions.paddingXL),
+
+                  // 게스트 로그인 안내 (게스트인 경우에만)
+                  if (isGuest) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.paddingXL,
+                      ),
+                      child: const GuestLoginPrompt(),
                     ),
-                  ),
-                  Container(
+                    const SizedBox(height: AppDimensions.spacingXL),
+                  ],
+
+                  // 업적 헤더 섹션
+                  Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingM,
-                      vertical: AppDimensions.paddingS,
+                      horizontal: AppDimensions.paddingXL,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.mathTeal.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                    ),
-                    child: Text(
-                      '${unlockedAchievements.length}/${achievements.length}',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.mathTeal,
-                        fontWeight: FontWeight.bold,
+                    child: Container(
+                      padding: const EdgeInsets.all(AppDimensions.paddingL),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.mathTeal.withValues(alpha: 0.08),
+                            AppColors.mathBlue.withValues(alpha: 0.08),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                        border: Border.all(
+                          color: AppColors.mathTeal.withValues(alpha: 0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // 트로피 아이콘
+                          Container(
+                            padding: const EdgeInsets.all(AppDimensions.paddingM),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.mathYellow,
+                                  AppColors.mathOrange,
+                                ],
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.mathYellow.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.emoji_events,
+                              color: AppColors.surface,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: AppDimensions.spacingM),
+                          // 텍스트 정보
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '나의 업적',
+                                  style: AppTextStyles.titleLarge.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${unlockedAchievements.length}개 달성',
+                                      style: AppTextStyles.bodyMedium.copyWith(
+                                        color: AppColors.mathTeal,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      ' / 총 ${achievements.length}개',
+                                      style: AppTextStyles.bodyMedium.copyWith(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 진행률 원형 인디케이터
+                          SizedBox(
+                            width: 56,
+                            height: 56,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  value: unlockedAchievements.length / achievements.length,
+                                  backgroundColor: AppColors.progressBackground,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.mathTeal,
+                                  ),
+                                  strokeWidth: 5,
+                                ),
+                                Text(
+                                  '${((unlockedAchievements.length / achievements.length) * 100).toInt()}%',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.mathTeal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: AppDimensions.spacingXL),
                 ],
               ),
             ),
-          ),
-
-          const SliverToBoxAdapter(
-            child: SizedBox(height: AppDimensions.spacingL),
           ),
 
           // 달성한 업적 (접기/펴기)
@@ -302,12 +376,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!mounted) return;
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         ),
+        clipBehavior: Clip.antiAlias,
         child: Container(
-          padding: const EdgeInsets.all(AppDimensions.paddingXL),
+          constraints: const BoxConstraints(
+            maxWidth: 400,
+            minHeight: 500,
+          ),
           decoration: BoxDecoration(
             gradient: achievement.isUnlocked
                 ? LinearGradient(
@@ -317,196 +396,335 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   )
                 : null,
             color: achievement.isUnlocked ? null : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 아이콘
+              // 상단 곡선 영역
               Container(
-                width: 80,
-                height: 80,
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                 decoration: BoxDecoration(
-                  color: achievement.isUnlocked
-                      ? AppColors.surface.withValues(alpha: 0.3)
-                      : AppColors.disabled.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+                  gradient: achievement.isUnlocked
+                      ? null
+                      : LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            _getAchievementColor(achievement).withValues(alpha: 0.1),
+                            AppColors.surface,
+                          ],
+                        ),
                 ),
-                child: Center(
-                  child: Text(
-                    achievement.icon,
-                    style: TextStyle(
-                      fontSize: 40,
-                      color: achievement.isUnlocked ? null : AppColors.disabled,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppDimensions.spacingL),
-
-              // 제목
-              Text(
-                achievement.title,
-                style: AppTextStyles.headlineMedium.copyWith(
-                  color: achievement.isUnlocked ? AppColors.surface : AppColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppDimensions.spacingM),
-
-              // 설명
-              Text(
-                achievement.description,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: achievement.isUnlocked
-                      ? AppColors.surface.withValues(alpha: 0.9)
-                      : AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppDimensions.spacingL),
-
-              // 진행률 (미달성인 경우에만)
-              if (!achievement.isUnlocked) ...[
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.paddingL),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '진행률',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            achievement.progressText,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: _getAchievementColor(achievement),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppDimensions.spacingM),
-                      Stack(
-                        children: [
-                          Container(
-                            height: 8,
+                child: Column(
+                  children: [
+                    // 아이콘 + 애니메이션
+                    TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 600),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      curve: Curves.elasticOut,
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: value,
+                          child: Container(
+                            width: 100,
+                            height: 100,
                             decoration: BoxDecoration(
-                              color: AppColors.progressBackground,
-                              borderRadius: BorderRadius.circular(4),
+                              gradient: achievement.isUnlocked
+                                  ? LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        AppColors.surface.withValues(alpha: 0.4),
+                                        AppColors.surface.withValues(alpha: 0.2),
+                                      ],
+                                    )
+                                  : LinearGradient(
+                                      colors: [
+                                        _getAchievementColor(achievement).withValues(alpha: 0.2),
+                                        _getAchievementColor(achievement).withValues(alpha: 0.1),
+                                      ],
+                                    ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: achievement.isUnlocked
+                                      ? AppColors.surface.withValues(alpha: 0.3)
+                                      : _getAchievementColor(achievement).withValues(alpha: 0.2),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ),
-                          FractionallySizedBox(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: achievement.progress.clamp(0.0, 1.0),
-                            child: Container(
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: _getAchievementColor(achievement),
-                                borderRadius: BorderRadius.circular(4),
+                            child: Center(
+                              child: Text(
+                                achievement.icon,
+                                style: TextStyle(
+                                  fontSize: 48,
+                                  color: achievement.isUnlocked ? null : AppColors.disabled,
+                                ),
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.spacingL),
-              ],
-
-              // 보상
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.paddingL),
-                decoration: BoxDecoration(
-                  color: achievement.isUnlocked
-                      ? AppColors.surface.withValues(alpha: 0.2)
-                      : AppColors.mathYellow.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.diamond,
-                      color: achievement.isUnlocked
-                          ? AppColors.surface
-                          : AppColors.mathYellow,
-                      size: 24,
+                        );
+                      },
                     ),
-                    const SizedBox(width: AppDimensions.spacingS),
+                    const SizedBox(height: 20),
+
+                    // 제목
                     Text(
-                      '+${achievement.xpReward} XP',
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: achievement.isUnlocked
-                            ? AppColors.surface
-                            : AppColors.mathYellow,
+                      achievement.title,
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: achievement.isUnlocked ? AppColors.surface : AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // 희귀도 표시
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: achievement.isUnlocked
+                            ? AppColors.surface.withValues(alpha: 0.25)
+                            : _getAchievementColor(achievement).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: achievement.isUnlocked
+                              ? AppColors.surface.withValues(alpha: 0.4)
+                              : _getAchievementColor(achievement).withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        _getRarityText(achievement.rarity),
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: achievement.isUnlocked
+                              ? AppColors.surface
+                              : _getAchievementColor(achievement),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: AppDimensions.spacingL),
 
-              // 달성 상태
-              if (achievement.isUnlocked) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              // 하단 정보 영역
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
                   children: [
-                    const Icon(
-                      Icons.check_circle,
-                      color: AppColors.surface,
-                      size: 20,
+                    // 설명
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: achievement.isUnlocked
+                            ? AppColors.surface.withValues(alpha: 0.15)
+                            : AppColors.background,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        achievement.description,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: achievement.isUnlocked
+                              ? AppColors.surface.withValues(alpha: 0.95)
+                              : AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Text(
-                      '달성 완료!',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.surface,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(height: 20),
+
+                    // 진행률 (미달성인 경우에만)
+                    if (!achievement.isUnlocked) ...[
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.borderLight,
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '진행률',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  achievement.progressText,
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: _getAchievementColor(achievement),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.progressBackground,
+                                    ),
+                                  ),
+                                  FractionallySizedBox(
+                                    alignment: Alignment.centerLeft,
+                                    widthFactor: achievement.progress.clamp(0.0, 1.0),
+                                    child: Container(
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            _getAchievementColor(achievement),
+                                            _getAchievementColor(achievement).withValues(alpha: 0.7),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // 보상
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        gradient: achievement.isUnlocked
+                            ? LinearGradient(
+                                colors: [
+                                  AppColors.surface.withValues(alpha: 0.25),
+                                  AppColors.surface.withValues(alpha: 0.15),
+                                ],
+                              )
+                            : LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.mathYellow.withValues(alpha: 0.15),
+                                  AppColors.mathOrange.withValues(alpha: 0.1),
+                                ],
+                              ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: achievement.isUnlocked
+                              ? AppColors.surface.withValues(alpha: 0.3)
+                              : AppColors.mathYellow.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.diamond,
+                            color: achievement.isUnlocked
+                                ? AppColors.surface
+                                : AppColors.mathYellow,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '+${achievement.xpReward} XP',
+                            style: AppTextStyles.titleLarge.copyWith(
+                              color: achievement.isUnlocked
+                                  ? AppColors.surface
+                                  : AppColors.mathYellow,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 달성 상태
+                    if (achievement.isUnlocked) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.check_circle,
+                              color: AppColors.surface,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '달성 완료!',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.surface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+
+                    // 닫기 버튼
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: achievement.isUnlocked
+                              ? AppColors.surface
+                              : AppColors.mathBlue,
+                          foregroundColor: achievement.isUnlocked
+                              ? _getAchievementColor(achievement)
+                              : AppColors.surface,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                          ),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          '닫기',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: AppDimensions.spacingL),
-              ],
-
-              // 닫기 버튼
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: achievement.isUnlocked
-                        ? AppColors.surface
-                        : AppColors.mathBlue,
-                    foregroundColor: achievement.isUnlocked
-                        ? _getAchievementColor(achievement)
-                        : AppColors.surface,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppDimensions.paddingM,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                    ),
-                  ),
-                  child: const Text(
-                    '닫기',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ),
             ],
@@ -514,6 +732,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  /// 희귀도 텍스트 변환
+  String _getRarityText(AchievementRarity rarity) {
+    switch (rarity) {
+      case AchievementRarity.common:
+        return '일반';
+      case AchievementRarity.uncommon:
+        return '고급';
+      case AchievementRarity.rare:
+        return '희귀';
+      case AchievementRarity.epic:
+        return '영웅';
+      case AchievementRarity.legendary:
+        return '전설';
+    }
   }
 
   /// 희귀도별 그라디언트 색상
