@@ -24,7 +24,10 @@ class AchievementCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppDimensions.paddingM),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.paddingS,
+          vertical: AppDimensions.paddingM,
+        ),
         decoration: BoxDecoration(
           gradient: isUnlocked
               ? LinearGradient(
@@ -64,42 +67,45 @@ class AchievementCard extends StatelessWidget {
                 ],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.min,
           children: [
             // 아이콘
             _buildIcon(isUnlocked),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             // 제목
-            Flexible(
-              child: Text(
-                achievement.title,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  color: isUnlocked ? AppColors.surface : AppColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                  height: 1.3,
-                  shadows: isUnlocked
-                      ? [
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            offset: const Offset(0, 1),
-                            blurRadius: 2,
-                          ),
-                        ]
-                      : null,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Text(
+                  achievement.title,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: isUnlocked ? AppColors.surface : AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                    shadows: isUnlocked
+                        ? [
+                            Shadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              offset: const Offset(0, 1),
+                              blurRadius: 2,
+                            ),
+                          ]
+                        : null,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             // 진행률 또는 달성 표시
             if (!isUnlocked) ...[
               Container(
                 height: 4,
-                margin: const EdgeInsets.symmetric(horizontal: 6),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
                   color: AppColors.progressBackground,
@@ -122,11 +128,11 @@ class AchievementCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
               Text(
                 achievement.progressText,
                 style: TextStyle(
-                  fontSize: 9.5,
+                  fontSize: 9,
                   color: _getRarityColor(),
                   fontWeight: FontWeight.w600,
                 ),
@@ -136,12 +142,12 @@ class AchievementCard extends StatelessWidget {
             ] else ...[
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
+                  horizontal: 6,
+                  vertical: 2,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.surface.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -149,13 +155,13 @@ class AchievementCard extends StatelessWidget {
                     const Icon(
                       Icons.check_circle,
                       color: AppColors.surface,
-                      size: 12,
+                      size: 11,
                     ),
-                    const SizedBox(width: 3),
+                    const SizedBox(width: 2),
                     Text(
                       '달성',
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 8.5,
                         color: AppColors.surface,
                         fontWeight: FontWeight.bold,
                       ),

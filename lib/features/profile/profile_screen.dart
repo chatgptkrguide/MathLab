@@ -53,9 +53,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             actions: [
               // 설정 버튼
               Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.only(right: 12.0),
                 child: Material(
                   color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   child: InkWell(
                     onTap: () async {
                       await AppHapticFeedback.selectionClick();
@@ -68,17 +69,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         );
                       }
                     },
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                    splashColor: AppColors.surface.withValues(alpha: 0.3),
+                    highlightColor: AppColors.surface.withValues(alpha: 0.2),
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                        color: AppColors.surface.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        border: Border.all(
+                          color: AppColors.surface.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
                       ),
                       child: const Icon(
-                        Icons.settings,
+                        Icons.settings_rounded,
                         color: AppColors.surface,
-                        size: 24,
+                        size: 22,
                       ),
                     ),
                   ),
@@ -280,7 +287,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     crossAxisCount: 3,
                     mainAxisSpacing: AppDimensions.spacingM,
                     crossAxisSpacing: AppDimensions.spacingM,
-                    childAspectRatio: 0.85,
+                    childAspectRatio: 0.75,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -345,7 +352,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     crossAxisCount: 3,
                     mainAxisSpacing: AppDimensions.spacingM,
                     crossAxisSpacing: AppDimensions.spacingM,
-                    childAspectRatio: 0.85,
+                    childAspectRatio: 0.75,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {

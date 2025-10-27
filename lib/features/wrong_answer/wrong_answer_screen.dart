@@ -55,58 +55,102 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             if (mounted) Navigator.of(context).pop();
           },
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          tabs: [
-            Tab(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('복습 필요'),
-                  if (state.needsReviewCount > 0) ...[
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.error,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                      ),
-                      child: Text(
-                        '${state.needsReviewCount}',
-                        style: const TextStyle(
-                          color: AppColors.surface,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Container(
+            margin: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.paddingL,
+              vertical: 8,
+            ),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textSecondary.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              indicatorPadding: EdgeInsets.zero,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: AppColors.primary,
+              unselectedLabelColor: AppColors.textSecondary,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+              tabs: [
+                Tab(
+                  height: 40,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('복습 필요'),
+                      if (state.needsReviewCount > 0) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.error,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '${state.needsReviewCount}',
+                            style: const TextStyle(
+                              color: AppColors.surface,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                      ],
+                    ],
+                  ),
+                ),
+                const Tab(
+                  height: 40,
+                  text: '최근 오답',
+                ),
+                Tab(
+                  height: 40,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('완료'),
+                      if (state.masteredCount > 0) ...[
+                        const SizedBox(width: 4),
+                        Text(
+                          '(${state.masteredCount})',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const Tab(text: '최근 오답'),
-            Tab(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('완료'),
-                  if (state.masteredCount > 0) ...[
-                    const SizedBox(width: 4),
-                    Text(
-                      '(${state.masteredCount})',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
       body: Column(
@@ -501,13 +545,28 @@ class _WrongAnswerCard extends StatelessWidget {
                   : AppColors.borderLight,
           width: isMastered || (showUrgency && wrongAnswer.urgency > 0) ? 2 : 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isMastered
+                ? AppColors.success.withValues(alpha: 0.1)
+                : showUrgency && wrongAnswer.urgency > 0
+                    ? _getUrgencyColor().withValues(alpha: 0.1)
+                    : AppColors.textSecondary.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.paddingM),
-          child: Column(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          splashColor: AppColors.primary.withValues(alpha: 0.1),
+          highlightColor: AppColors.primary.withValues(alpha: 0.05),
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.paddingM),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -638,6 +697,8 @@ class _WrongAnswerCard extends StatelessWidget {
                   ),
                 ),
             ],
+          ),
+        ),
           ),
         ),
       ),

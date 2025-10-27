@@ -101,7 +101,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Widget _buildPeriodTabs() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-      padding: const EdgeInsets.all(AppDimensions.paddingXS),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(16),
@@ -111,7 +111,16 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         indicator: BoxDecoration(
           color: AppColors.surface, // Duolingo flat white
           borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.surface.withValues(alpha: 0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
+        indicatorPadding: EdgeInsets.zero,
+        indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         labelColor: AppColors.mathBlue, // GoMath blue text when selected
         unselectedLabelColor: AppColors.surface,
@@ -123,9 +132,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           fontWeight: FontWeight.w600,
           fontSize: 15,
         ),
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
         tabs: LeaderboardPeriod.values
             .map((period) => Tab(
-                  height: 40,
+                  height: 44,
                   text: period.displayName,
                 ))
             .toList(),
