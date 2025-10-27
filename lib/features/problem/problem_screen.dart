@@ -70,6 +70,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   DateTime? _lastSelectTime;
   int? _pulsingIndex;
 
+  // 주관식 답안 입력
+  final TextEditingController _answerController = TextEditingController();
+  final FocusNode _answerFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -124,6 +128,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   void dispose() {
     _transitionController.dispose();
     _scrollController.dispose();
+    _answerController.dispose();
+    _answerFocusNode.dispose();
     super.dispose();
   }
 
@@ -446,6 +452,13 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   /// 선택지
   Widget _buildOptions() {
+    // 주관식 문제인 경우 입력 필드 표시
+    if (_currentProblem.type == ProblemType.shortAnswer ||
+        _currentProblem.type == ProblemType.calculation) {
+      return _buildAnswerInput();
+    }
+
+    // 객관식 문제
     if (_currentProblem.options == null) return const SizedBox();
 
     return Column(
@@ -470,6 +483,107 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// 정답 텍스트 가져오기
+  String _getCorrectAnswerText() {
+    // 주관식 문제의 경우
+    if (_currentProblem.correctAnswer != null) {
+      return _currentProblem.correctAnswer!;
+    }
+
+    // 객관식 문제의 경우
+    final options = _currentProblem.options;
+    final correctIndex = _currentProblem.correctAnswerIndex;
+
+    if (options != null &&
+        correctIndex != null &&
+        correctIndex >= 0 &&
+        correctIndex < options.length) {
+      return options[correctIndex];
+    }
+
+    return '알 수 없음';
+  }
+
+  /// 주관식 답안 입력 필드
+  Widget _buildAnswerInput() {
+    return FadeInWidget(
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.paddingL),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          border: Border.all(
+            color: _isAnswerSubmitted
+                ? (_isCorrect ? AppColors.successGreen : AppColors.errorRed)
+                : AppColors.borderLight,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '정답을 입력하세요',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacingS),
+            TextField(
+              controller: _answerController,
+              focusNode: _answerFocusNode,
+              enabled: !_isAnswerSubmitted,
+              keyboardType: _currentProblem.type == ProblemType.calculation
+                  ? const TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.text,
+              style: AppTextStyles.titleLarge,
+              decoration: InputDecoration(
+                hintText: _currentProblem.type == ProblemType.calculation ? '숫자를 입력하세요' : '답을 입력하세요',
+                hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  borderSide: BorderSide(color: AppColors.borderLight),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  borderSide: BorderSide(color: AppColors.borderLight),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  borderSide: BorderSide(color: AppColors.mathPurple, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  // 입력이 있으면 버튼 활성화
+                });
+              },
+              onSubmitted: (_) {
+                if (_answerController.text.isNotEmpty && !_isAnswerSubmitted) {
+                  _submitShortAnswer();
+                }
+              },
+            ),
+            if (_isAnswerSubmitted && !_isCorrect) ...[
+              const SizedBox(height: AppDimensions.spacingS),
+              Text(
+                '정답: ${_getCorrectAnswerText()}',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.successGreen,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -605,8 +719,12 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       return null;
     }
 
-    // 주관식/계산: 제출 버튼 표시 (아직 구현 안 됨)
-    // TODO: 주관식 입력이 있을 때만 활성화
+    // 주관식/계산: 입력이 있을 때만 제출 버튼 활성화
+    if (_currentProblem.type == ProblemType.shortAnswer ||
+        _currentProblem.type == ProblemType.calculation) {
+      return _answerController.text.isNotEmpty ? _submitShortAnswer : null;
+    }
+
     return null;
   }
 
@@ -614,6 +732,16 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     if (_isAnswerSubmitted) {
       return _isCorrect ? AppColors.successGreen : AppColors.mathButtonBlue; // GoMath 색상
     }
+
+    // 주관식: 입력이 있으면 활성화
+    if (_currentProblem.type == ProblemType.shortAnswer ||
+        _currentProblem.type == ProblemType.calculation) {
+      return _answerController.text.isEmpty
+          ? AppColors.borderLight
+          : AppColors.successGreen;
+    }
+
+    // 객관식: 선택이 있으면 활성화
     if (_selectedAnswerIndex == null) {
       return AppColors.borderLight; // 비활성화 회색
     }
@@ -778,6 +906,132 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     );
   }
 
+  /// 주관식 답안 제출
+  void _submitShortAnswer() async {
+    if (_answerController.text.isEmpty) return;
+
+    final user = ref.read(userProvider);
+    final userId = user?.id ?? 'user001';
+
+    // 답안 정규화 (공백 제거, 소문자 변환 등)
+    final userAnswer = _answerController.text.trim();
+    final correctAnswer = _currentProblem.correctAnswer?.trim() ?? '';
+
+    // 정답 체크 (대소문자 구분 없음, 공백 무시)
+    if (_currentProblem.type == ProblemType.calculation) {
+      // 계산 문제: 숫자 비교
+      _isCorrect = _compareNumbers(userAnswer, correctAnswer);
+    } else {
+      // 주관식: 문자열 비교 (대소문자 무시)
+      _isCorrect = userAnswer.toLowerCase() == correctAnswer.toLowerCase();
+    }
+
+    setState(() {
+      _isAnswerSubmitted = true;
+    });
+
+    // 실제 시간 측정
+    _stopwatch.stop();
+    final timeSpent = _stopwatch.elapsed.inSeconds;
+
+    // 결과 저장
+    final result = ProblemResult(
+      problemId: _currentProblem.id,
+      userId: userId,
+      selectedAnswerIndex: null, // 주관식은 인덱스 없음
+      textAnswer: userAnswer, // 사용자가 입력한 답
+      isCorrect: _isCorrect,
+      solvedAt: DateTime.now(),
+      timeSpentSeconds: timeSpent,
+      xpEarned: _isCorrect ? _currentProblem.xpReward : 0,
+    );
+
+    _results.add(result);
+    await ref.read(problemResultsProvider.notifier).addResult(result);
+
+    if (_isCorrect) {
+      // 정답: 연속 스트릭 증가
+      _currentStreak++;
+      if (_currentStreak > _maxStreak) {
+        _maxStreak = _currentStreak;
+      }
+
+      // 스트릭 보너스 XP 계산
+      int bonusXP = 0;
+      if (_currentStreak >= 10) {
+        bonusXP = 20; // 10연속 정답
+      } else if (_currentStreak >= 5) {
+        bonusXP = 10; // 5연속 정답
+      } else if (_currentStreak >= 3) {
+        bonusXP = 5; // 3연속 정답
+      }
+
+      _totalCorrect++;
+      _totalXPEarned += _currentProblem.xpReward + bonusXP;
+
+      // 정답 햅틱 피드백
+      await AppHapticFeedback.success();
+
+      // 사용자 XP 업데이트 (보너스 포함)
+      await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
+
+      // XP 획득 애니메이션 표시 (보너스 포함)
+      if (mounted) {
+        _showXPGainAnimation(_currentProblem.xpReward + bonusXP);
+      }
+
+      // 스트릭 애니메이션 표시
+      if (bonusXP > 0) {
+        setState(() {
+          _showStreakAnimation = true;
+        });
+
+        // 2초 후 애니메이션 종료
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          if (mounted) {
+            setState(() {
+              _showStreakAnimation = false;
+            });
+          }
+        });
+      }
+
+      // 뱃지 언락 체크
+      _checkAchievements();
+    } else {
+      // 오답: 스트릭 초기화
+      _currentStreak = 0;
+
+      // 오답 햅틱 피드백
+      await AppHapticFeedback.error();
+
+      // 오답: 오답 노트에 저장
+      await ref.read(errorNoteProvider.notifier).addErrorNote(
+            userId: userId,
+            problem: _currentProblem,
+            userAnswer: userAnswer,
+          );
+    }
+
+    // 레슨 진행률 업데이트
+    await ref.read(lessonProvider.notifier).onProblemSolved(
+      _currentProblem.id,
+      _isCorrect,
+    );
+  }
+
+  /// 숫자 비교 (오차 범위 허용)
+  bool _compareNumbers(String userAnswer, String correctAnswer) {
+    try {
+      final userNum = double.parse(userAnswer);
+      final correctNum = double.parse(correctAnswer);
+      // 0.01 오차 범위 허용
+      return (userNum - correctNum).abs() < 0.01;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// XP 획득 애니메이션
   void _showXPGainAnimation(int xp) {
     showXPGainAnimation(context, xp);
@@ -803,7 +1057,78 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   /// 뱃지 언락 알림
   void _showAchievementUnlocked(Achievement achievement) {
-    // TODO: 뱃지 언락 애니메이션 구현
+    // 뱃지 언락
+    ref.read(achievementProvider.notifier).unlockAchievement(achievement.id);
+
+    // 햅틱 피드백
+    AppHapticFeedback.success();
+
+    // 스낵바로 알림 표시
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.mathPurple,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  achievement.icon,
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '🎉 뱃지 획득!',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      achievement.title,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '+${achievement.xpReward} XP',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: AppColors.successGreen,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 4),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    }
   }
 
   /// 다음 문제
@@ -820,6 +1145,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _lastSelectedIndex = null;
       _lastSelectTime = null;
       _pulsingIndex = null;
+      _answerController.clear(); // 주관식 답안 초기화
     });
 
     // 타이머 리셋 및 재시작
