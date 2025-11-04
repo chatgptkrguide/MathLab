@@ -44,12 +44,10 @@ dependencies:
   shared_preferences: ^2.2.2
 
   # 애니메이션
-  lottie: ^2.7.0
   confetti: ^0.7.0
 
-  # 수학 렌더링 (Flutter 3.24.5 호환 문제로 임시 비활성화)
-  # TODO: 호환 가능한 수학 렌더링 라이브러리로 교체 필요
-  # flutter_math_fork: ^0.7.2
+  # 수학 렌더링 (LaTeX/TeX 지원)
+  # flutter_tex: ^4.0.9  # 주석 처리: 대신 LaTeX → Unicode 변환기 사용 (math_text.dart)
 
   # Firebase
   firebase_core: ^3.10.0

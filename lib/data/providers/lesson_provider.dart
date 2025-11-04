@@ -9,8 +9,8 @@ import 'problem_provider.dart';
 
 /// 레슨 상태 관리
 class LessonNotifier extends StateNotifier<List<Lesson>> {
-  LessonNotifier(this._ref) : super(_dataService.getSampleLessons()) {
-    Logger.info('[LessonProvider] 레슨 ${state.length}개로 초기화', tag: 'LessonProvider');
+  LessonNotifier(this._ref) : super([]) {
+    Logger.info('[LessonProvider] LessonNotifier 초기화', tag: 'LessonProvider');
     _loadLessons();
   }
 
@@ -32,10 +32,23 @@ class LessonNotifier extends StateNotifier<List<Lesson>> {
       state = lessons;
       Logger.info('[LessonProvider] 레슨 ${lessons.length}개 로드 완료', tag: 'LessonProvider');
     } else {
-      // 샘플 레슨을 저장
-      Logger.info('[LessonProvider] 저장된 레슨 없음, 샘플 레슨 저장', tag: 'LessonProvider');
-      await _saveLessons();
-      Logger.info('[LessonProvider] 샘플 레슨 ${state.length}개 저장 완료', tag: 'LessonProvider');
+      // JSON 파일에서 레슨 로드
+      Logger.info('[LessonProvider] 저장된 레슨 없음, JSON 파일에서 로드', tag: 'LessonProvider');
+      try {
+        final lessons = await _dataService.loadLessons();
+        state = lessons;
+        Logger.info('[LessonProvider] JSON 파일에서 ${lessons.length}개 레슨 로드 완료', tag: 'LessonProvider');
+        await _saveLessons();
+      } catch (e, stackTrace) {
+        Logger.error(
+          '[LessonProvider] JSON 로드 실패, 샘플 데이터 사용',
+          error: e,
+          stackTrace: stackTrace,
+          tag: 'LessonProvider',
+        );
+        state = _dataService.getSampleLessons();
+        await _saveLessons();
+      }
     }
 
     // 첫 번째 레슨은 항상 잠금 해제

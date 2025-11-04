@@ -79,12 +79,20 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
           child: Column(
             children: [
               _buildHeader(),
-              _buildStatsGrid(errorStats),
-              _buildActionButtons(filteredNotes),
-              _buildFilterTabs(),
-              Expanded(child: _buildErrorNotesList(userErrorNotes, filteredNotes)),
-              if (filteredNotes.isEmpty)
-                Flexible(child: _buildTips()),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildStatsGrid(errorStats),
+                      _buildActionButtons(filteredNotes),
+                      _buildFilterTabs(),
+                      _buildErrorNotesList(userErrorNotes, filteredNotes),
+                      if (filteredNotes.isEmpty)
+                        _buildTips(),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -362,6 +370,8 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     }
 
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       itemCount: filteredNotes.length,
       itemBuilder: (context, index) {

@@ -1063,7 +1063,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // 햅틱 피드백
     AppHapticFeedback.success();
 
-    // 스낵바로 알림 표시
+    // 스낵바로 알림 표시 (화면 위쪽에 표시)
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1125,7 +1125,13 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             borderRadius: BorderRadius.circular(12),
           ),
           duration: const Duration(seconds: 4),
-          margin: const EdgeInsets.all(16),
+          // 위쪽에 표시하도록 margin 수정
+          margin: const EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: 0,
+          ),
         ),
       );
     }

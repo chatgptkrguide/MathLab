@@ -118,181 +118,274 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: FadeTransition(
         opacity: _headerFadeAnimation,
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.paddingL,
-            vertical: AppDimensions.paddingM,
-          ),
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
+          padding: const EdgeInsets.all(AppDimensions.paddingL),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.surface,
+                AppColors.surface.withValues(alpha: 0.95),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 12,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              // 프로필 및 스탯 로우
               Row(
                 children: [
-                // 프로필 아바타 (간소화)
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: AppColors.mathButtonGradient,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.mathButtonBlue.withValues(alpha: 0.4),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+                  // 프로필 아바타 - 더 크고 입체적으로
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: AppColors.mathButtonGradient,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      user.name.substring(0, 1).toUpperCase(),
-                      style: const TextStyle(
+                      shape: BoxShape.circle,
+                      border: Border.all(
                         color: AppColors.surface,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        width: 2.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        user.name.substring(0, 1).toUpperCase(),
+                        style: const TextStyle(
+                          color: AppColors.surface,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppDimensions.spacingM),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                  const SizedBox(width: AppDimensions.spacingM),
+
+                  // 이름 및 레벨
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.3,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Level ${user.level}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 3),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Level ${user.level}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.surface,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                // 스트릭 & 하트 (staggered animation)
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOut,
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(20 * (1 - value), 0),
+
+                  // 스트릭 & 하트 배지
+                  TweenAnimationBuilder<double>(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.elasticOut,
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
                         child: child,
-                      ),
-                    );
-                  },
-                  child: _buildDuoStatBadge(Icons.local_fire_department, '${user.streakDays}', AppColors.mathOrange),
-                ),
-                const SizedBox(width: AppDimensions.spacingS),
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeOut,
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(20 * (1 - value), 0),
+                      );
+                    },
+                    child: _buildEnhancedStatBadge(
+                      Icons.local_fire_department,
+                      '${user.streakDays}',
+                      AppColors.mathOrange,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.spacingS),
+                  TweenAnimationBuilder<double>(
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.elasticOut,
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
                         child: child,
-                      ),
-                    );
-                  },
-                  child: _buildDuoStatBadge(Icons.favorite, '${user.hearts}', AppColors.mathRed),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppDimensions.spacingM),
-            // XP 진행률 바
-            _buildDuoProgressBar(user),
-            const SizedBox(height: AppDimensions.spacingM),
-            // Daily Challenge 버튼 (간소화)
-            InteractiveButton(
-              onTap: () async {
-                if (context.mounted) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const DailyChallengeScreen(),
+                      );
+                    },
+                    child: _buildEnhancedStatBadge(
+                      Icons.favorite,
+                      '${user.hearts}',
+                      AppColors.mathRed,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimensions.spacingL),
+
+              // XP 진행률 바 - 개선된 디자인
+              _buildEnhancedProgressBar(user),
+              const SizedBox(height: AppDimensions.spacingL),
+
+              // Daily Challenge 버튼 - 더 입체적으로
+              TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.elasticOut,
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: 0.8 + (0.2 * value),
+                    child: Opacity(
+                      opacity: value,
+                      child: child,
                     ),
                   );
-                }
-              },
-              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.paddingM,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  gradient: dailyChallengeState.allCompleted
-                      ? const LinearGradient(colors: AppColors.goldGradient)
-                      : const LinearGradient(
-                          colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                },
+                child: InteractiveButton(
+                  onTap: () async {
+                    if (context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const DailyChallengeScreen(),
                         ),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.emoji_events, color: AppColors.surface, size: 18),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    Text(
-                      dailyChallengeState.allCompleted
-                          ? '챌린지 완료! ✨'
-                          : '일일 챌린지',
-                      style: const TextStyle(
-                        color: AppColors.surface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                      vertical: 14,
                     ),
-                  ],
+                    decoration: BoxDecoration(
+                      gradient: dailyChallengeState.allCompleted
+                          ? const LinearGradient(
+                              colors: AppColors.goldGradient,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : const LinearGradient(
+                              colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                      boxShadow: [
+                        BoxShadow(
+                          color: dailyChallengeState.allCompleted
+                              ? AppColors.mathYellow.withValues(alpha: 0.4)
+                              : AppColors.mathTeal.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          dailyChallengeState.allCompleted
+                              ? Icons.check_circle
+                              : Icons.emoji_events,
+                          color: AppColors.surface,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppDimensions.spacingS),
+                        Text(
+                          dailyChallengeState.allCompleted
+                              ? '챌린지 완료! ✨'
+                              : '일일 챌린지',
+                          style: const TextStyle(
+                            color: AppColors.surface,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 
-  Widget _buildDuoStatBadge(IconData icon, String value, Color color) {
+  Widget _buildEnhancedStatBadge(IconData icon, String value, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.15),
+            color.withValues(alpha: 0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 16),
-          const SizedBox(width: 4),
+          Icon(icon, color: color, size: 18),
+          const SizedBox(width: 5),
           Text(
             value,
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.bold,
-              fontSize: 13,
+              fontSize: 14,
+              letterSpacing: 0.3,
             ),
           ),
         ],
@@ -300,45 +393,123 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildDuoProgressBar(User user) {
+  Widget _buildEnhancedProgressBar(User user) {
     final progress = user.levelProgress;
     final xpNeeded = user.xpToNextLevel;
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Lv ${user.level}',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '$xpNeeded XP',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        AnimatedProgressBar(
-          progress: progress,
-          height: 10,
-          backgroundColor: AppColors.borderLight,
-          gradient: const LinearGradient(
-            colors: [AppColors.mathTeal, AppColors.mathTealDark],
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
-          borderRadius: BorderRadius.circular(8),
-          duration: const Duration(milliseconds: 600),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.mathButtonBlue, AppColors.mathButtonBlueDark],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  'Level ${user.level}',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.surface,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.star,
+                    color: AppColors.mathYellow,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$xpNeeded XP',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Stack(
+            children: [
+              // 배경 바
+              Container(
+                height: 12,
+                decoration: BoxDecoration(
+                  color: AppColors.borderLight.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.borderLight,
+                    width: 1,
+                  ),
+                ),
+              ),
+              // 진행률 바
+              AnimatedProgressBar(
+                progress: progress,
+                height: 12,
+                backgroundColor: Colors.transparent,
+                gradient: const LinearGradient(
+                  colors: [AppColors.mathTeal, AppColors.mathTealDark],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                duration: const Duration(milliseconds: 800),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // 진행률 퍼센트
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${(progress * 100).toStringAsFixed(0)}%',
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const Text(
+                ' 완료',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

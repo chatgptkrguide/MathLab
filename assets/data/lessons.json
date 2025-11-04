@@ -1,0 +1,102 @@
+{
+  "lessons": [
+    {
+      "id": "lesson001",
+      "title": "기초 산술 마스터",
+      "description": "덧셈, 뺄셈, 곱셈의 기본을 다집니다",
+      "icon": "🔢",
+      "order": 1,
+      "grade": "초등",
+      "category": "기초산술",
+      "topics": ["사칙연산", "덧셈", "뺄셈", "곱셈"],
+      "totalProblems": 6,
+      "completedProblems": 0,
+      "isUnlocked": true,
+      "xpReward": 50
+    },
+    {
+      "id": "lesson002",
+      "title": "방정식 입문",
+      "description": "일차방정식의 기본 개념을 학습합니다",
+      "icon": "📐",
+      "order": 2,
+      "grade": "중1",
+      "category": "대수",
+      "topics": ["일차방정식", "등식의 성질"],
+      "totalProblems": 2,
+      "completedProblems": 0,
+      "isUnlocked": true,
+      "xpReward": 60
+    },
+    {
+      "id": "lesson003",
+      "title": "도형의 넓이",
+      "description": "정사각형과 직사각형의 넓이를 계산합니다",
+      "icon": "⬛",
+      "order": 3,
+      "grade": "초등",
+      "category": "기하",
+      "topics": ["도형", "넓이", "정사각형"],
+      "totalProblems": 2,
+      "completedProblems": 0,
+      "isUnlocked": true,
+      "xpReward": 55
+    },
+    {
+      "id": "lesson004",
+      "title": "통계 기초",
+      "description": "평균을 구하는 방법을 배웁니다",
+      "icon": "📊",
+      "order": 4,
+      "grade": "초등",
+      "category": "통계",
+      "topics": ["평균", "통계"],
+      "totalProblems": 2,
+      "completedProblems": 0,
+      "isUnlocked": false,
+      "xpReward": 60
+    },
+    {
+      "id": "lesson005",
+      "title": "주관식 연습",
+      "description": "직접 답을 입력하며 실력을 다집니다",
+      "icon": "✍️",
+      "order": 5,
+      "grade": "초등",
+      "category": "종합",
+      "topics": ["사칙연산", "주관식"],
+      "totalProblems": 3,
+      "completedProblems": 0,
+      "isUnlocked": false,
+      "xpReward": 70
+    },
+    {
+      "id": "lesson006",
+      "title": "분수의 이해",
+      "description": "음수 지수와 분수 지수를 학습합니다",
+      "icon": "🎯",
+      "order": 6,
+      "grade": "중1",
+      "category": "지수",
+      "topics": ["거듭제곱", "음수 지수", "지수 법칙", "분수 지수"],
+      "totalProblems": 3,
+      "completedProblems": 0,
+      "isUnlocked": false,
+      "xpReward": 100
+    },
+    {
+      "id": "lesson007",
+      "title": "근호와 거듭제곱근",
+      "description": "제곱근과 세제곱근을 계산합니다",
+      "icon": "√",
+      "order": 7,
+      "grade": "중2",
+      "category": "근호",
+      "topics": ["거듭제곱근", "근호 단순화", "제곱근"],
+      "totalProblems": 0,
+      "completedProblems": 0,
+      "isUnlocked": false,
+      "xpReward": 120
+    }
+  ]
+}

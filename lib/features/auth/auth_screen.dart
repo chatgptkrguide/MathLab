@@ -218,12 +218,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await AppHapticFeedback.mediumImpact();
 
     try {
-      // 게스트 계정 생성 (기존 UserProvider 로직 사용)
-      await ref.read(userProvider.notifier).createGuestUser();
+      // 게스트 계정으로 로그인
+      final success = await ref.read(authProvider.notifier).signInAsGuest();
 
       if (mounted) {
-        await AppHapticFeedback.success();
-        // AuthWrapper가 자동으로 홈으로 이동
+        if (success) {
+          await AppHapticFeedback.success();
+          // AuthWrapper가 자동으로 홈으로 이동
+
+          // UserProvider도 게스트 사용자 생성
+          await ref.read(userProvider.notifier).createGuestUser();
+        } else {
+          await AppHapticFeedback.error();
+          _showError('게스트로 시작하기에 실패했습니다');
+        }
       }
     } catch (e) {
       if (mounted) {

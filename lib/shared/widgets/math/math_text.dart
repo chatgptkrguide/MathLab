@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-// TODO: Flutter 3.24.5 호환 수학 렌더링 라이브러리로 교체 필요
-// import 'package:flutter_math_fork/flutter_math.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
-/// 수학 수식 렌더링 위젯
-/// 현재는 Text fallback 사용 (향후 LaTeX 렌더링 추가 예정)
+/// 수학 수식 텍스트 위젯
+/// LaTeX를 수평 분수선을 포함한 수학 표현으로 변환하여 표시
 class MathText extends StatelessWidget {
   final String text;
   final TextStyle? style;
@@ -24,80 +22,230 @@ class MathText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // LaTeX 표현식이 포함되어 있는지 확인
-    if (_containsMath(text)) {
-      return _buildMathWidget();
-    } else {
-      // 일반 텍스트
+    // LaTeX 분수를 파싱
+    final fractions = _parseFractions(text);
+
+    if (fractions.isEmpty) {
+      // 분수가 없으면 일반 텍스트로 변환
+      final displayText = _convertLatexToUnicode(text);
       return Text(
-        text,
-        style: style ?? AppTextStyles.bodyLarge.copyWith(fontSize: fontSize, color: color),
+        displayText,
+        style: style ?? AppTextStyles.bodyLarge.copyWith(
+          fontSize: fontSize,
+          color: color ?? AppColors.textPrimary,
+        ),
         textAlign: textAlign,
       );
     }
+
+    // 분수가 있으면 Rich Text로 렌더링
+    return _buildMathExpression(context, fractions);
   }
 
-  bool _containsMath(String text) {
-    // LaTeX 기호 또는 한국 수학 기호 감지
-    return text.contains(r'\') || // LaTeX 명령어
-        text.contains('^') || // 지수
-        text.contains('_') || // 아래첨자
-        text.contains('∛') || // 세제곱근
-        text.contains('∜') || // 네제곱근
-        text.contains('√') || // 제곱근
-        text.contains('⁶') || // 위첨자
-        text.contains('²') ||
-        text.contains('³') ||
-        text.contains('÷') ||
-        text.contains('×');
-  }
-
-  Widget _buildMathWidget() {
-    // TODO: flutter_math_fork 대신 호환 가능한 수학 렌더링 라이브러리 사용
-    // 현재는 일반 텍스트로 표시 (수학 기호는 유니코드로 표시됨)
-    return Text(
-      text,
-      style: style ?? AppTextStyles.bodyLarge.copyWith(fontSize: fontSize, color: color),
-      textAlign: textAlign,
+  /// 수학 표현식을 빌드 (분수 포함)
+  Widget _buildMathExpression(BuildContext context, List<dynamic> parts) {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: parts.map((part) {
+        if (part is Map && part['type'] == 'fraction') {
+          return _buildFraction(
+            part['numerator'] as String,
+            part['denominator'] as String,
+          );
+        } else if (part is String) {
+          final converted = _convertLatexToUnicode(part);
+          return Text(
+            converted,
+            style: style ?? AppTextStyles.bodyLarge.copyWith(
+              fontSize: fontSize,
+              color: color ?? AppColors.textPrimary,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      }).toList(),
     );
   }
 
-  // ignore: unused_element
-  String _convertToLatex(String text) {
-    String result = text;
+  /// 수평 분수선을 가진 분수 위젯 생성
+  Widget _buildFraction(String numerator, String denominator) {
+    final convertedNumerator = _convertLatexToUnicode(numerator);
+    final convertedDenominator = _convertLatexToUnicode(denominator);
 
-    // 한국어 수학 기호를 LaTeX로 변환
-    result = result
-        // 제곱근
-        .replaceAll('√', r'\sqrt')
-        .replaceAll('∛', r'\sqrt[3]')
-        .replaceAll('∜', r'\sqrt[4]')
-        .replaceAll('⁶√', r'\sqrt[6]')
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 분자
+          Text(
+            convertedNumerator,
+            style: style ?? AppTextStyles.bodyLarge.copyWith(
+              fontSize: fontSize * 0.8,
+              color: color ?? AppColors.textPrimary,
+            ),
+          ),
+          // 분수선
+          Container(
+            width: _calculateFractionLineWidth(convertedNumerator, convertedDenominator),
+            height: 1.5,
+            color: color ?? AppColors.textPrimary,
+            margin: const EdgeInsets.symmetric(vertical: 1),
+          ),
+          // 분모
+          Text(
+            convertedDenominator,
+            style: style ?? AppTextStyles.bodyLarge.copyWith(
+              fontSize: fontSize * 0.8,
+              color: color ?? AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-        // 분수 표현 (예: 3/2 → \frac{3}{2})
-        // 간단한 분수만 처리
-        .replaceAllMapped(
-          RegExp(r'(\d+)/(\d+)'),
-          (match) => '\\frac{${match.group(1)!}}{${match.group(2)!}}',
-        )
+  /// 분수선 너비 계산
+  double _calculateFractionLineWidth(String numerator, String denominator) {
+    final maxLength = numerator.length > denominator.length
+        ? numerator.length
+        : denominator.length;
+    return (fontSize * 0.6 * maxLength).clamp(20.0, 60.0);
+  }
 
-        // 지수 표현
-        .replaceAll('²', '^2')
-        .replaceAll('³', '^3')
-        .replaceAll('⁴', '^4')
-        .replaceAll('⁵', '^5')
-        .replaceAll('⁶', '^6')
+  /// LaTeX 분수를 파싱
+  List<dynamic> _parseFractions(String latex) {
+    final parts = <dynamic>[];
+    final regex = RegExp(r'\\frac\{([^}]+)\}\{([^}]+)\}');
+    int lastEnd = 0;
 
-        // 수학 연산자
-        .replaceAll('×', r'\times')
-        .replaceAll('÷', r'\div')
-        .replaceAll('±', r'\pm')
-        .replaceAll('≈', r'\approx')
-        .replaceAll('≠', r'\neq')
-        .replaceAll('≤', r'\leq')
-        .replaceAll('≥', r'\geq');
+    for (final match in regex.allMatches(latex)) {
+      // 분수 앞의 텍스트 추가
+      if (match.start > lastEnd) {
+        parts.add(latex.substring(lastEnd, match.start));
+      }
+
+      // 분수 추가
+      parts.add({
+        'type': 'fraction',
+        'numerator': match.group(1)!,
+        'denominator': match.group(2)!,
+      });
+
+      lastEnd = match.end;
+    }
+
+    // 남은 텍스트 추가
+    if (lastEnd < latex.length) {
+      parts.add(latex.substring(lastEnd));
+    }
+
+    return parts;
+  }
+
+  /// LaTeX를 Unicode 수학 기호로 변환
+  String _convertLatexToUnicode(String latex) {
+    String result = latex;
+
+    // $$...$$제거 (디스플레이 수식)
+    result = result.replaceAll(r'$$', '');
+    // $...$ 제거 (인라인 수식)
+    result = result.replaceAll(r'$', '');
+
+    // 제곱근
+    result = result.replaceAll(r'\sqrt[3]', '∛');
+    result = result.replaceAll(r'\sqrt[4]', '∜');
+    result = result.replaceAll(r'\sqrt[6]', '⁶√');
+    result = result.replaceAll(r'\sqrt', '√');
+
+    // 곱하기/나누기
+    result = result.replaceAll(r'\times', '×');
+    result = result.replaceAll(r'\div', '÷');
+    result = result.replaceAll(r'\pm', '±');
+
+    // 비교 연산자
+    result = result.replaceAll(r'\neq', '≠');
+    result = result.replaceAll(r'\ne', '≠');
+    result = result.replaceAll(r'\leq', '≤');
+    result = result.replaceAll(r'\geq', '≥');
+    result = result.replaceAll(r'\approx', '≈');
+
+    // 괄호
+    result = result.replaceAll(r'\left(', '(');
+    result = result.replaceAll(r'\right)', ')');
+    result = result.replaceAll(r'\left[', '[');
+    result = result.replaceAll(r'\right]', ']');
+    result = result.replaceAll(r'\{', '{');
+    result = result.replaceAll(r'\}', '}');
+
+    // 텍스트 모드
+    result = result.replaceAllMapped(
+      RegExp(r'\\text\{([^}]+)\}'),
+      (match) => match.group(1)!,
+    );
+
+    // 지수 표현 ^{-2} → ⁻²
+    result = result.replaceAllMapped(
+      RegExp(r'\^\{(-?\d+)\}'),
+      (match) => _toSuperscript(match.group(1)!),
+    );
+    result = result.replaceAllMapped(
+      RegExp(r'\^(-?\d)'),
+      (match) => _toSuperscript(match.group(1)!),
+    );
+
+    // 아래첨자 _{2} → ₂
+    result = result.replaceAllMapped(
+      RegExp(r'_\{(\d+)\}'),
+      (match) => _toSubscript(match.group(1)!),
+    );
+    result = result.replaceAllMapped(
+      RegExp(r'_(\d)'),
+      (match) => _toSubscript(match.group(1)!),
+    );
+
+    // 남은 백슬래시 제거
+    result = result.replaceAll(r'\', '');
 
     return result;
+  }
+
+  /// 숫자를 위첨자로 변환
+  String _toSuperscript(String number) {
+    const superscripts = {
+      '0': '⁰',
+      '1': '¹',
+      '2': '²',
+      '3': '³',
+      '4': '⁴',
+      '5': '⁵',
+      '6': '⁶',
+      '7': '⁷',
+      '8': '⁸',
+      '9': '⁹',
+      '-': '⁻',
+      '+': '⁺',
+    };
+
+    return number.split('').map((char) => superscripts[char] ?? char).join('');
+  }
+
+  /// 숫자를 아래첨자로 변환
+  String _toSubscript(String number) {
+    const subscripts = {
+      '0': '₀',
+      '1': '₁',
+      '2': '₂',
+      '3': '₃',
+      '4': '₄',
+      '5': '₅',
+      '6': '₆',
+      '7': '₇',
+      '8': '₈',
+      '9': '₉',
+    };
+
+    return number.split('').map((char) => subscripts[char] ?? char).join('');
   }
 }
 
@@ -116,10 +264,10 @@ class InlineMath extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: flutter_math_fork 대신 호환 가능한 수학 렌더링 라이브러리 사용
-    return Text(
+    return MathText(
       expression,
-      style: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
+      fontSize: fontSize,
+      color: color,
     );
   }
 }
@@ -139,11 +287,11 @@ class DisplayMath extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: flutter_math_fork 대신 호환 가능한 수학 렌더링 라이브러리 사용
     return Center(
-      child: Text(
+      child: MathText(
         expression,
-        style: TextStyle(fontSize: fontSize, color: color ?? AppColors.textPrimary),
+        fontSize: fontSize,
+        color: color,
         textAlign: TextAlign.center,
       ),
     );

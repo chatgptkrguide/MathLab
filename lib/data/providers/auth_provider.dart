@@ -184,6 +184,56 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// 게스트로 시작
+  Future<bool> signInAsGuest() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final existingAccounts = await _loadAccounts();
+      final guestNumber = existingAccounts
+              .where((acc) => acc.email.startsWith('guest_'))
+              .length +
+          1;
+
+      // 게스트 계정 생성
+      final guestAccount = UserAccount(
+        id: _generateUserId(),
+        email: 'guest_${DateTime.now().millisecondsSinceEpoch}@gomath.local',
+        displayName: '게스트 $guestNumber',
+        createdAt: DateTime.now(),
+        lastLoginAt: DateTime.now(),
+        accountType: AccountType.student, // 게스트는 student 타입으로 처리
+        preferences: {'grade': '미설정', 'isGuest': 'true'},
+      );
+
+      // 계정 저장
+      final updatedAccounts = [...existingAccounts, guestAccount];
+      await _saveAccounts(updatedAccounts);
+
+      // 즉시 로그인
+      await _setCurrentAccount(guestAccount.id);
+
+      state = AuthState(
+        isAuthenticated: true,
+        currentAccount: guestAccount,
+        availableAccounts: updatedAccounts,
+        isLoading: false,
+      );
+
+      Logger.info('게스트 로그인 완료: ${guestAccount.displayName}', tag: 'AuthProvider');
+      return true;
+    } catch (e, stackTrace) {
+      Logger.error(
+        '게스트 로그인 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+      state = state.copyWith(isLoading: false, error: '게스트 로그인에 실패했습니다: $e');
+      return false;
+    }
+  }
+
   /// 로그인 (이메일로)
   Future<bool> signIn(String email) async {
     try {

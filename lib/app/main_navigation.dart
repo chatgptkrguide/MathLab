@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../shared/widgets/layout/custom_bottom_nav.dart';
-import '../features/home/home_screen.dart';
+import '../features/home/home_screen_figma.dart';
 import '../features/lessons/lessons_screen.dart';
 import '../features/leaderboard/leaderboard_screen.dart';
 import '../features/errors/errors_screen.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/history/history_screen.dart';
 
 /// 메인 네비게이션 위젯
 /// 하단 네비게이션 바와 각 화면들을 관리
@@ -20,11 +21,11 @@ class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(),
-    const LessonsScreen(),
-    const LeaderboardScreen(),
-    const ErrorsScreen(),
-    const ProfileScreen(),
+    const HomeScreenFigma(),  // 피그마 디자인 홈 화면
+    const LessonsScreen(),     // 학습
+    const ErrorsScreen(),      // 오답
+    const ProfileScreen(),     // 프로필
+    const HistoryScreen(),     // 학습이력 (5번째 탭 추가)
   ];
 
   @override

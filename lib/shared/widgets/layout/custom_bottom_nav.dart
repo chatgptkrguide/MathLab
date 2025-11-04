@@ -21,24 +21,26 @@ class CustomBottomNavigation extends StatelessWidget {
       container: true,
       label: '하단 네비게이션',
       child: Container(
-        height: AppDimensions.navBarBaseHeight + MediaQuery.of(context).padding.bottom,
+        height: 75 + MediaQuery.of(context).padding.bottom,
         padding: EdgeInsets.only(
-          left: AppDimensions.paddingM,
-          right: AppDimensions.paddingM,
-          top: AppDimensions.paddingL,
-          bottom: MediaQuery.of(context).padding.bottom + AppDimensions.paddingS,
+          left: 16,
+          right: 16,
+          top: 12,
+          bottom: MediaQuery.of(context).padding.bottom + 8,
         ),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.surface, AppColors.background], // White to light gray (GoMath)
+          color: AppColors.surface,
+          border: Border(
+            top: BorderSide(
+              color: AppColors.borderLight.withOpacity(0.1),
+              width: 0.5,
+            ),
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.cardShadow.withValues(alpha: AppDimensions.shadowOpacity),
-              blurRadius: AppDimensions.shadowBlurRadius,
-              offset: AppDimensions.shadowOffset,
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
             ),
           ],
         ),
@@ -46,6 +48,12 @@ class CustomBottomNavigation extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // 피그마 디자인 순서: 홈, 학습, 오답, 프로필, 학습이력
+          _buildNavItem(
+            index: 0,
+            icon: Icons.home,
+            label: '홈',
+          ),
           _buildNavItem(
             index: 1,
             icon: Icons.school,
@@ -53,25 +61,18 @@ class CustomBottomNavigation extends StatelessWidget {
           ),
           _buildNavItem(
             index: 2,
-            icon: Icons.leaderboard,
-            label: '순위',
-          ),
-          // 홈을 중앙에 특별 배치
-          _buildNavItem(
-            index: 0,
-            icon: Icons.home,
-            label: '홈',
-            isSpecial: true,
-          ),
-          _buildNavItem(
-            index: 3,
             icon: Icons.error_outline,
             label: '오답',
           ),
           _buildNavItem(
-            index: 4,
+            index: 3,
             icon: Icons.person,
             label: '프로필',
+          ),
+          _buildNavItem(
+            index: 4,
+            icon: Icons.history_edu,
+            label: '학습이력',
           ),
         ],
       ),
@@ -149,41 +150,31 @@ class CustomBottomNavigation extends StatelessWidget {
             constraints: const BoxConstraints(minHeight: 48, minWidth: 48), // 접근성을 위한 최소 터치 영역
           padding: const EdgeInsets.symmetric(
             horizontal: 4.0, // 패딩 줄임
-            vertical: 8.0,   // 패딩 줄임
+            vertical: 6.0,   // 패딩 줄임
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.all(6.0), // 패딩 줄임
-                  decoration: isSelected
-                      ? BoxDecoration(
-                          color: AppColors.mathButtonBlue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                        )
-                      : null,
-                  child: Icon(
-                    isSelected ? _getSelectedIcon(icon) : icon,
-                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary,
-                    size: 20, // 아이콘 크기 고정
-                  ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                child: Icon(
+                  isSelected ? _getSelectedIcon(icon) : icon,
+                  color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.6),
+                  size: 24, // 아이콘 크기 조정
                 ),
               ),
-              const SizedBox(height: 2), // 간격 줄임
-              Flexible(
-                child: Text(
-                  label,
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 10, // 폰트 크기 줄임
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
+              const SizedBox(height: 4), // 간격 조정
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.7),
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 11, // 폰트 크기 조정
                 ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                maxLines: 1,
               ),
             ],
           ),
@@ -206,6 +197,8 @@ class CustomBottomNavigation extends StatelessWidget {
         return Icons.error;
       case Icons.person:
         return Icons.person;
+      case Icons.history_edu:
+        return Icons.history_edu;
       default:
         return defaultIcon;
     }

@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import '../models/models.dart';
+import '../../shared/utils/logger.dart';
 
 /// 목 데이터 서비스
 /// 실제 백엔드가 없어도 앱을 테스트할 수 있도록 하는 서비스
@@ -23,7 +26,32 @@ class MockDataService {
     );
   }
 
-  /// 샘플 레슨 데이터
+  /// JSON 파일에서 레슨 데이터 로드
+  Future<List<Lesson>> loadLessons() async {
+    try {
+      Logger.info('[MockDataService] lessons.json 로드 시작', tag: 'MockDataService');
+      final jsonString = await rootBundle.loadString('assets/data/lessons.json');
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+      final lessonsList = jsonData['lessons'] as List<dynamic>;
+
+      final lessons = lessonsList
+          .map((json) => Lesson.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      Logger.info('[MockDataService] lessons.json에서 ${lessons.length}개 레슨 로드 완료', tag: 'MockDataService');
+      return lessons;
+    } catch (e, stackTrace) {
+      Logger.error(
+        '[MockDataService] lessons.json 로드 실패, 기본 샘플 데이터 사용',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'MockDataService',
+      );
+      return getSampleLessons();
+    }
+  }
+
+  /// 샘플 레슨 데이터 (JSON 로드 실패 시 폴백)
   List<Lesson> getSampleLessons() {
     return [
       Lesson(
