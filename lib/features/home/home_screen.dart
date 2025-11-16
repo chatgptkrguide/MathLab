@@ -142,37 +142,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               // 프로필 및 스탯 로우
               Row(
                 children: [
-                  // 프로필 아바타 - 더 크고 입체적으로
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: AppColors.mathButtonGradient,
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.surface,
-                        width: 2.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                  // 프로필 아바타 - 애니메이션 추가로 더 생동감 있게
+                  TweenAnimationBuilder<double>(
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.elasticOut,
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: 0.7 + (0.3 * value),
+                        child: Transform.rotate(
+                          angle: (1 - value) * 0.1,
+                          child: child,
                         ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        user.name.substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
+                      );
+                    },
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: AppColors.mathButtonGradient,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                        border: Border.all(
                           color: AppColors.surface,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mathButtonBlue.withValues(alpha: 0.4),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                          BoxShadow(
+                            color: AppColors.mathButtonBlueDark.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            spreadRadius: -2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          user.name.substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            color: AppColors.surface,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black26,
+                                offset: Offset(0, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -351,41 +378,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildEnhancedStatBadge(IconData icon, String value, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            color.withValues(alpha: 0.15),
-            color.withValues(alpha: 0.08),
+            color.withValues(alpha: 0.18),
+            color.withValues(alpha: 0.10),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: color.withValues(alpha: 0.2),
+          color: color.withValues(alpha: 0.25),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withValues(alpha: 0.15),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: color.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 4,
+            spreadRadius: -1,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(width: 5),
+          // 아이콘에 작은 펄스 애니메이션 추가
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 1500),
+            curve: Curves.easeInOut,
+            tween: Tween(begin: 0.95, end: 1.05),
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: value,
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 18,
+                  shadows: [
+                    Shadow(
+                      color: color.withValues(alpha: 0.4),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+              );
+            },
+            onEnd: () {
+              setState(() {}); // 애니메이션 반복
+            },
+          ),
+          const SizedBox(width: 6),
           Text(
             value,
             style: TextStyle(
               color: color,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w800,
               fontSize: 14,
-              letterSpacing: 0.3,
+              letterSpacing: 0.4,
+              shadows: [
+                Shadow(
+                  color: color.withValues(alpha: 0.3),
+                  blurRadius: 2,
+                ),
+              ],
             ),
           ),
         ],
@@ -457,30 +520,67 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const SizedBox(height: 8),
           Stack(
             children: [
-              // 배경 바
+              // 배경 바 - 더 입체적으로
               Container(
-                height: 12,
+                height: 14,
                 decoration: BoxDecoration(
-                  color: AppColors.borderLight.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.borderLight.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.borderLight,
-                    width: 1,
+                    width: 1.5,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                      spreadRadius: -1,
+                    ),
+                  ],
                 ),
               ),
-              // 진행률 바
-              AnimatedProgressBar(
-                progress: progress,
-                height: 12,
-                backgroundColor: Colors.transparent,
-                gradient: const LinearGradient(
-                  colors: [AppColors.mathTeal, AppColors.mathTealDark],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+              // 진행률 바 - 더 풍부한 그라디언트와 glowing 효과
+              Container(
+                height: 14,
+                child: Stack(
+                  children: [
+                    AnimatedProgressBar(
+                      progress: progress,
+                      height: 14,
+                      backgroundColor: Colors.transparent,
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.mathTeal,
+                          AppColors.mathTealDark,
+                          AppColors.mathButtonBlue,
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      duration: const Duration(milliseconds: 1000),
+                    ),
+                    // Glowing 효과
+                    if (progress > 0)
+                      AnimatedProgressBar(
+                        progress: progress,
+                        height: 14,
+                        backgroundColor: Colors.transparent,
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withValues(alpha: 0.3),
+                            Colors.white.withValues(alpha: 0.1),
+                            Colors.transparent,
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        duration: const Duration(milliseconds: 1000),
+                      ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(10),
-                duration: const Duration(milliseconds: 800),
               ),
             ],
           ),

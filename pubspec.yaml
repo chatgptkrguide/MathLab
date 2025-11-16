@@ -43,8 +43,21 @@ dependencies:
   # 로컬 저장소
   shared_preferences: ^2.2.2
 
+  # HTTP 클라이언트
+  dio: ^5.4.0
+
+  # 환경변수
+  flutter_dotenv: ^5.1.0
+
   # 애니메이션
   confetti: ^0.7.0
+
+  # 성능 최적화
+  cached_network_image: ^3.3.1  # 이미지 캐싱
+  flutter_cache_manager: ^3.3.1  # 캐시 관리
+
+  # 네트워크
+  connectivity_plus: ^6.0.3  # 네트워크 상태 확인
 
   # 수학 렌더링 (LaTeX/TeX 지원)
   # flutter_tex: ^4.0.9  # 주석 처리: 대신 LaTeX → Unicode 변환기 사용 (math_text.dart)
@@ -87,6 +100,7 @@ flutter:
   assets:
     - assets/data/
     - assets/images/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

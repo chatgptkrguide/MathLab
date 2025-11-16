@@ -6,7 +6,7 @@ import '../../../data/models/models.dart';
 
 /// 레슨 카드 위젯 (데이터 모델 기반)
 /// Lessons 화면에서 각 레슨을 표시하는데 사용
-class LessonCard extends StatelessWidget {
+class LessonCard extends StatefulWidget {
   final Lesson lesson;
   final VoidCallback onTap;
 
@@ -17,13 +17,47 @@ class LessonCard extends StatelessWidget {
   });
 
   @override
+  State<LessonCard> createState() => _LessonCardState();
+}
+
+class _LessonCardState extends State<LessonCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  bool _isTapped = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    if (widget.lesson.isCompleted) {
+      _pulseController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bool isLocked = !lesson.isUnlocked;
-    final double progress = lesson.progress;
+    final bool isLocked = !widget.lesson.isUnlocked;
+    final double progress = widget.lesson.progress;
 
     return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
+      onTapDown: (_) => setState(() => _isTapped = true),
+      onTapUp: (_) => setState(() => _isTapped = false),
+      onTapCancel: () => setState(() => _isTapped = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _isTapped ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           gradient: isLocked
@@ -64,7 +98,7 @@ class LessonCard extends StatelessWidget {
                   const Spacer(),
                   // 제목
                   Text(
-                    lesson.title,
+                    widget.lesson.title,
                     style: AppTextStyles.titleMedium.copyWith(
                       color: isLocked ? AppColors.disabled : AppColors.surface,
                       fontWeight: FontWeight.bold,
@@ -89,22 +123,38 @@ class LessonCard extends StatelessWidget {
                   size: 20,
                 ),
               ),
-            // 완료 체크마크
-            if (lesson.isCompleted)
+            // 완료 체크마크 - 펄스 애니메이션 추가
+            if (widget.lesson.isCompleted)
               Positioned(
                 top: AppDimensions.paddingS,
                 right: AppDimensions.paddingS,
-                child: Container(
-                  padding: const EdgeInsets.all(AppDimensions.paddingXS),
-                  decoration: BoxDecoration(
-                    color: AppColors.successGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    color: AppColors.surface,
-                    size: 16,
-                  ),
+                child: AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: 1.0 + (_pulseController.value * 0.15),
+                      child: Container(
+                        padding: const EdgeInsets.all(AppDimensions.paddingXS),
+                        decoration: BoxDecoration(
+                          color: AppColors.successGreen,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.successGreen
+                                  .withValues(alpha: 0.6 * _pulseController.value),
+                              blurRadius: 8 + (4 * _pulseController.value),
+                              spreadRadius: 1 + (2 * _pulseController.value),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          color: AppColors.surface,
+                          size: 16,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
           ],
@@ -126,7 +176,7 @@ class LessonCard extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          lesson.icon,
+          widget.lesson.icon,
           style: const TextStyle(fontSize: 28),
         ),
       ),
@@ -142,7 +192,7 @@ class LessonCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${lesson.completedProblems}/${lesson.totalProblems} 문제',
+              '${widget.lesson.completedProblems}/${widget.lesson.totalProblems} 문제',
               style: AppTextStyles.bodySmall.copyWith(
                 color: isLocked
                     ? AppColors.disabled
@@ -180,7 +230,7 @@ class LessonCard extends StatelessWidget {
 
   /// 카테고리별 그라디언트 색상
   List<Color> _getGradientColors() {
-    switch (lesson.category) {
+    switch (widget.lesson.category) {
       case '기초산술':
         return AppColors.mathButtonGradient;
       case '대수':
@@ -196,7 +246,7 @@ class LessonCard extends StatelessWidget {
 
   /// 카테고리별 메인 색상
   Color _getPrimaryColor() {
-    switch (lesson.category) {
+    switch (widget.lesson.category) {
       case '기초산술':
         return AppColors.mathButtonBlue;
       case '대수':
