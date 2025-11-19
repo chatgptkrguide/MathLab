@@ -7,6 +7,7 @@ import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/animations/fade_in_widget.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/leaderboard_provider.dart';
+import '../league/league_screen.dart';
 
 /// 리더보드 화면
 /// 주간/월간/전체 순위를 표시합니다
@@ -78,18 +79,39 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '🏆',
-            style: const TextStyle(fontSize: 32),
+          const SizedBox(width: 48), // Balance for league button
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '🏆',
+                style: const TextStyle(fontSize: 32),
+              ),
+              const SizedBox(width: AppDimensions.spacingM),
+              Text(
+                '리더보드',
+                style: AppTextStyles.headlineLarge.copyWith(
+                  color: AppColors.surface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Text(
-            '리더보드',
-            style: AppTextStyles.headlineLarge.copyWith(
-              color: AppColors.surface,
-              fontWeight: FontWeight.bold,
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LeagueScreen(),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.emoji_events,
+              color: AppColors.mathYellow,
+              size: 32,
             ),
           ),
         ],

@@ -14,30 +14,9 @@ class AuthWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    // 로딩 중
-    if (authState.isLoading) {
-      return Scaffold(
-        backgroundColor: AppColors.mathBlue, // GoMath blue
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: AppColors.mathBlueGradient, // GoMath gradient
-            ),
-          ),
-          child: const Center(
-            child: DuolingoLoadingIndicator(
-              message: 'MathLab을 시작하는 중...',
-              size: 100,
-            ),
-          ),
-        ),
-      );
-    }
-
-    // 인증되지 않은 상태 또는 계정이 없는 경우
-    if (!authState.isAuthenticated || authState.currentAccount == null) {
+    // 항상 로그인 화면 먼저 표시
+    // 로딩 중이거나 인증되지 않은 상태
+    if (authState.isLoading || !authState.isAuthenticated || authState.currentAccount == null) {
       return const AuthScreen();
     }
 
