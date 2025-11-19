@@ -1,51 +1,236 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/app_text_styles.dart';
+import '../lessons/figma/lessons_screen_figma.dart';
+import '../../data/providers/user_provider.dart';
+import '../../shared/widgets/cards/daily_goal_card.dart';
+import '../../shared/widgets/indicators/circular_progress_ring.dart';
+import '../../shared/widgets/indicators/circular_level_badge.dart';
 
-/// 피그마 디자인과 100% 동일한 홈 화면
-/// Figma: 00 home 화면 구현
+/// Figma 디자인 "00 home" 화면 100% 재현
+/// 레퍼런스: assets/images/figma_home_reference.png
 class HomeScreenFigma extends ConsumerWidget {
   const HomeScreenFigma({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF61A1D8), // 피그마 정확한 상단 색상
-              Color(0xFFA1C9E8), // 피그마 정확한 하단 색상
+    final user = ref.watch(userProvider);
+
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: FigmaColors.homeGradient,
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+
+              // 상단: "안녕하세요!" + 스트릭
+              _buildTopSection(user),
+
+              const SizedBox(height: 24),
+
+              // 중앙: 로봇 캐릭터 + 진행률 링
+              _buildRobotSection(),
+
+              const SizedBox(height: 32),
+
+              // 오늘의 목표 카드
+              _buildTodayGoalCard(),
+
+              const SizedBox(height: 20),
+
+              // 학습 시작하기 버튼
+              _buildStartButton(context),
+
+              const SizedBox(height: 24),
+
+              // 하단 스탯 카드들 (XP, 레벨, 연속)
+              _buildStatsCards(user),
+
+              const SizedBox(height: 20),
+
+              // 언어 선택 카드
+              _buildLanguageCards(),
+
+              const SizedBox(height: 20),
+
+              // 데일리 챌린지 배너
+              _buildDailyChallengeB(),
+
+              const SizedBox(height: 100), // 네비게이션 바 공간
             ],
           ),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
+      ),
+    );
+  }
+
+  /// 상단: "안녕하세요!" + 스트릭
+  Widget _buildTopSection(user) {
+    // 사용자 이름 표시 (게스트인 경우 기본값)
+    final userName = user?.name ?? 'Guest';
+    final isGuest = user?.email == 'guest@gomath.com';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // 안녕하세요!
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isGuest ? '안녕하세요!' : '안녕하세요, $userName님!',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isGuest ? '게스트로 학습 중' : '$userName의 수학 학습',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withOpacity(0.8),
+                ),
+              ),
+            ],
+          ),
+
+          // 스트릭 배지
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Row(
               children: [
-                // 상단 헤더 (햄버거 메뉴 - GoMATH - 프로필)
-                _buildHeader(),
+                Image.asset('assets/icons/streak_fire.png', width: 20, height: 20),
+                const SizedBox(width: 6),
+                Text(
+                  '${user?.streakDays ?? 6}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                const SizedBox(height: 50),
+  /// 중앙: 로봇 캐릭터 + 진행률 링 (Figma 디자인)
+  Widget _buildRobotSection() {
+    return SizedBox(
+      width: 300,
+      height: 300,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Figma 원형 진행률 링
+          const CircularProgressRing(
+            progress: 0.8,
+            centerText: '80%',
+            subtitle: '완료',
+            size: 280,
+            strokeWidth: 16,
+          ),
 
-                // 로봇 캐릭터
-                _buildRobotCharacter(),
+          // 로봇 캐릭터 (중앙에 오버레이)
+          Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.2),
+            ),
+            child: Center(
+              child: Image.asset(
+                'assets/icons/robot_character.png',
+                width: 180,
+                height: 180,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Text(
+                    '🤖',
+                    style: TextStyle(fontSize: 100),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                const SizedBox(height: 35),
+  /// 오늘의 목표 카드 (Figma 디자인)
+  Widget _buildTodayGoalCard() {
+    return const DailyGoalCard(
+      icon: '📚',
+      title: '오늘의 목표',
+      progress: 0.8,
+      current: 80,
+      total: 100,
+    );
+  }
 
-                // 흰색 카드 (오늘의 학습 + START 버튼)
-                _buildMainCard(context),
-
-                const SizedBox(height: 25),
-
-                // 하단 카드들 (English, Spanish)
-                _buildBottomCards(),
-
-                const SizedBox(height: 30),
+  /// 학습 시작하기 버튼
+  Widget _buildStartButton(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0000FF), Color(0xFF0000CC)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0000FF).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LessonsScreenFigma(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(28),
+          child: const Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.play_arrow, color: Colors.white, size: 28),
+                SizedBox(width: 8),
+                Text(
+                  '학습 시작하기',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ],
             ),
           ),
@@ -54,254 +239,191 @@ class HomeScreenFigma extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 햄버거 메뉴
-          GestureDetector(
-            onTap: () {
-              // 메뉴 동작 추가 예정
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.menu_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-          ),
-
-          // GoMATH 로고
-          const Text(
-            'GoMATH',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: 1.0,
-            ),
-          ),
-
-          // 프로필 아이콘
-          GestureDetector(
-            onTap: () {
-              // 프로필 동작 추가 예정
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
-                  width: 2,
-                ),
-              ),
-              child: const Icon(
-                Icons.person_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRobotCharacter() {
-    return Container(
-      width: 180,
-      height: 180,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            Colors.white.withOpacity(0.25),
-            Colors.white.withOpacity(0.05),
-          ],
-          radius: 0.8,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 25,
-            spreadRadius: 5,
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Text(
-          '🤖',
-          style: TextStyle(fontSize: 80),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 25,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 오늘의 학습
-          Text(
-            '오늘의 학습',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // 메인 텍스트
-          const Text(
-            '수학의 세계로\n떠나볼까요?',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
-              height: 1.3,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 25),
-
-          // START 버튼
-          _buildStartButton(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStartButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Navigator.pushNamed(context, '/lessons');
-        // 임시로 스낵바 표시
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('학습 화면으로 이동'),
-            duration: Duration(seconds: 1),
-          ),
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        height: 54,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFF3B5BFF),
-              Color(0xFF2B4BEF),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF3B5BFF).withOpacity(0.3),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '학습 시작하기',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.3,
-              ),
-            ),
-            SizedBox(width: 8),
-            Icon(
-              Icons.play_arrow_rounded,
-              color: Colors.white,
-              size: 26,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomCards() {
+  /// 하단 스탯 카드들 (XP, 레벨, 연속)
+  Widget _buildStatsCards(user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildLanguageCard('📚', 'English'),
-          const SizedBox(width: 14),
-          _buildLanguageCard('🗣️', 'Spanish'),
+          // XP 카드
+          _buildStatCard('assets/icons/xp_icon.png', 'XP', '${user?.xp ?? 549}'),
+          const SizedBox(width: 12),
+          // 레벨 카드
+          _buildStatCard(null, '레벨', 'H Lv${user?.level ?? 1}'),
+          const SizedBox(width: 12),
+          // 연속 카드
+          _buildStatCard('assets/icons/streak_fire.png', '연속', '${user?.streakDays ?? 6}일'),
         ],
       ),
     );
   }
 
-  Widget _buildLanguageCard(String emoji, String label) {
+  Widget _buildStatCard(String? iconPath, String label, String value) {
     return Expanded(
       child: Container(
-        height: 95,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.18),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.25),
-            width: 1,
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              emoji,
-              style: const TextStyle(fontSize: 32),
-            ),
-            const SizedBox(height: 6),
+            iconPath != null
+                ? Image.asset(iconPath, width: 36, height: 36)
+                : const Icon(Icons.emoji_events, size: 36, color: Color(0xFFFFB74D)),
+            const SizedBox(height: 8),
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
                 fontSize: 12,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.3,
+                color: Color(0xFF666666),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A1A),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// 언어 선택 카드
+  Widget _buildLanguageCards() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          // English 카드
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('🇬🇧', style: TextStyle(fontSize: 24)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'English',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: Text('→', style: TextStyle(fontSize: 24, color: Colors.white)),
+          ),
+
+          // Spanish 카드
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('🇪🇸', style: TextStyle(fontSize: 24)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Spanish',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 데일리 챌린지 배너
+  Widget _buildDailyChallengeB() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFA726), Color(0xFFFF9800)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '데일리 챌린지',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '오늘의 챌린지 미션을 완료해 보세요',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    '데일리 챌린지 미션',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 챌린지 이미지
+          const Text('🎬', style: TextStyle(fontSize: 60)),
+        ],
       ),
     );
   }
