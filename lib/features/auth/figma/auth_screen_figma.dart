@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_text_styles.dart';
-import '../../data/providers/auth_provider.dart';
+import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_text_styles.dart';
+import '../../../data/providers/auth_provider.dart';
 
 /// Figma 디자인 "00" 로그인 화면 100% 재현
 /// 듀오링고 스타일의 모던한 로그인 UI
-class AuthScreen extends ConsumerStatefulWidget {
-  const AuthScreen({super.key});
+class AuthScreenFigma extends ConsumerStatefulWidget {
+  const AuthScreenFigma({super.key});
 
   @override
-  ConsumerState<AuthScreen> createState() => _AuthScreenState();
+  ConsumerState<AuthScreenFigma> createState() => _AuthScreenFigmaState();
 }
 
-class _AuthScreenState extends ConsumerState<AuthScreen> with TickerProviderStateMixin {
+class _AuthScreenFigmaState extends ConsumerState<AuthScreenFigma> with TickerProviderStateMixin {
   bool _isLoading = false;
   late AnimationController _logoAnimationController;
   late Animation<double> _logoScaleAnimation;
@@ -159,6 +159,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -222,7 +223,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with TickerProviderStat
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF58CC02).withValues(alpha: 0.4),
+                                    color: const Color(0xFF58CC02).withOpacity(0.4),
                                     blurRadius: 24,
                                     offset: const Offset(0, 8),
                                   ),
@@ -366,7 +367,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with TickerProviderStat
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF58CC02).withValues(alpha: 0.4),
+                      color: const Color(0xFF58CC02).withOpacity(0.4),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -485,7 +486,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with TickerProviderStat
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
+                color: Colors.black.withOpacity(0.08),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
