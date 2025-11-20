@@ -151,7 +151,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                         // 배경 텍스트들 (뒤쪽 레이어)
                         Column(
                           children: [
-                            const SizedBox(height: 27), // Figma Y 위치
+                            const SizedBox(height: 50), // Math is를 아래로 이동
                             // "Math is" (회전됨, 약간 기울어짐)
                             Transform.rotate(
                               angle: -0.0098, // -0.56도를 라디안으로: -0.56 * pi/180
@@ -163,7 +163,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 66), // Math is → Fun 간격
+                            const SizedBox(height: 30), // Math is → Fun 간격 줄임
                             // "Fun!!!"
                             FadeTransition(
                               opacity: _fadeAnimation,
@@ -176,7 +176,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                         ),
                         // Chatbot 캐릭터 (앞쪽 레이어, 텍스트 위에)
                         Positioned(
-                          top: 115, // Math is(27) + Math is 높이(107) - Chatbot 시작점 조정
+                          top: 130, // Math is 위치 조정에 따라 Chatbot도 조정
                           child: FadeTransition(
                             opacity: _fadeAnimation,
                             child: Image.asset(
@@ -201,7 +201,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 80), // GoMath Lab과 버튼 사이 간격 (더 넓게)
+                    const SizedBox(height: 96), // GoMath Lab과 버튼 사이 간격 (버튼 높이 64의 1.5배)
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
