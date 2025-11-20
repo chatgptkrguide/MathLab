@@ -2,11 +2,5 @@
   "buildCommand": null,
   "outputDirectory": "build/web",
   "installCommand": null,
-  "framework": null,
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "framework": null
 }
