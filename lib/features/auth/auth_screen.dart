@@ -151,7 +151,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                         // 배경 텍스트들 (뒤쪽 레이어)
                         Column(
                           children: [
-                            const SizedBox(height: 50), // Math is를 아래로 이동
+                            const SizedBox(height: 60), // Math is를 아래로 이동
                             // "Math is" (회전됨, 약간 기울어짐)
                             Transform.rotate(
                               angle: -0.0098, // -0.56도를 라디안으로: -0.56 * pi/180
@@ -201,7 +201,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 140), // GoMath Lab과 버튼 사이 간격 (아이콘 안 가리게)
+                    const SizedBox(height: 60), // GoMath Lab과 버튼 사이 간격
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
@@ -279,8 +279,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    // 버튼 아래 공간 (더 넓게)
-                    SizedBox(height: size.height * 0.18),
+                    // 버튼 아래 공간 (로고까지)
+                    SizedBox(height: size.height * 0.24),
 
                     // 로고 (맨 아래)
                     FadeTransition(
