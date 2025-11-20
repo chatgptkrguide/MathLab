@@ -103103,7 +103103,7 @@ case 2:return"Apple"}},
 j(a){return"SocialAuthResult{provider: "+this.gaE1()+", email: "+this.c+", name: "+this.d+"}"}}
 A.xg.prototype={
 kM(a,b){var s=null,r=b.eR($.aZ4(),t.Wb),q=A.hk(s,s,B.nC,s,s,new A.acA(a),s,s,s),p=A.z("\uc5c5\uc801",s,s,s,s,B.hk,s,s),o=r.a,n=t.p
-return A.dO(s,B.aS,A.aV3(s,A.a([A.aWz(!0,B.f,200,A.b08(A.dW(!0,A.X(s,A.ar(A.a([B.ads,A.z(""+r.ga5U()+" / "+o.length,s,s,s,s,B.aio,s,s),B.ai,A.dr(B.aO,A.a([A.X(s,s,B.h,s,s,new A.a0(B.V,s,s,A.Z(12),s,s,B.p),s,12,s,s,s,s,s,s),A.og(new A.acB(),s,B.dA,B.nf,new A.au(0,r.ga1m(),t.Y),t.i)],n),B.E,B.aK,s),B.b_,A.z(B.e.ar(r.ga1m()*100,1)+"% \uc644\ub8cc",s,s,s,s,B.L_,s,s),B.b_],n),B.l,B.ik,B.j),B.h,s,s,B.NS,s,s,s,s,B.b3,s,s,s),B.a6,!0),!0,p),!1,q,!0,s),new A.zZ(B.W,A.aAh(new A.rd(new A.acC(r),o.length,!0,!0,!0,s)),s)],n)),s,s,s)}}
+return A.dO(s,B.aS,A.aV3(s,A.a([A.aWz(!0,B.f,200,A.b08(A.dW(!0,A.X(s,A.ar(A.a([B.adt,A.z(""+r.ga5U()+" / "+o.length,s,s,s,s,B.aio,s,s),B.ai,A.dr(B.aO,A.a([A.X(s,s,B.h,s,s,new A.a0(B.V,s,s,A.Z(12),s,s,B.p),s,12,s,s,s,s,s,s),A.og(new A.acB(),s,B.dA,B.nf,new A.au(0,r.ga1m(),t.Y),t.i)],n),B.E,B.aK,s),B.b_,A.z(B.e.ar(r.ga1m()*100,1)+"% \uc644\ub8cc",s,s,s,s,B.L_,s,s),B.b_],n),B.l,B.ik,B.j),B.h,s,s,B.NS,s,s,s,s,B.b3,s,s,s),B.a6,!0),!0,p),!1,q,!0,s),new A.zZ(B.W,A.aAh(new A.rd(new A.acC(r),o.length,!0,!0,!0,s)),s)],n)),s,s,s)}}
 A.acA.prototype={
 $0(){var s=0,r=A.t(t.H),q=this,p
 var $async$$0=A.o(function(a,b){if(a===1)return A.p(b,r)
@@ -103257,7 +103257,7 @@ i=A.bF(a,j,i).w
 s=k.y
 s===$&&A.b()
 r=t.p
-s=A.dr(B.S,A.a([A.ar(A.a([B.Ku,A.aWO(-0.0098,new A.di(s,!1,A.hH("assets/images/login/math_is_text.png",j,B.dW,j,j),j)),B.adr,new A.di(k.y,!1,A.hH("assets/images/login/fun_text.png",j,B.dW,j,j),j)],r),B.l,B.k,B.j),A.iq(j,new A.di(k.y,!1,A.hH("assets/images/login/chatbot.png",j,B.dW,206,206),j),j,j,j,j,130,j)],r),B.h,B.aK,j)
+s=A.dr(B.S,A.a([A.ar(A.a([B.Ku,A.aWO(-0.0098,new A.di(s,!1,A.hH("assets/images/login/math_is_text.png",j,B.dW,j,j),j)),B.ads,new A.di(k.y,!1,A.hH("assets/images/login/fun_text.png",j,B.dW,j,j),j)],r),B.l,B.k,B.j),A.iq(j,new A.di(k.y,!1,A.hH("assets/images/login/chatbot.png",j,B.dW,206,206),j),j,j,j,j,130,j)],r),B.h,B.aK,j)
 q=k.y
 p=A.hH("assets/images/login/gomath_lab_text.png",j,B.dW,j,j)
 o=k.z
@@ -103265,7 +103265,7 @@ o===$&&A.b()
 n=A.Z(16)
 m=A.Z(16)
 l=A.a([new A.bp(0,B.T,B.r.aq(0.2),B.ow,12)],t.V)
-r=A.a([A.f6(A.X(j,A.ar(A.a([s,B.be,new A.di(q,!1,p,j),B.adt,A.o7(new A.di(q,!1,A.ar(A.a([A.dq(B.K,!0,j,A.ff(!1,n,!0,A.X(j,A.cm(A.z("\uc2dc\uc791\ud558\uae30",j,j,j,j,B.ahv,j,j),j,j),B.h,j,j,new A.a0(j,j,j,m,l,B.Ws,B.p),j,64,j,j,j,j,j,1/0),j,!0,j,j,j,j,j,j,j,j,j,k.gakN(),j,j,j,j),B.h,B.H,0,j,j,j,j,j,B.aZ),B.br,A.aj(A.a([A.aV(A.X(j,j,B.h,B.f.aq(0.2),j,j,j,1,j,j,j,j,j,j),1),new A.aW(B.cK,A.z("\ub610\ub294",j,j,j,j,A.cH(j,j,B.f.aq(0.6),j,j,j,j,j,j,j,j,14,j,j,B.ae,j,j,!0,j,j,j,j,j,j,j,j),j,j),j),A.aV(A.X(j,j,B.h,B.f.aq(0.2),j,j,j,1,j,j,j,j,j,j),1)],r),B.l,B.k,B.j),B.br,k.TX(B.f,B.U8,k.gakL(),"Google\ub85c \uacc4\uc18d\ud558\uae30",B.rk),B.ai,k.TX(B.PY,B.U1,k.gakU(),"Kakao\ub85c \uacc4\uc18d\ud558\uae30",B.Qs)],r),B.l,B.k,B.j),j),o,j,!0),A.co(j,h*0.18,j),new A.di(k.y,!1,A.hH("assets/images/login/logo.png",j,B.dW,66,170),j),B.Ku],r),B.l,B.k,B.j),B.h,j,new A.ag(0,1/0,h-i.r.b,1/0),j,j,j,j,j,B.Te,j,j,j),j,B.I,j,j,B.ac)],r)
+r=A.a([A.f6(A.X(j,A.ar(A.a([s,B.be,new A.di(q,!1,p,j),B.adr,A.o7(new A.di(q,!1,A.ar(A.a([A.dq(B.K,!0,j,A.ff(!1,n,!0,A.X(j,A.cm(A.z("\uc2dc\uc791\ud558\uae30",j,j,j,j,B.ahv,j,j),j,j),B.h,j,j,new A.a0(j,j,j,m,l,B.Ws,B.p),j,64,j,j,j,j,j,1/0),j,!0,j,j,j,j,j,j,j,j,j,k.gakN(),j,j,j,j),B.h,B.H,0,j,j,j,j,j,B.aZ),B.br,A.aj(A.a([A.aV(A.X(j,j,B.h,B.f.aq(0.2),j,j,j,1,j,j,j,j,j,j),1),new A.aW(B.cK,A.z("\ub610\ub294",j,j,j,j,A.cH(j,j,B.f.aq(0.6),j,j,j,j,j,j,j,j,14,j,j,B.ae,j,j,!0,j,j,j,j,j,j,j,j),j,j),j),A.aV(A.X(j,j,B.h,B.f.aq(0.2),j,j,j,1,j,j,j,j,j,j),1)],r),B.l,B.k,B.j),B.br,k.TX(B.f,B.U8,k.gakL(),"Google\ub85c \uacc4\uc18d\ud558\uae30",B.rk),B.ai,k.TX(B.PY,B.U1,k.gakU(),"Kakao\ub85c \uacc4\uc18d\ud558\uae30",B.Qs)],r),B.l,B.k,B.j),j),o,j,!0),A.co(j,h*0.18,j),new A.di(k.y,!1,A.hH("assets/images/login/logo.png",j,B.dW,66,170),j),B.Ku],r),B.l,B.k,B.j),B.h,j,new A.ag(0,1/0,h-i.r.b,1/0),j,j,j,j,j,B.Te,j,j,j),j,B.I,j,j,B.ac)],r)
 if(k.w)r.push(A.X(j,B.Pl,B.h,B.at,j,j,j,j,j,j,j,j,j,j))
 return A.dO(j,B.rk,A.dW(!0,A.dr(B.aO,r,B.E,B.aK,j),B.a6,!0),j,j,j)},
 TX(a,b,c,d,e){var s=null,r=A.Z(12),q=A.Z(12),p=A.bT(a,2),o=A.a([new A.bp(0,B.T,B.r.aq(0.1),B.bT,8)],t.V)
@@ -122568,20 +122568,20 @@ B.iH=new A.ck(6,null,null,null)
 B.lL=new A.ck(null,100,null,null)
 B.Kr=new A.ck(null,10,null,null)
 B.ai=new A.ck(null,12,null,null)
+B.adr=new A.ck(null,140,null,null)
 B.br=new A.ck(null,16,null,null)
 B.Ks=new A.ck(null,18,null,null)
 B.be=new A.ck(null,20,null,null)
 B.bU=new A.ck(null,24,null,null)
 B.iI=new A.ck(null,2,null,null)
-B.adr=new A.ck(null,30,null,null)
+B.ads=new A.ck(null,30,null,null)
 B.Kt=new A.ck(null,32,null,null)
 B.pj=new A.ck(null,40,null,null)
 B.ax=new A.ck(null,4,null,null)
 B.Ku=new A.ck(null,50,null,null)
-B.ads=new A.ck(null,60,null,null)
+B.adt=new A.ck(null,60,null,null)
 B.f9=new A.ck(null,6,null,null)
 B.b_=new A.ck(null,8,null,null)
-B.adt=new A.ck(null,96,null,null)
 B.adu=new A.ck(null,null,null,null)
 B.adv=new A.Ib(null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.pk=new A.ZK(0,0,0,0,0,0,0,!1,!1,null,0)
