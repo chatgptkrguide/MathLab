@@ -1,0 +1,31 @@
+{
+  "id": "polynomial_001",
+  "title": "다항식 덧셈과 뺄셈 오류 계산",
+  "question": "다항식 4x³+2x-1에 어떤 식을 더해야 할 것을 잘못하여 뺐더니 x³+x²+3x-2가 되었다고 할 때, 바르게 계산한 답은?",
+  "type": "multipleChoice",
+  "category": "algebra",
+  "difficulty": 3,
+  "choices": [
+    "① 7x³+x²+x",
+    "② 7x³-x²+x",
+    "③ 7x³+x²-x",
+    "④ 3x³+x²+5x-3",
+    "⑤ 3x³-x²+5x-3"
+  ],
+  "answer": 1,
+  "hints": [
+    "먼저 어떤 식을 A라고 하자.",
+    "문제에서 '더해야 할 것을 잘못하여 뺐다'는 것은 (4x³+2x-1) - A = x³+x²+3x-2 라는 뜻이다.",
+    "4x³+2x-1-A=x³+x²+3x-2에서 A=3x³-x²-x+1",
+    "따라서 바르게 계산한 답은 (4x³+2x-1) + A = (4x³+2x-1) + (3x³-x²-x+1) = 7x³-x²+x"
+  ],
+  "explanation": "1. 정답: ④\n\n2. 풀이: Hint: 잘못 뺀 식을 처한 잘못 뺀 식을 A라 하면\n\n4x³+2x-1-A=x³+x²+3x-2에서\nA=3x³-x²-x+1\n\n따라서 바르게 계산한 답은\n4x³+2x-1+A=7x³-x²+x",
+  "imageUrl": "assets/problems/images/polynomial_001_question.png",
+  "answerImageUrl": "assets/problems/images/polynomial_001_answer.png",
+  "metadata": {
+    "lessonId": "lesson001",
+    "tags": ["다항식", "덧셈", "뺄셈", "실수 계산"],
+    "estimatedTime": 300,
+    "xpReward": 20
+  }
+}

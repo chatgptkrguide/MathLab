@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 /// MathLab 앱의 텍스트 스타일 상수 정의
+///
+/// 폰트 전략:
+/// - 한글: NexonGothic (깔끔하고 친근한 게임 폰트 - 무료 상업적 사용 가능)
+/// - 숫자/수식: Inter (수학적 내용에 최적화)
+/// - 본문: Roboto (기본 읽기 텍스트)
 class AppTextStyles {
   AppTextStyles._(); // private constructor
 
@@ -11,6 +16,8 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
     color: AppColors.textPrimary,
     height: 1.2,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Inter', 'Roboto'],
   );
 
   static const TextStyle displaySmall = TextStyle(
@@ -18,6 +25,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.2,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Inter', 'Roboto'],
   );
 
   // 헤드라인 스타일
@@ -26,6 +35,8 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
     color: AppColors.textPrimary,
     height: 1.2,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Inter', 'Roboto'],
   );
 
   static const TextStyle headlineMedium = TextStyle(
@@ -33,6 +44,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.2,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Inter', 'Roboto'],
   );
 
   static const TextStyle headlineSmall = TextStyle(
@@ -40,6 +53,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.2,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Inter', 'Roboto'],
   );
 
   // 타이틀 스타일
@@ -48,6 +63,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.3,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Roboto', 'Inter'],
   );
 
   static const TextStyle titleMedium = TextStyle(
@@ -55,6 +72,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
     height: 1.3,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Roboto', 'Inter'],
   );
 
   static const TextStyle titleSmall = TextStyle(
@@ -62,6 +81,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
     height: 1.3,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Roboto', 'Inter'],
   );
 
   // 본문 스타일 (가독성 향상)
@@ -70,6 +91,8 @@ class AppTextStyles {
     fontWeight: FontWeight.normal,
     color: AppColors.textPrimary,
     height: 1.5, // 1.4 → 1.5 (줄간격 향상)
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   static const TextStyle bodyMedium = TextStyle(
@@ -77,6 +100,8 @@ class AppTextStyles {
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
     height: 1.5,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   static const TextStyle bodySmall = TextStyle(
@@ -84,6 +109,8 @@ class AppTextStyles {
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
     height: 1.5,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   // 라벨 스타일
@@ -92,6 +119,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
     height: 1.3,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   static const TextStyle labelMedium = TextStyle(
@@ -99,6 +128,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
     height: 1.3,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   static const TextStyle labelSmall = TextStyle(
@@ -106,6 +137,8 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
     height: 1.3,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   // 특별 스타일
@@ -114,6 +147,8 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
     color: AppColors.textPrimary,
     height: 1.2,
+    fontFamily: 'Inter', // 숫자는 Inter가 가장 보기 좋음
+    fontFamilyFallback: ['Roboto', 'NotoSansKR'],
   );
 
   static const TextStyle statLabel = TextStyle(
@@ -121,12 +156,16 @@ class AppTextStyles {
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
     height: 1.2,
+    fontFamily: 'Roboto',
+    fontFamilyFallback: ['NotoSansKR', 'Inter'],
   );
 
   static const TextStyle buttonText = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     height: 1.2,
+    fontFamily: 'NexonGothic',
+    fontFamilyFallback: ['Roboto', 'Inter'],
   );
 
   static const TextStyle progressText = TextStyle(
@@ -134,6 +173,29 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.primaryBlue,
     height: 1.2,
+    fontFamily: 'Inter', // 진행률 숫자는 Inter
+    fontFamilyFallback: ['Roboto', 'NotoSansKR'],
+  );
+
+  // 수학 문제 전용 스타일 (숫자와 수식에 최적화)
+  static const TextStyle mathProblem = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
+    height: 1.6,
+    fontFamily: 'Inter', // 수학 수식은 Inter가 최적
+    fontFamilyFallback: ['Roboto', 'NotoSansKR'],
+    letterSpacing: 0.3, // 수식의 가독성을 위한 자간
+  );
+
+  static const TextStyle mathAnswer = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    color: AppColors.textPrimary,
+    height: 1.5,
+    fontFamily: 'Inter',
+    fontFamilyFallback: ['Roboto', 'NotoSansKR'],
+    letterSpacing: 0.2,
   );
 
   // 이모지 스타일

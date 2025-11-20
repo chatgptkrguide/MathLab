@@ -1,5 +1,7 @@
 // 모든 공통 위젯들을 한번에 export하는 barrel 파일
 /// 카테고리별로 정리되어 관리가 용이합니다
+library;
+
 
 // 버튼 위젯
 export 'buttons/buttons.dart';

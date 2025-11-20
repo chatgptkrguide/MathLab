@@ -168,15 +168,18 @@ class PracticeProvider extends StateNotifier<PracticeState> {
     // 오답 노트에서 문제 재구성
     final problems = errorNotes.map((note) => Problem(
       id: note.problemId,
-      lessonId: note.lessonId,
+      title: note.category,
       question: note.question,
       type: ProblemType.multipleChoice, // 기본 타입
       explanation: note.explanation,
       category: note.category,
       difficulty: note.difficulty,
-      tags: note.tags,
-      xpReward: note.difficulty * 5, // 난이도 기반 XP
-      correctAnswer: note.correctAnswer,
+      answer: note.correctAnswer,
+      metadata: {
+        'lessonId': note.lessonId,
+        'tags': note.tags,
+        'xpReward': note.difficulty * 5, // 난이도 기반 XP
+      },
     )).toList();
 
     final session = PracticeSession(

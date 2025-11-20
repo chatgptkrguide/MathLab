@@ -25,8 +25,8 @@ class ResponsiveWrapper extends StatelessWidget {
     // 작은 화면에서는 자동으로 스크롤 가능하게 만들기
     if (enableScroll && (isSmallScreen || isVerySmallScreen)) {
       content = SingleChildScrollView(
-        child: content,
         physics: const BouncingScrollPhysics(),
+        child: content,
       );
     }
 

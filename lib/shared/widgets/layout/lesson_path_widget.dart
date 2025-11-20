@@ -314,11 +314,14 @@ class DuolingoPathPainter extends CustomPainter {
     final path = Path();
     path.moveTo(x1, y1);
 
-    // 부드러운 베지어 곡선
-    final controlX1 = (x1 + x2) / 2;
-    final controlY1 = y2 / 3;
-    final controlX2 = (x1 + x2) / 2;
-    final controlY2 = (y2 * 2) / 3;
+    // 더 부드러운 S자 곡선을 위한 베지어 곡선 제어점
+    // 왼쪽에서 오른쪽으로 갈 때와 오른쪽에서 왼쪽으로 갈 때 다른 곡선
+    final isMovingRight = x2 > x1;
+
+    final controlX1 = isMovingRight ? x1 + (x2 - x1) * 0.3 : x1 - (x1 - x2) * 0.3;
+    final controlY1 = y2 * 0.25;
+    final controlX2 = isMovingRight ? x1 + (x2 - x1) * 0.7 : x1 - (x1 - x2) * 0.7;
+    final controlY2 = y2 * 0.75;
 
     path.cubicTo(controlX1, controlY1, controlX2, controlY2, x2, y2);
 

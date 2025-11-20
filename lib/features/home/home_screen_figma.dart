@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/figma_colors.dart';
-import '../../shared/constants/app_text_styles.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
 import '../daily_reward/daily_reward_screen.dart';
 import '../profile/figma/profile_detail_screen_v3_new.dart';
@@ -9,7 +8,6 @@ import '../leaderboard/leaderboard_screen.dart';
 import '../../data/providers/user_provider.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';
-import '../../shared/widgets/indicators/circular_level_badge.dart';
 
 /// Figma 디자인 "00 home" 화면 100% 재현
 /// 레퍼런스: assets/images/figma_home_reference.png
@@ -33,17 +31,17 @@ class HomeScreenFigma extends ConsumerWidget {
               const SizedBox(height: 16),
 
               // 상단: "안녕하세요!" + 스트릭
-              _buildTopSection(user),
+              _buildTopSection(context, user),
 
               const SizedBox(height: 24),
 
               // 중앙: 로봇 캐릭터 + 진행률 링
-              _buildRobotSection(),
+              _buildRobotSection(context),
 
               const SizedBox(height: 32),
 
               // 오늘의 목표 카드
-              _buildTodayGoalCard(),
+              _buildTodayGoalCard(context),
 
               const SizedBox(height: 20),
 
@@ -63,7 +61,7 @@ class HomeScreenFigma extends ConsumerWidget {
               const SizedBox(height: 20),
 
               // 데일리 챌린지 배너
-              _buildDailyChallengeB(),
+              _buildDailyChallengeB(context),
 
               const SizedBox(height: 100), // 네비게이션 바 공간
             ],
@@ -74,7 +72,7 @@ class HomeScreenFigma extends ConsumerWidget {
   }
 
   /// 상단: "안녕하세요!" + 스트릭
-  Widget _buildTopSection(user) {
+  Widget _buildTopSection(BuildContext context, user) {
     // 사용자 이름 표시 (게스트인 경우 기본값)
     final userName = user?.name ?? 'Guest';
     final isGuest = user?.email == 'guest@gomath.com';
@@ -115,7 +113,7 @@ class HomeScreenFigma extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProfileDetailScreenV3(),
+                    builder: (context) => const ProfileDetailScreenV3New(),
                   ),
                 );
               },
@@ -149,16 +147,23 @@ class HomeScreenFigma extends ConsumerWidget {
   }
 
   /// 중앙: 로봇 캐릭터 + 진행률 링 (Figma 디자인)
-  Widget _buildRobotSection() {
+  Widget _buildRobotSection(BuildContext context) {
     return GestureDetector(
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Text('🤖', style: TextStyle(fontSize: 24)),
-                SizedBox(width: 12),
-                Expanded(
+                Image.asset(
+                  'assets/icons/robot_character.png',
+                  width: 32,
+                  height: 32,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('🤖', style: TextStyle(fontSize: 24));
+                  },
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
                   child: Text(
                     '안녕! 나는 GoMath 로봇이야. 오늘도 열심히 공부하자! 💪',
                     style: TextStyle(fontSize: 15),
@@ -204,9 +209,16 @@ class HomeScreenFigma extends ConsumerWidget {
                   width: 180,
                   height: 180,
                   errorBuilder: (context, error, stackTrace) {
-                    return const Text(
-                      '🤖',
-                      style: TextStyle(fontSize: 100),
+                    return Image.asset(
+                      'assets/icons/character_design.png',
+                      width: 180,
+                      height: 180,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Text(
+                          '🤖',
+                          style: TextStyle(fontSize: 100),
+                        );
+                      },
                     );
                   },
                 ),
@@ -219,7 +231,7 @@ class HomeScreenFigma extends ConsumerWidget {
   }
 
   /// 오늘의 목표 카드 (Figma 디자인)
-  Widget _buildTodayGoalCard() {
+  Widget _buildTodayGoalCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -307,7 +319,7 @@ class HomeScreenFigma extends ConsumerWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfileDetailScreenV3(),
+                  builder: (context) => const ProfileDetailScreenV3New(),
                 ),
               );
             },
@@ -337,7 +349,7 @@ class HomeScreenFigma extends ConsumerWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfileDetailScreenV3(),
+                  builder: (context) => const ProfileDetailScreenV3New(),
                 ),
               );
             },
@@ -370,8 +382,29 @@ class HomeScreenFigma extends ConsumerWidget {
             child: Column(
               children: [
                 iconPath != null
-                    ? Image.asset(iconPath, width: 36, height: 36)
-                    : const Icon(Icons.emoji_events, size: 36, color: Color(0xFFFFB74D)),
+                    ? Image.asset(
+                        iconPath,
+                        width: 36,
+                        height: 36,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/icons/gomath_logo_small.png',
+                            width: 36,
+                            height: 36,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.emoji_events, size: 36, color: Color(0xFFFFB74D));
+                            },
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/icons/gomath_logo_small.png',
+                        width: 36,
+                        height: 36,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.emoji_events, size: 36, color: Color(0xFFFFB74D));
+                        },
+                      ),
                 const SizedBox(height: 8),
                 Text(
                   label,
@@ -465,7 +498,7 @@ class HomeScreenFigma extends ConsumerWidget {
   }
 
   /// 데일리 챌린지 배너
-  Widget _buildDailyChallengeB() {
+  Widget _buildDailyChallengeB(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(

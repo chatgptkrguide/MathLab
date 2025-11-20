@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_dimensions.dart';
-import '../loading/loading_indicators.dart';
+import '../indicators/loading_widgets.dart';
 
 /// 최적화된 네트워크 이미지 위젯
 ///

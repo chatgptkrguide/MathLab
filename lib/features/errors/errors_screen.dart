@@ -4,6 +4,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../shared/widgets/layout/common_app_bar.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/error_note_provider.dart';
@@ -74,28 +75,27 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      body: SafeArea(
-        child: ResponsiveWrapper(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildStatsGrid(errorStats),
-                      _buildActionButtons(filteredNotes),
-                      _buildFilterTabs(),
-                      _buildErrorNotesList(userErrorNotes, filteredNotes),
-                      if (filteredNotes.isEmpty)
-                        _buildTips(),
-                    ],
-                  ),
+      body: Column(
+        children: [
+          const CommonAppBar(title: '오답'),
+          Expanded(
+            child: ResponsiveWrapper(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    _buildStatsGrid(errorStats),
+                    _buildActionButtons(filteredNotes),
+                    _buildFilterTabs(),
+                    _buildErrorNotesList(userErrorNotes, filteredNotes),
+                    if (filteredNotes.isEmpty)
+                      _buildTips(),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_text_styles.dart';
-import '../../constants/app_dimensions.dart';
 
 /// 커스텀 하단 네비게이션 바
 /// 새 디자인에 맞게 홈 탭이 둥근 원형으로 구현
@@ -21,12 +19,12 @@ class CustomBottomNavigation extends StatelessWidget {
       container: true,
       label: '하단 네비게이션',
       child: Container(
-        height: 75 + MediaQuery.of(context).padding.bottom,
+        height: 58 + MediaQuery.of(context).padding.bottom,
         padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 12,
-          bottom: MediaQuery.of(context).padding.bottom + 8,
+          left: 1,
+          right: 1,
+          top: 4,
+          bottom: MediaQuery.of(context).padding.bottom + 2,
         ),
         decoration: BoxDecoration(
           color: AppColors.surface,
@@ -45,24 +43,25 @@ class CustomBottomNavigation extends StatelessWidget {
           ],
         ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 피그마 디자인 순서: 홈, 학습, 오답, 프로필, 학습이력
+          // 새로운 순서: 학습, 오답, 홈(가운데), 프로필, 학습이력
           _buildNavItem(
             index: 0,
-            icon: Icons.home,
-            label: '홈',
-          ),
-          _buildNavItem(
-            index: 1,
             icon: Icons.school,
             label: '학습',
           ),
           _buildNavItem(
-            index: 2,
+            index: 1,
             icon: Icons.error_outline,
             label: '오답',
+          ),
+          _buildNavItem(
+            index: 2,
+            icon: Icons.home,
+            label: '홈',
+            isSpecial: true, // 홈 탭을 특별하게 표시
           ),
           _buildNavItem(
             index: 3,
@@ -145,40 +144,43 @@ class CustomBottomNavigation extends StatelessWidget {
         onTap: () => onTap(index),
         child: GestureDetector(
           onTap: () => onTap(index),
-          behavior: HitTestBehavior.opaque, // 전체 영역 터치 가능
+          behavior: HitTestBehavior.opaque,
           child: Container(
-            constraints: const BoxConstraints(minHeight: 48, minWidth: 48), // 접근성을 위한 최소 터치 영역
-          padding: const EdgeInsets.symmetric(
-            horizontal: 4.0, // 패딩 줄임
-            vertical: 6.0,   // 패딩 줄임
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(
-                  isSelected ? _getSelectedIcon(icon) : icon,
-                  color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.6),
-                  size: 24, // 아이콘 크기 조정
+            constraints: const BoxConstraints(minHeight: 40, minWidth: 40),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 1.0,
+              vertical: 2.0,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    isSelected ? _getSelectedIcon(icon) : icon,
+                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.6),
+                    size: 20,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4), // 간격 조정
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.7),
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  fontSize: 11, // 폰트 크기 조정
+                const SizedBox(height: 2),
+                Flexible(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.7),
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontSize: 9,
+                      height: 1.0,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                  ),
                 ),
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -188,17 +190,17 @@ class CustomBottomNavigation extends StatelessWidget {
     // 선택된 상태일 때 filled 아이콘으로 변경
     switch (defaultIcon) {
       case Icons.home:
-        return Icons.home;
+        return Icons.home_rounded;
       case Icons.school:
-        return Icons.school;
+        return Icons.school_rounded;
       case Icons.leaderboard:
-        return Icons.leaderboard;
+        return Icons.leaderboard_rounded;
       case Icons.error_outline:
-        return Icons.error;
+        return Icons.error_rounded;
       case Icons.person:
-        return Icons.person;
+        return Icons.person_rounded;
       case Icons.history_edu:
-        return Icons.history_edu;
+        return Icons.history_edu_rounded;
       default:
         return defaultIcon;
     }

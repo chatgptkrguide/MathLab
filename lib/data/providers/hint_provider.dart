@@ -96,7 +96,7 @@ class HintProvider extends StateNotifier<HintState> {
   /// 힌트 해제
   Future<bool> unlockHint(Problem problem, int hintIndex) async {
     // 힌트가 있는지 확인
-    if (problem.hints == null || hintIndex >= (problem.hints?.length ?? 0)) {
+    if (hintIndex >= problem.hints.length) {
       Logger.warning('Invalid hint index: $hintIndex');
       return false;
     }
@@ -144,9 +144,9 @@ class HintProvider extends StateNotifier<HintState> {
 
   /// 다음 힌트 인덱스 (다음에 해제할 힌트)
   int? getNextHintIndex(Problem problem) {
-    if (problem.hints == null || problem.hints!.isEmpty) return null;
+    if (problem.hints.isEmpty) return null;
 
-    for (int i = 0; i < problem.hints!.length; i++) {
+    for (int i = 0; i < problem.hints.length; i++) {
       if (!isHintUnlocked(problem.id, i)) {
         return i;
       }

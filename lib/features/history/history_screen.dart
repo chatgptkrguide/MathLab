@@ -4,6 +4,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
+import '../../shared/widgets/layout/common_app_bar.dart';
 import '../../data/providers/user_provider.dart';
 
 /// 학습 이력 화면 (Figma 디자인 03)
@@ -30,53 +31,27 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             colors: AppColors.mathBlueGradient,
           ),
         ),
-        child: SafeArea(
-          child: ResponsiveWrapper(
-            child: Column(
-              children: [
-                _buildHeader(context),
-                _buildUserStats(
-                  streakDays: user?.streakDays ?? 0,
-                  xp: user?.xp ?? 0,
-                  level: user?.level ?? 1,
+        child: Column(
+          children: [
+            const CommonAppBar(title: '학습이력'),
+            Expanded(
+              child: ResponsiveWrapper(
+                child: Column(
+                  children: [
+                    _buildUserStats(
+                      streakDays: user?.streakDays ?? 0,
+                      xp: user?.xp ?? 0,
+                      level: user?.level ?? 1,
+                    ),
+                    Expanded(
+                      child: _buildContent(),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: _buildContent(),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 헤더 (뒤로가기 + 로고)
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.surface),
-            onPressed: () => Navigator.pop(context),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'GoMATH',
-              style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.mathButtonBlue,
-                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -99,7 +74,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         children: [
           Expanded(
             child: Text(
-              '소인수분해',
+              '고 1',
               style: AppTextStyles.titleMedium.copyWith(
                 color: AppColors.surface,
                 fontWeight: FontWeight.w600,

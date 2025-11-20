@@ -627,7 +627,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
-              _currentProblem.explanation,
+              _currentProblem.explanation ?? '풀이 설명이 없습니다',
               style: AppTextStyles.bodyMedium.copyWith(
                 height: 1.6,
               ),
@@ -708,7 +708,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   VoidCallback? _getButtonAction() {
     // 답 제출 후에는 다음 문제 또는 결과 확인
     if (_isAnswerSubmitted) {
-      if (_isLastProblem) {
+      // 2문제 완료하면 결과 확인
+      if (_currentProblemIndex >= 1 || _isLastProblem) {
         return _showResults;
       }
       return _nextProblem;
@@ -761,7 +762,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     if (!_isAnswerSubmitted) {
       return '제출';
     }
-    if (_isLastProblem) {
+    // 2문제 완료하면 결과 확인
+    if (_currentProblemIndex >= 1 || _isLastProblem) {
       return '결과 확인';
     }
     return '다음 문제';
@@ -1264,7 +1266,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
     // 힌트가 없는 문제는 버튼 표시 안 함
     final hints = _currentProblem.hints;
-    if (hints == null || hints.isEmpty) {
+    if (hints.isEmpty) {
       return null;
     }
 

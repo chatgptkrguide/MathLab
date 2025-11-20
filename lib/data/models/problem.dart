@@ -1,221 +1,145 @@
-/// 간소화된 수학 문제 모델 (에러 수정 버전)
+/// 수학 문제 데이터 모델
 class Problem {
   final String id;
-  final String lessonId; // 호환성을 위해 lessonId 유지
+  final String title;
   final String question;
   final ProblemType type;
-  final String explanation;
   final String category;
-  final int difficulty;
-  final List<String> tags;
-  final int xpReward;
-
-  // 객관식용
-  final List<String>? options;
-  final int? correctAnswerIndex;
-
-  // 주관식용
-  final String? correctAnswer;
-  final String? inputHint;
-
-  // 힌트 시스템
-  final List<String>? hints;
+  final int difficulty; // 1-5
+  final List<String> choices; // 객관식 선택지
+  final dynamic answer; // 정답 (객관식: int index, 주관식: String)
+  final List<String> hints; // 힌트 리스트
+  final String? explanation; // 풀이 설명
+  final String? imageUrl; // 문제 이미지 경로
+  final String? answerImageUrl; // 답 이미지 경로
+  final Map<String, dynamic>? metadata; // 추가 메타데이터
 
   const Problem({
     required this.id,
-    required this.lessonId,
+    required this.title,
     required this.question,
     required this.type,
-    required this.explanation,
     required this.category,
     required this.difficulty,
-    required this.tags,
-    required this.xpReward,
-    this.options,
-    this.correctAnswerIndex,
-    this.correctAnswer,
-    this.inputHint,
-    this.hints,
+    this.choices = const [],
+    required this.answer,
+    this.hints = const [],
+    this.explanation,
+    this.imageUrl,
+    this.answerImageUrl,
+    this.metadata,
   });
+
+  // Backward compatibility factory constructor for old code
+  factory Problem.legacy({
+    required String id,
+    String? lessonId,
+    required ProblemType type,
+    required String question,
+    required String category,
+    required int difficulty,
+    List<String>? tags,
+    int? xpReward,
+    List<String>? options,
+    int? correctAnswerIndex,
+    String? correctAnswer,
+    String? explanation,
+    List<String>? hints,
+  }) {
+    return Problem(
+      id: id,
+      title: category,
+      question: question,
+      type: type,
+      category: category,
+      difficulty: difficulty,
+      choices: options ?? [],
+      answer: correctAnswerIndex ?? correctAnswer ?? 0,
+      hints: hints ?? [],
+      explanation: explanation,
+      metadata: {
+        if (lessonId != null) 'lessonId': lessonId,
+        if (tags != null) 'tags': tags,
+        if (xpReward != null) 'xpReward': xpReward,
+      },
+    );
+  }
 
   factory Problem.fromJson(Map<String, dynamic> json) {
     return Problem(
       id: json['id'] as String,
-      lessonId: json['lessonId'] ?? json['episodeId'] ?? 'lesson001',
+      title: json['title'] as String,
       question: json['question'] as String,
       type: ProblemType.values.firstWhere(
-        (e) => e.toString().split('.').last == json['type'],
-        orElse: () => ProblemType.multipleChoice,
+        (e) => e.toString() == 'ProblemType.${json['type']}',
       ),
-      explanation: json['explanation'] as String,
       category: json['category'] as String,
       difficulty: json['difficulty'] as int,
-      tags: List<String>.from(json['tags'] as List),
-      xpReward: json['xpReward'] as int,
-      options: json['options'] != null ? List<String>.from(json['options']) : null,
-      correctAnswerIndex: json['correctAnswerIndex'] as int?,
-      correctAnswer: json['correctAnswer'] as String?,
-      inputHint: json['inputHint'] as String?,
-      hints: json['hints'] != null ? List<String>.from(json['hints']) : null,
+      choices: (json['choices'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      answer: json['answer'],
+      hints: (json['hints'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      explanation: json['explanation'] as String?,
+      imageUrl: json['imageUrl'] as String?,
+      answerImageUrl: json['answerImageUrl'] as String?,
+      metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'lessonId': lessonId,
+      'title': title,
       'question': question,
       'type': type.toString().split('.').last,
-      'explanation': explanation,
       'category': category,
       'difficulty': difficulty,
-      'tags': tags,
-      'xpReward': xpReward,
-      if (options != null) 'options': options,
-      if (correctAnswerIndex != null) 'correctAnswerIndex': correctAnswerIndex,
-      if (correctAnswer != null) 'correctAnswer': correctAnswer,
-      if (inputHint != null) 'inputHint': inputHint,
-      if (hints != null) 'hints': hints,
+      'choices': choices,
+      'answer': answer,
+      'hints': hints,
+      'explanation': explanation,
+      'imageUrl': imageUrl,
+      'answerImageUrl': answerImageUrl,
+      'metadata': metadata,
     };
   }
 
-  /// 정답 확인 (객관식)
-  bool isCorrectAnswer(int selectedIndex) {
-    if (type != ProblemType.multipleChoice || correctAnswerIndex == null) {
-      return false;
-    }
-    return selectedIndex == correctAnswerIndex;
-  }
-
-  /// 정답 확인 (주관식)
-  bool isCorrectTextAnswer(String userAnswer) {
-    if (correctAnswer == null) return false;
-    return userAnswer.trim().toLowerCase() == correctAnswer!.trim().toLowerCase();
-  }
-
-  /// 문제 유형별 아이콘
+  // 기존 코드 호환성을 위한 getter들
+  List<String>? get options => choices.isNotEmpty ? choices : null;
+  String? get lessonId => metadata?['lessonId'] as String?;
+  List<String> get tags => (metadata?['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+  int get xpReward => (metadata?['xpReward'] as int?) ?? 10;
+  String? get correctAnswer => answer is String ? answer as String : (answer is int && choices.isNotEmpty ? choices[answer as int] : null);
+  int? get correctAnswerIndex => answer is int ? answer as int : null;
   String get typeIcon {
     switch (type) {
       case ProblemType.multipleChoice:
-        return '📝';
+        return '✓';
       case ProblemType.shortAnswer:
-        return '✏️';
+        return '✎';
+      case ProblemType.dragAndDrop:
+        return '⇄';
+      case ProblemType.stepByStep:
+        return '⋯';
       case ProblemType.calculation:
-        return '🔢';
+        return '≈';
     }
   }
 
-  /// 난이도 텍스트
-  String get difficultyText {
-    switch (difficulty) {
-      case 1: return '매우 쉬움';
-      case 2: return '쉬움';
-      case 3: return '보통';
-      case 4: return '어려움';
-      case 5: return '매우 어려움';
-      default: return '보통';
+  bool isCorrectAnswer(int selectedIndex) {
+    if (answer is int) {
+      return selectedIndex == answer;
+    } else if (answer is String && choices.isNotEmpty) {
+      return choices[selectedIndex] == answer;
     }
+    return false;
   }
-
-  Problem copyWith({
-    String? id,
-    String? lessonId,
-    String? question,
-    ProblemType? type,
-    String? explanation,
-    String? category,
-    int? difficulty,
-    List<String>? tags,
-    int? xpReward,
-    List<String>? options,
-    int? correctAnswerIndex,
-    String? correctAnswer,
-    String? inputHint,
-    List<String>? hints,
-  }) {
-    return Problem(
-      id: id ?? this.id,
-      lessonId: lessonId ?? this.lessonId,
-      question: question ?? this.question,
-      type: type ?? this.type,
-      explanation: explanation ?? this.explanation,
-      category: category ?? this.category,
-      difficulty: difficulty ?? this.difficulty,
-      tags: tags ?? this.tags,
-      xpReward: xpReward ?? this.xpReward,
-      options: options ?? this.options,
-      correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
-      correctAnswer: correctAnswer ?? this.correctAnswer,
-      inputHint: inputHint ?? this.inputHint,
-      hints: hints ?? this.hints,
-    );
-  }
-
-  @override
-  String toString() => 'Problem{id: $id, type: $type}';
-
-  @override
-  bool operator ==(Object other) => other is Problem && other.id == id;
-
-  @override
-  int get hashCode => id.hashCode;
 }
 
-/// 문제 유형 (간소화)
+/// 문제 유형
 enum ProblemType {
   multipleChoice, // 객관식
   shortAnswer, // 주관식
-  calculation, // 계산
-}
-
-/// 문제 풀이 결과 (간소화)
-class ProblemResult {
-  final String problemId;
-  final String userId;
-  final int? selectedAnswerIndex;
-  final String? textAnswer;
-  final bool isCorrect;
-  final DateTime solvedAt;
-  final int timeSpentSeconds;
-  final int xpEarned;
-
-  const ProblemResult({
-    required this.problemId,
-    required this.userId,
-    this.selectedAnswerIndex,
-    this.textAnswer,
-    required this.isCorrect,
-    required this.solvedAt,
-    required this.timeSpentSeconds,
-    required this.xpEarned,
-  });
-
-  factory ProblemResult.fromJson(Map<String, dynamic> json) {
-    return ProblemResult(
-      problemId: json['problemId'] as String,
-      userId: json['userId'] as String,
-      selectedAnswerIndex: json['selectedAnswerIndex'] as int?,
-      textAnswer: json['textAnswer'] as String?,
-      isCorrect: json['isCorrect'] as bool,
-      solvedAt: DateTime.parse(json['solvedAt'] as String),
-      timeSpentSeconds: json['timeSpentSeconds'] as int,
-      xpEarned: json['xpEarned'] as int,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'problemId': problemId,
-      'userId': userId,
-      'selectedAnswerIndex': selectedAnswerIndex,
-      'textAnswer': textAnswer,
-      'isCorrect': isCorrect,
-      'solvedAt': solvedAt.toIso8601String(),
-      'timeSpentSeconds': timeSpentSeconds,
-      'xpEarned': xpEarned,
-    };
-  }
-
-  @override
-  String toString() => 'ProblemResult{problemId: $problemId, isCorrect: $isCorrect}';
+  dragAndDrop, // 드래그 앤 드롭
+  stepByStep, // 단계별 풀이
+  calculation, // 계산 문제 (기존 코드 호환성)
 }

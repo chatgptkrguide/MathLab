@@ -5,6 +5,7 @@ import '../../practice/practice_screen.dart';
 import '../../level_test/level_test_screen.dart';
 import '../../achievements/achievements_screen.dart';
 import '../../daily_challenge/daily_challenge_screen.dart';
+import '../../settings/settings_screen.dart';
 
 /// Figma 디자인 "05" 프로필 상세 페이지 - 완전 재구성 버전
 /// Figma Page 05 구조와 100% 일치하도록 구현
@@ -74,7 +75,7 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
     );
   }
 
-  /// Header - 뒤로가기 + 프로필 텍스트
+  /// Header - 프로필 텍스트 + 설정 버튼
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -92,11 +93,8 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 뒤로가기 버튼
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
+          // 왼쪽 여백 (대칭을 위해)
+          const SizedBox(width: 48),
 
           // 프로필 텍스트
           const Text(
@@ -109,8 +107,18 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
             ),
           ),
 
-          // 오른쪽 여백 (대칭을 위해)
-          const SizedBox(width: 48),
+          // 설정 버튼
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white, size: 28),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -159,7 +167,7 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user?.name ?? '소인수분해',
+                      user?.name ?? '고 1',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -171,11 +179,11 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
                     // 스탯 행 (XP, 스트릭, 레벨)
                     Row(
                       children: [
-                        _buildMiniStat('💎', '${user?.xp ?? 549}'),
-                        const SizedBox(width: 12),
-                        _buildMiniStat('🔥', '${user?.streakDays ?? 6}'),
-                        const SizedBox(width: 12),
-                        _buildMiniStat('🏅', 'H Lv${user?.level ?? 1}'),
+                        Expanded(child: _buildMiniStat('💎', '${user?.xp ?? 549}')),
+                        const SizedBox(width: 4),
+                        Expanded(child: _buildMiniStat('🔥', '${user?.streakDays ?? 6}')),
+                        const SizedBox(width: 4),
+                        Expanded(child: _buildMiniStat('🏅', 'Lv${user?.level ?? 1}')),
                       ],
                     ),
                   ],
@@ -190,7 +198,7 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
 
   Widget _buildMiniStat(String emoji, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(12),
@@ -198,15 +206,20 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
+          Text(emoji, style: const TextStyle(fontSize: 12)),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A1A),
+              ),
             ),
           ),
         ],
@@ -405,9 +418,9 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildBadge('assets/badges/badge_locked_1.png', 'Dealing with\nTechnic', isLocked: true),
-              _buildBadge('assets/badges/badge_locked_2.png', 'Challenge\nMaster', isLocked: true),
-              _buildBadge('assets/badges/badge_locked_3.png', 'Streak\nAchiever', isLocked: true),
+              Expanded(child: _buildBadge('assets/badges/badge_locked_1.png', '테크닉', isLocked: true)),
+              Expanded(child: _buildBadge('assets/badges/badge_locked_2.png', '챌린지', isLocked: true)),
+              Expanded(child: _buildBadge('assets/badges/badge_locked_3.png', '연속학습', isLocked: true)),
             ],
           ),
         ],

@@ -56,13 +56,13 @@ class MockDataService {
     return [
       Lesson(
         id: 'lesson001',
-        title: '1. 소인수분해',
-        description: '자연수의 성질과 소인수분해를 학습합니다',
+        title: '1. 공수 다항식',
+        description: '공수 다항식의 원리와 계산법을 학습합니다',
         icon: '🔢',
         order: 1,
         grade: '중1',
-        category: '기초산술',
-        topics: ['자연수', '소수', '합성수', '소인수분해'],
+        category: '대수학',
+        topics: ['다항식', '인수분해', '공수 전개', '공수 다항식'],
         totalProblems: 20,
         completedProblems: 0,
         isUnlocked: true,
@@ -301,31 +301,33 @@ class MockDataService {
       // 문제 1: 기본 지수 계산 (쉬움)
       Problem(
         id: 'problem001',
-        lessonId: 'lesson001',
+        title: '지수 계산',
         type: ProblemType.multipleChoice,
         question: '다음 중 계산 결과가 다른 것은?',
         category: '지수',
         difficulty: 2,
-        tags: ['거듭제곱', '음수 지수', '지수 법칙'],
-        xpReward: 10,
-        options: [
+        choices: [
           '(3/2)^(-2) = 4/9',
           '(-1/2)^(-3) = -8',
           '(-3)^(-2) = 1/9',
           '-3^(-2) = -1/9',
         ],
-        correctAnswerIndex: 2,
-        correctAnswer: '(-3)^(-2) = 1/9',
+        answer: 2,
         explanation: '(-3)^(-2) = 1/(-3)^2 = 1/9가 맞지만, 보기에서는 1/9로 표시되어 있어 정답입니다. '
             '실제로 (-3)^2 = 9이므로 (-3)^(-2) = 1/9입니다.',
         hints: [
           '음수의 거듭제곱을 먼저 계산하세요',
           '(-a)^n과 -a^n의 차이를 생각해보세요',
         ],
+        metadata: {
+          'lessonId': 'lesson001',
+          'tags': ['거듭제곱', '음수 지수', '지수 법칙'],
+          'xpReward': 10,
+        },
       ),
 
       // 문제 2: 근호 단순화 (중간)
-      Problem(
+      Problem.legacy(
         id: 'problem002',
         lessonId: 'lesson001',
         type: ProblemType.multipleChoice,
@@ -351,7 +353,7 @@ class MockDataService {
       ),
 
       // 문제 3: 분수 지수 표현 (어려움)
-      Problem(
+      Problem.legacy(
         id: 'problem003',
         lessonId: 'lesson001',
         type: ProblemType.multipleChoice,
@@ -389,7 +391,7 @@ class MockDataService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
-      problems.add(Problem(
+      problems.add(Problem.legacy(
         id: 'basic_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
@@ -419,7 +421,7 @@ class MockDataService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
-      problems.add(Problem(
+      problems.add(Problem.legacy(
         id: 'algebra_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
@@ -450,7 +452,7 @@ class MockDataService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
-      problems.add(Problem(
+      problems.add(Problem.legacy(
         id: 'geometry_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
@@ -485,7 +487,7 @@ class MockDataService {
       final sum = nums.reduce((a, b) => a + b);
       final avg = sum ~/ nums.length;
 
-      problems.add(Problem(
+      problems.add(Problem.legacy(
         id: 'stats_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,

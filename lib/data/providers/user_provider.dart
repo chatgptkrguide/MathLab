@@ -250,6 +250,13 @@ class UserNotifier extends StateNotifier<User?> {
     await _saveUser();
   }
 
+  /// 사용자 정보 전체 업데이트
+  Future<void> updateUser(User updatedUser) async {
+    state = updatedUser;
+    await _saveUser();
+    Logger.info('사용자 정보 업데이트 완료: ${updatedUser.name}', tag: 'UserProvider');
+  }
+
   /// 사용자 이름 변경
   Future<void> updateUserName(String newName) async {
     if (state == null) return;

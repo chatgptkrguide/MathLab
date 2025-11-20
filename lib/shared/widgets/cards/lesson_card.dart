@@ -160,6 +160,7 @@ class _LessonCardState extends State<LessonCard>
           ],
         ),
       ),
+      ),
     );
   }
 

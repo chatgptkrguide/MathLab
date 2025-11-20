@@ -6,6 +6,7 @@ export 'achievement.dart';
 export 'learning_stats.dart';
 export 'error_note.dart';
 export 'problem.dart';
+export 'problem_result.dart';
 export 'leaderboard_entry.dart';
 export 'league.dart';
 export 'daily_reward.dart';

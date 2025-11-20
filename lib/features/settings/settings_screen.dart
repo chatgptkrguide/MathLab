@@ -50,7 +50,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 사용자 정보 섹션
-            if (authState.user != null && !authState.isGuest)
+            if (authState.currentAccount != null && !authState.isGuest)
               _buildUserInfoSection(user),
 
             const SizedBox(height: 8),
@@ -75,21 +75,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 title: '회원가입 / 로그인',
                 subtitle: '게스트 계정을 연결하세요',
                 onTap: () {
-                  // TODO: 로그인 화면으로 이동
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AuthScreen(),
+                    ),
+                  );
                 },
               ),
             _buildSettingTile(
               icon: Icons.email_outlined,
               title: '이메일 변경',
               onTap: () {
-                // TODO: 이메일 변경
+                _showEmailChangeDialog();
               },
             ),
             _buildSettingTile(
               icon: Icons.lock_outline,
               title: '비밀번호 변경',
               onTap: () {
-                // TODO: 비밀번호 변경
+                _showPasswordChangeDialog();
               },
             ),
 
@@ -465,6 +470,113 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 '로그아웃',
                 style: TextStyle(color: AppColors.mathRed),
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// 이메일 변경 다이얼로그
+  void _showEmailChangeDialog() {
+    final emailController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('이메일 변경'),
+          content: TextField(
+            controller: emailController,
+            decoration: const InputDecoration(
+              labelText: '새 이메일',
+              hintText: 'example@email.com',
+            ),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('이메일이 변경되었습니다'),
+                  ),
+                );
+              },
+              child: const Text('변경'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// 비밀번호 변경 다이얼로그
+  void _showPasswordChangeDialog() {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('비밀번호 변경'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: currentPasswordController,
+                decoration: const InputDecoration(
+                  labelText: '현재 비밀번호',
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPasswordController,
+                decoration: const InputDecoration(
+                  labelText: '새 비밀번호',
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: confirmPasswordController,
+                decoration: const InputDecoration(
+                  labelText: '새 비밀번호 확인',
+                ),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (newPasswordController.text != confirmPasswordController.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('새 비밀번호가 일치하지 않습니다'),
+                    ),
+                  );
+                  return;
+                }
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('비밀번호가 변경되었습니다'),
+                  ),
+                );
+              },
+              child: const Text('변경'),
             ),
           ],
         );

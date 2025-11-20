@@ -138,7 +138,9 @@ class LessonNotifier extends StateNotifier<List<Lesson>> {
         .length;
 
     // 레슨 진행률 업데이트
-    await updateLessonProgress(problem.lessonId, solvedLessonProblems);
+    if (problem.lessonId != null) {
+      await updateLessonProgress(problem.lessonId!, solvedLessonProblems);
+    }
   }
 
   /// 학년별 레슨 조회

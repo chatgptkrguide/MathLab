@@ -5,7 +5,6 @@ import '../shared/constants/app_colors.dart';
 import '../shared/themes/app_theme.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import 'auth_wrapper.dart';
-import 'splash_screen.dart';
 
 /// GoMath 앱의 메인 위젯
 class MathLabApp extends StatelessWidget {
@@ -36,8 +35,8 @@ class MathLabApp extends StatelessWidget {
         );
       },
 
-      // 스플래시 화면에서 온보딩 여부 체크
-      home: const SplashScreen(),
+      // 바로 로그인 화면(AuthWrapper)으로 시작
+      home: const AuthWrapper(),
 
       // 라우팅 설정
       routes: {

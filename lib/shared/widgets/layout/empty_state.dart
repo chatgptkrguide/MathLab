@@ -42,75 +42,139 @@ class EmptyState extends StatelessWidget {
           width: availableWidth.isFinite ? availableWidth : null,
           padding: EdgeInsets.all(isSmallScreen ? AppDimensions.paddingM : AppDimensions.paddingL),
           child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: minHeightValue,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // 아이콘
-                    Icon(
-                      icon,
-                      size: isSmallScreen ? 48 : 64,
-                      color: Colors.grey.shade400,
+            child: minHeightValue.isFinite
+                ? ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: minHeightValue,
                     ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Spacer(),
+                          // 아이콘
+                          Icon(
+                            icon,
+                            size: isSmallScreen ? 48 : 64,
+                            color: Colors.grey.shade400,
+                          ),
 
-                    SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingL),
+                          SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingL),
 
-                    // 제목
-                    Text(
-                      title,
-                      style: isSmallScreen
-                          ? AppTextStyles.titleLarge
-                          : AppTextStyles.headlineSmall,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.visible,
-                    ),
+                          // 제목
+                          Text(
+                            title,
+                            style: isSmallScreen
+                                ? AppTextStyles.titleLarge
+                                : AppTextStyles.headlineSmall,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.visible,
+                          ),
 
-                    SizedBox(height: isSmallScreen ? AppDimensions.spacingS : AppDimensions.spacingM),
+                          SizedBox(height: isSmallScreen ? AppDimensions.spacingS : AppDimensions.spacingM),
 
-                    // 메시지
-                    Flexible(
-                      child: Text(
-                        message,
-                        style: isSmallScreen
-                            ? AppTextStyles.bodySmall
-                            : AppTextStyles.bodyMedium,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.visible,
+                          // 메시지
+                          Text(
+                            message,
+                            style: isSmallScreen
+                                ? AppTextStyles.bodySmall
+                                : AppTextStyles.bodyMedium,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.visible,
+                          ),
+
+                          // 액션 버튼 (있는 경우에만)
+                          if (actionText != null && onActionPressed != null) ...[
+                            SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingXL),
+                            SizedBox(
+                              width: isSmallScreen ? availableWidth * 0.8 : 200,
+                              child: OutlinedButton(
+                                onPressed: onActionPressed,
+                                style: OutlinedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isSmallScreen ? AppDimensions.paddingM : AppDimensions.paddingXL,
+                                    vertical: AppDimensions.paddingM,
+                                  ),
+                                ),
+                                child: Text(
+                                  actionText!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 12 : 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          const Spacer(),
+                        ],
                       ),
                     ),
-
-                    // 액션 버튼 (있는 경우에만)
-                    if (actionText != null && onActionPressed != null) ...[
-                      SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingXL),
-                      SizedBox(
-                        width: isSmallScreen ? availableWidth * 0.8 : 200,
-                        child: OutlinedButton(
-                          onPressed: onActionPressed,
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isSmallScreen ? AppDimensions.paddingM : AppDimensions.paddingXL,
-                              vertical: AppDimensions.paddingM,
-                            ),
-                          ),
-                          child: Text(
-                            actionText!,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 12 : 14,
-                            ),
-                          ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // 아이콘
+                        Icon(
+                          icon,
+                          size: isSmallScreen ? 48 : 64,
+                          color: Colors.grey.shade400,
                         ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
+
+                        SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingL),
+
+                        // 제목
+                        Text(
+                          title,
+                          style: isSmallScreen
+                              ? AppTextStyles.titleLarge
+                              : AppTextStyles.headlineSmall,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.visible,
+                        ),
+
+                        SizedBox(height: isSmallScreen ? AppDimensions.spacingS : AppDimensions.spacingM),
+
+                        // 메시지
+                        Text(
+                          message,
+                          style: isSmallScreen
+                              ? AppTextStyles.bodySmall
+                              : AppTextStyles.bodyMedium,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.visible,
+                        ),
+
+                        // 액션 버튼 (있는 경우에만)
+                        if (actionText != null && onActionPressed != null) ...[
+                          SizedBox(height: isSmallScreen ? AppDimensions.spacingM : AppDimensions.spacingXL),
+                          SizedBox(
+                            width: isSmallScreen ? availableWidth * 0.8 : 200,
+                            child: OutlinedButton(
+                              onPressed: onActionPressed,
+                              style: OutlinedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isSmallScreen ? AppDimensions.paddingM : AppDimensions.paddingXL,
+                                  vertical: AppDimensions.paddingM,
+                                ),
+                              ),
+                              child: Text(
+                                actionText!,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 12 : 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
           ),
         );
       },

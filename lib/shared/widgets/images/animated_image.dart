@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_animations.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_dimensions.dart';
-import '../loading/loading_indicators.dart';
+import '../indicators/loading_widgets.dart';
 
 /// 애니메이션이 적용된 이미지 로더
 class AnimatedImage extends StatefulWidget {

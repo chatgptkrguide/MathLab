@@ -584,7 +584,10 @@ class AuthState {
   }
 
   /// 게스트 모드인지 확인
-  bool get isGuest => !isAuthenticated;
+  bool get isGuest {
+    if (currentAccount == null) return false;
+    return currentAccount!.preferences['isGuest'] == 'true';
+  }
 
   /// 다중 계정이 있는지 확인
   bool get hasMultipleAccounts => availableAccounts.length > 1;

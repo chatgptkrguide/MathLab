@@ -1,0 +1,31 @@
+{
+  "id": "polynomial_002",
+  "title": "두 다항식의 사칙연산",
+  "question": "두 다항식 A=(2x-y)², B=x²+2xy에 대하여 X+B=A-3B를 만족시키는 다항식 X는?",
+  "type": "multipleChoice",
+  "category": "algebra",
+  "difficulty": 3,
+  "choices": [
+    "① x²-4xy",
+    "② x²+8xy",
+    "③ y²-4xy",
+    "④ y²-6xy",
+    "⑤ y²-12xy"
+  ],
+  "answer": 4,
+  "hints": [
+    "정리하고 맨 나중에 계산하기",
+    "X+B=A-3B에서 X=A-4B를 구한다.",
+    "A=(2x-y)²를 전개하면 4x²-4xy+y²이다.",
+    "X=A-4B에 대입하여 계산하면 X=(2x-y)²-4(x²+2xy)=4x²-4xy+y²-4x²-8xy=y²-12xy"
+  ],
+  "explanation": "2. 정답: ⑤\n\n풀이: Hint: 정리하고 맨 나중에 계산하기\n\nX+B=A-3B에서 X=A-4B\n\n∴ X=(2x-y)²-4(x²+2xy)\n    =4x²-4xy+y²-4x²-8xy\n    =y²-12xy",
+  "imageUrl": "assets/problems/images/polynomial_002_question.png",
+  "answerImageUrl": "assets/problems/images/polynomial_002_answer.png",
+  "metadata": {
+    "lessonId": "lesson001",
+    "tags": ["다항식", "전개", "정리", "사칙연산"],
+    "estimatedTime": 300,
+    "xpReward": 20
+  }
+}

@@ -48,7 +48,7 @@ class _HintSectionState extends ConsumerState<HintSection>
   @override
   Widget build(BuildContext context) {
     // 힌트가 없으면 표시하지 않음
-    if (widget.problem.hints == null || widget.problem.hints!.isEmpty) {
+    if (widget.problem.hints.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -113,7 +113,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${_getUnlockedCount()}/${widget.problem.hints!.length} 사용됨',
+                          '${_getUnlockedCount()}/${widget.problem.hints.length} 사용됨',
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -184,7 +184,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                       children: [
                         const SizedBox(height: AppDimensions.spacingM),
                         ...List.generate(
-                          widget.problem.hints!.length,
+                          widget.problem.hints.length,
                           (index) {
                             // hintState를 통해 unlock 여부 확인
                             final hintKey = '${widget.problem.id}_$index';
@@ -193,7 +193,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                             return _HintItem(
                               problem: widget.problem,
                               hintIndex: index,
-                              hintText: widget.problem.hints![index],
+                              hintText: widget.problem.hints[index],
                               isUnlocked: isUnlocked,
                               canUnlock: userXP >= HintProvider.hintCost,
                               onUnlock: () => _unlockHint(context, index),
@@ -213,7 +213,7 @@ class _HintSectionState extends ConsumerState<HintSection>
   int _getUnlockedCount() {
     final hintState = ref.watch(hintProvider);
     int count = 0;
-    for (int i = 0; i < widget.problem.hints!.length; i++) {
+    for (int i = 0; i < widget.problem.hints.length; i++) {
       // hintState를 통해 unlock 여부 확인
       final hintKey = '${widget.problem.id}_$i';
       if (hintState.unlockedHints.contains(hintKey)) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_dimensions.dart';
 import '../../constants/app_text_styles.dart';
 
 /// 학습 캘린더 사이드 메뉴 (피그마 03 디자인 기반)
@@ -12,7 +11,7 @@ class LearningCalendarDrawer extends StatefulWidget {
 }
 
 class _LearningCalendarDrawerState extends State<LearningCalendarDrawer> {
-  DateTime _focusedDay = DateTime.now();
+  final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
   // 학습한 날짜 (예시 데이터 - 피그마처럼 13~18일)

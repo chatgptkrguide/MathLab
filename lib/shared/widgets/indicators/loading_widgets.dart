@@ -133,11 +133,11 @@ class SkeletonLoader extends StatefulWidget {
   final double borderRadius;
 
   const SkeletonLoader({
-    Key? key,
+    super.key,
     this.width = double.infinity,
     required this.height,
     this.borderRadius = 12.0,
-  }) : super(key: key);
+  });
 
   @override
   State<SkeletonLoader> createState() => _SkeletonLoaderState();
@@ -285,4 +285,17 @@ class SkeletonProgressCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 범용 스켈레톤 로딩 위젯 (호환성 함수)
+Widget SkeletonLoading({
+  double? width,
+  double height = 20,
+  double borderRadius = 4,
+}) {
+  return SkeletonLoader(
+    width: width ?? double.infinity,
+    height: height,
+    borderRadius: borderRadius,
+  );
 }

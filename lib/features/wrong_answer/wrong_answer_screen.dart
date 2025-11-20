@@ -394,7 +394,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => ProblemScreen(
-          lessonId: wrongAnswer.problem.lessonId,
+          lessonId: wrongAnswer.problem.lessonId ?? '',
           problems: [wrongAnswer.problem],
         ),
       ),

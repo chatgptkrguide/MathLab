@@ -3,9 +3,8 @@ import 'package:flutter/services.dart';
 import '../shared/widgets/layout/custom_bottom_nav.dart';
 import '../features/home/home_screen_figma.dart';
 import '../features/lessons/figma/lessons_screen_figma.dart';
-import '../features/leaderboard/leaderboard_screen.dart';
 import '../features/errors/errors_screen.dart';
-import '../features/profile/figma/profile_screen_figma.dart';
+import '../features/profile/figma/profile_detail_screen_v3_new.dart';
 import '../features/history/history_screen.dart';
 
 /// 메인 네비게이션 위젯
@@ -18,14 +17,14 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
+  int _currentIndex = 2; // 초기 화면을 홈(가운데)으로 설정
 
   final List<Widget> _screens = [
-    const HomeScreenFigma(),       // 피그마 디자인 홈 화면
-    const LessonsScreenFigma(),    // 피그마 디자인 학습 화면
-    const ErrorsScreen(),          // 오답
-    const ProfileScreenFigma(),    // 피그마 디자인 프로필 화면
-    const HistoryScreen(),         // 학습이력 (5번째 탭 추가)
+    const LessonsScreenFigma(),         // 0: 학습
+    const ErrorsScreen(),               // 1: 오답
+    const HomeScreenFigma(),            // 2: 홈 (가운데)
+    const ProfileDetailScreenV3New(),   // 3: 프로필 (학습자 상세)
+    const HistoryScreen(),              // 4: 학습이력
   ];
 
   @override

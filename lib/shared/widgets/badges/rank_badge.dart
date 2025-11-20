@@ -19,7 +19,7 @@ class RankBadge extends StatelessWidget {
     final colors = _getColorsForRank(rankType);
     final isLegend = level == 0;
 
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(

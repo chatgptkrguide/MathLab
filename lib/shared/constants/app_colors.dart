@@ -50,6 +50,7 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF1A1A1A);
   static const Color textSecondary = Color(0xFF4A4A4A);
+  static const Color textTertiary = Color(0xFF9E9E9E);
   static const Color borderLight = Color(0xFFDADCE0);
   static const Color disabled = Color(0xFF9AA0A6);
   static const Color cardShadow = Color(0x0D000000);
@@ -59,6 +60,7 @@ class AppColors {
   // ==========================================
 
   static const Color xpGold = Color(0xFFFFD700);
+  static const Color mathGold = xpGold; // 별칭 (호환성)
   static const Color streakOrange = Color(0xFFFF6B35);
   static const Color levelBronze = Color(0xFFCD7F32);
   static const Color levelSilver = Color(0xFFC0C0C0);
