@@ -142,7 +142,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                 constraints: BoxConstraints(minHeight: size.height - MediaQuery.of(context).padding.top),
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // 상단 영역: Math is + Fun!!! + Chatbot (겹침)
                     Stack(
@@ -177,7 +176,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                         ),
                         // Chatbot 캐릭터 (앞쪽 레이어, 텍스트 위에)
                         Positioned(
-                          top: 142, // Figma Y 위치
+                          top: 115, // Math is(27) + Math is 높이(107) - Chatbot 시작점 조정
                           child: FadeTransition(
                             opacity: _fadeAnimation,
                             child: Image.asset(
@@ -191,6 +190,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ],
                     ),
 
+                    const SizedBox(height: 20), // Stack과 GoMath Lab 사이 간격
+
                     // "GoMath Lab" 텍스트 (Chatbot 바로 아래)
                     FadeTransition(
                       opacity: _fadeAnimation,
@@ -200,7 +201,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 40), // GoMath Lab과 버튼 사이 간격
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
@@ -278,7 +279,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 60),
+                    // 버튼 아래 공간 (Spacer 대신 고정 높이)
+                    SizedBox(height: size.height * 0.12),
 
                     // 로고 (맨 아래)
                     FadeTransition(
