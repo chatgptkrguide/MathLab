@@ -201,7 +201,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 60), // GoMath Lab과 버튼 사이 간격
+                    const SizedBox(height: 200), // GoMath Lab과 버튼 사이 간격
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
@@ -280,7 +280,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                     ),
 
                     // 버튼 아래 공간 (로고까지)
-                    SizedBox(height: size.height * 0.24),
+                    SizedBox(height: size.height * 0.12),
 
                     // 로고 (맨 아래)
                     FadeTransition(
