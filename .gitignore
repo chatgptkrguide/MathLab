@@ -101,3 +101,4 @@ app.*.map.json
 !**/assets/images/*.png
 !web/icons/*.png
 !web/favicon.png
+.vercel
