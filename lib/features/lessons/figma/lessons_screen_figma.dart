@@ -5,6 +5,7 @@ import '../../../shared/widgets/drawers/learning_calendar_drawer.dart';
 import '../../../shared/widgets/drawers/top_slide_drawer.dart';
 import '../../../shared/widgets/layout/common_app_bar.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/services/korean_math_curriculum.dart';
 import '../../practice/practice_screen.dart';
 import '../../level_test/level_test_screen.dart';
 import '../../problems/problem_solving_screen.dart';
@@ -12,11 +13,14 @@ import '../../problems/problem_solving_screen.dart';
 /// Figma 디자인 "01" 학습 페이지 100% 재현
 /// 레퍼런스: assets/images/figma_01_lessons_reference.png
 class LessonsScreenFigma extends ConsumerWidget {
-  const LessonsScreenFigma({super.key});
+  final String? selectedGrade;
+
+  const LessonsScreenFigma({super.key, this.selectedGrade});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
+    final displayGrade = selectedGrade ?? user?.currentGrade ?? '중1';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -42,9 +46,9 @@ class LessonsScreenFigma extends ConsumerWidget {
               ),
             ),
 
-          // 사용자 정보 바 (고 1, 스트릭, XP, 레벨)
+          // 사용자 정보 바 (선택된 학년 표시)
           FigmaUserInfoBar(
-            userName: '고 1',
+            userName: displayGrade,
             streakDays: user?.streakDays ?? 6,
             xp: user?.xp ?? 549,
             level: 'HLv${user?.level ?? 1}',
@@ -175,19 +179,24 @@ class LessonsScreenFigma extends ConsumerWidget {
     final currentLessonIndex = 0; // 현재 진행중인 레슨 인덱스
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // 레슨 데이터 정의
-    final lessons = [
-      {'image': 'assets/images/book_pencil.png', 'label': 'START!', 'isLocked': false, 'lessonId': 'lesson001', 'isCompleted': false},
-      {'image': 'assets/images/book.png', 'label': '', 'isLocked': true, 'lessonId': 'lesson002', 'isCompleted': false},
-      {'image': 'assets/images/rulers.png', 'label': '', 'isLocked': true, 'lessonId': 'lesson003', 'isCompleted': false},
-      {'image': 'assets/images/bag.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-      {'image': 'assets/images/clock.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-      {'image': 'assets/images/winner.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-      {'image': 'assets/images/laptop.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-      {'image': 'assets/images/globe.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-      {'image': 'assets/images/blackboard.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-      {'image': 'assets/images/microscope.png', 'label': '', 'isLocked': true, 'lessonId': null, 'isCompleted': false},
-    ];
+    // 선택된 학년에 따른 한국 수학 교육과정 데이터 가져오기
+    final displayGrade = selectedGrade ?? '중1';
+    final curriculumLessons = KoreanMathCurriculum.getLessonsByGrade(displayGrade);
+
+    // 레슨 데이터를 UI 형식으로 변환
+    final lessons = curriculumLessons.asMap().entries.map((entry) {
+      final index = entry.key;
+      final lesson = entry.value;
+
+      return {
+        'image': 'assets/images/${_getLessonImage(index)}.png',
+        'label': lesson.title,
+        'isLocked': index > currentLessonIndex, // 현재 인덱스 이후는 잠금
+        'lessonId': lesson.id,
+        'isCompleted': lesson.completedProblems == lesson.totalProblems,
+        'icon': lesson.icon,
+      };
+    }).toList();
 
     return Stack(
       children: [
@@ -296,22 +305,7 @@ class LessonsScreenFigma extends ConsumerWidget {
             ),
           ),
 
-          // 라벨
-          if (label.isNotEmpty)
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          // 라벨 (제거됨 - 요청사항)
 
           // 잠금 오버레이
           if (isLocked)
@@ -389,20 +383,26 @@ class LessonsScreenFigma extends ConsumerWidget {
     );
   }
 
+  /// 레슨 인덱스에 따른 이미지 파일명 반환
+  String _getLessonImage(int index) {
+    final images = [
+      'book_pencil', 'book', 'rulers', 'bag', 'clock',
+      'winner', 'laptop', 'globe', 'blackboard', 'microscope',
+    ];
+    return images[index % images.length];
+  }
+
   /// 문제 풀이 화면으로 네비게이션
   Future<void> _navigateToProblems(BuildContext context, String lessonId) async {
-    // 레슨 데이터 정의
-    final lessons = [
-      {'image': 'assets/images/book_pencil.png', 'label': 'START!', 'isLocked': false, 'lessonId': 'lesson001'},
-      {'image': 'assets/images/book.png', 'label': '', 'isLocked': false, 'lessonId': 'lesson002'},
-      {'image': 'assets/images/rulers.png', 'label': '', 'isLocked': false, 'lessonId': 'lesson003'},
-    ];
+    // 선택된 학년의 교육과정 데이터 가져오기
+    final displayGrade = selectedGrade ?? '중1';
+    final curriculumLessons = KoreanMathCurriculum.getLessonsByGrade(displayGrade);
 
     // 레슨 타이틀 찾기
-    final lessonTitle = lessons.firstWhere(
-      (lesson) => lesson['lessonId'] == lessonId,
-      orElse: () => {'label': '학습하기'},
-    )['label'] as String;
+    final lesson = curriculumLessons.firstWhere(
+      (lesson) => lesson.id == lessonId,
+      orElse: () => curriculumLessons.first,
+    );
 
     // 문제 풀이 화면으로 이동
     if (context.mounted) {
@@ -411,7 +411,7 @@ class LessonsScreenFigma extends ConsumerWidget {
         MaterialPageRoute(
           builder: (context) => ProblemSolvingScreen(
             lessonId: lessonId,
-            lessonTitle: lessonTitle.isNotEmpty ? lessonTitle : '학습하기',
+            lessonTitle: lesson.title,
           ),
         ),
       );

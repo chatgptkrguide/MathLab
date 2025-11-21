@@ -150,6 +150,16 @@ class UserNotifier extends StateNotifier<User?> {
     }
   }
 
+  /// 학년 업데이트
+  Future<void> updateGrade(String newGrade) async {
+    if (state == null) return;
+
+    state = state!.copyWith(currentGrade: newGrade);
+    await _saveUser();
+
+    Logger.info('학년 변경: $newGrade', tag: 'UserProvider');
+  }
+
   /// XP 추가
   Future<void> addXP(int xp) async {
     if (state == null) return;
