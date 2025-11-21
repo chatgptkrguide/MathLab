@@ -7,6 +7,7 @@ import '../profile/figma/profile_detail_screen_v3_new.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../problems/problem_solving_screen.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/providers/navigation_provider.dart';
 import '../../data/services/korean_math_curriculum.dart';
 import '../../data/models/models.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
@@ -672,13 +673,8 @@ class HomeScreenFigma extends ConsumerWidget {
           Navigator.pop(context);
           // 학년 업데이트
           ProviderScope.containerOf(context).read(userProvider.notifier).updateGrade(grade);
-          // 레슨 화면으로 이동
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LessonsScreenFigma(selectedGrade: grade),
-            ),
-          );
+          // 레슨 탭으로 이동 (탭바 유지)
+          ProviderScope.containerOf(context).read(navigationProvider.notifier).goToLessons();
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
