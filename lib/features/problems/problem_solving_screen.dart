@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 import '../../data/models/problem.dart';
 import '../../data/repositories/problem_repository.dart';
+import '../../data/providers/lesson_progress_provider.dart';
+import '../../data/providers/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 
 /// 문제 풀이 화면 (듀오링고 스타일)
-class ProblemSolvingScreen extends StatefulWidget {
+class ProblemSolvingScreen extends ConsumerStatefulWidget {
   final String lessonId;
   final String lessonTitle;
 
@@ -16,10 +19,10 @@ class ProblemSolvingScreen extends StatefulWidget {
   });
 
   @override
-  State<ProblemSolvingScreen> createState() => _ProblemSolvingScreenState();
+  ConsumerState<ProblemSolvingScreen> createState() => _ProblemSolvingScreenState();
 }
 
-class _ProblemSolvingScreenState extends State<ProblemSolvingScreen>
+class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     with SingleTickerProviderStateMixin {
   // 문제 목록
   List<Problem> _problems = [];
@@ -254,15 +257,22 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen>
 
   void _showCompletion() {
     _timer?.cancel();
+
+    // 레슨 완료 처리 - 다음 레슨으로 진행
+    final user = ref.read(userProvider);
+    final currentGrade = user?.currentGrade ?? '중1';
+    ref.read(lessonProgressProvider.notifier).completeLesson(currentGrade);
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('축하합니다!'),
         content: Text(
-          '모든 문제를 완료했습니다!\n'
+          '레슨을 완료했습니다!\n'
           '맞춘 문제: $_correctAnswers / ${_problems.length}\n'
-          '남은 하트: $_hearts',
+          '남은 하트: $_hearts\n\n'
+          '다음 레슨이 열렸습니다!',
         ),
         actions: [
           ElevatedButton(

@@ -33,34 +33,25 @@ class ProblemRepository {
     return problems;
   }
 
-  /// 레슨 ID로 문제 목록 로드
+  /// 레슨 ID로 문제 목록 로드 (각 레슨당 1개 문제만)
   Future<List<Problem>> loadProblemsByLesson(String lessonId) async {
     final problems = <Problem>[];
 
-    // polynomial 문제 파일 로드 시도
-    try {
-      final problem1 = await loadProblem('assets/problems/polynomials/polynomial_001.json');
-      problems.add(problem1);
-    } catch (e) {
-      print('polynomial_001.json 로드 실패: $e');
-    }
-
-    try {
-      final problem2 = await loadProblem('assets/problems/polynomials/polynomial_002.json');
-      problems.add(problem2);
-    } catch (e) {
-      print('polynomial_002.json 로드 실패: $e');
-    }
-
-    // JSON 파일 로드에 성공한 경우 반환
-    if (problems.isNotEmpty) {
-      return problems;
-    }
-
-    // JSON 파일이 없는 경우에만 샘플 문제 생성
-    print('JSON 파일을 찾을 수 없어 샘플 문제를 생성합니다.');
-    problems.addAll(_generateSampleProblems(lessonId));
+    // 각 레슨마다 하나의 문제만 생성
+    problems.add(_generateSingleProblem(lessonId));
     return problems;
+  }
+
+  /// 레슨당 단일 문제 생성
+  Problem _generateSingleProblem(String lessonId) {
+    // lessonId에서 번호 추출 (예: ms1_001 -> 1)
+    final lessonNumber = int.tryParse(lessonId.split('_').last) ?? 1;
+
+    // 5개 문제를 순환하면서 할당
+    final problemIndex = (lessonNumber - 1) % 5;
+    final allProblems = _generateSampleProblems(lessonId);
+
+    return allProblems[problemIndex];
   }
 
   /// 레슨별 샘플 문제 생성 (임시)

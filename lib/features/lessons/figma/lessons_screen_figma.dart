@@ -5,6 +5,7 @@ import '../../../shared/widgets/drawers/learning_calendar_drawer.dart';
 import '../../../shared/widgets/drawers/top_slide_drawer.dart';
 import '../../../shared/widgets/layout/common_app_bar.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/providers/lesson_progress_provider.dart';
 import '../../../data/services/korean_math_curriculum.dart';
 import '../../practice/practice_screen.dart';
 import '../../level_test/level_test_screen.dart';
@@ -21,6 +22,7 @@ class LessonsScreenFigma extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
     final displayGrade = selectedGrade ?? user?.currentGrade ?? '중1';
+    final currentLessonIndex = ref.watch(currentLessonIndexProvider(displayGrade));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -164,7 +166,7 @@ class LessonsScreenFigma extends ConsumerWidget {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              child: _buildLearningPath(context),
+              child: _buildLearningPath(context, currentLessonIndex),
             ),
           ),
           ],
@@ -174,9 +176,7 @@ class LessonsScreenFigma extends ConsumerWidget {
   }
 
   /// 듀오링고 스타일 학습 경로 (지그재그 레이아웃)
-  Widget _buildLearningPath(BuildContext context) {
-    // 사용자 진행 상태 가져오기 (나중에 provider로 관리)
-    final currentLessonIndex = 0; // 현재 진행중인 레슨 인덱스
+  Widget _buildLearningPath(BuildContext context, int currentLessonIndex) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // 선택된 학년에 따른 한국 수학 교육과정 데이터 가져오기
@@ -193,7 +193,7 @@ class LessonsScreenFigma extends ConsumerWidget {
         'label': lesson.title,
         'isLocked': index > currentLessonIndex, // 현재 인덱스 이후는 잠금
         'lessonId': lesson.id,
-        'isCompleted': lesson.completedProblems == lesson.totalProblems,
+        'isCompleted': index < currentLessonIndex, // 현재 인덱스 이전은 완료
         'icon': lesson.icon,
       };
     }).toList();
