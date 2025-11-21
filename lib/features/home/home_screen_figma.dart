@@ -5,7 +5,10 @@ import '../lessons/figma/lessons_screen_figma.dart';
 import '../daily_reward/daily_reward_screen.dart';
 import '../profile/figma/profile_detail_screen_v3_new.dart';
 import '../leaderboard/leaderboard_screen.dart';
+import '../problems/problem_solving_screen.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/services/korean_math_curriculum.dart';
+import '../../data/models/models.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';
 

@@ -68,8 +68,10 @@ class ProblemRepository {
     return [
       Problem(
         id: '${lessonId}_sample_001',
+        title: '기본 덧셈',
         question: '다음 중 올바른 것을 고르세요.',
         type: ProblemType.multipleChoice,
+        category: '기초 연산',
         choices: ['2 + 2 = 4', '2 + 2 = 5', '2 + 2 = 3', '2 + 2 = 6'],
         answer: 0, // 첫 번째 선택지가 정답
         difficulty: 1,
@@ -78,8 +80,10 @@ class ProblemRepository {
       ),
       Problem(
         id: '${lessonId}_sample_002',
+        title: '곱셈 계산',
         question: '5 × 3 = ?',
         type: ProblemType.multipleChoice,
+        category: '기초 연산',
         choices: ['12', '15', '18', '20'],
         answer: 1, // 두 번째 선택지가 정답
         difficulty: 1,
@@ -88,8 +92,10 @@ class ProblemRepository {
       ),
       Problem(
         id: '${lessonId}_sample_003',
+        title: '뺄셈 계산',
         question: '10 - 4 = ?',
         type: ProblemType.multipleChoice,
+        category: '기초 연산',
         choices: ['4', '5', '6', '7'],
         answer: 2, // 세 번째 선택지가 정답
         difficulty: 1,
@@ -98,8 +104,10 @@ class ProblemRepository {
       ),
       Problem(
         id: '${lessonId}_sample_004',
+        title: '수 비교',
         question: '다음 중 가장 큰 수는?',
         type: ProblemType.multipleChoice,
+        category: '수와 연산',
         choices: ['7', '12', '9', '5'],
         answer: 1, // 두 번째 선택지가 정답
         difficulty: 1,
@@ -108,8 +116,10 @@ class ProblemRepository {
       ),
       Problem(
         id: '${lessonId}_sample_005',
+        title: '나눗셈 계산',
         question: '8 ÷ 2 = ?',
         type: ProblemType.multipleChoice,
+        category: '기초 연산',
         choices: ['2', '3', '4', '5'],
         answer: 2, // 세 번째 선택지가 정답
         difficulty: 2,
