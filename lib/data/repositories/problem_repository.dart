@@ -33,12 +33,40 @@ class ProblemRepository {
     return problems;
   }
 
-  /// 레슨 ID로 문제 목록 로드 (각 레슨당 1개 문제만)
+  /// 레슨 ID로 문제 목록 로드
   Future<List<Problem>> loadProblemsByLesson(String lessonId) async {
     final problems = <Problem>[];
 
-    // 각 레슨마다 하나의 문제만 생성
-    problems.add(_generateSingleProblem(lessonId));
+    // 레슨 ID에 따른 폴더 경로 매핑
+    final lessonFolderMap = {
+      'ms1_001': 'ms1_소인수분해',
+      'ms1_002': 'ms1_정수와유리수',
+      'ms1_003': 'ms1_문자와식',
+      // 더 많은 매핑 추가 예정
+    };
+
+    final folderName = lessonFolderMap[lessonId];
+
+    if (folderName != null) {
+      // JSON 파일 로드 시도 (최대 5개)
+      for (int i = 1; i <= 5; i++) {
+        try {
+          final problemId = '${lessonId}_${i.toString().padLeft(3, '0')}';
+          final path = 'assets/problems/$folderName/$problemId.json';
+          final problem = await loadProblem(path);
+          problems.add(problem);
+        } catch (e) {
+          // 파일이 없으면 중단
+          break;
+        }
+      }
+    }
+
+    // JSON 파일이 없으면 임시 샘플 문제 사용
+    if (problems.isEmpty) {
+      problems.add(_generateSingleProblem(lessonId));
+    }
+
     return problems;
   }
 

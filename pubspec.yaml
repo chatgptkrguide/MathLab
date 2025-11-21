@@ -107,6 +107,7 @@ flutter:
     - assets/fonts/
     - assets/problems/
     - assets/problems/images/
+    - assets/problems/ms1_소인수분해/
     - assets/problems/polynomials/
     - .env
 
