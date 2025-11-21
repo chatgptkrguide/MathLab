@@ -237,12 +237,31 @@ class HomeScreenFigma extends ConsumerWidget {
   Widget _buildTodayGoalCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LessonsScreenFigma(),
-          ),
-        );
+        // 현재 사용자의 학년에 따른 첫 번째 레슨으로 바로 이동
+        final user = ProviderScope.containerOf(context).read(userProvider);
+        final currentGrade = user?.currentGrade ?? '중1';
+        final lessons = KoreanMathCurriculum.getLessonsByGrade(currentGrade);
+
+        if (lessons.isNotEmpty) {
+          // 첫 번째 레슨의 문제 풀이 화면으로 바로 이동
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProblemSolvingScreen(
+                lessonId: lessons[0].id,
+                lessonTitle: lessons[0].title,
+              ),
+            ),
+          );
+        } else {
+          // 레슨이 없으면 레슨 선택 화면으로
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LessonsScreenFigma(),
+            ),
+          );
+        }
       },
       child: const DailyGoalCard(
         icon: '📚',
@@ -277,12 +296,31 @@ class HomeScreenFigma extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LessonsScreenFigma(),
-              ),
-            );
+            // 현재 사용자의 학년에 따른 첫 번째 레슨으로 바로 이동
+            final user = ProviderScope.containerOf(context).read(userProvider);
+            final currentGrade = user?.currentGrade ?? '중1';
+            final lessons = KoreanMathCurriculum.getLessonsByGrade(currentGrade);
+
+            if (lessons.isNotEmpty) {
+              // 첫 번째 레슨의 문제 풀이 화면으로 바로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProblemSolvingScreen(
+                    lessonId: lessons[0].id,
+                    lessonTitle: lessons[0].title,
+                  ),
+                ),
+              );
+            } else {
+              // 레슨이 없으면 레슨 선택 화면으로
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LessonsScreenFigma(),
+                ),
+              );
+            }
           },
           borderRadius: BorderRadius.circular(28),
           child: const Center(
