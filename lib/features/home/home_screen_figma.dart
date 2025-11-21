@@ -673,8 +673,10 @@ class HomeScreenFigma extends ConsumerWidget {
           Navigator.pop(context);
           // 학년 업데이트
           ProviderScope.containerOf(context).read(userProvider.notifier).updateGrade(grade);
-          // 레슨 탭으로 이동 (탭바 유지)
-          ProviderScope.containerOf(context).read(navigationProvider.notifier).goToLessons();
+          // 단원 선택 모달 표시
+          Future.delayed(const Duration(milliseconds: 300), () {
+            _showLessonSelectionModal(context, grade);
+          });
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
