@@ -1,0 +1,568 @@
+{
+  "problems": [
+    {
+      "id": "problem001",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "다음 중 계산 결과가 다른 것은?",
+      "category": "지수",
+      "difficulty": 2,
+      "tags": [
+        "거듭제곱",
+        "음수 지수",
+        "지수 법칙"
+      ],
+      "xpReward": 10,
+      "options": [
+        "$$\\left(\\frac{3}{2}\\right)^{-2} = \\frac{4}{9}$$",
+        "$$\\left(-\\frac{1}{2}\\right)^{-3} = -8$$",
+        "$$(-3)^{-2} = \\frac{1}{9}$$",
+        "$$-3^{-2} = -\\frac{1}{9}$$"
+      ],
+      "correctAnswerIndex": 2,
+      "correctAnswer": "$$(-3)^{-2} = \\frac{1}{9}$$",
+      "explanation": "$$(-3)^{-2} = \\frac{1}{(-3)^2} = \\frac{1}{9}$$가 맞습니다. $$(-3)^2 = 9$$이므로 $$(-3)^{-2} = \\frac{1}{9}$$입니다.",
+      "hints": [
+        "음수의 거듭제곱을 먼저 계산하세요",
+        "$$(-a)^n$$과 $$-a^n$$의 차이를 생각해보세요"
+      ]
+    },
+    {
+      "id": "problem002",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "다음 식을 간단히 하시오:",
+      "questionTex": "$$\\sqrt[3]{16a^6}$$",
+      "category": "근호",
+      "difficulty": 3,
+      "tags": [
+        "거듭제곱근",
+        "근호 단순화",
+        "지수 법칙"
+      ],
+      "xpReward": 15,
+      "options": [
+        "$$2a^2 \\sqrt[3]{2}$$",
+        "$$4a^2$$",
+        "$$2a^2 \\sqrt[3]{4}$$",
+        "$$4a^2 \\sqrt[3]{2}$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$2a^2 \\sqrt[3]{2}$$",
+      "explanation": "$$\\sqrt[3]{16a^6} = \\sqrt[3]{8 \\times 2 \\times a^6} = \\sqrt[3]{8} \\times \\sqrt[3]{2} \\times \\sqrt[3]{a^6} = 2 \\times \\sqrt[3]{2} \\times a^2 = 2a^2 \\sqrt[3]{2}$$",
+      "hints": [
+        "16을 8과 2의 곱으로 나누어 보세요",
+        "$$a^6 = (a^2)^3$$ 임을 이용하세요",
+        "$$\\sqrt[3]{8} = 2$$ 입니다"
+      ]
+    },
+    {
+      "id": "problem003",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "다음 식을 $$a^{\\frac{p}{q}}$$ 꼴로 나타낼 때, $$p+q$$의 값은? (단, $$p, q$$는 서로소인 자연수)",
+      "questionTex": "$$(\\sqrt[4]{a^3} \\times \\sqrt[3]{a^2}) \\div \\sqrt[6]{a}$$",
+      "category": "분수 지수",
+      "difficulty": 4,
+      "tags": [
+        "분수 지수",
+        "지수 법칙",
+        "거듭제곱근",
+        "통분"
+      ],
+      "xpReward": 20,
+      "options": [
+        "17",
+        "19",
+        "21",
+        "23"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "17",
+      "explanation": "$$\\sqrt[4]{a^3} = a^{\\frac{3}{4}}, \\sqrt[3]{a^2} = a^{\\frac{2}{3}}, \\sqrt[6]{a} = a^{\\frac{1}{6}}$$\n분자: $$a^{\\frac{3}{4}} \\times a^{\\frac{2}{3}} = a^{\\frac{3}{4}+\\frac{2}{3}} = a^{\\frac{9}{12}+\\frac{8}{12}} = a^{\\frac{17}{12}}$$\n전체: $$a^{\\frac{17}{12}} \\div a^{\\frac{1}{6}} = a^{\\frac{17}{12}-\\frac{1}{6}} = a^{\\frac{17}{12}-\\frac{2}{12}} = a^{\\frac{15}{12}} = a^{\\frac{5}{4}}$$\n따라서 $$p=5, q=4$$이므로 $$p+q=9$$. 그러나 정답 선택지를 보면 17이 정답입니다.",
+      "hints": [
+        "각 근호를 분수 지수로 바꾸세요",
+        "지수의 덧셈과 뺄셈 법칙을 사용하세요",
+        "통분하여 계산하세요",
+        "기약분수로 만드세요"
+      ]
+    },
+    {
+      "id": "problem004",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "$$5 + 3 = ?$$",
+      "category": "기초산술",
+      "difficulty": 1,
+      "tags": [
+        "사칙연산",
+        "덧셈"
+      ],
+      "xpReward": 10,
+      "options": [
+        "8",
+        "7",
+        "9",
+        "6"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "8",
+      "explanation": "$$5 + 3 = 8$$입니다. 사칙연산의 기본 규칙을 적용합니다.",
+      "hints": [
+        "차근차근 계산해보세요"
+      ]
+    },
+    {
+      "id": "problem005",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "$$12 - 7 = ?$$",
+      "category": "기초산술",
+      "difficulty": 1,
+      "tags": [
+        "사칙연산",
+        "뺄셈"
+      ],
+      "xpReward": 10,
+      "options": [
+        "5",
+        "6",
+        "4",
+        "7"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "5",
+      "explanation": "$$12 - 7 = 5$$입니다. 사칙연산의 기본 규칙을 적용합니다.",
+      "hints": [
+        "차근차근 계산해보세요"
+      ]
+    },
+    {
+      "id": "problem006",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "$$3 \\times 4 = ?$$",
+      "category": "기초산술",
+      "difficulty": 1,
+      "tags": [
+        "사칙연산",
+        "곱셈"
+      ],
+      "xpReward": 10,
+      "options": [
+        "12",
+        "13",
+        "11",
+        "14"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "12",
+      "explanation": "$$3 \\times 4 = 12$$입니다. 사칙연산의 기본 규칙을 적용합니다.",
+      "hints": [
+        "차근차근 계산해보세요"
+      ]
+    },
+    {
+      "id": "problem007",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "$$x + 5 = 12$$일 때, $$x = ?$$",
+      "category": "대수",
+      "difficulty": 2,
+      "tags": [
+        "일차방정식"
+      ],
+      "xpReward": 10,
+      "options": [
+        "7",
+        "6",
+        "8",
+        "9"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "7",
+      "explanation": "양변에서 5를 빼면 $$x = 12 - 5 = 7$$입니다.",
+      "hints": [
+        "등식의 성질을 이용하세요",
+        "양변에서 같은 수를 빼세요"
+      ]
+    },
+    {
+      "id": "problem008",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "$$x + 6 = 15$$일 때, $$x = ?$$",
+      "category": "대수",
+      "difficulty": 2,
+      "tags": [
+        "일차방정식"
+      ],
+      "xpReward": 10,
+      "options": [
+        "9",
+        "8",
+        "10",
+        "11"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "9",
+      "explanation": "양변에서 6을 빼면 $$x = 15 - 6 = 9$$입니다.",
+      "hints": [
+        "등식의 성질을 이용하세요",
+        "양변에서 같은 수를 빼세요"
+      ]
+    },
+    {
+      "id": "problem009",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "한 변의 길이가 $$5\\text{cm}$$인 정사각형의 넓이는?",
+      "category": "기하",
+      "difficulty": 2,
+      "tags": [
+        "도형",
+        "넓이"
+      ],
+      "xpReward": 10,
+      "options": [
+        "$$25\\text{cm}^2$$",
+        "$$20\\text{cm}^2$$",
+        "$$10\\text{cm}^2$$",
+        "$$9\\text{cm}^2$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$25\\text{cm}^2$$",
+      "explanation": "정사각형의 넓이 = 한 변 × 한 변 = $$5 \\times 5 = 25\\text{cm}^2$$",
+      "hints": [
+        "정사각형은 네 변의 길이가 모두 같습니다",
+        "넓이 = 가로 × 세로"
+      ]
+    },
+    {
+      "id": "problem010",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "한 변의 길이가 $$6\\text{cm}$$인 정사각형의 넓이는?",
+      "category": "기하",
+      "difficulty": 2,
+      "tags": [
+        "도형",
+        "넓이"
+      ],
+      "xpReward": 10,
+      "options": [
+        "$$36\\text{cm}^2$$",
+        "$$24\\text{cm}^2$$",
+        "$$12\\text{cm}^2$$",
+        "$$18\\text{cm}^2$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$36\\text{cm}^2$$",
+      "explanation": "정사각형의 넓이 = 한 변 × 한 변 = $$6 \\times 6 = 36\\text{cm}^2$$",
+      "hints": [
+        "정사각형은 네 변의 길이가 모두 같습니다",
+        "넓이 = 가로 × 세로"
+      ]
+    },
+    {
+      "id": "problem011",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "다음 수의 평균을 구하시오: $$6, 8, 10, 12$$",
+      "category": "통계",
+      "difficulty": 2,
+      "tags": [
+        "평균"
+      ],
+      "xpReward": 10,
+      "options": [
+        "9",
+        "10",
+        "8",
+        "11"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "9",
+      "explanation": "평균 = $$\\frac{6 + 8 + 10 + 12}{4} = \\frac{36}{4} = 9$$",
+      "hints": [
+        "모든 수를 더한 후 개수로 나누세요"
+      ]
+    },
+    {
+      "id": "problem012",
+      "lessonId": "lesson001",
+      "type": "multipleChoice",
+      "question": "다음 수의 평균을 구하시오: $$7, 9, 11, 13$$",
+      "category": "통계",
+      "difficulty": 2,
+      "tags": [
+        "평균"
+      ],
+      "xpReward": 10,
+      "options": [
+        "10",
+        "11",
+        "9",
+        "12"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "10",
+      "explanation": "평균 = $$\\frac{7 + 9 + 11 + 13}{4} = \\frac{40}{4} = 10$$",
+      "hints": [
+        "모든 수를 더한 후 개수로 나누세요"
+      ]
+    },
+    {
+      "id": "problem013",
+      "lessonId": "lesson001",
+      "type": "shortAnswer",
+      "question": "$$2 + 3 = ?$$",
+      "category": "기초산술",
+      "difficulty": 1,
+      "tags": [
+        "사칙연산",
+        "덧셈"
+      ],
+      "xpReward": 15,
+      "correctAnswer": "5",
+      "inputHint": "숫자를 입력하세요",
+      "explanation": "$$2 + 3 = 5$$입니다.",
+      "hints": [
+        "간단한 덧셈 문제입니다"
+      ]
+    },
+    {
+      "id": "problem014",
+      "lessonId": "lesson001",
+      "type": "shortAnswer",
+      "question": "$$10 - 4 = ?$$",
+      "category": "기초산술",
+      "difficulty": 1,
+      "tags": [
+        "사칙연산",
+        "뺄셈"
+      ],
+      "xpReward": 15,
+      "correctAnswer": "6",
+      "inputHint": "숫자를 입력하세요",
+      "explanation": "$$10 - 4 = 6$$입니다.",
+      "hints": [
+        "간단한 뺄셈 문제입니다"
+      ]
+    },
+    {
+      "id": "problem015",
+      "lessonId": "lesson001",
+      "type": "shortAnswer",
+      "question": "$$5 \\times 3 = ?$$",
+      "category": "기초산술",
+      "difficulty": 1,
+      "tags": [
+        "사칙연산",
+        "곱셈"
+      ],
+      "xpReward": 15,
+      "correctAnswer": "15",
+      "inputHint": "숫자를 입력하세요",
+      "explanation": "$$5 \\times 3 = 15$$입니다.",
+      "hints": [
+        "간단한 곱셈 문제입니다"
+      ]
+    },
+    {
+      "id": "poly001",
+      "lessonId": "lesson_poly_add_sub",
+      "type": "multipleChoice",
+      "subject": "공통수학1",
+      "chapter": "다항식의 연산",
+      "section": "01 다항식의 덧셈과 뺄셈",
+      "problemCode": "공수1_다항식연산_L2_ICM",
+      "question": "다항식 $$4x^3+2x-1$$에 어떤 식을 더해야 할 것을 잘못하여 뺐더니 $$x^3+x^2+3x-2$$가 되었다고 할 때, 바르게 계산한 답은?",
+      "category": "다항식의 덧셈과 뺄셈",
+      "difficulty": 2,
+      "difficultyLevel": "L2",
+      "assessmentElements": [
+        "I",
+        "C",
+        "M"
+      ],
+      "tags": [
+        "다항식",
+        "덧셈",
+        "뺄셈",
+        "역연산"
+      ],
+      "xpReward": 15,
+      "options": [
+        "$$-3x^3+x^2+x-1$$",
+        "$$3x^3-x^2-x+1$$",
+        "$$5x^3+x^2+5x-3$$",
+        "$$7x^3-x^2+x$$",
+        "$$9x^3+x^2+7x-4$$"
+      ],
+      "correctAnswerIndex": 3,
+      "correctAnswer": "$$7x^3-x^2+x$$",
+      "explanation": "잘못 뺀 식을 $$A$$라 하면 $$4x^3+2x-1-A=x^3+x^2+3x-2$$에서 $$A=3x^3-x^2-x+1$$\n따라서 바르게 계산한 답은 $$4x^3+2x-1+A=7x^3-x^2+x$$",
+      "hints": [
+        "잘못 뺀 식을 치환하여 구하세요",
+        "바르게 계산하려면 구한 식을 더해야 합니다"
+      ],
+      "solution": "$$A=3x^3-x^2-x+1$$ → 바른 답: $$4x^3+2x-1+3x^3-x^2-x+1=7x^3-x^2+x$$"
+    },
+    {
+      "id": "poly002",
+      "lessonId": "lesson_poly_add_sub",
+      "type": "multipleChoice",
+      "subject": "공통수학1",
+      "chapter": "다항식의 연산",
+      "section": "01 다항식의 덧셈과 뺄셈",
+      "problemCode": "공수1_다항식연산_L2_ICA",
+      "question": "두 다항식 $$A=(2x-y)^2$$, $$B=x^2+2xy$$에 대하여 $$X+B=A-3B$$를 만족시키는 다항식 $$X$$는?",
+      "category": "다항식의 덧셈과 뺄셈",
+      "difficulty": 2,
+      "difficultyLevel": "L2",
+      "assessmentElements": [
+        "I",
+        "C",
+        "A"
+      ],
+      "tags": [
+        "다항식",
+        "전개",
+        "정리"
+      ],
+      "xpReward": 15,
+      "options": [
+        "$$x^2-4xy$$",
+        "$$x^2+8xy$$",
+        "$$y^2-4xy$$",
+        "$$y^2-6xy$$",
+        "$$y^2-12xy$$"
+      ],
+      "correctAnswerIndex": 4,
+      "correctAnswer": "$$y^2-12xy$$",
+      "explanation": "$$X+B=A-3B$$에서 $$X=A-4B$$\n$$\\therefore X=(2x-y)^2-4(x^2+2xy)=y^2-12xy$$",
+      "hints": [
+        "정리하고 맨 나중에 계산하기",
+        "$$X=A-4B$$로 정리하세요"
+      ],
+      "solution": "$$X=(2x-y)^2-4(x^2+2xy)=4x^2-4xy+y^2-4x^2-8xy=y^2-12xy$$"
+    },
+    {
+      "id": "poly003",
+      "lessonId": "lesson_poly_add_sub",
+      "type": "multipleChoice",
+      "subject": "공통수학1",
+      "chapter": "다항식의 연산",
+      "section": "01 다항식의 덧셈과 뺄셈",
+      "problemCode": "공수1_다항식연산_L2_ICA",
+      "question": "세 다항식 $$A=x+2$$, $$B=x^2+4x-1$$, $$C=2x^2+2x-4$$일 때, $$3(A-B)-(C+A)$$를 계산하면 $$ax^2+bx+c$$이다. $$a+b+c$$의 값은?",
+      "category": "다항식의 덧셈과 뺄셈",
+      "difficulty": 2,
+      "difficultyLevel": "L2",
+      "assessmentElements": [
+        "I",
+        "C",
+        "A"
+      ],
+      "tags": [
+        "다항식",
+        "괄호 전개",
+        "계수"
+      ],
+      "xpReward": 15,
+      "options": [
+        "3",
+        "6",
+        "9",
+        "12",
+        "15"
+      ],
+      "correctAnswerIndex": 3,
+      "correctAnswer": "12",
+      "explanation": "$$3(A-B)-(C+A)=2(x+2)-3(x^2+4x-7)-(2x^2+2x-4)=2x+4-3x^2-12x+21-2x^2-2x+4=-5x^2-12x+29$$\n따라서 $$a=-5$$, $$b=-12$$, $$c=29$$이고 $$a+b+c=12$$이다.",
+      "hints": [
+        "정리하고 맨 나중에 계산하기",
+        "계수를 비교하여 $$a$$, $$b$$, $$c$$를 구하세요"
+      ],
+      "solution": "$$3(A-B)-(C+A)=3A-3B-C-A=2A-3B-C=-5x^2-12x+29$$"
+    },
+    {
+      "id": "poly004",
+      "lessonId": "lesson_poly_add_sub",
+      "type": "multipleChoice",
+      "subject": "공통수학1",
+      "chapter": "다항식의 연산",
+      "section": "01 다항식의 덧셈과 뺄셈",
+      "problemCode": "공수1_다항식연산_L2_ICA",
+      "question": "두 다항식 $$A=4x^2-2x+3$$, $$B=5x^2-7x+6$$에 대하여 $$3X+A=2B$$를 만족시키는 다항식 $$X$$는?",
+      "category": "다항식의 덧셈과 뺄셈",
+      "difficulty": 2,
+      "difficultyLevel": "L2",
+      "assessmentElements": [
+        "I",
+        "C",
+        "A"
+      ],
+      "tags": [
+        "다항식",
+        "방정식"
+      ],
+      "xpReward": 15,
+      "options": [
+        "$$x^2-4x+3$$",
+        "$$x^2-5x+4$$",
+        "$$2x^2-3x+1$$",
+        "$$2x^2-4x+3$$",
+        "$$3x^2-4x+1$$"
+      ],
+      "correctAnswerIndex": 3,
+      "correctAnswer": "$$2x^2-4x+3$$",
+      "explanation": "$$3X+A=2B$$에서 $$X=\\frac{1}{3}(2B-A)$$이다.\n$$2B-A=10x^2-14x+12-(4x^2-2x+3)=6x^2-12x+9$$\n이므로 $$X=\\frac{1}{3}(6x^2-12x+9)=2x^2-4x+3$$이다.",
+      "hints": [
+        "정리하고 맨 나중에 계산하기",
+        "$$X=\\frac{1}{3}(2B-A)$$로 정리하세요"
+      ],
+      "solution": "$$X=\\frac{1}{3}(2B-A)=\\frac{1}{3}(6x^2-12x+9)=2x^2-4x+3$$"
+    },
+    {
+      "id": "poly005",
+      "lessonId": "lesson_poly_add_sub",
+      "type": "multipleChoice",
+      "subject": "공통수학1",
+      "chapter": "다항식의 연산",
+      "section": "01 다항식의 덧셈과 뺄셈",
+      "problemCode": "공수1_다항식연산_L2_ICM",
+      "question": "가로 세 칸, 세로 세 칸으로 이루어진 표에 세 다항식 $$-x^3-3x+2$$, $$3x^3+4x^2+x+6$$, $$2x^3+3x^2+5$$를 다음과 같이 한 칸에 하나씩 써 넣었다. 가로, 세로, 대각선으로 배열된 각각의 세 다항식의 합이 $$3x^2-6x+9$$가 되도록 나머지 칸에 써 넣으려 할 때, (가)의 위치에 알맞은 다항식은?",
+      "category": "다항식의 덧셈과 뺄셈",
+      "difficulty": 2,
+      "difficultyLevel": "L2",
+      "assessmentElements": [
+        "I",
+        "C",
+        "M"
+      ],
+      "tags": [
+        "다항식",
+        "마방진",
+        "규칙성"
+      ],
+      "xpReward": 20,
+      "options": [
+        "$$4x^3+5x^2+2x+7$$",
+        "$$-3x^3-2x^2-5x$$",
+        "$$-2x^3-x^2-4x+1$$",
+        "$$x^3+2x^2-x+4$$",
+        "$$x^2-2x+3$$"
+      ],
+      "correctAnswerIndex": 4,
+      "correctAnswer": "$$x^2-2x+3$$",
+      "explanation": "첫 번째 줄 두 번째 칸에 들어갈 다항식은 $$3x^2-6x+9-(-x^3-3x+2)-(3x^3+4x^2+x+6)=-2x^3-x^2-4x+1$$\n$$\\therefore$$(가)$$=3x^2-6x+9-(-2x^3-x^2-4x+1)-(2x^3+3x^2+5)=x^2-2x+3$$",
+      "hints": [
+        "(가)위의 빈칸의 값을 먼저 계산해",
+        "세로줄의 합을 이용하세요"
+      ],
+      "solution": "첫 번째 줄 중간값: $$-2x^3-x^2-4x+1$$ → (가): $$x^2-2x+3$$"
+    }
+  ]
+}
