@@ -30,6 +30,9 @@ class UserNotifier extends StateNotifier<User?> {
         // 저장된 사용자 정보가 있으면 로드
         state = user;
         Logger.info('사용자 정보 로드 성공: ${user.name}', tag: 'UserProvider');
+
+        // 스트릭 확인 및 업데이트
+        await checkAndUpdateStreak();
       } else {
         // 없으면 샘플 사용자 생성
         state = _dataService.getSampleUser();
@@ -213,51 +216,124 @@ class UserNotifier extends StateNotifier<User?> {
     await _saveUser();
   }
 
-  /// 스트릭 업데이트 (매일 학습 시 호출)
-  Future<void> updateStreak() async {
+  /// 앱 시작 시 스트릭 확인 및 업데이트
+  Future<void> checkAndUpdateStreak() async {
     if (state == null) return;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final lastStudyDate = state!.lastStudyDate;
 
-    // 마지막 학습 날짜 확인
-    final lastStudyDateString = await _storage.getString(GameConstants.lastStudyDateKey);
-
-    DateTime? lastStudyDate;
-    if (lastStudyDateString != null) {
-      lastStudyDate = DateTime.parse(lastStudyDateString);
-      lastStudyDate = DateTime(lastStudyDate.year, lastStudyDate.month, lastStudyDate.day);
+    if (lastStudyDate == null) {
+      // 처음 사용하는 경우 - 아무것도 하지 않음
+      Logger.info('첫 사용자, 스트릭 대기 중', tag: 'UserProvider');
+      return;
     }
+
+    final lastStudyDateOnly = DateTime(
+      lastStudyDate.year,
+      lastStudyDate.month,
+      lastStudyDate.day,
+    );
+
+    // 오늘 이미 학습했으면 아무것도 하지 않음
+    if (_isSameDay(lastStudyDateOnly, today)) {
+      Logger.debug('오늘 이미 학습 완료', tag: 'UserProvider');
+      return;
+    }
+
+    // 어제 학습했으면 유지, 그 이전이면 리셋
+    if (!_isConsecutiveDay(lastStudyDateOnly, today)) {
+      // 스트릭 끊김
+      final oldStreak = state!.streakDays;
+      if (oldStreak > 0) {
+        Logger.warning(
+          '🔥 스트릭 끊김! 이전: $oldStreak일 → 0일로 리셋',
+          tag: 'UserProvider',
+        );
+        state = state!.copyWith(streakDays: 0, lastStudyDate: null);
+        await _saveUser();
+      }
+    }
+  }
+
+  /// 학습 완료 시 스트릭 증가
+  Future<void> incrementStreakOnStudy() async {
+    if (state == null) return;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastStudyDate = state!.lastStudyDate;
 
     int newStreakDays = state!.streakDays;
 
     if (lastStudyDate == null) {
       // 첫 학습
       newStreakDays = 1;
-      Logger.info('첫 학습 시작! 스트릭: 1일', tag: 'UserProvider');
-    } else if (lastStudyDate.isAtSameMomentAs(today)) {
-      // 오늘 이미 학습함 - 스트릭 유지
-      Logger.debug('오늘 이미 학습 완료', tag: 'UserProvider');
-      return;
-    } else if (lastStudyDate.add(const Duration(days: 1)).isAtSameMomentAs(today)) {
-      // 어제 학습했음 - 스트릭 증가
-      newStreakDays = state!.streakDays + 1;
-      Logger.info('스트릭 증가! 현재: $newStreakDays일', tag: 'UserProvider');
+      Logger.info('🔥 첫 학습 시작! 스트릭: 1일', tag: 'UserProvider');
     } else {
-      // 스트릭 끊김 - 새로 시작
-      final oldStreak = state!.streakDays;
-      newStreakDays = 1;
-      Logger.warning(
-        '스트릭 끊김! 이전: $oldStreak일 → 새로 시작: 1일',
-        tag: 'UserProvider',
+      final lastStudyDateOnly = DateTime(
+        lastStudyDate.year,
+        lastStudyDate.month,
+        lastStudyDate.day,
       );
+
+      if (_isSameDay(lastStudyDateOnly, today)) {
+        // 오늘 이미 학습함 - 스트릭 유지
+        Logger.debug('오늘 이미 학습 완료, 스트릭 유지', tag: 'UserProvider');
+        return;
+      } else if (_isConsecutiveDay(lastStudyDateOnly, today)) {
+        // 어제 학습했음 - 스트릭 증가
+        newStreakDays = state!.streakDays + 1;
+        Logger.info('🔥 스트릭 증가! 현재: $newStreakDays일', tag: 'UserProvider');
+      } else {
+        // 스트릭 끊김 - 새로 시작
+        final oldStreak = state!.streakDays;
+        newStreakDays = 1;
+        Logger.warning(
+          '🔥 스트릭 끊김! 이전: $oldStreak일 → 새로 시작: 1일',
+          tag: 'UserProvider',
+        );
+      }
     }
 
-    state = state!.copyWith(streakDays: newStreakDays);
+    state = state!.copyWith(
+      streakDays: newStreakDays,
+      lastStudyDate: now,
+    );
 
-    // 마지막 학습 날짜 저장
-    await _storage.setString(GameConstants.lastStudyDateKey, today.toIso8601String());
     await _saveUser();
+  }
+
+  /// 스트릭 리셋 (관리자용 또는 테스트용)
+  Future<void> resetStreak() async {
+    if (state == null) return;
+
+    Logger.warning('스트릭 강제 리셋', tag: 'UserProvider');
+    state = state!.copyWith(
+      streakDays: 0,
+      lastStudyDate: null,
+    );
+    await _saveUser();
+  }
+
+  /// 연속된 날짜인지 확인 (어제 → 오늘)
+  bool _isConsecutiveDay(DateTime lastDate, DateTime currentDate) {
+    final yesterday = currentDate.subtract(const Duration(days: 1));
+    return _isSameDay(lastDate, yesterday);
+  }
+
+  /// 같은 날짜인지 확인 (년-월-일만 비교)
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+           date1.month == date2.month &&
+           date1.day == date2.day;
+  }
+
+  /// 스트릭 업데이트 (매일 학습 시 호출) - DEPRECATED: incrementStreakOnStudy 사용
+  @Deprecated('Use incrementStreakOnStudy instead')
+  Future<void> updateStreak() async {
+    await incrementStreakOnStudy();
   }
 
   /// 사용자 정보 전체 업데이트

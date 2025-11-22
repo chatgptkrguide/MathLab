@@ -863,6 +863,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       // 사용자 XP 업데이트 (보너스 포함)
       await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
 
+      // 매일 학습 스트릭 업데이트 (최초 정답 시에만)
+      if (_totalCorrect == 1) {
+        await ref.read(userProvider.notifier).incrementStreakOnStudy();
+      }
+
       // XP 획득 애니메이션 표시 (보너스 포함)
       if (mounted) {
         _showXPGainAnimation(_currentProblem.xpReward + bonusXP);
@@ -976,6 +981,11 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
       // 사용자 XP 업데이트 (보너스 포함)
       await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
+
+      // 매일 학습 스트릭 업데이트 (최초 정답 시에만)
+      if (_totalCorrect == 1) {
+        await ref.read(userProvider.notifier).incrementStreakOnStudy();
+      }
 
       // XP 획득 애니메이션 표시 (보너스 포함)
       if (mounted) {

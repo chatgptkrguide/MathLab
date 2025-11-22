@@ -110,6 +110,10 @@ class Problem {
   int get xpReward => (metadata?['xpReward'] as int?) ?? 10;
   String? get correctAnswer => answer is String ? answer as String : (answer is int && choices.isNotEmpty ? choices[answer as int] : null);
   int? get correctAnswerIndex => answer is int ? answer as int : null;
+
+  // 한국 교육과정 관련 getter들
+  String? get grade => metadata?['grade'] as String?;
+  String? get chapter => metadata?['chapter'] as String?;
   String get typeIcon {
     switch (type) {
       case ProblemType.multipleChoice:

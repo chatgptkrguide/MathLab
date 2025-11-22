@@ -12,6 +12,7 @@ class User {
   final int hearts; // 하트 (생명) 수
   final int dailyXP; // 오늘 획득한 XP
   final DateTime lastXPResetDate; // 마지막 XP 리셋 날짜
+  final DateTime? lastStudyDate; // 마지막 학습 날짜 (스트릭 계산용)
 
   const User({
     required this.id,
@@ -26,6 +27,7 @@ class User {
     this.hearts = 5, // 기본 하트 5개
     this.dailyXP = 0, // 기본 일일 XP 0
     DateTime? lastXPResetDate,
+    this.lastStudyDate, // 마지막 학습 날짜 (nullable)
   }) : lastXPResetDate = lastXPResetDate ?? joinDate;
 
   /// JSON으로부터 User 객체 생성
@@ -46,6 +48,9 @@ class User {
       lastXPResetDate: json['lastXPResetDate'] != null
           ? DateTime.parse(json['lastXPResetDate'] as String)
           : joinDate,
+      lastStudyDate: json['lastStudyDate'] != null
+          ? DateTime.parse(json['lastStudyDate'] as String)
+          : null,
     );
   }
 
@@ -64,6 +69,7 @@ class User {
       'hearts': hearts,
       'dailyXP': dailyXP,
       'lastXPResetDate': lastXPResetDate.toIso8601String(),
+      'lastStudyDate': lastStudyDate?.toIso8601String(),
     };
   }
 
@@ -81,6 +87,7 @@ class User {
     int? hearts,
     int? dailyXP,
     DateTime? lastXPResetDate,
+    DateTime? lastStudyDate,
   }) {
     return User(
       id: id ?? this.id,
@@ -95,6 +102,7 @@ class User {
       hearts: hearts ?? this.hearts,
       dailyXP: dailyXP ?? this.dailyXP,
       lastXPResetDate: lastXPResetDate ?? this.lastXPResetDate,
+      lastStudyDate: lastStudyDate ?? this.lastStudyDate,
     );
   }
 

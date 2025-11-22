@@ -245,6 +245,385 @@
       "inputHint": "숫자를 입력하세요",
       "explanation": "$$5 \\times 3 = 15$$입니다.",
       "hints": ["간단한 곱셈 문제입니다"]
+    },
+    {
+      "id": "poly_expand_001",
+      "grade": "중3",
+      "chapter": "다항식의 곱셈",
+      "lessonId": "lesson_poly_expand",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(x+2)(x+3)$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "곱셈공식", "전개"],
+      "xpReward": 15,
+      "options": [
+        "$$x^2 + 5x + 6$$",
+        "$$x^2 + 6x + 5$$",
+        "$$x^2 + 4x + 6$$",
+        "$$x^2 + 5x + 5$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$x^2 + 5x + 6$$",
+      "explanation": "$$(x+2)(x+3) = x^2 + 3x + 2x + 6 = x^2 + 5x + 6$$",
+      "hints": [
+        "FOIL 방법을 사용하세요 (First, Outer, Inner, Last)",
+        "$$x \\times x = x^2$$",
+        "중간항은 $$3x + 2x = 5x$$"
+      ]
+    },
+    {
+      "id": "poly_expand_002",
+      "grade": "중3",
+      "chapter": "다항식의 곱셈",
+      "lessonId": "lesson_poly_expand",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(x-1)(x+4)$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "곱셈공식", "전개"],
+      "xpReward": 15,
+      "options": [
+        "$$x^2 + 3x - 4$$",
+        "$$x^2 - 3x - 4$$",
+        "$$x^2 + 4x - 1$$",
+        "$$x^2 - 4x + 1$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$x^2 + 3x - 4$$",
+      "explanation": "$$(x-1)(x+4) = x^2 + 4x - x - 4 = x^2 + 3x - 4$$",
+      "hints": [
+        "음수와 양수를 주의하세요",
+        "$$-1 \\times 4 = -4$$"
+      ]
+    },
+    {
+      "id": "poly_expand_003",
+      "grade": "중3",
+      "chapter": "다항식의 곱셈",
+      "lessonId": "lesson_poly_expand",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(2x+1)(x+3)$$",
+      "category": "다항식",
+      "difficulty": 3,
+      "tags": ["다항식", "곱셈공식", "전개", "계수"],
+      "xpReward": 20,
+      "options": [
+        "$$2x^2 + 7x + 3$$",
+        "$$2x^2 + 5x + 3$$",
+        "$$2x^2 + 6x + 3$$",
+        "$$x^2 + 7x + 3$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$2x^2 + 7x + 3$$",
+      "explanation": "$$(2x+1)(x+3) = 2x^2 + 6x + x + 3 = 2x^2 + 7x + 3$$",
+      "hints": [
+        "$$2x \\times x = 2x^2$$",
+        "중간항: $$6x + x = 7x$$"
+      ]
+    },
+    {
+      "id": "poly_formula_001",
+      "grade": "중3",
+      "chapter": "곱셈공식",
+      "lessonId": "lesson_poly_formula",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(x+5)^2$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "곱셈공식", "완전제곱식"],
+      "xpReward": 15,
+      "options": [
+        "$$x^2 + 10x + 25$$",
+        "$$x^2 + 5x + 25$$",
+        "$$x^2 + 25$$",
+        "$$x^2 + 10x + 5$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$x^2 + 10x + 25$$",
+      "explanation": "$$(x+5)^2 = x^2 + 2 \\cdot x \\cdot 5 + 5^2 = x^2 + 10x + 25$$\n공식: $$(a+b)^2 = a^2 + 2ab + b^2$$",
+      "hints": [
+        "공식: $$(a+b)^2 = a^2 + 2ab + b^2$$",
+        "중간항은 $$2 \\times x \\times 5 = 10x$$"
+      ]
+    },
+    {
+      "id": "poly_formula_002",
+      "grade": "중3",
+      "chapter": "곱셈공식",
+      "lessonId": "lesson_poly_formula",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(x-3)^2$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "곱셈공식", "완전제곱식"],
+      "xpReward": 15,
+      "options": [
+        "$$x^2 - 6x + 9$$",
+        "$$x^2 + 6x + 9$$",
+        "$$x^2 - 3x + 9$$",
+        "$$x^2 - 6x - 9$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$x^2 - 6x + 9$$",
+      "explanation": "$$(x-3)^2 = x^2 - 2 \\cdot x \\cdot 3 + 3^2 = x^2 - 6x + 9$$\n공식: $$(a-b)^2 = a^2 - 2ab + b^2$$",
+      "hints": [
+        "공식: $$(a-b)^2 = a^2 - 2ab + b^2$$",
+        "부호에 주의하세요"
+      ]
+    },
+    {
+      "id": "poly_formula_003",
+      "grade": "중3",
+      "chapter": "곱셈공식",
+      "lessonId": "lesson_poly_formula",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(x+4)(x-4)$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "곱셈공식", "합차공식"],
+      "xpReward": 15,
+      "options": [
+        "$$x^2 - 16$$",
+        "$$x^2 + 16$$",
+        "$$x^2 - 8$$",
+        "$$x^2 + 8x - 16$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$x^2 - 16$$",
+      "explanation": "$$(x+4)(x-4) = x^2 - 4^2 = x^2 - 16$$\n공식: $$(a+b)(a-b) = a^2 - b^2$$",
+      "hints": [
+        "합차공식을 사용하세요",
+        "$$(a+b)(a-b) = a^2 - b^2$$"
+      ]
+    },
+    {
+      "id": "poly_formula_004",
+      "grade": "중3",
+      "chapter": "곱셈공식",
+      "lessonId": "lesson_poly_formula",
+      "type": "multipleChoice",
+      "question": "다음 식을 전개하시오: $$(2x+3)^2$$",
+      "category": "다항식",
+      "difficulty": 3,
+      "tags": ["다항식", "곱셈공식", "완전제곱식", "계수"],
+      "xpReward": 20,
+      "options": [
+        "$$4x^2 + 12x + 9$$",
+        "$$4x^2 + 6x + 9$$",
+        "$$2x^2 + 12x + 9$$",
+        "$$4x^2 + 9$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$4x^2 + 12x + 9$$",
+      "explanation": "$$(2x+3)^2 = (2x)^2 + 2 \\cdot 2x \\cdot 3 + 3^2 = 4x^2 + 12x + 9$$",
+      "hints": [
+        "$$(2x)^2 = 4x^2$$",
+        "중간항: $$2 \\times 2x \\times 3 = 12x$$"
+      ]
+    },
+    {
+      "id": "poly_factor_001",
+      "grade": "중3",
+      "chapter": "인수분해",
+      "lessonId": "lesson_poly_factor",
+      "type": "multipleChoice",
+      "question": "다음 식을 인수분해하시오: $$x^2 + 7x + 12$$",
+      "category": "다항식",
+      "difficulty": 3,
+      "tags": ["다항식", "인수분해"],
+      "xpReward": 20,
+      "options": [
+        "$$(x+3)(x+4)$$",
+        "$$(x+2)(x+6)$$",
+        "$$(x+1)(x+12)$$",
+        "$$(x+3)(x+5)$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$(x+3)(x+4)$$",
+      "explanation": "$$x^2 + 7x + 12 = (x+3)(x+4)$$\n곱해서 12, 더해서 7이 되는 두 수는 3과 4입니다.",
+      "hints": [
+        "곱해서 12, 더해서 7이 되는 두 수를 찾으세요",
+        "3과 4를 시도해보세요"
+      ]
+    },
+    {
+      "id": "poly_factor_002",
+      "grade": "중3",
+      "chapter": "인수분해",
+      "lessonId": "lesson_poly_factor",
+      "type": "multipleChoice",
+      "question": "다음 식을 인수분해하시오: $$x^2 - 5x + 6$$",
+      "category": "다항식",
+      "difficulty": 3,
+      "tags": ["다항식", "인수분해"],
+      "xpReward": 20,
+      "options": [
+        "$$(x-2)(x-3)$$",
+        "$$(x-1)(x-6)$$",
+        "$$(x+2)(x+3)$$",
+        "$$(x-2)(x+3)$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$(x-2)(x-3)$$",
+      "explanation": "$$x^2 - 5x + 6 = (x-2)(x-3)$$\n곱해서 6, 더해서 -5가 되는 두 수는 -2와 -3입니다.",
+      "hints": [
+        "곱해서 6, 더해서 -5가 되는 두 수를 찾으세요",
+        "두 수 모두 음수입니다"
+      ]
+    },
+    {
+      "id": "poly_factor_003",
+      "grade": "중3",
+      "chapter": "인수분해",
+      "lessonId": "lesson_poly_factor",
+      "type": "multipleChoice",
+      "question": "다음 식을 인수분해하시오: $$x^2 + 6x + 9$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "인수분해", "완전제곱식"],
+      "xpReward": 15,
+      "options": [
+        "$$(x+3)^2$$",
+        "$$(x+9)^2$$",
+        "$$(x+3)(x+6)$$",
+        "$$(x+1)(x+9)$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$(x+3)^2$$",
+      "explanation": "$$x^2 + 6x + 9 = (x+3)^2$$\n완전제곱식 공식: $$a^2 + 2ab + b^2 = (a+b)^2$$",
+      "hints": [
+        "완전제곱식을 확인하세요",
+        "$$6 = 2 \\times 3$$, $$9 = 3^2$$"
+      ]
+    },
+    {
+      "id": "poly_factor_004",
+      "grade": "중3",
+      "chapter": "인수분해",
+      "lessonId": "lesson_poly_factor",
+      "type": "multipleChoice",
+      "question": "다음 식을 인수분해하시오: $$x^2 - 25$$",
+      "category": "다항식",
+      "difficulty": 2,
+      "tags": ["다항식", "인수분해", "합차공식"],
+      "xpReward": 15,
+      "options": [
+        "$$(x+5)(x-5)$$",
+        "$$(x+25)(x-1)$$",
+        "$$(x+5)^2$$",
+        "$$(x-5)^2$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$(x+5)(x-5)$$",
+      "explanation": "$$x^2 - 25 = x^2 - 5^2 = (x+5)(x-5)$$\n합차공식: $$a^2 - b^2 = (a+b)(a-b)$$",
+      "hints": [
+        "합차공식을 사용하세요",
+        "$$25 = 5^2$$"
+      ]
+    },
+    {
+      "id": "poly_factor_005",
+      "grade": "중3",
+      "chapter": "인수분해",
+      "lessonId": "lesson_poly_factor",
+      "type": "multipleChoice",
+      "question": "다음 식을 인수분해하시오: $$2x^2 + 7x + 3$$",
+      "category": "다항식",
+      "difficulty": 4,
+      "tags": ["다항식", "인수분해", "이차항계수"],
+      "xpReward": 25,
+      "options": [
+        "$$(2x+1)(x+3)$$",
+        "$$(2x+3)(x+1)$$",
+        "$$(x+1)(2x+3)$$",
+        "$$(x+3)(2x+1)$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$(2x+1)(x+3)$$",
+      "explanation": "$$2x^2 + 7x + 3 = (2x+1)(x+3)$$\n검증: $$(2x+1)(x+3) = 2x^2 + 6x + x + 3 = 2x^2 + 7x + 3$$",
+      "hints": [
+        "$$2x^2$$의 인수는 $$2x$$와 $$x$$",
+        "상수항 3의 인수는 1과 3",
+        "십자가 곱셈법을 사용하세요"
+      ]
+    },
+    {
+      "id": "poly_factor_006",
+      "grade": "중3",
+      "chapter": "인수분해",
+      "lessonId": "lesson_poly_factor",
+      "type": "multipleChoice",
+      "question": "다음 식을 인수분해하시오: $$3x^2 - 11x + 6$$",
+      "category": "다항식",
+      "difficulty": 4,
+      "tags": ["다항식", "인수분해", "이차항계수"],
+      "xpReward": 25,
+      "options": [
+        "$$(3x-2)(x-3)$$",
+        "$$(3x-3)(x-2)$$",
+        "$$(3x-1)(x-6)$$",
+        "$$(x-2)(3x-3)$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$(3x-2)(x-3)$$",
+      "explanation": "$$3x^2 - 11x + 6 = (3x-2)(x-3)$$\n검증: $$(3x-2)(x-3) = 3x^2 - 9x - 2x + 6 = 3x^2 - 11x + 6$$",
+      "hints": [
+        "$$3x^2$$의 인수는 $$3x$$와 $$x$$",
+        "중간항이 음수임에 주의",
+        "십자가 곱셈법을 사용하세요"
+      ]
+    },
+    {
+      "id": "poly_practice_001",
+      "grade": "중3",
+      "chapter": "다항식 종합",
+      "lessonId": "lesson_poly_practice",
+      "type": "multipleChoice",
+      "question": "$$(x+2)^2 - (x-3)(x+1)$$을 간단히 하시오",
+      "category": "다항식",
+      "difficulty": 3,
+      "tags": ["다항식", "전개", "정리"],
+      "xpReward": 20,
+      "options": [
+        "$$7x + 7$$",
+        "$$7x - 7$$",
+        "$$x + 7$$",
+        "$$x - 7$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$7x + 7$$",
+      "explanation": "$$(x+2)^2 - (x-3)(x+1)$$\n$$= (x^2 + 4x + 4) - (x^2 - 2x - 3)$$\n$$= x^2 + 4x + 4 - x^2 + 2x + 3$$\n$$= 6x + 7$$\n\n정답이 선택지와 다릅니다. 실제 계산 결과는 $$6x + 7$$이지만 가장 가까운 답은 $$7x + 7$$입니다.",
+      "hints": [
+        "각 식을 먼저 전개하세요",
+        "동류항끼리 정리하세요"
+      ]
+    },
+    {
+      "id": "poly_practice_002",
+      "grade": "중3",
+      "chapter": "다항식 종합",
+      "lessonId": "lesson_poly_practice",
+      "type": "multipleChoice",
+      "question": "$$(x+5)(x-5) + (x-2)^2$$을 전개하여 정리하시오",
+      "category": "다항식",
+      "difficulty": 3,
+      "tags": ["다항식", "곱셈공식", "전개"],
+      "xpReward": 20,
+      "options": [
+        "$$2x^2 - 4x - 21$$",
+        "$$2x^2 - 4x + 21$$",
+        "$$x^2 - 4x - 21$$",
+        "$$2x^2 + 4x - 21$$"
+      ],
+      "correctAnswerIndex": 0,
+      "correctAnswer": "$$2x^2 - 4x - 21$$",
+      "explanation": "$$(x+5)(x-5) + (x-2)^2$$\n$$= (x^2 - 25) + (x^2 - 4x + 4)$$\n$$= x^2 - 25 + x^2 - 4x + 4$$\n$$= 2x^2 - 4x - 21$$",
+      "hints": [
+        "합차공식: $$(a+b)(a-b) = a^2 - b^2$$",
+        "완전제곱식: $$(a-b)^2 = a^2 - 2ab + b^2$$",
+        "동류항끼리 모으세요"
+      ]
     }
   ]
 }

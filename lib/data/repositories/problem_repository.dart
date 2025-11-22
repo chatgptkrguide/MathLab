@@ -33,41 +33,91 @@ class ProblemRepository {
     return problems;
   }
 
+  /// 모든 문제 로드
+  Future<List<Problem>> loadAllProblems() async {
+    try {
+      final jsonString = await rootBundle.loadString('assets/data/problems.json');
+      final jsonData = json.decode(jsonString) as Map<String, dynamic>;
+      final problemsJson = jsonData['problems'] as List<dynamic>;
+
+      return problemsJson.map((problemData) {
+        final data = problemData as Map<String, dynamic>;
+
+        // grade와 chapter를 metadata에 추가
+        final metadata = <String, dynamic>{};
+        if (data.containsKey('grade')) {
+          metadata['grade'] = data['grade'];
+        }
+        if (data.containsKey('chapter')) {
+          metadata['chapter'] = data['chapter'];
+        }
+        if (data.containsKey('lessonId')) {
+          metadata['lessonId'] = data['lessonId'];
+        }
+        if (data.containsKey('tags')) {
+          metadata['tags'] = data['tags'];
+        }
+        if (data.containsKey('xpReward')) {
+          metadata['xpReward'] = data['xpReward'];
+        }
+
+        // Problem 객체 생성
+        return Problem(
+          id: data['id'] as String,
+          title: (data['chapter'] as String?) ?? (data['category'] as String? ?? '문제'),
+          question: data['question'] as String,
+          type: ProblemType.values.firstWhere(
+            (e) => e.toString() == 'ProblemType.${data['type']}',
+            orElse: () => ProblemType.multipleChoice,
+          ),
+          category: data['category'] as String? ?? '기타',
+          difficulty: data['difficulty'] as int? ?? 1,
+          choices: (data['options'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+          answer: data['correctAnswerIndex'] ?? data['correctAnswer'] ?? data['answer'] ?? 0,
+          hints: (data['hints'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+          explanation: data['explanation'] as String?,
+          metadata: metadata.isNotEmpty ? metadata : null,
+        );
+      }).toList();
+    } catch (e) {
+      print('전체 문제 로드 오류: $e');
+      return [];
+    }
+  }
+
+  /// 학년과 단원으로 문제 필터링
+  Future<List<Problem>> loadProblemsByGradeAndChapter({
+    String? grade,
+    String? chapter,
+  }) async {
+    final allProblems = await loadAllProblems();
+
+    return allProblems.where((problem) {
+      if (grade != null && problem.grade != grade) {
+        return false;
+      }
+      if (chapter != null && problem.chapter != chapter) {
+        return false;
+      }
+      return true;
+    }).toList();
+  }
+
   /// 레슨 ID로 문제 목록 로드
   Future<List<Problem>> loadProblemsByLesson(String lessonId) async {
-    final problems = <Problem>[];
+    final allProblems = await loadAllProblems();
 
-    // 레슨 ID에 따른 폴더 경로 매핑
-    final lessonFolderMap = {
-      'ms1_001': 'ms1_소인수분해',
-      'ms1_002': 'ms1_정수와유리수',
-      'ms1_003': 'ms1_문자와식',
-      // 더 많은 매핑 추가 예정
-    };
+    // lessonId로 필터링
+    final filteredProblems = allProblems.where((problem) {
+      return problem.lessonId == lessonId;
+    }).toList();
 
-    final folderName = lessonFolderMap[lessonId];
-
-    if (folderName != null) {
-      // JSON 파일 로드 시도 (최대 5개)
-      for (int i = 1; i <= 5; i++) {
-        try {
-          final problemId = '${lessonId}_${i.toString().padLeft(3, '0')}';
-          final path = 'assets/problems/$folderName/$problemId.json';
-          final problem = await loadProblem(path);
-          problems.add(problem);
-        } catch (e) {
-          // 파일이 없으면 중단
-          break;
-        }
-      }
+    // 문제가 없으면 임시 샘플 문제 사용
+    if (filteredProblems.isEmpty) {
+      return [_generateSingleProblem(lessonId)];
     }
 
-    // JSON 파일이 없으면 임시 샘플 문제 사용
-    if (problems.isEmpty) {
-      problems.add(_generateSingleProblem(lessonId));
-    }
-
-    return problems;
+    return filteredProblems;
   }
 
   /// 레슨당 단일 문제 생성
