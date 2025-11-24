@@ -14,6 +14,8 @@ import '../../data/providers/lesson_provider.dart';
 import '../../data/providers/error_note_provider.dart';
 import '../../data/providers/achievement_provider.dart';
 import '../../data/providers/hint_provider.dart';
+import '../../data/providers/study_history_provider.dart';
+import '../../data/services/sound_service.dart';
 import 'widgets/problem_option_button.dart';
 import 'widgets/problem_result_dialog.dart';
 import 'widgets/xp_gain_animation.dart';
@@ -857,15 +859,22 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _totalCorrect++;
       _totalXPEarned += _currentProblem.xpReward + bonusXP;
 
-      // 정답 햅틱 피드백
+      // 정답 햅틱 피드백 및 사운드
       await AppHapticFeedback.success();
+      await SoundEffects.playCorrect();
 
       // 사용자 XP 업데이트 (보너스 포함)
       await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
 
+      // XP 획득 사운드
+      await SoundEffects.playXPGain();
+
       // 매일 학습 스트릭 업데이트 (최초 정답 시에만)
       if (_totalCorrect == 1) {
         await ref.read(userProvider.notifier).incrementStreakOnStudy();
+
+        // 학습 이력에 오늘 날짜 추가
+        await ref.read(studyHistoryProvider.notifier).markTodayAsCompleted();
       }
 
       // XP 획득 애니메이션 표시 (보너스 포함)
@@ -895,8 +904,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       // 오답: 스트릭 초기화
       _currentStreak = 0;
 
-      // 오답 햅틱 피드백
+      // 오답 햅틱 피드백 및 사운드
       await AppHapticFeedback.error();
+      await SoundEffects.playWrong();
 
       // 오답: 오답 노트에 저장
       await ref.read(errorNoteProvider.notifier).addErrorNote(
@@ -976,15 +986,22 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       _totalCorrect++;
       _totalXPEarned += _currentProblem.xpReward + bonusXP;
 
-      // 정답 햅틱 피드백
+      // 정답 햅틱 피드백 및 사운드
       await AppHapticFeedback.success();
+      await SoundEffects.playCorrect();
 
       // 사용자 XP 업데이트 (보너스 포함)
       await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
 
+      // XP 획득 사운드
+      await SoundEffects.playXPGain();
+
       // 매일 학습 스트릭 업데이트 (최초 정답 시에만)
       if (_totalCorrect == 1) {
         await ref.read(userProvider.notifier).incrementStreakOnStudy();
+
+        // 학습 이력에 오늘 날짜 추가
+        await ref.read(studyHistoryProvider.notifier).markTodayAsCompleted();
       }
 
       // XP 획득 애니메이션 표시 (보너스 포함)
@@ -1014,8 +1031,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       // 오답: 스트릭 초기화
       _currentStreak = 0;
 
-      // 오답 햅틱 피드백
+      // 오답 햅틱 피드백 및 사운드
       await AppHapticFeedback.error();
+      await SoundEffects.playWrong();
 
       // 오답: 오답 노트에 저장
       await ref.read(errorNoteProvider.notifier).addErrorNote(

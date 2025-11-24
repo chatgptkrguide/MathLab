@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/wrong_answer_provider.dart';
 import '../../data/models/wrong_answer.dart';
 import '../../shared/constants/constants.dart';
+import '../../shared/constants/figma_colors.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../problem/problem_screen.dart';
 
@@ -37,234 +38,181 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 커스텀 헤더 (GoMath 브랜드 스타일)
-            _buildHeader(context),
-
-            // 통계 카드 (현대적인 카드 디자인)
-            _buildStatsCards(state),
-
-            // 탭 바
-            _buildTabBar(state),
-
-            // 탭 뷰
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // 복습 필요 탭
-                  _ReviewNeededTab(
-                    provider: provider,
-                    onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
-                  ),
-
-                  // 최근 오답 탭
-                  _RecentTab(
-                    provider: provider,
-                    onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
-                  ),
-
-                  // 완료 탭
-                  _MasteredTab(
-                    provider: provider,
-                    onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
-                  ),
-                ],
-              ),
-            ),
-          ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: FigmaColors.homeGradient,
         ),
-      ),
-    );
-  }
-
-  /// 커스텀 헤더 - GoMath 브랜드 스타일
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.paddingM,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.mathRed,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.mathRed.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // 뒤로 가기 버튼
-          Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            child: InkWell(
-              onTap: () async {
-                await AppHapticFeedback.lightImpact();
-                if (mounted) Navigator.of(context).pop();
-              },
-              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-              splashColor: AppColors.surface.withValues(alpha: 0.2),
-              highlightColor: AppColors.surface.withValues(alpha: 0.1),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                  border: Border.all(
-                    color: AppColors.surface.withValues(alpha: 0.3),
-                    width: 1.5,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_rounded,
-                  color: AppColors.surface,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: AppDimensions.spacingM),
-
-          // 제목 + 이모지
-          Expanded(
-            child: Row(
-              children: [
-                const Text(
-                  '📚',
-                  style: TextStyle(fontSize: 28),
-                ),
-                const SizedBox(width: AppDimensions.spacingS),
-                Text(
-                  '오답 노트',
-                  style: AppTextStyles.headlineMedium.copyWith(
-                    color: AppColors.surface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 통계 카드 - 현대적인 3D 카드 디자인
-  Widget _buildStatsCards(WrongAnswerState state) {
-    return Container(
-      margin: const EdgeInsets.all(AppDimensions.paddingL),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.error_outline_rounded,
-              label: '총 오답',
-              value: '${state.totalCount}',
-              color: AppColors.mathRed,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.schedule_rounded,
-              label: '복습 필요',
-              value: '${state.needsReviewCount}',
-              color: AppColors.mathOrange,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacingM),
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.check_circle_outline_rounded,
-              label: '완료',
-              value: '${state.masteredCount}',
-              color: AppColors.successGreen,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 개별 통계 카드 - GoMath 3D 스타일
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeOutBack,
-      tween: Tween(begin: 0.9, end: 1.0),
-      builder: (context, scale, child) {
-        return Transform.scale(
-          scale: scale,
-          child: Stack(
-            clipBehavior: Clip.none,
+        child: SafeArea(
+          child: Column(
             children: [
-              // 3D Shadow
-              Positioned(
-                top: 6,
-                left: 0,
-                right: 0,
-                bottom: -6,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-              // Main Card
+              // 통합 헤더 (홈 화면과 동일한 디자인)
               Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.paddingM,
-                  horizontal: AppDimensions.paddingS,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: color.withValues(alpha: 0.3),
-                    width: 2,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: AppColors.headerBlueGradient,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
                   ),
                 ),
-                child: Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(icon, color: color, size: 32),
-                    const SizedBox(height: 6),
-                    Text(
-                      value,
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.headerText, size: 28),
+                      onPressed: () async {
+                        await AppHapticFeedback.lightImpact();
+                        if (context.mounted) Navigator.of(context).pop();
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '오답 노트',
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          color: AppColors.headerText,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      label,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
+                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                  ],
+                ),
+              ),
+
+              // 통계 카드 (현대적인 카드 디자인)
+              _buildStatsCards(state),
+
+              // 탭 바
+              _buildTabBar(state),
+
+              // 탭 뷰
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // 복습 필요 탭
+                    _ReviewNeededTab(
+                      provider: provider,
+                      onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
+                    ),
+
+                    // 최근 오답 탭
+                    _RecentTab(
+                      provider: provider,
+                      onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
+                    ),
+
+                    // 완료 탭
+                    _MasteredTab(
+                      provider: provider,
+                      onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
+    );
+  }
+
+
+  /// 통계 카드 - 심플하고 깔끔한 디자인
+  Widget _buildStatsCards(WrongAnswerState state) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingL,
+        vertical: AppDimensions.paddingM,
+      ),
+      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textSecondary.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem(
+            icon: Icons.error_outline_rounded,
+            label: '총 오답',
+            value: '${state.totalCount}',
+            color: AppColors.mathRed,
+          ),
+          Container(
+            width: 1,
+            height: 40,
+            color: AppColors.borderLight,
+          ),
+          _buildStatItem(
+            icon: Icons.schedule_rounded,
+            label: '복습 필요',
+            value: '${state.needsReviewCount}',
+            color: AppColors.mathOrange,
+          ),
+          Container(
+            width: 1,
+            height: 40,
+            color: AppColors.borderLight,
+          ),
+          _buildStatItem(
+            icon: Icons.check_circle_outline_rounded,
+            label: '완료',
+            value: '${state.masteredCount}',
+            color: AppColors.successGreen,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 개별 통계 항목 - 심플한 디자인
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: color, size: 28),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 

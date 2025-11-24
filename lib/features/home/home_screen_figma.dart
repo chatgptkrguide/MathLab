@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_text_styles.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
 import '../daily_reward/daily_reward_screen.dart';
 import '../profile/figma/profile_detail_screen_v3_new.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../problems/problem_solving_screen.dart';
+import '../messages/messages_screen.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/navigation_provider.dart';
+import '../../data/providers/message_provider.dart';
 import '../../data/services/korean_math_curriculum.dart';
 import '../../data/models/models.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
@@ -29,13 +33,98 @@ class HomeScreenFigma extends ConsumerWidget {
         gradient: FigmaColors.homeGradient,
       ),
       child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
+        child: Column(
+          children: [
+            // 통합 헤더 (다른 페이지와 동일한 디자인)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: AppColors.headerBlueGradient,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                  Expanded(
+                    child: Text(
+                      '홈',
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: AppColors.headerText,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final unreadCount = ref.watch(unreadMessageCountProvider);
 
-              // 상단: "안녕하세요!" + 스트릭
-              _buildTopSection(context, user),
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.mail_outline, color: AppColors.headerText, size: 28),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MessagesScreen(),
+                                ),
+                              );
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          if (unreadCount > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.mathRed,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  unreadCount > 9 ? '9+' : '$unreadCount',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+
+                    // 상단: "안녕하세요!" + 스트릭
+                    _buildTopSection(context, user),
 
               const SizedBox(height: 24),
 
@@ -68,14 +157,17 @@ class HomeScreenFigma extends ConsumerWidget {
               _buildDailyChallengeB(context),
 
               const SizedBox(height: 100), // 네비게이션 바 공간
-            ],
-          ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// 상단: "안녕하세요!" + 스트릭
+  /// 상단: "안녕하세요!" + 메시지 + 스트릭
   Widget _buildTopSection(BuildContext context, user) {
     // 사용자 이름 표시 (게스트인 경우 기본값)
     final userName = user?.name ?? 'Guest';
@@ -87,64 +179,67 @@ class HomeScreenFigma extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 안녕하세요!
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isGuest ? '안녕하세요!' : '안녕하세요, $userName님!',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isGuest ? '안녕하세요!' : '안녕하세요, $userName님!',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                isGuest ? '게스트로 학습 중' : '$userName의 수학 학습',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.8),
+                const SizedBox(height: 4),
+                Text(
+                  isGuest ? '게스트로 학습 중' : '$userName의 수학 학습',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           // 스트릭 배지 (클릭하면 프로필 상세 화면으로)
           Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileDetailScreenV3New(),
-                  ),
-                );
-              },
-              borderRadius: BorderRadius.circular(24),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset('assets/icons/streak_fire.png', width: 20, height: 20),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${user?.streakDays ?? 6}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileDetailScreenV3New(),
                       ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        Image.asset('assets/icons/streak_fire.png', width: 20, height: 20),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${user?.streakDays ?? 6}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
         ],
       ),
     );
@@ -236,40 +331,43 @@ class HomeScreenFigma extends ConsumerWidget {
 
   /// 오늘의 목표 카드 (Figma 디자인)
   Widget _buildTodayGoalCard(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // 현재 사용자의 학년에 따른 첫 번째 레슨으로 바로 이동
-        final user = ProviderScope.containerOf(context).read(userProvider);
-        final currentGrade = user?.currentGrade ?? '중1';
-        final lessons = KoreanMathCurriculum.getLessonsByGrade(currentGrade);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: GestureDetector(
+        onTap: () {
+          // 현재 사용자의 학년에 따른 첫 번째 레슨으로 바로 이동
+          final user = ProviderScope.containerOf(context).read(userProvider);
+          final currentGrade = user?.currentGrade ?? '중1';
+          final lessons = KoreanMathCurriculum.getLessonsByGrade(currentGrade);
 
-        if (lessons.isNotEmpty) {
-          // 첫 번째 레슨의 문제 풀이 화면으로 바로 이동
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProblemSolvingScreen(
-                lessonId: lessons[0].id,
-                lessonTitle: lessons[0].title,
+          if (lessons.isNotEmpty) {
+            // 첫 번째 레슨의 문제 풀이 화면으로 바로 이동
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProblemSolvingScreen(
+                  lessonId: lessons[0].id,
+                  lessonTitle: lessons[0].title,
+                ),
               ),
-            ),
-          );
-        } else {
-          // 레슨이 없으면 레슨 선택 화면으로
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const LessonsScreenFigma(),
-            ),
-          );
-        }
-      },
-      child: const DailyGoalCard(
-        icon: '📚',
-        title: '오늘의 목표',
-        progress: 0.8,
-        current: 80,
-        total: 100,
+            );
+          } else {
+            // 레슨이 없으면 레슨 선택 화면으로
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LessonsScreenFigma(),
+              ),
+            );
+          }
+        },
+        child: const DailyGoalCard(
+          icon: '📚',
+          title: '오늘의 목표',
+          progress: 0.8,
+          current: 80,
+          total: 100,
+        ),
       ),
     );
   }
@@ -366,7 +464,7 @@ class HomeScreenFigma extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           // 레벨 카드 - 리더보드 화면으로 이동
           _buildStatCard(
             null,
@@ -381,7 +479,7 @@ class HomeScreenFigma extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           // 연속 카드 - 프로필 상세 화면으로 이동
           _buildStatCard(
             'assets/icons/streak_fire.png',
@@ -535,7 +633,7 @@ class HomeScreenFigma extends ConsumerWidget {
 
           // 가운데: 화살표
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
+            padding: EdgeInsets.symmetric(horizontal: 12),
             child: Icon(
               Icons.arrow_forward,
               size: 24,

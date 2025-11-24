@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_text_styles.dart';
+import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../practice/practice_screen.dart';
 import '../../level_test/level_test_screen.dart';
 import '../../achievements/achievements_screen.dart';
@@ -21,8 +24,49 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header - 뒤로가기 + 프로필 텍스트
-            _buildHeader(context),
+            // 통합 헤더 (홈 화면과 동일한 디자인)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: AppColors.headerBlueGradient,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                  Expanded(
+                    child: Text(
+                      '프로필',
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: AppColors.headerText,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.settings, color: AppColors.headerText, size: 28),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                      );
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
 
             // Scrollable Content
             Expanded(
@@ -71,55 +115,6 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  /// Header - 프로필 텍스트 + 설정 버튼
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF61A1D8), Color(0xFF61A1D8)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 왼쪽 여백 (대칭을 위해)
-          const SizedBox(width: 48),
-
-          // 프로필 텍스트
-          const Text(
-            '프로필',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 1.0,
-            ),
-          ),
-
-          // 설정 버튼
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
-              );
-            },
-          ),
-        ],
       ),
     );
   }

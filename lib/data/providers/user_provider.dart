@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
 import '../services/local_storage_service.dart';
+import '../services/notification_service.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/logger.dart';
 
@@ -303,6 +304,16 @@ class UserNotifier extends StateNotifier<User?> {
     );
 
     await _saveUser();
+
+    // 스트릭 유지 알림 스케줄링 (매일 저녁 8시)
+    try {
+      await NotificationService().scheduleStreakReminder(
+        currentStreak: newStreakDays,
+      );
+      Logger.info('스트릭 알림 스케줄링 완료: $newStreakDays일', tag: 'UserProvider');
+    } catch (e) {
+      Logger.error('스트릭 알림 스케줄링 실패', error: e, tag: 'UserProvider');
+    }
   }
 
   /// 스트릭 리셋 (관리자용 또는 테스트용)

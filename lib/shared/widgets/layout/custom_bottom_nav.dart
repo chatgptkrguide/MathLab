@@ -155,22 +155,33 @@ class CustomBottomNavigation extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // 상단 인디케이터
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: 3,
+                  width: isSelected ? 30 : 0,
+                  decoration: BoxDecoration(
+                    color: AppColors.mathButtonBlue,
+                    borderRadius: BorderRadius.circular(1.5),
+                  ),
+                ),
+                const SizedBox(height: 4),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     isSelected ? _getSelectedIcon(icon) : icon,
                     color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.6),
-                    size: 20,
+                    size: isSelected ? 24 : 22,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Flexible(
                   child: Text(
                     label,
                     style: TextStyle(
                       color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.7),
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      fontSize: 9,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      fontSize: isSelected ? 10 : 9,
                       height: 1.0,
                     ),
                     overflow: TextOverflow.ellipsis,

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/figma_components/figma_user_info_bar.dart';
 import '../../../shared/widgets/drawers/learning_calendar_drawer.dart';
 import '../../../shared/widgets/drawers/top_slide_drawer.dart';
-import '../../../shared/widgets/layout/common_app_bar.dart';
+import '../../../shared/widgets/layout/adaptive_app_header.dart';
+import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_text_styles.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/providers/lesson_progress_provider.dart';
 import '../../../data/services/korean_math_curriculum.dart';
@@ -30,31 +32,49 @@ class LessonsScreenFigma extends ConsumerWidget {
         width: double.infinity,
         height: double.infinity,
         color: const Color(0xFFF5F5F5), // 밝은 회색 배경
-        child: Column(
-          children: [
-            // 상단 바 (Home 제목 + 메뉴 버튼)
-            CommonAppBar(
-              title: 'Home',
-              leading: IconButton(
-                icon: const Icon(Icons.menu, size: 28),
-                onPressed: () {
-                  TopSlideDrawer.show(
-                    context,
-                    const LearningCalendarDrawer(),
-                  );
-                },
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // 상단 바 (학습 제목 + 메뉴 버튼)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: AppColors.headerBlueGradient,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
+                      onPressed: () {
+                        _showGradeSelectionDrawer(context, ref);
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '학습',
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          color: AppColors.headerText,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                  ],
+                ),
               ),
-            ),
-
-          // 사용자 정보 바 (선택된 학년 표시)
-          FigmaUserInfoBar(
-            userName: displayGrade,
-            streakDays: user?.streakDays ?? 6,
-            xp: user?.xp ?? 549,
-            level: 'HLv${user?.level ?? 1}',
-          ),
 
           // Quick Action Buttons (Practice & Level Test)
           Padding(
@@ -169,7 +189,8 @@ class LessonsScreenFigma extends ConsumerWidget {
               child: _buildLearningPath(context, currentLessonIndex),
             ),
           ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -416,6 +437,156 @@ class LessonsScreenFigma extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  /// 학년/단원 선택 drawer 표시
+  void _showGradeSelectionDrawer(BuildContext context, WidgetRef ref) {
+    TopSlideDrawer.show(
+      context,
+      _GradeSelectionDrawer(
+        currentGrade: selectedGrade ?? ref.read(userProvider)?.currentGrade ?? '중1',
+      ),
+    );
+  }
+}
+
+/// 학년/단원 선택 Drawer
+class _GradeSelectionDrawer extends ConsumerWidget {
+  final String currentGrade;
+
+  const _GradeSelectionDrawer({required this.currentGrade});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final availableGrades = ['초1', '초2', '초3', '초4', '초5', '초6', '중1', '중2', '중3', '고1', '고2', '고3'];
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '학년 선택',
+                  style: AppTextStyles.headlineMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // 현재 학년 표시
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.mathBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.mathBlue, width: 2),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.school, color: AppColors.mathBlue, size: 24),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '현재 학년',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Text(
+                        currentGrade,
+                        style: AppTextStyles.headlineSmall.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.mathBlue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 학년 그리드
+            Text(
+              '다른 학년 보기',
+              style: AppTextStyles.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: availableGrades.map((grade) {
+                final isSelected = grade == currentGrade;
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      // 학년 변경 로직 추가 예정
+                      Navigator.pop(context);
+                      // TODO: 학년 변경 후 화면 새로고침
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.mathBlue
+                            : AppColors.background,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.mathBlue
+                              : AppColors.borderLight,
+                          width: 2,
+                        ),
+                      ),
+                      child: Text(
+                        grade,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: isSelected
+                              ? AppColors.surface
+                              : AppColors.textPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

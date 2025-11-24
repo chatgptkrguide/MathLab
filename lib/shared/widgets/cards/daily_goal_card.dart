@@ -24,9 +24,9 @@ class DailyGoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 366,
+      width: double.infinity,
       constraints: const BoxConstraints(minHeight: 88),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: FigmaColors.cardDefault,
         borderRadius: BorderRadius.circular(FigmaSizes.cardBorderRadius),

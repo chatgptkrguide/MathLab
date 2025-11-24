@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
+import '../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../data/providers/auth_provider.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/providers/lesson_progress_provider.dart';
 import '../auth/auth_screen.dart';
 import '../profile/edit_profile_screen.dart';
 
@@ -32,31 +34,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          '설정',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: AppColors.mathBlue,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 사용자 정보 섹션
-            if (authState.currentAccount != null && !authState.isGuest)
-              _buildUserInfoSection(user),
+            // 통합 헤더 (홈 화면과 동일한 디자인)
+            AdaptiveAppHeader(
+              title: '설정',
+              gradientColors: AppColors.headerBlueGradient,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+              titleAlignment: MainAxisAlignment.spaceBetween,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: AppColors.headerText, size: 28),
+                onPressed: () {
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 사용자 정보 섹션
+                    if (authState.currentAccount != null && !authState.isGuest)
+                      _buildUserInfoSection(user),
 
-            const SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
-            // 계정 섹션
-            _buildSectionHeader('계정'),
+                    // 계정 섹션
+                    _buildSectionHeader('계정'),
             _buildSettingTile(
               icon: Icons.person_outline,
               title: '프로필 편집',
@@ -178,6 +189,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const Divider(height: 32),
 
+            // 학습 데이터 섹션
+            _buildSectionHeader('학습 데이터'),
+            _buildSettingTile(
+              icon: Icons.refresh,
+              title: '학습 초기화',
+              subtitle: '모든 학습 진행 상태를 초기화합니다',
+              titleColor: AppColors.warning,
+              onTap: () {
+                _showResetProgressDialog();
+              },
+            ),
+
+            const Divider(height: 32),
+
             // 로그아웃 / 탈퇴 섹션
             _buildSettingTile(
               icon: Icons.logout,
@@ -197,6 +222,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
 
             const SizedBox(height: 100), // 네비게이션 바 공간
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -444,6 +473,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  /// 학습 초기화 확인 다이얼로그
+  void _showResetProgressDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: AppColors.warning),
+              SizedBox(width: 8),
+              Text('학습 초기화'),
+            ],
+          ),
+          content: const Text(
+            '모든 학습 진행 상태가 초기화됩니다.\n'
+            '이 작업은 되돌릴 수 없습니다.\n\n'
+            '정말 진행하시겠습니까?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // 진행 상태 초기화
+                await ref.read(lessonProgressProvider.notifier).resetProgress();
+                await ref.read(userProvider.notifier).resetUser();
+
+                if (mounted) {
+                  Navigator.pop(context); // 다이얼로그 닫기
+
+                  // 성공 메시지
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('학습 진행 상태가 초기화되었습니다.'),
+                      backgroundColor: AppColors.success,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: const Text(
+                '초기화',
+                style: TextStyle(color: AppColors.warning),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// 로그아웃 확인 다이얼로그
   void _showLogoutDialog() {
     showDialog(
@@ -462,8 +544,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 // 로그아웃 실행
                 await ref.read(authProvider.notifier).signOut();
                 if (mounted) {
-                  Navigator.pop(context); // 다이얼로그 닫기
-                  // 로그인 화면으로 이동 (AuthWrapper가 자동으로 처리)
+                  // 로그인 화면으로 이동하고 네비게이션 스택 전체 클리어
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AuthScreen()),
+                    (route) => false,
+                  );
                 }
               },
               child: const Text(

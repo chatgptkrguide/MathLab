@@ -40,7 +40,13 @@ class ProblemRepository {
       final jsonData = json.decode(jsonString) as Map<String, dynamic>;
       final problemsJson = jsonData['problems'] as List<dynamic>;
 
-      return problemsJson.map((problemData) {
+      return problemsJson.where((problemData) {
+        final data = problemData as Map<String, dynamic>;
+        // 간단한 기초산술 문제 필터링 (난이도 1이고 카테고리가 기초산술인 경우 제외)
+        final category = data['category'] as String? ?? '';
+        final difficulty = data['difficulty'] as int? ?? 1;
+        return !(category == '기초산술' && difficulty == 1);
+      }).map((problemData) {
         final data = problemData as Map<String, dynamic>;
 
         // grade와 chapter를 metadata에 추가
@@ -61,7 +67,7 @@ class ProblemRepository {
           metadata['xpReward'] = data['xpReward'];
         }
 
-        // Problem 객체 생성
+        // Problem 객체 생성 (options -> choices, correctAnswerIndex -> answer 매핑)
         return Problem(
           id: data['id'] as String,
           title: (data['chapter'] as String?) ?? (data['category'] as String? ?? '문제'),
@@ -72,7 +78,8 @@ class ProblemRepository {
           ),
           category: data['category'] as String? ?? '기타',
           difficulty: data['difficulty'] as int? ?? 1,
-          choices: (data['options'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+          choices: (data['options'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+                   (data['choices'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
           answer: data['correctAnswerIndex'] ?? data['correctAnswer'] ?? data['answer'] ?? 0,
           hints: (data['hints'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
           explanation: data['explanation'] as String?,
@@ -105,97 +112,87 @@ class ProblemRepository {
 
   /// 레슨 ID로 문제 목록 로드
   Future<List<Problem>> loadProblemsByLesson(String lessonId) async {
-    final allProblems = await loadAllProblems();
+    // 1단계: 한국 교육과정 문제 폴더에서 직접 로드 시도
+    try {
+      final koreanProblems = await _loadKoreanCurriculumProblems(lessonId);
+      if (koreanProblems.isNotEmpty) {
+        print('[ProblemRepository] 한국 교육과정 문제 ${koreanProblems.length}개 로드: $lessonId');
+        return koreanProblems;
+      }
+    } catch (e) {
+      print('[ProblemRepository] 한국 교육과정 문제 로드 실패: $e');
+    }
 
-    // lessonId로 필터링
+    // 2단계: 기존 problems.json에서 필터링
+    final allProblems = await loadAllProblems();
     final filteredProblems = allProblems.where((problem) {
       return problem.lessonId == lessonId;
     }).toList();
 
-    // 문제가 없으면 임시 샘플 문제 사용
-    if (filteredProblems.isEmpty) {
-      return [_generateSingleProblem(lessonId)];
+    if (filteredProblems.isNotEmpty) {
+      return filteredProblems;
     }
 
-    return filteredProblems;
+    // 3단계: 샘플 문제 사용
+    return [_generateSingleProblem(lessonId)];
   }
 
-  /// 레슨당 단일 문제 생성
+  /// 한국 교육과정 문제 로드 (assets/problems/ms1_소인수분해/ 등)
+  Future<List<Problem>> _loadKoreanCurriculumProblems(String lessonId) async {
+    final problems = <Problem>[];
+
+    // lessonId 형식: ms1_001, ms1_002 등
+    // 폴더 구조: assets/problems/ms1_소인수분해/ms1_001_001.json
+
+    // lessonId에서 학년과 단원 번호 추출
+    final parts = lessonId.split('_');
+    if (parts.length < 2) return problems;
+
+    final grade = parts[0]; // ms1, ms2 등
+    final unitNum = parts[1]; // 001, 002 등
+
+    // 단원별 폴더 맵핑
+    final folderMap = {
+      'ms1_001': 'ms1_소인수분해',
+      'ms2_001': 'polynomials', // 다항식
+      // 추가 단원 맵핑...
+    };
+
+    final folder = folderMap[lessonId];
+    if (folder == null) return problems;
+
+    // 해당 폴더의 모든 문제 파일 로드 (최대 10개)
+    for (int i = 1; i <= 10; i++) {
+      final fileNum = i.toString().padLeft(3, '0');
+      final fileName = '${grade}_${unitNum}_$fileNum.json';
+      final filePath = 'assets/problems/$folder/$fileName';
+
+      try {
+        final problem = await loadProblem(filePath);
+        problems.add(problem);
+      } catch (e) {
+        // 파일이 없으면 중단
+        break;
+      }
+    }
+
+    return problems;
+  }
+
+  /// 레슨당 단일 문제 생성 (폴백용 - problems.json에서 문제를 찾을 수 없을 때)
   Problem _generateSingleProblem(String lessonId) {
-    // lessonId에서 번호 추출 (예: ms1_001 -> 1)
-    final lessonNumber = int.tryParse(lessonId.split('_').last) ?? 1;
-
-    // 5개 문제를 순환하면서 할당
-    final problemIndex = (lessonNumber - 1) % 5;
-    final allProblems = _generateSampleProblems(lessonId);
-
-    return allProblems[problemIndex];
-  }
-
-  /// 레슨별 샘플 문제 생성 (임시)
-  List<Problem> _generateSampleProblems(String lessonId) {
-    return [
-      Problem(
-        id: '${lessonId}_sample_001',
-        title: '기본 덧셈',
-        question: '다음 중 올바른 것을 고르세요.',
-        type: ProblemType.multipleChoice,
-        category: '기초 연산',
-        choices: ['2 + 2 = 4', '2 + 2 = 5', '2 + 2 = 3', '2 + 2 = 6'],
-        answer: 0, // 첫 번째 선택지가 정답
-        difficulty: 1,
-        hints: ['덧셈의 기본 원리를 생각해보세요.', '2를 두 번 더하면 얼마일까요?'],
-        explanation: '2 + 2 = 4입니다. 기본적인 덧셈 문제입니다.',
-      ),
-      Problem(
-        id: '${lessonId}_sample_002',
-        title: '곱셈 계산',
-        question: '5 × 3 = ?',
-        type: ProblemType.multipleChoice,
-        category: '기초 연산',
-        choices: ['12', '15', '18', '20'],
-        answer: 1, // 두 번째 선택지가 정답
-        difficulty: 1,
-        hints: ['5를 3번 더하면 됩니다.', '5 + 5 + 5를 계산해보세요.'],
-        explanation: '5 × 3 = 15입니다. 5를 3번 더한 값입니다.',
-      ),
-      Problem(
-        id: '${lessonId}_sample_003',
-        title: '뺄셈 계산',
-        question: '10 - 4 = ?',
-        type: ProblemType.multipleChoice,
-        category: '기초 연산',
-        choices: ['4', '5', '6', '7'],
-        answer: 2, // 세 번째 선택지가 정답
-        difficulty: 1,
-        hints: ['10에서 4를 빼면 됩니다.', '거꾸로 생각하면 4 + ? = 10입니다.'],
-        explanation: '10 - 4 = 6입니다. 기본적인 뺄셈 문제입니다.',
-      ),
-      Problem(
-        id: '${lessonId}_sample_004',
-        title: '수 비교',
-        question: '다음 중 가장 큰 수는?',
-        type: ProblemType.multipleChoice,
-        category: '수와 연산',
-        choices: ['7', '12', '9', '5'],
-        answer: 1, // 두 번째 선택지가 정답
-        difficulty: 1,
-        hints: ['각 숫자를 비교해보세요.', '10보다 큰 숫자가 있나요?'],
-        explanation: '12가 가장 큰 수입니다.',
-      ),
-      Problem(
-        id: '${lessonId}_sample_005',
-        title: '나눗셈 계산',
-        question: '8 ÷ 2 = ?',
-        type: ProblemType.multipleChoice,
-        category: '기초 연산',
-        choices: ['2', '3', '4', '5'],
-        answer: 2, // 세 번째 선택지가 정답
-        difficulty: 2,
-        hints: ['8을 2로 나누면 됩니다.', '2 × ? = 8을 생각해보세요.'],
-        explanation: '8 ÷ 2 = 4입니다. 기본적인 나눗셈 문제입니다.',
-      ),
-    ];
+    return Problem(
+      id: '${lessonId}_fallback',
+      title: '문제 준비 중',
+      question: '이 레슨의 문제를 준비 중입니다. 잠시 후 다시 시도해주세요.',
+      type: ProblemType.multipleChoice,
+      category: '일반',
+      choices: ['확인'],
+      answer: 0,
+      difficulty: 1,
+      hints: ['곧 새로운 문제가 추가됩니다.'],
+      explanation: '문제 데이터를 업데이트 중입니다.',
+    );
   }
 
   /// 난이도별 문제 필터링

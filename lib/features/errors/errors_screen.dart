@@ -4,7 +4,6 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/widgets.dart';
-import '../../shared/widgets/layout/common_app_bar.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/error_note_provider.dart';
@@ -74,28 +73,76 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     final errorStats = _getErrorStats(userErrorNotes);
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
-      body: Column(
-        children: [
-          const CommonAppBar(title: '오답'),
-          Expanded(
-            child: ResponsiveWrapper(
-              child: SingleChildScrollView(
-                child: Column(
+      backgroundColor: AppColors.background,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF6DA5D8),
+              Color(0xFFE8F4FA),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // 통합 헤더 (홈 화면과 동일한 디자인)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: AppColors.headerBlueGradient,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildHeader(),
-                    _buildStatsGrid(errorStats),
-                    _buildActionButtons(filteredNotes),
-                    _buildFilterTabs(),
-                    _buildErrorNotesList(userErrorNotes, filteredNotes),
-                    if (filteredNotes.isEmpty)
-                      _buildTips(),
+                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                    Expanded(
+                      child: Text(
+                        '오답 노트',
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          color: AppColors.headerText,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
                   ],
                 ),
               ),
-            ),
+              Expanded(
+                child: ResponsiveWrapper(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildHeader(),
+                        _buildStatsGrid(errorStats),
+                        _buildActionButtons(filteredNotes),
+                        _buildFilterTabs(),
+                        _buildErrorNotesList(userErrorNotes, filteredNotes),
+                        if (filteredNotes.isEmpty)
+                          _buildTips(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
