@@ -2,31 +2,5 @@
   "buildCommand": null,
   "outputDirectory": "build/web",
   "installCommand": null,
-  "framework": null,
-  "headers": [
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(favicon.png|manifest.json|flutter_bootstrap.js|flutter_service_worker.js|flutter.js|main.dart.js|version.json)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  "framework": null
 }
