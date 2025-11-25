@@ -1,6 +1,6 @@
 {
-  "buildCommand": null,
+  "buildCommand": "flutter build web --release && cp build/web/index.html build/web/404.html",
   "outputDirectory": "build/web",
-  "installCommand": null,
+  "installCommand": "flutter pub get",
   "framework": null
 }
