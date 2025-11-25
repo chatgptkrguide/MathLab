@@ -65,10 +65,18 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.headerText, size: 28),
-                      onPressed: () async {
-                        await AppHapticFeedback.lightImpact();
-                        if (context.mounted) Navigator.of(context).pop();
+                      icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
+                      onPressed: () {
+                        // TODO: 학년 선택 드로어 (필요시 추가)
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('학년 선택 기능 준비 중입니다'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        );
                       },
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),

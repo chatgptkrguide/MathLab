@@ -33,7 +33,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 통합 헤더 (홈 화면과 동일한 디자인)
+              // 통합 헤더 (학습 화면과 동일한 디자인)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: const BoxDecoration(
@@ -50,7 +50,23 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                    IconButton(
+                      icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
+                      onPressed: () {
+                        // TODO: 학년 선택 드로어 (필요시 추가)
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('학년 선택 기능 준비 중입니다'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        );
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
                     Expanded(
                       child: Text(
                         '학습이력',
