@@ -3,10 +3,37 @@
   "outputDirectory": "build/web",
   "installCommand": null,
   "framework": null,
-  "rewrites": [
+  "headers": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/assets/(.*)$",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "^/canvaskit/(.*)$",
+      "dest": "/canvaskit/$1"
+    },
+    {
+      "src": "^/icons/(.*)$",
+      "dest": "/icons/$1"
+    },
+    {
+      "src": "^/(favicon\\.png|manifest\\.json|flutter_bootstrap\\.js|flutter_service_worker\\.js|flutter\\.js|main\\.dart\\.js|version\\.json)$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
