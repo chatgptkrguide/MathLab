@@ -1,7 +1,6 @@
 # Flutter 소스 파일 (빌드 결과만 필요)
 lib/
 test/
-assets/
 android/
 ios/
 linux/
