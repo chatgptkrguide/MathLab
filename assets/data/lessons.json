@@ -97,6 +97,20 @@
       "completedProblems": 0,
       "isUnlocked": false,
       "xpReward": 120
+    },
+    {
+      "id": "lesson_poly_add_sub",
+      "title": "다항식의 덧셈과 뺄셈",
+      "description": "다항식의 기본 연산을 학습합니다",
+      "icon": "📐",
+      "order": 8,
+      "grade": "고1",
+      "category": "다항식",
+      "topics": ["다항식", "덧셈", "뺄셈", "전개"],
+      "totalProblems": 5,
+      "completedProblems": 0,
+      "isUnlocked": true,
+      "xpReward": 150
     }
   ]
 }

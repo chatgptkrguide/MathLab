@@ -7,6 +7,9 @@ import '../../data/providers/user_provider.dart';
 import '../../data/providers/lesson_progress_provider.dart';
 import '../auth/auth_screen.dart';
 import '../profile/edit_profile_screen.dart';
+import 'notification_settings_screen.dart';
+import '../legal/terms_of_service_screen.dart';
+import '../legal/privacy_policy_screen.dart';
 
 /// 설정 화면
 /// - 계정 관리
@@ -22,7 +25,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _notificationsEnabled = true;
   bool _soundEnabled = true;
   bool _darkModeEnabled = false;
   String _selectedLanguage = '한국어';
@@ -113,15 +115,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             // 알림 섹션
             _buildSectionHeader('알림'),
-            _buildSwitchTile(
+            _buildSettingTile(
               icon: Icons.notifications_outlined,
-              title: '푸시 알림',
-              subtitle: '학습 리마인더 및 업데이트 알림',
-              value: _notificationsEnabled,
-              onChanged: (value) {
-                setState(() {
-                  _notificationsEnabled = value;
-                });
+              title: '알림 설정',
+              subtitle: '알림 타입 및 시간 설정',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationSettingsScreen(),
+                  ),
+                );
               },
             ),
             _buildSwitchTile(
@@ -176,14 +180,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: Icons.description_outlined,
               title: '이용약관',
               onTap: () {
-                // TODO: 이용약관 화면으로 이동
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TermsOfServiceScreen(),
+                  ),
+                );
               },
             ),
             _buildSettingTile(
               icon: Icons.privacy_tip_outlined,
               title: '개인정보 처리방침',
               onTap: () {
-                // TODO: 개인정보 처리방침 화면으로 이동
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyPolicyScreen(),
+                  ),
+                );
               },
             ),
 

@@ -5,8 +5,12 @@ import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/animations/fade_in_widget.dart';
+import '../../shared/utils/level_badge_mapper.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/leaderboard_provider.dart';
+import '../../data/providers/friend_provider.dart';
+import '../../data/providers/all_users_provider.dart';
+import '../../data/providers/user_provider.dart';
 import '../league/league_screen.dart';
 
 /// 리더보드 화면
@@ -271,13 +275,21 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'Lv.${entry.level}',
-                              style: const TextStyle(
-                                color: AppColors.surface,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            // 레벨 배지
+                            Image.asset(
+                              LevelBadgeMapper.getBadgeImagePath(entry.level),
+                              width: 24,
+                              height: 24,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Text(
+                                  'Lv.${entry.level}',
+                                  style: const TextStyle(
+                                    color: AppColors.surface,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -414,12 +426,20 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      'Lv.${entry.level}',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
+                    // 레벨 배지
+                    Image.asset(
+                      LevelBadgeMapper.getBadgeImagePath(entry.level),
+                      width: 16,
+                      height: 16,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Text(
+                          'Lv.${entry.level}',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 8),
                     const Icon(
@@ -462,6 +482,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               ),
             ],
           ),
+          // 친구 추가 버튼 (자기 자신이 아닌 경우만)
+          if (!entry.isCurrentUser) ...[
+            const SizedBox(width: 8),
+            _buildFriendButton(entry),
+          ],
         ],
       ),
     );
@@ -569,6 +594,120 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       return entries.firstWhere((entry) => entry.isCurrentUser);
     } catch (e) {
       return null;
+    }
+  }
+
+  /// 친구 추가 버튼
+  Widget _buildFriendButton(LeaderboardEntry entry) {
+    final friends = ref.watch(friendsProvider);
+    final currentUser = ref.watch(userProvider);
+
+    // 이미 친구인지 확인
+    final isFriend = friends.any(
+      (f) => f.userId == entry.userId && f.status == FriendRequestStatus.accepted,
+    );
+
+    // 대기 중인 요청이 있는지 확인
+    final hasPendingRequest = friends.any(
+      (f) => f.userId == entry.userId && f.status == FriendRequestStatus.pending,
+    );
+
+    if (isFriend) {
+      // 이미 친구인 경우 표시 안 함
+      return const SizedBox.shrink();
+    }
+
+    if (hasPendingRequest) {
+      // 대기 중인 요청이 있는 경우
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.textSecondary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          '대기중',
+          style: TextStyle(
+            fontSize: 11,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    // 친구 추가 버튼
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: IconButton(
+        onPressed: () => _sendFriendRequest(entry),
+        icon: Icon(
+          Icons.person_add,
+          color: AppColors.primary,
+          size: 20,
+        ),
+        padding: const EdgeInsets.all(8),
+        constraints: const BoxConstraints(
+          minWidth: 36,
+          minHeight: 36,
+        ),
+        tooltip: '친구 추가',
+      ),
+    );
+  }
+
+  /// 친구 요청 보내기
+  Future<void> _sendFriendRequest(LeaderboardEntry entry) async {
+    try {
+      // AllUsersProvider에서 실제 사용자 정보 가져오기
+      final allUsers = ref.read(allUsersProvider);
+      final targetUser = allUsers.firstWhere(
+        (u) => u.id == entry.userId,
+        orElse: () => User(
+          id: entry.userId,
+          name: entry.userName,
+          email: '${entry.userId}@example.com',
+          joinDate: DateTime.now(),
+          level: entry.level,
+          xp: entry.xp,
+          streakDays: entry.streakDays,
+          currentGrade: entry.grade,
+          avatarUrl: '👤',
+          hearts: 5,
+          dailyXP: 0,
+          lastXPResetDate: DateTime.now(),
+        ),
+      );
+
+      await ref.read(friendsProvider.notifier).sendFriendRequest(
+        userId: targetUser.id,
+        name: targetUser.name,
+        level: targetUser.level,
+        xp: targetUser.xp,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${targetUser.name}님에게 친구 요청을 보냈습니다'),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('친구 요청을 보내는데 실패했습니다'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 }

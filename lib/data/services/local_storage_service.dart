@@ -1,14 +1,19 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/utils/logger.dart';
+import 'encryption_service.dart';
 
 /// 로컬 저장소 서비스
 /// SharedPreferences를 추상화하여 일관된 데이터 저장/로드 인터페이스 제공
+/// 민감한 데이터는 AES 암호화를 사용하여 저장
 class LocalStorageService {
   // Singleton 패턴
   static final LocalStorageService _instance = LocalStorageService._internal();
   factory LocalStorageService() => _instance;
   LocalStorageService._internal();
+
+  /// 암호화 서비스
+  final EncryptionService _encryption = EncryptionService();
 
   /// SharedPreferences 인스턴스 캐싱
   SharedPreferences? _prefs;
@@ -374,6 +379,180 @@ class LocalStorageService {
         tag: 'Storage',
       );
       return {};
+    }
+  }
+
+  // ========== 암호화된 저장소 메서드 ==========
+
+  /// 암호화된 JSON 객체 저장
+  ///
+  /// 민감한 데이터(사용자 정보, 인증 토큰 등)를 AES 암호화하여 저장
+  ///
+  /// [key] 저장소 키
+  /// [data] 저장할 객체
+  /// [toJson] Object to JSON 변환 함수
+  Future<bool> saveSecureObject<T>({
+    required String key,
+    required T data,
+    required Map<String, dynamic> Function(T) toJson,
+  }) async {
+    try {
+      final preferences = await prefs;
+      final jsonData = toJson(data);
+      final encryptedText = _encryption.encryptJson(jsonData);
+
+      final success = await preferences.setString(key, encryptedText);
+
+      if (success) {
+        Logger.debug('Saved encrypted object for key: $key', tag: 'SecureStorage');
+      } else {
+        Logger.warning('Failed to save encrypted object for key: $key', tag: 'SecureStorage');
+      }
+
+      return success;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Error saving encrypted object for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SecureStorage',
+      );
+      return false;
+    }
+  }
+
+  /// 암호화된 JSON 객체 로드
+  ///
+  /// [key] 저장소 키
+  /// [fromJson] JSON to Object 변환 함수
+  ///
+  /// Returns null if key doesn't exist or decryption fails
+  Future<T?> loadSecureObject<T>({
+    required String key,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
+    try {
+      final preferences = await prefs;
+      final encryptedText = preferences.getString(key);
+
+      if (encryptedText == null) {
+        Logger.debug('No encrypted data found for key: $key', tag: 'SecureStorage');
+        return null;
+      }
+
+      final jsonData = _encryption.decryptJson(encryptedText);
+      final object = fromJson(jsonData);
+
+      Logger.debug('Loaded encrypted object for key: $key', tag: 'SecureStorage');
+      return object;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Failed to load encrypted object for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SecureStorage',
+      );
+      return null;
+    }
+  }
+
+  /// 암호화된 문자열 저장
+  ///
+  /// [key] 저장소 키
+  /// [value] 저장할 문자열
+  Future<bool> setSecureString(String key, String value) async {
+    try {
+      final preferences = await prefs;
+      final encryptedText = _encryption.encrypt(value);
+      final success = await preferences.setString(key, encryptedText);
+
+      if (success) {
+        Logger.debug('Saved encrypted string for key: $key', tag: 'SecureStorage');
+      }
+
+      return success;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Failed to set encrypted string for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SecureStorage',
+      );
+      return false;
+    }
+  }
+
+  /// 암호화된 문자열 로드
+  ///
+  /// [key] 저장소 키
+  /// Returns null if key doesn't exist or decryption fails
+  Future<String?> getSecureString(String key) async {
+    try {
+      final preferences = await prefs;
+      final encryptedText = preferences.getString(key);
+
+      if (encryptedText == null) {
+        Logger.debug('No encrypted string found for key: $key', tag: 'SecureStorage');
+        return null;
+      }
+
+      final decrypted = _encryption.decrypt(encryptedText);
+      Logger.debug('Loaded encrypted string for key: $key', tag: 'SecureStorage');
+      return decrypted;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Failed to get encrypted string for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SecureStorage',
+      );
+      return null;
+    }
+  }
+
+  /// 민감한 데이터 마이그레이션
+  ///
+  /// 기존의 평문 데이터를 암호화된 형태로 변환
+  /// [key] 저장소 키
+  /// Returns true if migration successful or no data to migrate
+  Future<bool> migrateToEncrypted(String key) async {
+    try {
+      final preferences = await prefs;
+      final plainText = preferences.getString(key);
+
+      if (plainText == null) {
+        Logger.debug('No data to migrate for key: $key', tag: 'SecureStorage');
+        return true;
+      }
+
+      // 이미 암호화된 데이터인지 확인 (복호화 시도)
+      try {
+        _encryption.decrypt(plainText);
+        Logger.debug('Data already encrypted for key: $key', tag: 'SecureStorage');
+        return true;
+      } catch (_) {
+        // 복호화 실패 = 평문 데이터
+      }
+
+      // 평문 데이터를 암호화하여 저장
+      final encryptedText = _encryption.encrypt(plainText);
+      final success = await preferences.setString(key, encryptedText);
+
+      if (success) {
+        Logger.info('Migrated data to encrypted format for key: $key', tag: 'SecureStorage');
+      } else {
+        Logger.warning('Failed to migrate data for key: $key', tag: 'SecureStorage');
+      }
+
+      return success;
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Error migrating data for key: $key',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SecureStorage',
+      );
+      return false;
     }
   }
 }

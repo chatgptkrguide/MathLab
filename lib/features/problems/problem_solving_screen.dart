@@ -70,8 +70,12 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
   Future<void> _loadProblems() async {
     try {
-      // 레슨 ID에 따라 문제 로드
-      final problems = await _repository.loadProblemsByLesson(widget.lessonId);
+      // 사용자의 현재 학년 가져오기
+      final user = ref.read(userProvider);
+      final currentGrade = user?.currentGrade ?? '중1';
+
+      // 레슨 ID와 학년에 따라 문제 로드
+      final problems = await _repository.loadProblemsByLessonAndGrade(widget.lessonId, currentGrade);
 
       setState(() {
         _problems = problems;

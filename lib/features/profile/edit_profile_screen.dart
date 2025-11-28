@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../../shared/constants/constants.dart';
 import '../../data/providers/user_provider.dart';
+import '../../shared/widgets/feedback/feedback.dart';
 
 /// 프로필 편집 화면
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -16,6 +20,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _bioController;
+
+  File? _selectedImage;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -137,6 +144,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   /// 프로필 이미지
   Widget _buildProfileImage() {
+    final user = ref.watch(userProvider);
+
     return Stack(
       children: [
         Container(
@@ -150,11 +159,29 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               width: 4,
             ),
           ),
-          child: const Center(
-            child: Text(
-              '👤',
-              style: TextStyle(fontSize: 60),
-            ),
+          child: ClipOval(
+            child: _selectedImage != null
+                ? Image.file(
+                    _selectedImage!,
+                    fit: BoxFit.cover,
+                    width: 120,
+                    height: 120,
+                  )
+                : user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
+                    ? Image.network(
+                        user.avatarUrl,
+                        fit: BoxFit.cover,
+                        width: 120,
+                        height: 120,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Text('👤', style: TextStyle(fontSize: 60)),
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Text('👤', style: TextStyle(fontSize: 60)),
+                      ),
           ),
         ),
         Positioned(
@@ -178,19 +205,97 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 color: Colors.white,
                 size: 20,
               ),
-              onPressed: () {
-                // TODO: 이미지 선택 기능
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('프로필 이미지 변경 기능은 준비 중입니다'),
-                  ),
-                );
-              },
+              onPressed: _showImageSourceDialog,
             ),
           ),
         ),
       ],
     );
+  }
+
+  /// 이미지 소스 선택 다이얼로그
+  void _showImageSourceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('프로필 사진 변경'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppColors.mathBlue),
+              title: const Text('갤러리에서 선택'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.mathBlue),
+              title: const Text('카메라로 촬영'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 이미지 선택
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('이미지 선택 실패: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  /// 프로필 이미지 업로드
+  Future<String?> _uploadProfileImage(String userId) async {
+    if (_selectedImage == null) return null;
+
+    try {
+      final fileName = 'profile_$userId.jpg';
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child(fileName);
+
+      final uploadTask = await storageRef.putFile(_selectedImage!);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      if (!mounted) return null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('이미지 업로드 실패: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return null;
+    }
   }
 
   /// 입력 필드
@@ -342,22 +447,45 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   /// 프로필 저장
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: 실제 프로필 업데이트 로직
-      final updatedUser = ref.read(userProvider)?.copyWith(
-            name: _nameController.text,
-            email: _emailController.text,
-          );
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      if (updatedUser != null) {
-        ref.read(userProvider.notifier).updateUser(updatedUser);
+    final user = ref.read(userProvider);
+    if (user == null) return;
+
+    setState(() {
+      _isUploading = true;
+    });
+
+    if (!mounted) return;
+    LoadingOverlay.show(context, message: '프로필 저장 중...');
+
+    try {
+      // 이미지 업로드 (선택된 이미지가 있을 경우)
+      String? newAvatarUrl;
+      if (_selectedImage != null) {
+        newAvatarUrl = await _uploadProfileImage(user.id);
+        if (newAvatarUrl == null) {
+          throw Exception('이미지 업로드 실패');
+        }
       }
+
+      // 프로필 업데이트
+      final updatedUser = user.copyWith(
+        name: _nameController.text,
+        email: _emailController.text,
+        avatarUrl: newAvatarUrl ?? user.avatarUrl,
+      );
+
+      ref.read(userProvider.notifier).updateUser(updatedUser);
+
+      if (!mounted) return;
+      LoadingOverlay.hide(context);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('프로필이 저장되었습니다'),
-          backgroundColor: AppColors.mathGreen,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
@@ -366,6 +494,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       );
 
       Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      LoadingOverlay.hide(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('프로필 저장 실패: $e'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUploading = false;
+        });
+      }
     }
   }
 }

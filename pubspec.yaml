@@ -42,6 +42,8 @@ dependencies:
 
   # 로컬 저장소
   shared_preferences: ^2.2.2
+  encrypt: ^5.0.3  # AES 암호화
+  crypto: ^3.0.3  # 해시 함수
 
   # HTTP 클라이언트
   dio: ^5.4.0
@@ -89,6 +91,15 @@ dependencies:
   # URL 런처 (이메일, 전화번호 등)
   url_launcher: ^6.2.2
 
+  # 공부 타이머
+  stop_watch_timer: ^3.1.1
+
+  # 이미지 선택
+  image_picker: ^1.0.7
+
+  # 차트
+  fl_chart: ^0.69.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -128,6 +139,21 @@ flutter:
     - assets/problems/images/
     - assets/problems/ms1_소인수분해/
     - assets/problems/polynomials/
+    - assets/problems/high/
+    - assets/problems/high/grade1/
+    - assets/problems/high/grade2/
+    - assets/problems/high/grade3/
+    - assets/problems/middle/
+    - assets/problems/middle/grade1/
+    - assets/problems/middle/grade2/
+    - assets/problems/middle/grade3/
+    - assets/problems/elementary/
+    - assets/problems/elementary/grade1/
+    - assets/problems/elementary/grade2/
+    - assets/problems/elementary/grade3/
+    - assets/problems/elementary/grade4/
+    - assets/problems/elementary/grade5/
+    - assets/problems/elementary/grade6/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

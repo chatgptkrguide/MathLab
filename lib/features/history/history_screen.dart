@@ -5,8 +5,10 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
+import '../../shared/widgets/dialogs/grade_selection_dialog.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/study_history_provider.dart';
+import 'monthly_stats_screen.dart';
 
 /// 학습 이력 화면 (Figma 디자인 03)
 /// 챌린지 진행 상황과 캘린더를 표시
@@ -53,14 +55,25 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     IconButton(
                       icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
                       onPressed: () {
-                        // TODO: 학년 선택 드로어 (필요시 추가)
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('학년 선택 기능 준비 중입니다'),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                        final currentGrade = user?.currentGrade ?? '중1';
+                        showDialog(
+                          context: context,
+                          builder: (context) => GradeSelectionDialog(
+                            currentGrade: currentGrade,
+                            onGradeSelected: (newGrade) {
+                              ref.read(userProvider.notifier).updateUser(
+                                user!.copyWith(currentGrade: newGrade),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('학년이 $newGrade(으)로 변경되었습니다'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
@@ -321,13 +334,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               ),
               TextButton.icon(
                 onPressed: () {
-                  // TODO: 월간 상세 통계 페이지로 이동
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('월간 상세 통계 기능 준비 중입니다'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MonthlyStatsScreen(
+                        selectedMonth: DateTime.now(),
                       ),
                     ),
                   );

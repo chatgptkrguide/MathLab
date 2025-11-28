@@ -2,6 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/league_provider.dart';
+import '../../data/providers/friend_provider.dart';
+import '../../data/providers/all_users_provider.dart';
+import '../../data/providers/user_provider.dart';
+import '../../data/models/models.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 
@@ -277,7 +281,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen>
 }
 
 /// 참가자 카드
-class _ParticipantCard extends StatelessWidget {
+class _ParticipantCard extends ConsumerWidget {
   final LeagueParticipant participant;
   final int rank;
   final bool isMe;
@@ -307,7 +311,7 @@ class _ParticipantCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingL,
@@ -439,6 +443,12 @@ class _ParticipantCard extends StatelessWidget {
             ],
           ),
 
+          // 친구 추가 버튼 (자기 자신이 아닌 경우만)
+          if (!isMe) ...[
+            const SizedBox(width: 8),
+            _buildFriendButton(context, ref),
+          ],
+
           // 승급/강등 표시
           if (isPromotionZone && !isMe) ...[
             const SizedBox(width: AppDimensions.spacingS),
@@ -458,5 +468,109 @@ class _ParticipantCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// 친구 추가 버튼
+  Widget _buildFriendButton(BuildContext context, WidgetRef ref) {
+    final friends = ref.watch(friendsProvider);
+
+    // 이미 친구인지 확인
+    final isFriend = friends.any(
+      (f) => f.userId == participant.id && f.status == FriendRequestStatus.accepted,
+    );
+
+    // 대기 중인 요청이 있는지 확인
+    final hasPendingRequest = friends.any(
+      (f) => f.userId == participant.id && f.status == FriendRequestStatus.pending,
+    );
+
+    if (isFriend) {
+      return const SizedBox.shrink();
+    }
+
+    if (hasPendingRequest) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.textSecondary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          '대기중',
+          style: TextStyle(
+            fontSize: 11,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    // 친구 추가 버튼
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: IconButton(
+        onPressed: () => _sendFriendRequest(context, ref),
+        icon: Icon(Icons.person_add, color: AppColors.primary, size: 20),
+        padding: const EdgeInsets.all(8),
+        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+        tooltip: '친구 추가',
+      ),
+    );
+  }
+
+  /// 친구 요청 보내기
+  Future<void> _sendFriendRequest(BuildContext context, WidgetRef ref) async {
+    try {
+      // AllUsersProvider에서 실제 사용자 정보 가져오기
+      final allUsers = ref.read(allUsersProvider);
+      final targetUser = allUsers.firstWhere(
+        (u) => u.id == participant.id,
+        orElse: () => User(
+          id: participant.id,
+          name: participant.name,
+          email: '${participant.id}@example.com',
+          joinDate: DateTime.now(),
+          level: 1,
+          xp: participant.weeklyXP,
+          streakDays: 0,
+          currentGrade: '중1',
+          avatarUrl: '👤',
+          hearts: 5,
+          dailyXP: 0,
+          lastXPResetDate: DateTime.now(),
+        ),
+      );
+
+      await ref.read(friendsProvider.notifier).sendFriendRequest(
+        userId: targetUser.id,
+        name: targetUser.name,
+        level: targetUser.level,
+        xp: targetUser.xp,
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${targetUser.name}님에게 친구 요청을 보냈습니다'),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('친구 요청을 보내는데 실패했습니다'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 }

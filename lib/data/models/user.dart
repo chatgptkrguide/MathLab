@@ -1,3 +1,5 @@
+import 'school_level.dart';
+
 /// 사용자 정보 모델
 class User {
   final String id;
@@ -13,6 +15,7 @@ class User {
   final int dailyXP; // 오늘 획득한 XP
   final DateTime lastXPResetDate; // 마지막 XP 리셋 날짜
   final DateTime? lastStudyDate; // 마지막 학습 날짜 (스트릭 계산용)
+  final DateTime? lastHeartUpdateTime; // 마지막 하트 업데이트 시간 (재생 계산용)
 
   const User({
     required this.id,
@@ -28,6 +31,7 @@ class User {
     this.dailyXP = 0, // 기본 일일 XP 0
     DateTime? lastXPResetDate,
     this.lastStudyDate, // 마지막 학습 날짜 (nullable)
+    this.lastHeartUpdateTime, // 마지막 하트 업데이트 시간 (nullable)
   }) : lastXPResetDate = lastXPResetDate ?? joinDate;
 
   /// JSON으로부터 User 객체 생성
@@ -51,6 +55,9 @@ class User {
       lastStudyDate: json['lastStudyDate'] != null
           ? DateTime.parse(json['lastStudyDate'] as String)
           : null,
+      lastHeartUpdateTime: json['lastHeartUpdateTime'] != null
+          ? DateTime.parse(json['lastHeartUpdateTime'] as String)
+          : null,
     );
   }
 
@@ -70,6 +77,7 @@ class User {
       'dailyXP': dailyXP,
       'lastXPResetDate': lastXPResetDate.toIso8601String(),
       'lastStudyDate': lastStudyDate?.toIso8601String(),
+      'lastHeartUpdateTime': lastHeartUpdateTime?.toIso8601String(),
     };
   }
 
@@ -88,6 +96,7 @@ class User {
     int? dailyXP,
     DateTime? lastXPResetDate,
     DateTime? lastStudyDate,
+    DateTime? lastHeartUpdateTime,
   }) {
     return User(
       id: id ?? this.id,
@@ -103,6 +112,7 @@ class User {
       dailyXP: dailyXP ?? this.dailyXP,
       lastXPResetDate: lastXPResetDate ?? this.lastXPResetDate,
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
+      lastHeartUpdateTime: lastHeartUpdateTime ?? this.lastHeartUpdateTime,
     );
   }
 
@@ -126,6 +136,12 @@ class User {
     if (level <= 30) return '고급자';
     return '전문가';
   }
+
+  /// 현재 학년의 학교급 (초등/중등/고등) 추출
+  SchoolLevel get schoolLevel => SchoolLevel.fromGrade(currentGrade);
+
+  /// 학년 번호 (1-6 또는 1-3)
+  int get gradeNumber => SchoolLevel.getGradeNumber(currentGrade);
 
   @override
   String toString() {

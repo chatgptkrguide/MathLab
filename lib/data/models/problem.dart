@@ -1,3 +1,5 @@
+import 'school_level.dart';
+
 /// 수학 문제 데이터 모델
 class Problem {
   final String id;
@@ -114,6 +116,13 @@ class Problem {
   // 한국 교육과정 관련 getter들
   String? get grade => metadata?['grade'] as String?;
   String? get chapter => metadata?['chapter'] as String?;
+
+  /// 학교급 (초등/중등/고등) 추출
+  SchoolLevel? get schoolLevel => grade != null ? SchoolLevel.fromGrade(grade!) : null;
+
+  /// 학년 번호 (1-6 또는 1-3)
+  int? get gradeNumber => grade != null ? SchoolLevel.getGradeNumber(grade!) : null;
+
   String get typeIcon {
     switch (type) {
       case ProblemType.multipleChoice:

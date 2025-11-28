@@ -14,6 +14,18 @@ class GameConstants {
   /// 문제당 기본 XP 보상
   static const int baseXPReward = 10;
 
+  /// 난이도별 XP 배수
+  static const Map<int, double> difficultyXpMultiplier = {
+    1: 1.0, // 쉬움
+    2: 1.5, // 보통
+    3: 2.0, // 어려움
+    4: 2.5, // 매우 어려움
+    5: 3.0, // 최고 난이도
+  };
+
+  /// 힌트 사용 시 XP 감소율
+  static const double hintXpPenalty = 0.5; // 50% 감소
+
   // ========== 하트 시스템 ==========
   /// 최대 하트 개수
   static const int maxHearts = 5;
@@ -21,12 +33,35 @@ class GameConstants {
   /// 하트 회복 시간 (분)
   static const int heartRecoveryMinutes = 30;
 
+  /// 하트 재생 시간 (밀리초)
+  static const int heartRegenerationMs = heartRecoveryMinutes * 60 * 1000;
+
+  /// 문제 틀렸을 때 잃는 하트 개수
+  static const int heartsLostPerMistake = 1;
+
+  /// 하트 재생 타이머 체크 간격 (초)
+  static const int heartTimerCheckIntervalSeconds = 60;
+
   // ========== 스트릭 시스템 ==========
+  /// 기본 스트릭 일수 (새 유저 또는 폴백 값)
+  static const int defaultStreakDays = 0;
+
   /// 스트릭 프리즈 가능 횟수
   static const int maxStreakFreezes = 2;
 
   /// 주간 스트릭 보상 임계값
   static const int weeklyStreakThreshold = 7;
+
+  /// 스트릭 보너스 XP 배수
+  static const Map<int, double> streakBonusMultiplier = {
+    3: 1.1, // 3일 연속: +10% XP
+    5: 1.2, // 5일 연속: +20% XP
+    10: 1.5, // 10일 연속: +50% XP
+    30: 2.0, // 30일 연속: +100% XP
+  };
+
+  /// 스트릭이 깨지지 않는 최대 시간 (시간)
+  static const int streakGracePeriodHours = 24;
 
   // ========== 레벨 시스템 ==========
   /// 초급 레벨 범위
@@ -57,6 +92,12 @@ class GameConstants {
 
   /// 최대 문제 수
   static const int maxProblemCount = 20;
+
+  /// 최소 문제 풀이 개수 (결과 화면 표시 기준)
+  static const int minimumProblemsForResults = 1;
+
+  /// 답안 제출 더블클릭 시간 제한 (밀리초)
+  static const int doubleClickSubmitTimeMs = 500;
 
   // ========== 기본값 ==========
   /// 기본 레슨 ID
@@ -93,6 +134,18 @@ class GameConstants {
 
   /// 느린 애니메이션 (ms)
   static const int slowAnimationMs = 500;
+
+  /// 문제 풀이 애니메이션 지속 시간 (밀리초)
+  static const int problemAnimationDurationMs = 300;
+
+  /// 정답 피드백 애니메이션 지속 시간 (밀리초)
+  static const int correctAnswerAnimationMs = 1000;
+
+  /// 오답 피드백 애니메이션 지속 시간 (밀리초)
+  static const int wrongAnswerAnimationMs = 800;
+
+  /// 레벨업 애니메이션 지속 시간 (밀리초)
+  static const int levelUpAnimationMs = 2000;
 
   // ========== 타이밍 ==========
   /// SnackBar 표시 시간 (초)
@@ -147,4 +200,18 @@ class GameConstants {
 
   /// 디버그 모드에서 빠른 레벨업 (XP 감소)
   static const int debugXPPerLevel = 50;
+
+  // ========== 알림 시스템 ==========
+  /// 스트릭 알림 기본 시간 (시)
+  static const int defaultStreakReminderHour = 20; // 저녁 8시
+
+  /// 학습 알림 기본 시간 (시)
+  static const int defaultStudyReminderHour = 9; // 아침 9시
+
+  // ========== 리그 시스템 (미래 기능) ==========
+  /// 리그 최소 참가 XP
+  static const int leagueMinimumXp = 500;
+
+  /// 리그 주간 리셋 요일 (0 = 일요일, 6 = 토요일)
+  static const int leagueResetDayOfWeek = 0; // 일요일
 }

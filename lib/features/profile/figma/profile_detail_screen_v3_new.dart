@@ -9,6 +9,10 @@ import '../../level_test/level_test_screen.dart';
 import '../../achievements/achievements_screen.dart';
 import '../../daily_challenge/daily_challenge_screen.dart';
 import '../../settings/settings_screen.dart';
+import '../../academic_records/academic_records_screen.dart';
+import '../../course_enrollment/course_enrollment_screen.dart';
+import '../../league_tier/league_tier_screen.dart';
+import '../../friends/friends_screen.dart';
 
 /// Figma 디자인 "05" 프로필 상세 페이지 - 완전 재구성 버전
 /// Figma Page 05 구조와 100% 일치하도록 구현
@@ -146,11 +150,16 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
                 child: CircleAvatar(
                   radius: 42,
                   backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.person,
-                    size: 50,
-                    color: Colors.grey.shade400,
-                  ),
+                  backgroundImage: user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
+                      ? NetworkImage(user.avatarUrl)
+                      : null,
+                  child: user?.avatarUrl == null || user!.avatarUrl.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Colors.grey.shade400,
+                        )
+                      : null,
                 ),
               ),
 
@@ -663,6 +672,80 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const DailyChallengeScreen(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 3: Academic Records & Course Enrollment
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickAccessCard(
+                  context,
+                  '📊',
+                  '학업 성적',
+                  'Academic Records',
+                  const Color(0xFF9C27B0),
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AcademicRecordsScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildQuickAccessCard(
+                  context,
+                  '📚',
+                  '수강 과정',
+                  'My Courses',
+                  const Color(0xFF00BCD4),
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CourseEnrollmentScreen(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 4: League Tier & Friends
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickAccessCard(
+                  context,
+                  '🏆',
+                  '리그 티어',
+                  'League Tier',
+                  const Color(0xFFFF5722),
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TierLevelScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildQuickAccessCard(
+                  context,
+                  '👥',
+                  '친구',
+                  'Friends',
+                  const Color(0xFF673AB7),
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FriendsScreen(),
                     ),
                   ),
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/game_constants.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/animations/fade_in_widget.dart';
 import '../../shared/widgets/math/math_text.dart';
@@ -414,6 +415,28 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
               fontSize: 15,
             ),
           ),
+          // 학년 정보 표시
+          if (_currentProblem.grade != null) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 3,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.surface.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _currentProblem.grade!,
+                style: const TextStyle(
+                  color: AppColors.surface,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(
@@ -778,7 +801,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // 같은 답을 500ms 이내에 다시 선택하면 자동 제출
     if (_lastSelectedIndex == index &&
         _lastSelectTime != null &&
-        now.difference(_lastSelectTime!).inMilliseconds <= 500) {
+        now.difference(_lastSelectTime!).inMilliseconds <= GameConstants.doubleClickSubmitTimeMs) {
       // 두 번째 클릭 -> 자동 제출
       await AppHapticFeedback.success();
       setState(() {
@@ -798,7 +821,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       });
 
       // 500ms 후에 깜빡임 중지
-      Future.delayed(const Duration(milliseconds: 500), () {
+      Future.delayed(const Duration(milliseconds: GameConstants.doubleClickSubmitTimeMs), () {
         if (mounted && _pulsingIndex == index) {
           setState(() {
             _pulsingIndex = null;

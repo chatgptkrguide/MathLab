@@ -15,14 +15,13 @@ class UserNotifier extends StateNotifier<User?> {
 
   final MockDataService _dataService = MockDataService();
   final LocalStorageService _storage = LocalStorageService();
-  Timer? _heartRegenTimer;
 
   /// 앱 시작 시 사용자 정보 로드
   Future<void> _loadUser() async {
     try {
       Logger.info('사용자 정보 로드 시작', tag: 'UserProvider');
 
-      final user = await _storage.loadObject<User>(
+      final user = await _storage.loadSecureObject<User>(
         key: GameConstants.userStorageKey,
         fromJson: User.fromJson,
       );
@@ -34,15 +33,15 @@ class UserNotifier extends StateNotifier<User?> {
 
         // 스트릭 확인 및 업데이트
         await checkAndUpdateStreak();
+
+        // 하트 경과 시간 기반 재생
+        await _updateHeartsBasedOnTime();
       } else {
         // 없으면 샘플 사용자 생성
         state = _dataService.getSampleUser();
         await _saveUser();
         Logger.info('새 사용자 생성: ${state?.name}', tag: 'UserProvider');
       }
-
-      // 하트 재생 타이머 시작
-      _startHeartRegeneration();
     } catch (e, stackTrace) {
       Logger.error(
         '사용자 정보 로드 실패',
@@ -53,41 +52,39 @@ class UserNotifier extends StateNotifier<User?> {
 
       // 에러 시 샘플 사용자로 폴백
       state = _dataService.getSampleUser();
-      _startHeartRegeneration();
     }
   }
 
-  @override
-  void dispose() {
-    _heartRegenTimer?.cancel();
-    super.dispose();
-  }
-
-  /// 하트 재생 타이머 시작 (30분마다 하트 1개)
-  void _startHeartRegeneration() {
-    _heartRegenTimer?.cancel();
-
-    // 30분마다 실행
-    _heartRegenTimer = Timer.periodic(
-      const Duration(minutes: 30),
-      (timer) {
-        if (state != null && state!.hearts < GameConstants.maxHearts) {
-          _regenerateOneHeart();
-        }
-      },
-    );
-
-    Logger.info('하트 재생 타이머 시작 (30분마다)', tag: 'UserProvider');
-  }
-
-  /// 하트 1개 재생
-  Future<void> _regenerateOneHeart() async {
+  /// 경과 시간 기반 하트 재생 (30분마다 1개)
+  Future<void> _updateHeartsBasedOnTime() async {
     if (state == null || state!.hearts >= GameConstants.maxHearts) return;
 
-    state = state!.copyWith(hearts: state!.hearts + 1);
-    await _saveUser();
+    final now = DateTime.now();
+    final lastHeartUpdate = state!.lastHeartUpdateTime ?? now;
 
-    Logger.info('하트 재생: ${state!.hearts}/${GameConstants.maxHearts}', tag: 'UserProvider');
+    // 경과 시간 계산 (분 단위)
+    final minutesPassed = now.difference(lastHeartUpdate).inMinutes;
+
+    // 재생할 하트 수 계산 (30분마다 1개)
+    final heartsToRegenerate = minutesPassed ~/ GameConstants.heartRecoveryMinutes;
+
+    if (heartsToRegenerate > 0) {
+      final newHearts = (state!.hearts + heartsToRegenerate).clamp(0, GameConstants.maxHearts);
+      final actualRegenerated = newHearts - state!.hearts;
+
+      if (actualRegenerated > 0) {
+        state = state!.copyWith(
+          hearts: newHearts,
+          lastHeartUpdateTime: now,
+        );
+        await _saveUser();
+
+        Logger.info(
+          '하트 자동 재생: +$actualRegenerated (현재: $newHearts/${GameConstants.maxHearts})',
+          tag: 'UserProvider',
+        );
+      }
+    }
   }
 
   /// 하트 전체 구매 (광고 시청 또는 IAP)
@@ -103,7 +100,7 @@ class UserNotifier extends StateNotifier<User?> {
   /// 특정 계정의 사용자 정보 로드
   Future<void> loadUserByAccount(String accountId) async {
     try {
-      final user = await _storage.loadObject<User>(
+      final user = await _storage.loadSecureObject<User>(
         key: 'user_$accountId',
         fromJson: User.fromJson,
       );
@@ -138,7 +135,7 @@ class UserNotifier extends StateNotifier<User?> {
     if (state == null) return;
 
     try {
-      await _storage.saveObject<User>(
+      await _storage.saveSecureObject<User>(
         key: GameConstants.userStorageKey,
         data: state!,
         toJson: (user) => user.toJson(),
@@ -384,9 +381,6 @@ class UserNotifier extends StateNotifier<User?> {
     );
 
     await _saveUser();
-
-    // 하트 재생 타이머 시작
-    _startHeartRegeneration();
 
     Logger.info('게스트 사용자 생성 완료: $guestId', tag: 'UserProvider');
   }

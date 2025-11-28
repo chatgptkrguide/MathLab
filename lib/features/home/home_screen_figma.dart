@@ -3,19 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/figma_colors.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
+import '../../shared/constants/game_constants.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
 import '../daily_reward/daily_reward_screen.dart';
 import '../profile/figma/profile_detail_screen_v3_new.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../problems/problem_solving_screen.dart';
 import '../messages/messages_screen.dart';
+import '../friends/friends_screen.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/navigation_provider.dart';
 import '../../data/providers/message_provider.dart';
+import '../../data/providers/friend_provider.dart';
 import '../../data/services/korean_math_curriculum.dart';
 import '../../data/models/models.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';
+import '../../shared/utils/level_badge_mapper.dart';
 
 /// Figma 디자인 "00 home" 화면 100% 재현
 /// 레퍼런스: assets/images/figma_home_reference.png
@@ -146,6 +150,11 @@ class HomeScreenFigma extends ConsumerWidget {
               // 하단 스탯 카드들 (XP, 레벨, 연속)
               _buildStatsCards(context, user),
 
+              const SizedBox(height: 24),
+
+              // 친구 활동 섹션
+              _buildFriendsActivity(context),
+
               const SizedBox(height: 20),
 
               // 학년 선택 카드
@@ -228,7 +237,7 @@ class HomeScreenFigma extends ConsumerWidget {
                         Image.asset('assets/icons/streak_fire.png', width: 20, height: 20),
                         const SizedBox(width: 6),
                         Text(
-                          '${user?.streakDays ?? 6}',
+                          '${user?.streakDays ?? GameConstants.defaultStreakDays}',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -484,7 +493,7 @@ class HomeScreenFigma extends ConsumerWidget {
           _buildStatCard(
             'assets/icons/streak_fire.png',
             '연속',
-            '${user?.streakDays ?? 6}일',
+            '${user?.streakDays ?? GameConstants.defaultStreakDays}일',
             onTap: () {
               Navigator.push(
                 context,
@@ -772,7 +781,7 @@ class HomeScreenFigma extends ConsumerWidget {
           // 학년 업데이트
           ProviderScope.containerOf(context).read(userProvider.notifier).updateGrade(grade);
           // 단원 선택 모달 표시
-          Future.delayed(const Duration(milliseconds: 300), () {
+          Future.delayed(const Duration(milliseconds: GameConstants.normalAnimationMs), () {
             _showLessonSelectionModal(context, grade);
           });
         },
@@ -936,6 +945,259 @@ class HomeScreenFigma extends ConsumerWidget {
               const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 친구 활동 섹션
+  Widget _buildFriendsActivity(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final friends = ref.watch(friendsProvider);
+        final acceptedFriends = friends
+            .where((f) => f.status == FriendRequestStatus.accepted)
+            .toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 섹션 헤더
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        '친구 활동',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A1A1A),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (acceptedFriends.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${acceptedFriends.length}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FriendsScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      '전체 보기',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // 친구 목록 (수평 스크롤)
+            if (acceptedFriends.isEmpty)
+              _buildEmptyFriendsState(context)
+            else
+              SizedBox(
+                height: 140,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  itemCount: acceptedFriends.length,
+                  itemBuilder: (context, index) {
+                    final friend = acceptedFriends[index];
+                    return _buildFriendCard(friend);
+                  },
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// 친구가 없을 때 표시
+  Widget _buildEmptyFriendsState(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.2),
+          width: 2,
+          style: BorderStyle.solid,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '친구와 함께 학습하세요!',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '친구를 추가하고 함께 수학 실력을 키워보세요',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Material(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FriendsScreen(),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: const Row(
+                  children: [
+                    Icon(Icons.person_add, color: Colors.white, size: 20),
+                    SizedBox(width: 6),
+                    Text(
+                      '추가',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 친구 카드
+  Widget _buildFriendCard(Friend friend) {
+    return Container(
+      width: 140,
+      margin: const EdgeInsets.only(right: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 아바타
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.accentCyan.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?',
+                  style: TextStyle(
+                    color: AppColors.accentCyan,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // 이름
+            Text(
+              friend.name,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A1A),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            // 레벨 배지
+            Image.asset(
+              LevelBadgeMapper.getBadgeImagePath(friend.level),
+              width: 24,
+              height: 24,
+              errorBuilder: (context, error, stackTrace) {
+                // 배지 이미지 로드 실패 시 텍스트로 폴백
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.workspace_premium, size: 12, color: AppColors.mathGold),
+                    const SizedBox(width: 3),
+                    Text(
+                      'Lv.${friend.level}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

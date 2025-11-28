@@ -1,3 +1,5 @@
+import 'school_level.dart';
+
 /// 수업/레슨 정보 모델
 class Lesson {
   final String id;
@@ -125,6 +127,12 @@ class Lesson {
 
   /// 예상 소요 시간 (분) - 문제당 2분으로 가정
   int get estimatedMinutes => remainingProblems * 2;
+
+  /// 학교급 (초등/중등/고등) 추출
+  SchoolLevel get schoolLevel => SchoolLevel.fromGrade(grade);
+
+  /// 학년 번호 (1-6 또는 1-3)
+  int get gradeNumber => SchoolLevel.getGradeNumber(grade);
 
   @override
   String toString() {

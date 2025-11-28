@@ -7,13 +7,23 @@ import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/logger.dart';
 
 /// 문제 관련 상태 관리
+///
+/// 주의: 생성자에서 비동기 초기화를 수행합니다.
+/// 데이터가 로드될 때까지 state는 빈 리스트입니다.
+/// UI에서는 빈 상태를 적절히 처리해야 합니다.
 class ProblemNotifier extends StateNotifier<List<Problem>> {
   ProblemNotifier() : super([]) {
+    // 생성자에서 비동기 초기화 - 완료를 기다리지 않음
+    // 이는 Riverpod의 일반적인 패턴이며, state가 업데이트되면 UI가 자동으로 리빌드됩니다.
     _loadProblems();
   }
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   /// 문제 데이터 로드
   Future<void> _loadProblems() async {
+    _isLoading = true;
     try {
       Logger.info('문제 데이터 로드 시작', tag: 'ProblemProvider');
 
@@ -35,6 +45,8 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
         tag: 'ProblemProvider',
       );
       state = [];
+    } finally {
+      _isLoading = false;
     }
   }
 
@@ -134,15 +146,24 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
 }
 
 /// 문제 결과 관리
+///
+/// 주의: 생성자에서 비동기 초기화를 수행합니다.
+/// 데이터가 로드될 때까지 state는 빈 리스트입니다.
+/// UI에서는 빈 상태를 적절히 처리해야 합니다.
 class ProblemResultsNotifier extends StateNotifier<List<ProblemResult>> {
   ProblemResultsNotifier() : super([]) {
+    // 생성자에서 비동기 초기화 - 완료를 기다리지 않음
+    // 이는 Riverpod의 일반적인 패턴이며, state가 업데이트되면 UI가 자동으로 리빌드됩니다.
     _loadResults();
   }
 
   final LocalStorageService _storage = LocalStorageService();
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   /// 결과 데이터 로드
   Future<void> _loadResults() async {
+    _isLoading = true;
     try {
       Logger.debug('문제 결과 로드 시작', tag: 'ProblemResultsProvider');
 
@@ -161,6 +182,8 @@ class ProblemResultsNotifier extends StateNotifier<List<ProblemResult>> {
         tag: 'ProblemResultsProvider',
       );
       state = [];
+    } finally {
+      _isLoading = false;
     }
   }
 
