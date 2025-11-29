@@ -4,6 +4,10 @@ import 'local_storage_service.dart';
 import 'firestore_service.dart';
 import '../models/sync_status.dart';
 import '../models/sync_task.dart';
+import '../models/user.dart';
+import '../models/wrong_answer.dart';
+import '../repositories/user_repository.dart';
+import '../repositories/wrong_answer_repository.dart';
 import '../../shared/utils/logger.dart';
 
 /// 동기화 관리자
@@ -22,6 +26,10 @@ class SyncManager {
   final LocalStorageService _localStorage = LocalStorageService();
   final FirestoreService _firestore = FirestoreService();
   final Connectivity _connectivity = Connectivity();
+
+  // Repository 인스턴스 (initialize에서 주입받음)
+  UserRepository? _userRepository;
+  WrongAnswerRepository? _wrongAnswerRepository;
 
   // 동기화 상태 스트림
   final _syncStatusController = StreamController<SyncStatus>.broadcast();
@@ -44,9 +52,24 @@ class SyncManager {
   // ==================== 초기화 ====================
 
   /// 초기화
-  Future<void> initialize() async {
+  Future<void> initialize({
+    UserRepository? userRepository,
+    WrongAnswerRepository? wrongAnswerRepository,
+  }) async {
     try {
       Logger.info('SyncManager 초기화 시작', tag: 'SyncManager');
+
+      // Repository 주입
+      _userRepository = userRepository ??
+          UserRepository(
+            localStorageService: _localStorage,
+            firestoreService: _firestore,
+          );
+      _wrongAnswerRepository = wrongAnswerRepository ??
+          WrongAnswerRepository(
+            localStorageService: _localStorage,
+            firestoreService: _firestore,
+          );
 
       // 오프라인 큐 로드
       await _loadPendingTasks();
@@ -231,31 +254,143 @@ class SyncManager {
   Future<void> _executeTask(SyncTask task) async {
     switch (task.type) {
       case SyncTaskType.uploadUserProfile:
-        // TODO: UserRepository를 사용하여 프로필 업로드
-        Logger.debug('사용자 프로필 업로드: ${task.accountId}', tag: 'SyncManager');
+        await _uploadUserProfile(task);
         break;
 
       case SyncTaskType.uploadWrongAnswer:
-        // TODO: WrongAnswerRepository를 사용하여 오답 업로드
-        Logger.debug('오답 업로드: ${task.accountId}', tag: 'SyncManager');
+        await _uploadWrongAnswer(task);
         break;
 
       case SyncTaskType.uploadStudyHistory:
-        // TODO: StudyHistoryRepository를 사용하여 학습 기록 업로드
-        Logger.debug('학습 기록 업로드: ${task.accountId}', tag: 'SyncManager');
+        // TODO: StudyHistoryRepository 구현 후 추가
+        Logger.debug('학습 기록 업로드: ${task.accountId} (미구현)', tag: 'SyncManager');
         break;
 
       case SyncTaskType.uploadLeague:
-        // TODO: LeagueRepository를 사용하여 리그 데이터 업로드
-        Logger.debug('리그 데이터 업로드: ${task.accountId}', tag: 'SyncManager');
+        // TODO: LeagueRepository 구현 후 추가
+        Logger.debug('리그 데이터 업로드: ${task.accountId} (미구현)', tag: 'SyncManager');
         break;
 
       case SyncTaskType.downloadUserProfile:
-      case SyncTaskType.downloadWrongAnswers:
-      case SyncTaskType.downloadStudyHistory:
-        // 다운로드 작업은 Repository에서 자동으로 처리
-        Logger.debug('다운로드 작업: ${task.type.name}', tag: 'SyncManager');
+        await _downloadUserProfile(task);
         break;
+
+      case SyncTaskType.downloadWrongAnswers:
+        await _downloadWrongAnswers(task);
+        break;
+
+      case SyncTaskType.downloadStudyHistory:
+        // TODO: StudyHistoryRepository 구현 후 추가
+        Logger.debug('학습 기록 다운로드: ${task.accountId} (미구현)', tag: 'SyncManager');
+        break;
+    }
+  }
+
+  /// 사용자 프로필 업로드
+  Future<void> _uploadUserProfile(SyncTask task) async {
+    if (_userRepository == null) {
+      throw Exception('UserRepository가 초기화되지 않았습니다');
+    }
+
+    try {
+      // task.data에서 User 객체 복원
+      final userData = task.data['user'] as Map<String, dynamic>;
+      final user = User.fromJson(userData);
+
+      // Repository를 통해 Firebase에 업로드
+      await _userRepository!.saveToFirebase(task.accountId, user);
+
+      Logger.info('사용자 프로필 업로드 완료: ${task.accountId}', tag: 'SyncManager');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 프로필 업로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
+    }
+  }
+
+  /// 오답 업로드
+  Future<void> _uploadWrongAnswer(SyncTask task) async {
+    if (_wrongAnswerRepository == null) {
+      throw Exception('WrongAnswerRepository가 초기화되지 않았습니다');
+    }
+
+    try {
+      // task.data에서 WrongAnswer 객체 복원
+      final wrongAnswerData = task.data['wrongAnswer'] as Map<String, dynamic>;
+      final wrongAnswer = WrongAnswer.fromJson(wrongAnswerData);
+
+      // Repository를 통해 Firebase에 업로드
+      await _wrongAnswerRepository!.saveToFirebase(task.accountId, wrongAnswer);
+
+      Logger.info('오답 업로드 완료: ${wrongAnswer.id}', tag: 'SyncManager');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '오답 업로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
+    }
+  }
+
+  /// 사용자 프로필 다운로드
+  Future<void> _downloadUserProfile(SyncTask task) async {
+    if (_userRepository == null) {
+      throw Exception('UserRepository가 초기화되지 않았습니다');
+    }
+
+    try {
+      // Repository를 통해 Firebase에서 다운로드
+      final user = await _userRepository!.getFromFirebase(task.accountId);
+
+      if (user != null) {
+        // 로컬에 저장
+        await _userRepository!.saveToLocal(task.accountId, user);
+        Logger.info('사용자 프로필 다운로드 완료: ${task.accountId}', tag: 'SyncManager');
+      } else {
+        Logger.warning('Firebase에 사용자 프로필 없음: ${task.accountId}', tag: 'SyncManager');
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 프로필 다운로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
+    }
+  }
+
+  /// 오답 목록 다운로드
+  Future<void> _downloadWrongAnswers(SyncTask task) async {
+    if (_wrongAnswerRepository == null) {
+      throw Exception('WrongAnswerRepository가 초기화되지 않았습니다');
+    }
+
+    try {
+      // Repository를 통해 Firebase에서 다운로드
+      final wrongAnswers = await _wrongAnswerRepository!.getFromFirebase(task.accountId);
+
+      if (wrongAnswers.isNotEmpty) {
+        // 로컬에 저장
+        await _wrongAnswerRepository!.saveToLocal(task.accountId, wrongAnswers);
+        Logger.info('오답 목록 다운로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
+      } else {
+        Logger.debug('Firebase에 오답 목록 없음: ${task.accountId}', tag: 'SyncManager');
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        '오답 목록 다운로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
     }
   }
 
@@ -272,13 +407,8 @@ class SyncManager {
     try {
       _updateStatus(SyncState.syncing, '초기 동기화 중');
 
-      // TODO: Repository를 사용하여 모든 데이터 동기화
-      // - 사용자 프로필
-      // - 오답 노트
-      // - 학습 기록
-      // - 리그 데이터
-
-      await Future.delayed(const Duration(seconds: 1)); // 임시
+      // Repository를 사용하여 모든 데이터 다운로드
+      await downloadChanges(accountId);
 
       _updateStatus(SyncState.success, '초기 동기화 완료');
     } catch (e, stackTrace) {
@@ -327,7 +457,29 @@ class SyncManager {
     try {
       Logger.info('로컬 → Firebase 업로드 시작', tag: 'SyncManager');
 
-      // TODO: Repository를 사용하여 로컬 변경사항 업로드
+      // 1. 사용자 프로필 업로드
+      if (_userRepository != null) {
+        final user = await _userRepository!.getFromLocal(accountId);
+        if (user != null) {
+          await _userRepository!.saveToFirebase(accountId, user);
+          Logger.debug('사용자 프로필 업로드 완료', tag: 'SyncManager');
+        }
+      }
+
+      // 2. 오답 목록 업로드
+      if (_wrongAnswerRepository != null) {
+        final wrongAnswers = await _wrongAnswerRepository!.getFromLocal(accountId);
+        for (final wrongAnswer in wrongAnswers) {
+          try {
+            await _wrongAnswerRepository!.saveToFirebase(accountId, wrongAnswer);
+          } catch (e) {
+            Logger.warning('오답 업로드 실패: ${wrongAnswer.id} - $e', tag: 'SyncManager');
+          }
+        }
+        Logger.debug('오답 목록 업로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
+      }
+
+      // TODO: 학습 기록, 리그 데이터 업로드 추가
 
       Logger.info('업로드 완료', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -348,7 +500,39 @@ class SyncManager {
     try {
       Logger.info('Firebase → 로컬 다운로드 시작', tag: 'SyncManager');
 
-      // TODO: Repository를 사용하여 Firebase 데이터 다운로드
+      // 1. 사용자 프로필 다운로드
+      if (_userRepository != null) {
+        final remoteUser = await _userRepository!.getFromFirebase(accountId);
+        if (remoteUser != null) {
+          final localUser = await _userRepository!.getFromLocal(accountId);
+
+          // 충돌 해결 (Local-First: 로컬 우선, Remote가 더 최신이면 덮어쓰기)
+          if (localUser != null) {
+            final merged = await _userRepository!.mergeData(localUser, remoteUser);
+            if (merged != null) {
+              await _userRepository!.saveToLocal(accountId, merged);
+            }
+          } else {
+            await _userRepository!.saveToLocal(accountId, remoteUser);
+          }
+          Logger.debug('사용자 프로필 다운로드 완료', tag: 'SyncManager');
+        }
+      }
+
+      // 2. 오답 목록 다운로드
+      if (_wrongAnswerRepository != null) {
+        final remoteAnswers = await _wrongAnswerRepository!.getFromFirebase(accountId);
+        if (remoteAnswers.isNotEmpty) {
+          final localAnswers = await _wrongAnswerRepository!.getFromLocal(accountId);
+
+          // 병합: 양쪽 데이터 통합 (중복 제거)
+          final merged = _mergeWrongAnswers(localAnswers, remoteAnswers);
+          await _wrongAnswerRepository!.saveToLocal(accountId, merged);
+          Logger.debug('오답 목록 다운로드 완료: ${merged.length}개', tag: 'SyncManager');
+        }
+      }
+
+      // TODO: 학습 기록, 리그 데이터 다운로드 추가
 
       Logger.info('다운로드 완료', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -360,5 +544,30 @@ class SyncManager {
       );
       throw Exception('다운로드 실패: $e');
     }
+  }
+
+  /// 오답 목록 병합 (중복 제거)
+  List<WrongAnswer> _mergeWrongAnswers(List<WrongAnswer> local, List<WrongAnswer> remote) {
+    final Map<String, WrongAnswer> merged = {};
+
+    // 로컬 데이터 추가
+    for (final answer in local) {
+      merged[answer.id] = answer;
+    }
+
+    // 원격 데이터 추가 (중복 시 최신 것 사용)
+    for (final answer in remote) {
+      final existing = merged[answer.id];
+      if (existing == null) {
+        merged[answer.id] = answer;
+      } else {
+        // 복습 횟수가 많은 것 우선
+        if (answer.reviewCount > existing.reviewCount) {
+          merged[answer.id] = answer;
+        }
+      }
+    }
+
+    return merged.values.toList();
   }
 }
