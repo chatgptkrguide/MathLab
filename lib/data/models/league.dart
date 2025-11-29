@@ -240,6 +240,15 @@ class League {
     );
   }
 
+  /// Firestore DocumentSnapshot에서 League 생성
+  factory League.fromFirestore(dynamic doc) {
+    final data = doc.data() as Map<String, dynamic>?;
+    if (data == null) {
+      throw Exception('League document data is null');
+    }
+    return League.fromJson(data);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'tier': tier.toString(),

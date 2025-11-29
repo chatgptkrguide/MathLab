@@ -31,8 +31,11 @@ class ProgressModel {
   });
 
   /// Firestore에서 데이터 가져오기
-  factory ProgressModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+  factory ProgressModel.fromFirestore(dynamic doc) {
+    final data = doc.data() as Map<String, dynamic>?;
+    if (data == null) {
+      throw Exception('ProgressModel document data is null');
+    }
     return ProgressModel(
       userId: data['userId'] as String,
       grade: data['grade'] as String,
@@ -132,8 +135,11 @@ class DailyStudyModel {
   });
 
   /// Firestore에서 데이터 가져오기
-  factory DailyStudyModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+  factory DailyStudyModel.fromFirestore(dynamic doc) {
+    final data = doc.data() as Map<String, dynamic>?;
+    if (data == null) {
+      throw Exception('DailyStudyModel document data is null');
+    }
     return DailyStudyModel(
       userId: data['userId'] as String,
       date: (data['date'] as Timestamp).toDate(),

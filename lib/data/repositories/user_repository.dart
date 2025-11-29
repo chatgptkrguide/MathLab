@@ -62,7 +62,7 @@ class UserRepository extends BaseRepository<User> {
   @override
   Future<void> deleteFromLocal(String storageKey) async {
     try {
-      await localStorageService.delete(storageKey);
+      await localStorageService.remove(storageKey);
       Logger.debug('로컬 사용자 프로필 삭제 완료: $storageKey', tag: 'UserRepository');
     } catch (e, stackTrace) {
       Logger.error(
