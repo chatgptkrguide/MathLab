@@ -29,20 +29,42 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
       'grades': ['초1', '초2', '초3', '초4', '초5', '초6'],
       'icon': Icons.school,
       'color': AppColors.mathYellow,
+      'gradeIcons': [
+        Icons.local_florist,  // 초1: 꽃
+        Icons.eco,            // 초2: 잎
+        Icons.park,           // 초3: 나무
+        Icons.star,           // 초4: 별
+        Icons.emoji_events,   // 초5: 트로피
+        Icons.military_tech,  // 초6: 메달
+      ],
     },
     {
       'name': '중학교',
       'grades': ['중1', '중2', '중3'],
       'icon': Icons.menu_book,
       'color': AppColors.mathBlue,
+      'gradeIcons': [
+        Icons.menu_book,        // 중1: 책
+        Icons.import_contacts,  // 중2: 열린 책
+        Icons.school,           // 중3: 졸업모
+      ],
     },
     {
       'name': '고등학교',
       'grades': ['고1', '고2', '고3'],
       'icon': Icons.library_books,
       'color': AppColors.mathPurple,
+      'gradeIcons': [
+        Icons.science,         // 고1: 과학
+        Icons.biotech,         // 고2: 실험
+        Icons.rocket_launch,   // 고3: 로켓
+      ],
     },
   ];
+
+  // 완료된 학년 목록 (추후 사용자 데이터에서 가져올 예정)
+  // 테스트용: 초1, 초2, 중1 완료로 표시
+  final Set<String> _completedGrades = {'초1', '초2', '중1'};
 
   @override
   void initState() {
@@ -125,8 +147,11 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                       onTap: () {
                         setState(() {
                           _selectedSchoolIndex = index;
-                          // 해당 학교의 첫 번째 학년으로 자동 선택
-                          _selectedGrade = school['grades'][0];
+                          // 현재 학년이 선택된 학교급에 속하지 않을 때만 변경
+                          final grades = school['grades'] as List<String>;
+                          if (!grades.contains(_selectedGrade)) {
+                            _selectedGrade = grades[0];
+                          }
                         });
                       },
                       child: AnimatedContainer(
@@ -251,6 +276,7 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
     final school = _schools[_selectedSchoolIndex];
     final grades = school['grades'] as List<String>;
     final schoolColor = school['color'] as Color;
+    final gradeIcons = school['gradeIcons'] as List<IconData>;
 
     return GridView.builder(
       shrinkWrap: true,
@@ -259,12 +285,14 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
         crossAxisCount: 3,
         crossAxisSpacing: AppDimensions.spacingM,
         mainAxisSpacing: AppDimensions.spacingM,
-        childAspectRatio: 1.5,
+        childAspectRatio: 1.2,
       ),
       itemCount: grades.length,
       itemBuilder: (context, index) {
         final grade = grades[index];
         final isSelected = _selectedGrade == grade;
+        final isCompleted = _completedGrades.contains(grade);
+        final gradeIcon = gradeIcons[index];
 
         return GestureDetector(
           onTap: () {
@@ -272,50 +300,94 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
               _selectedGrade = grade;
             });
           },
-          child: AnimatedContainer(
-            duration: AppDimensions.animationFast,
-            decoration: BoxDecoration(
-              gradient: isSelected
-                  ? LinearGradient(
-                      colors: [
-                        schoolColor,
-                        schoolColor.withValues(alpha: 0.8),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null,
-              color: isSelected ? null : AppColors.background,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-              border: Border.all(
-                color: isSelected
-                    ? schoolColor
-                    : AppColors.borderLight,
-                width: isSelected ? 2 : 1,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: schoolColor.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+          child: Stack(
+            children: [
+              AnimatedContainer(
+                duration: AppDimensions.animationFast,
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(
+                          colors: [
+                            schoolColor,
+                            schoolColor.withValues(alpha: 0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: isSelected ? null : AppColors.background,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  border: Border.all(
+                    color: isSelected
+                        ? schoolColor
+                        : isCompleted
+                            ? AppColors.success
+                            : AppColors.borderLight,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: schoolColor.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      gradeIcon,
+                      color: isSelected
+                          ? Colors.white
+                          : isCompleted
+                              ? schoolColor
+                              : AppColors.textSecondary,
+                      size: 28,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      grade,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textPrimary,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w600,
                       ),
-                    ]
-                  : null,
-            ),
-            child: Center(
-              child: Text(
-                grade,
-                style: AppTextStyles.headlineSmall.copyWith(
-                  color: isSelected
-                      ? Colors.white
-                      : AppColors.textPrimary,
-                  fontWeight: isSelected
-                      ? FontWeight.bold
-                      : FontWeight.w600,
+                    ),
+                  ],
                 ),
               ),
-            ),
+              // 완료 뱃지
+              if (isCompleted)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.success.withValues(alpha: 0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
       },

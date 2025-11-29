@@ -3,6 +3,7 @@ import '../models/wrong_answer.dart';
 import '../models/problem.dart';
 import '../../shared/utils/logger.dart';
 import '../../data/services/local_storage_service.dart';
+import 'auth_provider.dart';
 
 /// 오답 노트 상태
 class WrongAnswerState {
@@ -10,12 +11,16 @@ class WrongAnswerState {
   final int totalCount;
   final int masteredCount;
   final int needsReviewCount;
+  final String? selectedCategory; // 선택된 카테고리 필터
+  final int? selectedDifficulty; // 선택된 난이도 필터 (1-5)
 
   const WrongAnswerState({
     required this.wrongAnswers,
     required this.totalCount,
     required this.masteredCount,
     required this.needsReviewCount,
+    this.selectedCategory,
+    this.selectedDifficulty,
   });
 
   WrongAnswerState copyWith({
@@ -23,12 +28,18 @@ class WrongAnswerState {
     int? totalCount,
     int? masteredCount,
     int? needsReviewCount,
+    String? selectedCategory,
+    int? selectedDifficulty,
+    bool clearCategory = false,
+    bool clearDifficulty = false,
   }) {
     return WrongAnswerState(
       wrongAnswers: wrongAnswers ?? this.wrongAnswers,
       totalCount: totalCount ?? this.totalCount,
       masteredCount: masteredCount ?? this.masteredCount,
       needsReviewCount: needsReviewCount ?? this.needsReviewCount,
+      selectedCategory: clearCategory ? null : (selectedCategory ?? this.selectedCategory),
+      selectedDifficulty: clearDifficulty ? null : (selectedDifficulty ?? this.selectedDifficulty),
     );
   }
 
@@ -37,51 +48,98 @@ class WrongAnswerState {
     if (totalCount == 0) return 0.0;
     return masteredCount / totalCount;
   }
+
+  /// 필터링된 오답 목록
+  List<WrongAnswer> get filteredWrongAnswers {
+    var filtered = wrongAnswers;
+
+    // 카테고리 필터
+    if (selectedCategory != null) {
+      filtered = filtered.where((wa) => wa.problem.category == selectedCategory).toList();
+    }
+
+    // 난이도 필터
+    if (selectedDifficulty != null) {
+      filtered = filtered.where((wa) => wa.problem.difficulty == selectedDifficulty).toList();
+    }
+
+    return filtered;
+  }
 }
 
 /// 오답 노트 Provider
 class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
+  final Ref ref; // Riverpod Ref for accessing current account
   final LocalStorageService _storage = LocalStorageService();
 
-  static const String _storageKey = 'wrong_answers';
-
-  WrongAnswerProvider()
+  WrongAnswerProvider(this.ref)
       : super(const WrongAnswerState(
           wrongAnswers: [],
           totalCount: 0,
           masteredCount: 0,
           needsReviewCount: 0,
         )) {
-    _loadWrongAnswers();
+    _initialize();
+  }
+
+  /// 현재 계정 ID 기반 저장소 키
+  String? get _storageKey {
+    final currentAccount = ref.read(currentAccountProvider);
+    if (currentAccount == null) {
+      Logger.warning('No logged in account', tag: 'WrongAnswerProvider');
+      return null;
+    }
+    return 'wrong_answers_${currentAccount.id}';
+  }
+
+  /// 초기화 및 데이터 로드
+  Future<void> _initialize() async {
+    await _loadWrongAnswers();
   }
 
   /// 오답 로드
   Future<void> _loadWrongAnswers() async {
     try {
-      final data = await _storage.loadMap(_storageKey);
+      final key = _storageKey;
+      if (key == null) {
+        // 로그인된 계정 없음 - 빈 상태로 초기화
+        _updateState([]);
+        return;
+      }
+
+      final data = await _storage.loadMap(key);
       if (data != null) {
         final wrongAnswers = (data['wrongAnswers'] as List?)
             ?.map((json) => WrongAnswer.fromJson(json))
             .toList() ?? [];
 
         _updateState(wrongAnswers);
-        Logger.info('Loaded ${wrongAnswers.length} wrong answers');
+        Logger.info('Loaded ${wrongAnswers.length} wrong answers for account', tag: 'WrongAnswerProvider');
+      } else {
+        _updateState([]);
       }
     } catch (e) {
-      Logger.error('Failed to load wrong answers', error: e);
+      Logger.error('Failed to load wrong answers', error: e, tag: 'WrongAnswerProvider');
+      _updateState([]);
     }
   }
 
   /// 오답 저장
   Future<void> _saveWrongAnswers() async {
     try {
-      await _storage.saveMap(_storageKey, {
+      final key = _storageKey;
+      if (key == null) {
+        Logger.warning('Cannot save wrong answers - no logged in account', tag: 'WrongAnswerProvider');
+        return;
+      }
+
+      await _storage.saveMap(key, {
         'wrongAnswers': state.wrongAnswers.map((wa) => wa.toJson()).toList(),
       });
 
-      Logger.info('Saved ${state.wrongAnswers.length} wrong answers');
+      Logger.info('Saved ${state.wrongAnswers.length} wrong answers for account', tag: 'WrongAnswerProvider');
     } catch (e) {
-      Logger.error('Failed to save wrong answers', error: e);
+      Logger.error('Failed to save wrong answers', error: e, tag: 'WrongAnswerProvider');
     }
   }
 
@@ -100,9 +158,10 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
   }
 
   /// 오답 추가
+  /// [selectedAnswerIndex]는 객관식 문제의 경우에만 필요 (주관식은 null)
   Future<void> addWrongAnswer({
     required Problem problem,
-    required int selectedAnswerIndex,
+    int? selectedAnswerIndex, // 주관식 지원을 위해 optional로 변경
   }) async {
     // 이미 존재하는지 확인
     final existingIndex = state.wrongAnswers.indexWhere(
@@ -129,7 +188,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
       final wrongAnswer = WrongAnswer(
         id: 'wa_${DateTime.now().millisecondsSinceEpoch}',
         problem: problem,
-        selectedAnswerIndex: selectedAnswerIndex,
+        selectedAnswerIndex: selectedAnswerIndex, // nullable 허용
         timestamp: DateTime.now(),
       );
 
@@ -184,9 +243,51 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     Logger.info('Deleted wrong answer: $wrongAnswerId');
   }
 
-  /// 복습 필요 목록
-  List<WrongAnswer> get reviewList {
+  /// 필터 설정 - 카테고리
+  void setCategory(String? category) {
+    state = state.copyWith(
+      selectedCategory: category,
+      clearCategory: category == null,
+    );
+  }
+
+  /// 필터 설정 - 난이도
+  void setDifficulty(int? difficulty) {
+    state = state.copyWith(
+      selectedDifficulty: difficulty,
+      clearDifficulty: difficulty == null,
+    );
+  }
+
+  /// 모든 필터 초기화
+  void clearFilters() {
+    state = state.copyWith(
+      clearCategory: true,
+      clearDifficulty: true,
+    );
+  }
+
+  /// 사용 가능한 카테고리 목록
+  List<String> get availableCategories {
     return state.wrongAnswers
+        .map((wa) => wa.problem.category)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  /// 사용 가능한 난이도 목록
+  List<int> get availableDifficulties {
+    return state.wrongAnswers
+        .map((wa) => wa.problem.difficulty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  /// 복습 필요 목록 (필터 적용)
+  List<WrongAnswer> get reviewList {
+    return state.filteredWrongAnswers
         .where((wa) => wa.needsReview)
         .toList()
       ..sort((a, b) {
@@ -197,15 +298,15 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
       });
   }
 
-  /// 최근 오답 목록 (최신순)
+  /// 최근 오답 목록 (최신순, 필터 적용)
   List<WrongAnswer> get recentList {
-    return [...state.wrongAnswers]
+    return [...state.filteredWrongAnswers]
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
-  /// 완료 목록
+  /// 완료 목록 (필터 적용)
   List<WrongAnswer> get masteredList {
-    return state.wrongAnswers
+    return state.filteredWrongAnswers
         .where((wa) => wa.isMastered)
         .toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
@@ -255,5 +356,5 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
 /// Provider 정의
 final wrongAnswerProvider =
     StateNotifierProvider<WrongAnswerProvider, WrongAnswerState>((ref) {
-  return WrongAnswerProvider();
+  return WrongAnswerProvider(ref);
 });

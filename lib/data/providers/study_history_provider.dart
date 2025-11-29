@@ -1,20 +1,43 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/local_storage_service.dart';
 import '../../shared/utils/logger.dart';
+import 'auth_provider.dart';
 
 /// 학습 이력 상태 관리 (날짜별 학습 완료 기록)
 class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
-  StudyHistoryNotifier() : super({}) {
-    _loadHistory();
+  final Ref ref;
+  final LocalStorageService _storage = LocalStorageService();
+
+  StudyHistoryNotifier(this.ref) : super({}) {
+    _initialize();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
-  static const String _storageKey = 'study_history';
+  /// 현재 계정 ID 기반 저장소 키
+  String? get _storageKey {
+    final currentAccount = ref.read(currentAccountProvider);
+    if (currentAccount == null) {
+      Logger.warning('No logged in account', tag: 'StudyHistory');
+      return null;
+    }
+    return 'study_history_${currentAccount.id}';
+  }
+
+  /// 초기화 및 데이터 로드
+  Future<void> _initialize() async {
+    await _loadHistory();
+  }
 
   /// 학습 이력 로드
   Future<void> _loadHistory() async {
     try {
-      final historyString = await _storage.getString(_storageKey);
+      final key = _storageKey;
+      if (key == null) {
+        // 로그인된 계정 없음 - 빈 상태로 초기화
+        state = {};
+        return;
+      }
+
+      final historyString = await _storage.getString(key);
       if (historyString != null && historyString.isNotEmpty) {
         // 쉼표로 구분된 날짜 문자열 파싱 (예: "2025-01-15,2025-01-16,2025-01-17")
         final dateStrings = historyString.split(',');
@@ -33,6 +56,8 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
 
         state = dates;
         Logger.info('학습 이력 로드 완료: ${dates.length}일', tag: 'StudyHistory');
+      } else {
+        state = {};
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -41,12 +66,19 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
         stackTrace: stackTrace,
         tag: 'StudyHistory',
       );
+      state = {};
     }
   }
 
   /// 학습 이력 저장
   Future<void> _saveHistory() async {
     try {
+      final key = _storageKey;
+      if (key == null) {
+        Logger.warning('Cannot save study history - no logged in account', tag: 'StudyHistory');
+        return;
+      }
+
       // DateTime을 날짜만 문자열로 변환 (시간 제거)
       final dateStrings = state
           .map((date) => _dateOnlyString(date))
@@ -54,7 +86,7 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
         ..sort(); // 정렬
 
       final historyString = dateStrings.join(',');
-      await _storage.setString(_storageKey, historyString);
+      await _storage.setString(key, historyString);
       Logger.debug('학습 이력 저장 완료: ${state.length}일', tag: 'StudyHistory');
     } catch (e, stackTrace) {
       Logger.error(
@@ -109,8 +141,11 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
   /// 학습 이력 초기화 (테스트용)
   Future<void> resetHistory() async {
     state = {};
-    await _storage.remove(_storageKey);
-    Logger.warning('학습 이력 초기화', tag: 'StudyHistory');
+    final key = _storageKey;
+    if (key != null) {
+      await _storage.remove(key);
+      Logger.warning('학습 이력 초기화', tag: 'StudyHistory');
+    }
   }
 
   /// 같은 날짜인지 확인 (년-월-일만 비교)
@@ -147,7 +182,7 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
 /// 학습 이력 프로바이더
 final studyHistoryProvider =
     StateNotifierProvider<StudyHistoryNotifier, Set<DateTime>>((ref) {
-  return StudyHistoryNotifier();
+  return StudyHistoryNotifier(ref);
 });
 
 /// 오늘 학습 완료 여부 프로바이더

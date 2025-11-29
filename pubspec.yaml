@@ -131,6 +131,7 @@ flutter:
     - assets/data/
     - assets/images/
     - assets/images/login/
+    - assets/images/ranks/  # 리그 순위 아이콘
     - assets/icons/
     - assets/badges/
     - assets/fonts/

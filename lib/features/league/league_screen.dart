@@ -1,15 +1,10 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/league.dart';
 import '../../data/providers/league_provider.dart';
-import '../../data/providers/friend_provider.dart';
-import '../../data/providers/all_users_provider.dart';
-import '../../data/providers/user_provider.dart';
-import '../../data/models/models.dart';
-import '../../shared/constants/constants.dart';
-import '../../shared/utils/haptic_feedback.dart';
+import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_text_styles.dart';
 
-/// 리그 화면
 class LeagueScreen extends ConsumerStatefulWidget {
   const LeagueScreen({super.key});
 
@@ -17,560 +12,1020 @@ class LeagueScreen extends ConsumerStatefulWidget {
   ConsumerState<LeagueScreen> createState() => _LeagueScreenState();
 }
 
-class _LeagueScreenState extends ConsumerState<LeagueScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  Timer? _countdownTimer;
-  String _remainingTime = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-    );
-
-    _animationController.forward();
-
-    // 카운트다운 타이머 시작
-    _startCountdownTimer();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _countdownTimer?.cancel();
-    super.dispose();
-  }
-
-  void _startCountdownTimer() {
-    _updateRemainingTime();
-
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        _updateRemainingTime();
-      }
-    });
-  }
-
-  void _updateRemainingTime() {
-    final state = ref.read(leagueProvider);
-    setState(() {
-      _remainingTime = state.remainingTimeString;
-    });
-  }
+class _LeagueScreenState extends ConsumerState<LeagueScreen> {
+  LeagueTier selectedTier = LeagueTier.silver; // 현재 선택된 티어
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(leagueProvider);
-    final myLeagueInfo = state.myLeagueInfo;
-
-    // 순위로 정렬
-    final sortedParticipants = [...state.participants]
-      ..sort((a, b) => b.weeklyXP.compareTo(a.weeklyXP));
+    final leagueState = ref.watch(leagueProvider);
+    final currentUserRank = ref.watch(currentUserRankProvider);
+    final canPromote = ref.watch(canPromoteProvider);
+    final isRelegationZone = ref.watch(isRelegationZoneProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // 앱바
-          SliverAppBar(
-            expandedHeight: 280,
-            floating: false,
-            pinned: true,
-            backgroundColor: myLeagueInfo.tier.color,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.surface),
-              onPressed: () async {
-                await AppHapticFeedback.lightImpact();
-                if (mounted) Navigator.of(context).pop();
-              },
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: myLeagueInfo.tier.gradientColors,
-                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 게임 스타일 헤더
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: AppColors.headerBlueGradient,
                 ),
-                child: SafeArea(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 40),
-                        // 티어 아이콘
-                        Text(
-                          myLeagueInfo.tier.emoji,
-                          style: const TextStyle(fontSize: 64),
-                        ),
-                        const SizedBox(height: AppDimensions.spacingS),
-                        // 티어명
-                        Text(
-                          '${myLeagueInfo.tier.displayName} 리그',
-                          style: const TextStyle(
-                            color: AppColors.surface,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.emoji_events, color: AppColors.mathYellow, size: 28),
+                  const SizedBox(width: 8),
+                  Text(
+                    '리그',
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      color: AppColors.headerText,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // 🎯 듀오링고 스타일 티어 선택 바
+            _buildTierSelector(leagueState.currentLeague?.tier),
+
+            // 콘텐츠
+            Expanded(
+              child: leagueState.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : leagueState.error != null
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                              const SizedBox(height: 16),
+                              Text(
+                                '오류 발생',
+                                style: AppTextStyles.headlineMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                leagueState.error!,
+                                style: AppTextStyles.bodyMedium,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: AppDimensions.spacingXS),
-                        // 순위
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppDimensions.paddingM,
-                            vertical: AppDimensions.paddingS,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                          ),
-                          child: Text(
-                            '${state.myRank}위 / ${myLeagueInfo.totalPlayers}명',
-                            style: const TextStyle(
-                              color: AppColors.surface,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.spacingM),
-                        // 주간 XP
-                        Text(
-                          '주간 XP: ${state.myWeeklyXP}',
-                          style: const TextStyle(
-                            color: AppColors.surface,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.spacingXS),
-                        // 남은 시간
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.timer,
-                              color: AppColors.surface,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '남은 시간: $_remainingTime',
-                              style: const TextStyle(
-                                color: AppColors.surface,
-                                fontSize: 14,
+                        )
+                      : leagueState.currentLeague == null
+                          ? const Center(child: Text('리그 정보가 없습니다'))
+                          : RefreshIndicator(
+                              onRefresh: () => ref.read(leagueProvider.notifier).refreshLeague(),
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 16),
+
+                                    // 리그 정보 헤더
+                                    _buildLeagueHeader(
+                                      context,
+                                      leagueState.currentLeague!,
+                                      currentUserRank,
+                                      canPromote,
+                                      isRelegationZone,
+                                    ),
+
+                                    // 승급/강등 안내
+                                    _buildPromotionInfo(context),
+
+                                    // 리더보드
+                                    _buildLeaderboard(
+                                      context,
+                                      leagueState.currentLeague!,
+                                      currentUserRank,
+                                    ),
+
+                                    const SizedBox(height: 100),
+                                  ],
+                                ),
                               ),
                             ),
-                          ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLeagueHeader(
+    BuildContext context,
+    League league,
+    int? currentUserRank,
+    bool canPromote,
+    bool isRelegationZone,
+  ) {
+    final daysLeft = league.weekEndDate.difference(DateTime.now()).inDays;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(league.tier.color),
+            Color(league.tier.color).withOpacity(0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Color(league.tier.color).withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // 배경 데코레이션
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            left: -30,
+            bottom: -30,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
+
+          // 메인 콘텐츠
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                // 리그 아이콘 & 이름 (듀오링고 스타일)
+                Column(
+                  children: [
+                    // 큰 티어 아이콘
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          league.tier.iconPath,
+                          width: 70,
+                          height: 70,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            // 이미지 로드 실패 시 이모티콘 표시
+                            return Text(
+                              league.tier.iconEmoji,
+                              style: const TextStyle(fontSize: 56),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // 리그 이름
+                    Text(
+                      league.tier.displayName,
+                      style: AppTextStyles.displaySmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // 타이머
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.timer, color: Colors.white, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$daysLeft일 후 승급/강등',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 현재 순위 카드
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        '내 순위',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.mathYellow.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.emoji_events,
+                              color: AppColors.mathYellow,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '${currentUserRank ?? '-'}위',
+                            style: AppTextStyles.displaySmall.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 32,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 승급/강등 상태 배지
+                if (canPromote || isRelegationZone) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: canPromote
+                            ? AppColors.greenGradient
+                            : [AppColors.mathRed, AppColors.mathRedDark],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (canPromote ? AppColors.mathGreen : AppColors.mathRed)
+                              .withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          canPromote ? Icons.arrow_upward : Icons.warning,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          canPromote ? '승급 가능!' : '강등 위험',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-          ),
-
-          // 승급/강등 안내
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.all(AppDimensions.paddingL),
-              padding: const EdgeInsets.all(AppDimensions.paddingM),
-              decoration: BoxDecoration(
-                color: myLeagueInfo.canPromote
-                    ? AppColors.success.withValues(alpha: 0.1)
-                    : myLeagueInfo.relegationRisk
-                        ? AppColors.error.withValues(alpha: 0.1)
-                        : AppColors.surface,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                border: Border.all(
-                  color: myLeagueInfo.canPromote
-                      ? AppColors.success
-                      : myLeagueInfo.relegationRisk
-                          ? AppColors.error
-                          : AppColors.borderLight,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: (myLeagueInfo.canPromote
-                            ? AppColors.success
-                            : myLeagueInfo.relegationRisk
-                                ? AppColors.error
-                                : AppColors.borderLight)
-                        .withValues(alpha: 0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
                 ],
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    myLeagueInfo.canPromote
-                        ? Icons.arrow_upward
-                        : myLeagueInfo.relegationRisk
-                            ? Icons.arrow_downward
-                            : Icons.info_outline,
-                    color: myLeagueInfo.canPromote
-                        ? AppColors.success
-                        : myLeagueInfo.relegationRisk
-                            ? AppColors.error
-                            : AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: AppDimensions.spacingS),
-                  Expanded(
-                    child: Text(
-                      myLeagueInfo.canPromote
-                          ? '상위 20% 안에 들었어요! 이대로 유지하면 승급할 수 있어요.'
-                          : myLeagueInfo.relegationRisk
-                              ? '하위 20%입니다. 조금만 더 열심히 하면 강등을 피할 수 있어요!'
-                              : '열심히 학습해서 상위권에 진입하세요!',
-                      style: TextStyle(
-                        color: myLeagueInfo.canPromote
-                            ? AppColors.success
-                            : myLeagueInfo.relegationRisk
-                                ? AppColors.error
-                                : AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
-
-          // 참가자 리스트
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final participant = sortedParticipants[index];
-                final rank = index + 1;
-                final isMe = participant.id == 'current_user';
-
-                return _ParticipantCard(
-                  participant: participant,
-                  rank: rank,
-                  isMe: isMe,
-                  isPromotionZone: rank <= (sortedParticipants.length * 0.2).round(),
-                  isRelegationZone: rank > (sortedParticipants.length * 0.8).round(),
-                );
-              },
-              childCount: sortedParticipants.length,
-            ),
-          ),
-
-          const SliverToBoxAdapter(
-            child: SizedBox(height: AppDimensions.spacingXL),
           ),
         ],
       ),
     );
   }
-}
 
-/// 참가자 카드
-class _ParticipantCard extends ConsumerWidget {
-  final LeagueParticipant participant;
-  final int rank;
-  final bool isMe;
-  final bool isPromotionZone;
-  final bool isRelegationZone;
-
-  const _ParticipantCard({
-    required this.participant,
-    required this.rank,
-    required this.isMe,
-    required this.isPromotionZone,
-    required this.isRelegationZone,
-  });
-
-  Color _getRankColor() {
-    if (rank == 1) return AppColors.mathYellow; // 금 (GoMath)
-    if (rank == 2) return AppColors.levelSilver; // 은 (표준 메달 색상)
-    if (rank == 3) return AppColors.levelBronze; // 동 (표준 메달 색상)
-    return AppColors.textSecondary;
-  }
-
-  IconData _getRankIcon() {
-    if (rank == 1) return Icons.emoji_events;
-    if (rank == 2) return Icons.emoji_events;
-    if (rank == 3) return Icons.emoji_events;
-    return Icons.person;
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget _buildPromotionInfo(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: isMe ? AppDimensions.paddingS : 4,
-      ),
-      padding: const EdgeInsets.all(AppDimensions.paddingM),
-      decoration: BoxDecoration(
-        color: isMe
-            ? AppColors.primary.withValues(alpha: 0.1)
-            : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: isMe
-              ? AppColors.primary
-              : isPromotionZone
-                  ? AppColors.success.withValues(alpha: 0.3)
-                  : isRelegationZone
-                      ? AppColors.error.withValues(alpha: 0.3)
-                      : AppColors.borderLight,
-          width: isMe ? 2 : 1,
-        ),
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         children: [
-          // 순위
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: rank <= 3
-                  ? _getRankColor().withValues(alpha: 0.2)
-                  : AppColors.disabled.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: rank <= 3
-                  ? Icon(
-                      _getRankIcon(),
-                      color: _getRankColor(),
-                      size: 28,
-                    )
-                  : Text(
-                      '$rank',
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+          // 승급 카드
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.mathGreen.withOpacity(0.15),
+                    AppColors.mathGreen.withOpacity(0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.mathGreen.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.mathGreen.withOpacity(0.2),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(
+                      Icons.arrow_upward,
+                      color: AppColors.mathGreen,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '승급',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.mathGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '상위 10명',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.mathGreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
-          const SizedBox(width: AppDimensions.spacingM),
+          const SizedBox(width: 12),
 
-          // 이름 및 정보
+          // 강등 카드
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      participant.name,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isMe ? AppColors.primary : AppColors.textPrimary,
-                      ),
-                    ),
-                    if (isMe) ...[
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                        ),
-                        child: const Text(
-                          '나',
-                          style: TextStyle(
-                            color: AppColors.surface,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.mathRed.withOpacity(0.15),
+                    AppColors.mathRed.withOpacity(0.05),
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Text(
-                      participant.tier.emoji,
-                      style: const TextStyle(fontSize: 14),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.mathRed.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.mathRed.withOpacity(0.2),
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      participant.tier.displayName,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    child: const Icon(
+                      Icons.arrow_downward,
+                      color: AppColors.mathRed,
+                      size: 24,
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '강등',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.mathRed,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '하위 5명',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.mathRed,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaderboard(
+    BuildContext context,
+    League league,
+    int? currentUserRank,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 리더보드 제목
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.leaderboard, color: AppColors.primary, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  '리더보드',
+                  style: AppTextStyles.headlineMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
           ),
 
-          // 주간 XP
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${participant.weeklyXP}',
-                style: AppTextStyles.titleLarge.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isMe ? AppColors.primary : AppColors.textPrimary,
+          // 참가자 카드 목록
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: league.participants.length,
+            itemBuilder: (context, index) {
+              final participant = league.participants[index];
+              final isCurrentUser = participant.userId == 'current_user';
+              final isTop3 = participant.rank <= 3; // 듀오링고 스타일: 상위 3명 강조
+              final isPromotionZone = participant.rank <= 10;
+              final isRelegationZone = participant.rank > league.participants.length - 5 &&
+                  league.tier != LeagueTier.bronze;
+
+              // 듀오링고 스타일: 상위 3명 특별 배경색
+              Color? topRankBgColor;
+              if (isTop3) {
+                topRankBgColor = participant.rank == 1
+                    ? const Color(0xFFFFD700).withOpacity(0.15) // 금색
+                    : participant.rank == 2
+                        ? const Color(0xFFC0C0C0).withOpacity(0.15) // 은색
+                        : const Color(0xFFCD7F32).withOpacity(0.15); // 동색
+              }
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  // 듀오링고 스타일: 현재 사용자와 상위 3명 그라데이션
+                  gradient: isCurrentUser
+                      ? LinearGradient(
+                          colors: [
+                            AppColors.primary.withOpacity(0.12),
+                            AppColors.primary.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : topRankBgColor != null
+                          ? LinearGradient(
+                              colors: [
+                                topRankBgColor,
+                                topRankBgColor.withOpacity(0.05),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : null,
+                  color: topRankBgColor == null && !isCurrentUser ? Colors.white : null,
+                  borderRadius: BorderRadius.circular(16),
+                  border: isCurrentUser
+                      ? Border.all(
+                          color: AppColors.primary,
+                          width: 3, // 듀오링고 스타일: 더 두꺼운 테두리
+                        )
+                      : isTop3
+                          ? Border.all(
+                              color: participant.rank == 1
+                                  ? const Color(0xFFFFD700)
+                                  : participant.rank == 2
+                                      ? const Color(0xFFC0C0C0)
+                                      : const Color(0xFFCD7F32),
+                              width: 2,
+                            )
+                          : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isCurrentUser
+                          ? AppColors.primary.withOpacity(0.3)
+                          : isTop3
+                              ? Colors.black.withOpacity(0.12)
+                              : Colors.black.withOpacity(0.08),
+                      blurRadius: isCurrentUser ? 15 : isTop3 ? 10 : 8,
+                      offset: Offset(0, isCurrentUser ? 5 : isTop3 ? 4 : 3),
+                    ),
+                  ],
                 ),
-              ),
-              Text(
-                'XP',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      // 순위 아이콘
+                      SizedBox(
+                        width: 44,
+                        child: _buildRankBadge(participant.rank),
+                      ),
+                      const SizedBox(width: 14),
+
+                      // 이름과 뱃지
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    participant.userName,
+                                    style: AppTextStyles.titleLarge.copyWith(
+                                      fontWeight: isCurrentUser
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                      color: isCurrentUser
+                                          ? AppColors.primary
+                                          : AppColors.textPrimary,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (isCurrentUser) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '나',
+                                      style: AppTextStyles.labelSmall.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            if (participant.badges.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Wrap(
+                                spacing: 4,
+                                runSpacing: 4,
+                                children: participant.badges.take(3).map((badge) {
+                                  return _buildBadgeChip(badge);
+                                }).toList(),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      // 경험치와 상태
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: AppColors.goldGradient,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${participant.weeklyXp}',
+                                  style: AppTextStyles.titleSmall.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isPromotionZone || isRelegationZone) ...[
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: (isPromotionZone
+                                        ? AppColors.mathGreen
+                                        : AppColors.mathRed)
+                                    .withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                isPromotionZone
+                                    ? Icons.arrow_upward
+                                    : Icons.arrow_downward,
+                                color: isPromotionZone
+                                    ? AppColors.mathGreen
+                                    : AppColors.mathRed,
+                                size: 16,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
-
-          // 친구 추가 버튼 (자기 자신이 아닌 경우만)
-          if (!isMe) ...[
-            const SizedBox(width: 8),
-            _buildFriendButton(context, ref),
-          ],
-
-          // 승급/강등 표시
-          if (isPromotionZone && !isMe) ...[
-            const SizedBox(width: AppDimensions.spacingS),
-            const Icon(
-              Icons.arrow_upward,
-              color: AppColors.success,
-              size: 20,
-            ),
-          ] else if (isRelegationZone && !isMe) ...[
-            const SizedBox(width: AppDimensions.spacingS),
-            const Icon(
-              Icons.arrow_downward,
-              color: AppColors.error,
-              size: 20,
-            ),
-          ],
         ],
       ),
     );
   }
 
-  /// 친구 추가 버튼
-  Widget _buildFriendButton(BuildContext context, WidgetRef ref) {
-    final friends = ref.watch(friendsProvider);
-
-    // 이미 친구인지 확인
-    final isFriend = friends.any(
-      (f) => f.userId == participant.id && f.status == FriendRequestStatus.accepted,
-    );
-
-    // 대기 중인 요청이 있는지 확인
-    final hasPendingRequest = friends.any(
-      (f) => f.userId == participant.id && f.status == FriendRequestStatus.pending,
-    );
-
-    if (isFriend) {
-      return const SizedBox.shrink();
-    }
-
-    if (hasPendingRequest) {
+  Widget _buildRankBadge(int rank) {
+    // 듀오링고 스타일: 상위 3명은 메달 아이콘
+    if (rank <= 3) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
-          color: AppColors.textSecondary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: rank == 1
+                ? [const Color(0xFFFFD700), const Color(0xFFFFA500)] // 금메달
+                : rank == 2
+                    ? [const Color(0xFFC0C0C0), const Color(0xFFA8A8A8)] // 은메달
+                    : [const Color(0xFFCD7F32), const Color(0xFF8B4513)], // 동메달
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: (rank == 1
+                      ? const Color(0xFFFFD700)
+                      : rank == 2
+                          ? const Color(0xFFC0C0C0)
+                          : const Color(0xFFCD7F32))
+                  .withOpacity(0.4),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Text(
-          '대기중',
-          style: TextStyle(
-            fontSize: 11,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
+        child: Center(
+          child: Text(
+            rank == 1 ? '🥇' : rank == 2 ? '🥈' : '🥉',
+            style: const TextStyle(fontSize: 24),
           ),
         ),
       );
     }
 
-    // 친구 추가 버튼
+    // 4위 이하는 기존 이미지 또는 숫자
+    String? rankIconPath;
+
+    switch (rank) {
+      case 4:
+        rankIconPath = 'assets/images/ranks/gt_lv1.png';
+        break;
+      case 5:
+        rankIconPath = 'assets/images/ranks/a_레전드.png';
+        break;
+      case 6:
+        rankIconPath = 'assets/images/ranks/a_lv3.png';
+        break;
+      case 7:
+        rankIconPath = 'assets/images/ranks/a_lv2.png';
+        break;
+      case 8:
+        rankIconPath = 'assets/images/ranks/a_lv1.png';
+        break;
+      case 9:
+        rankIconPath = 'assets/images/ranks/h_레전드.png';
+        break;
+      case 10:
+        rankIconPath = 'assets/images/ranks/h_lv3.png';
+        break;
+      case 11:
+        rankIconPath = 'assets/images/ranks/h_lv2.png';
+        break;
+      case 12:
+        rankIconPath = 'assets/images/ranks/h_lv1.png';
+        break;
+    }
+
+    return rankIconPath != null
+        ? Image.asset(
+            rankIconPath,
+            width: 40,
+            height: 40,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              // 이미지 로드 실패 시 숫자로 표시
+              return Text(
+                '$rank',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textSecondary,
+                ),
+              );
+            },
+          )
+        : Text(
+            '$rank',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textSecondary,
+            ),
+          );
+  }
+
+  Widget _buildBadgeChip(LeagueBadge badge) {
+    // 뱃지별 색상 매핑
+    final badgeColors = {
+      LeagueBadge.streak: AppColors.mathOrange,
+      LeagueBadge.perfect: AppColors.mathYellow,
+      LeagueBadge.topScorer: AppColors.mathPurple,
+      LeagueBadge.rising: AppColors.mathTeal,
+      LeagueBadge.veteran: AppColors.mathGold,
+    };
+
+    final badgeColor = badgeColors[badge] ?? AppColors.primary;
+
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        gradient: LinearGradient(
+          colors: [
+            badgeColor.withOpacity(0.2),
+            badgeColor.withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: badgeColor.withOpacity(0.4),
+          width: 1.5,
+        ),
       ),
-      child: IconButton(
-        onPressed: () => _sendFriendRequest(context, ref),
-        icon: Icon(Icons.person_add, color: AppColors.primary, size: 20),
-        padding: const EdgeInsets.all(8),
-        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-        tooltip: '친구 추가',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            badge.icon,
+            style: const TextStyle(fontSize: 11),
+          ),
+          const SizedBox(width: 3),
+          Text(
+            badge.displayName.replaceAll(RegExp(r'[^\w\s]'), '').trim(),
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: badgeColor,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// 친구 요청 보내기
-  Future<void> _sendFriendRequest(BuildContext context, WidgetRef ref) async {
-    try {
-      // AllUsersProvider에서 실제 사용자 정보 가져오기
-      final allUsers = ref.read(allUsersProvider);
-      final targetUser = allUsers.firstWhere(
-        (u) => u.id == participant.id,
-        orElse: () => User(
-          id: participant.id,
-          name: participant.name,
-          email: '${participant.id}@example.com',
-          joinDate: DateTime.now(),
-          level: 1,
-          xp: participant.weeklyXP,
-          streakDays: 0,
-          currentGrade: '중1',
-          avatarUrl: '👤',
-          hearts: 5,
-          dailyXP: 0,
-          lastXPResetDate: DateTime.now(),
-        ),
-      );
-
-      await ref.read(friendsProvider.notifier).sendFriendRequest(
-        userId: targetUser.id,
-        name: targetUser.name,
-        level: targetUser.level,
-        xp: targetUser.xp,
-      );
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${targetUser.name}님에게 친구 요청을 보냈습니다'),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('친구 요청을 보내는데 실패했습니다'),
-            backgroundColor: AppColors.error,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+  // 🎯 듀오링고 스타일 티어 선택 바
+  Widget _buildTierSelector(LeagueTier? currentTier) {
+    // 현재 티어로 초기 선택값 설정
+    if (currentTier != null && selectedTier != currentTier) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          selectedTier = currentTier;
+        });
+      });
     }
+
+    return Container(
+      height: 120,
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: LeagueTier.values.length,
+        itemBuilder: (context, index) {
+          final tier = LeagueTier.values[index];
+          final isSelected = tier == selectedTier;
+          final isCurrentUserTier = tier == currentTier;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedTier = tier;
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              width: isSelected ? 100 : 80,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isSelected
+                      ? [
+                          Color(tier.color),
+                          Color(tier.color).withOpacity(0.8),
+                        ]
+                      : [
+                          Color(tier.color).withOpacity(0.3),
+                          Color(tier.color).withOpacity(0.2),
+                        ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: isSelected
+                    ? Border.all(
+                        color: Colors.white,
+                        width: 3,
+                      )
+                    : null,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Color(tier.color).withOpacity(0.5),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: Stack(
+                children: [
+                  // 티어 아이콘
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // 랭크 아이콘 이미지
+                        Image.asset(
+                          tier.iconPath,
+                          width: isSelected ? 50 : 40,
+                          height: isSelected ? 50 : 40,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            // 이미지 로드 실패 시 이모티콘 표시
+                            return Text(
+                              tier.iconEmoji,
+                              style: TextStyle(
+                                fontSize: isSelected ? 40 : 32,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          tier.displayName.replaceAll(' 리그', ''),
+                          style: TextStyle(
+                            fontSize: isSelected ? 13 : 11,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                            color: isSelected ? Colors.white : Colors.white70,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 현재 사용자 티어 표시
+                  if (isCurrentUserTier)
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: AppColors.mathYellow,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mathYellow.withOpacity(0.5),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.star,
+                          color: Colors.white,
+                          size: 12,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

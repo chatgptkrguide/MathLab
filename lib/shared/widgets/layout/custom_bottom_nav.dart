@@ -46,7 +46,7 @@ class CustomBottomNavigation extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 새로운 순서: 학습, 오답, 홈(가운데), 프로필, 학습이력
+          // 새로운 순서: 학습, 오답, 홈(가운데), 프로필, 리그
           _buildNavItem(
             index: 0,
             icon: Icons.school,
@@ -70,8 +70,8 @@ class CustomBottomNavigation extends StatelessWidget {
           ),
           _buildNavItem(
             index: 4,
-            icon: Icons.history_edu,
-            label: '학습이력',
+            icon: Icons.emoji_events,
+            label: '리그',
           ),
         ],
       ),
@@ -210,6 +210,8 @@ class CustomBottomNavigation extends StatelessWidget {
         return Icons.error_rounded;
       case Icons.person:
         return Icons.person_rounded;
+      case Icons.emoji_events:
+        return Icons.emoji_events_rounded;
       case Icons.history_edu:
         return Icons.history_edu_rounded;
       default:

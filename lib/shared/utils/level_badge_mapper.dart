@@ -1,50 +1,73 @@
 /// 레벨을 배지 이미지로 매핑하는 유틸리티
 class LevelBadgeMapper {
-  /// 레벨에 따른 배지 이미지 경로 반환
+  /// 레벨에 따른 랭크 아이콘 경로 반환 (Figma 디자인 기반)
   static String getBadgeImagePath(int level) {
     if (level <= 0) {
-      return 'assets/badges/badge_locked_1.png';
-    } else if (level <= 5) {
-      // Bronze Tier (1-5): Locked badges
-      final badgeNumber = ((level - 1) % 3) + 1;
-      return 'assets/badges/badge_locked_$badgeNumber.png';
+      // 레벨 0 이하: A Lv1
+      return 'assets/images/ranks/a_lv1.png';
+    } else if (level <= 3) {
+      // A Tier Lv1 (1-3)
+      return 'assets/images/ranks/a_lv1.png';
+    } else if (level <= 6) {
+      // A Tier Lv2 (4-6)
+      return 'assets/images/ranks/a_lv2.png';
     } else if (level <= 10) {
-      // Silver Tier (6-10): Checkmark clipboard
-      return 'assets/badges/badge_checkmark_clipboard.png';
-    } else if (level <= 15) {
-      // Gold Tier (11-15): Checkmark certified
-      return 'assets/badges/badge_checkmark_certified.png';
+      // A Tier Lv3 (7-10)
+      return 'assets/images/ranks/a_lv3.png';
+    } else if (level <= 13) {
+      // H Tier Lv1 (11-13)
+      return 'assets/images/ranks/h_lv1.png';
+    } else if (level <= 16) {
+      // H Tier Lv2 (14-16)
+      return 'assets/images/ranks/h_lv2.png';
     } else if (level <= 20) {
-      // Platinum Tier (16-20): Star certified
-      return 'assets/badges/badge_star_certified.png';
+      // H Tier Lv3 (17-20)
+      return 'assets/images/ranks/h_lv3.png';
+    } else if (level <= 23) {
+      // GT Tier Lv1 (21-23)
+      return 'assets/images/ranks/gt_lv1.png';
+    } else if (level <= 26) {
+      // GT Tier Lv2 (24-26)
+      return 'assets/images/ranks/gt_lv2.png';
     } else if (level <= 30) {
-      // Diamond Tier (21-30): Achievement success
-      return 'assets/badges/badge_achievement_success.png';
+      // GT Tier Lv3 (27-30)
+      return 'assets/images/ranks/gt_lv3.png';
     } else {
-      // Legendary Tier (31+): Achievement trophy
-      return 'assets/badges/badge_achievement_trophy.png';
+      // Legendary Tier (31+): 최고 등급
+      return 'assets/images/ranks/gt_레전드.png';
     }
   }
 
   /// 레벨에 따른 티어 이름 반환
   static String getTierName(int level) {
     if (level <= 0) return '초보자';
-    if (level <= 5) return 'Bronze';
-    if (level <= 10) return 'Silver';
-    if (level <= 15) return 'Gold';
-    if (level <= 20) return 'Platinum';
-    if (level <= 30) return 'Diamond';
-    return 'Legendary';
+    if (level <= 10) return 'A Tier';    // A Lv1-3
+    if (level <= 20) return 'H Tier';    // H Lv1-3
+    if (level <= 30) return 'GT Tier';   // GT Lv1-3
+    return 'Legend';                      // 레전드
+  }
+
+  /// 레벨에 따른 세부 랭크 이름 반환
+  static String getRankName(int level) {
+    if (level <= 0) return 'A Lv1';
+    if (level <= 3) return 'A Lv1';
+    if (level <= 6) return 'A Lv2';
+    if (level <= 10) return 'A Lv3';
+    if (level <= 13) return 'H Lv1';
+    if (level <= 16) return 'H Lv2';
+    if (level <= 20) return 'H Lv3';
+    if (level <= 23) return 'GT Lv1';
+    if (level <= 26) return 'GT Lv2';
+    if (level <= 30) return 'GT Lv3';
+    return '레전드';
   }
 
   /// 레벨에 따른 티어 색상 반환 (hex)
   static int getTierColor(int level) {
-    if (level <= 0) return 0xFF9E9E9E;
-    if (level <= 5) return 0xFFCD7F32;  // Bronze
-    if (level <= 10) return 0xFFC0C0C0; // Silver
-    if (level <= 15) return 0xFFFFD700; // Gold
-    if (level <= 20) return 0xFFE5E4E2; // Platinum
-    if (level <= 30) return 0xFFB9F2FF; // Diamond Blue
-    return 0xFFFF6B6B;                   // Legendary Red
+    if (level <= 0) return 0xFF9E9E9E;   // Gray
+    if (level <= 10) return 0xFF9C27B0;  // A - Purple
+    if (level <= 20) return 0xFF2196F3;  // H - Blue
+    if (level <= 30) return 0xFF4CAF50;  // GT - Green
+    return 0xFFFFD700;                    // Legend - Gold
   }
 }

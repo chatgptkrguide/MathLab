@@ -20,27 +20,36 @@ class ProfileStatBadge extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: AppColors.mathYellow,
-            size: 20,
+          // 듀오링고 스타일: 아이콘을 컨테이너로 감싸서 강조
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.mathYellow,
+              size: 24, // 20 → 24
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6), // 4 → 6
           Text(
             value,
             style: const TextStyle(
               color: AppColors.surface,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 22, // 18 → 22 (듀오링고 스타일: 더 크게)
+              letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 3), // 2 → 3
           Text(
             label,
             style: const TextStyle(
               color: AppColors.surface,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+              fontSize: 12, // 11 → 12
+              fontWeight: FontWeight.w600, // w500 → w600
             ),
           ),
         ],

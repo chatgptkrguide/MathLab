@@ -3,25 +3,48 @@ import '../models/models.dart';
 import '../services/local_storage_service.dart';
 import '../services/notification_service.dart';
 import '../../shared/utils/logger.dart';
+import 'auth_provider.dart';
 
 /// 메시지 상태 관리
 class MessageNotifier extends StateNotifier<List<Message>> {
-  MessageNotifier() : super([]) {
-    _loadMessages();
+  final Ref ref; // Riverpod Ref for accessing current account
+  final LocalStorageService _storage = LocalStorageService();
+
+  MessageNotifier(this.ref) : super([]) {
+    _initialize();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
-  static const String _storageKey = 'messages';
+  /// 현재 계정 ID 기반 저장소 키
+  String? get _storageKey {
+    final currentAccount = ref.read(currentAccountProvider);
+    if (currentAccount == null) {
+      Logger.warning('No logged in account', tag: 'MessageProvider');
+      return null;
+    }
+    return 'messages_${currentAccount.id}';
+  }
+
+  /// 초기화 및 데이터 로드
+  Future<void> _initialize() async {
+    await _loadMessages();
+  }
 
   /// 메시지 로드
   Future<void> _loadMessages() async {
     try {
+      final key = _storageKey;
+      if (key == null) {
+        // 로그인된 계정 없음 - 빈 상태로 초기화
+        state = [];
+        return;
+      }
+
       final messages = await _storage.loadList<Message>(
-        key: _storageKey,
+        key: key,
         fromJson: Message.fromJson,
       );
 
-      if (messages != null && messages.isNotEmpty) {
+      if (messages.isNotEmpty) {
         state = messages;
         Logger.info('메시지 ${messages.length}개 로드 완료', tag: 'MessageProvider');
       } else {
@@ -70,8 +93,14 @@ class MessageNotifier extends StateNotifier<List<Message>> {
   /// 메시지 저장
   Future<void> _saveMessages() async {
     try {
+      final key = _storageKey;
+      if (key == null) {
+        Logger.warning('Cannot save messages - no logged in account', tag: 'MessageProvider');
+        return;
+      }
+
       await _storage.saveList(
-        key: _storageKey,
+        key: key,
         data: state,
         toJson: (message) => message.toJson(),
       );
@@ -249,7 +278,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
 
 /// 메시지 Provider
 final messageProvider = StateNotifierProvider<MessageNotifier, List<Message>>(
-  (ref) => MessageNotifier(),
+  (ref) => MessageNotifier(ref),
 );
 
 /// 읽지 않은 메시지 개수 Provider

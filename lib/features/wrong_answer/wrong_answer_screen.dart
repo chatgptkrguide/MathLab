@@ -100,6 +100,9 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
               // 통계 카드 (현대적인 카드 디자인)
               _buildStatsCards(state),
 
+              // 필터 바 (카테고리, 난이도)
+              _buildFilterBar(),
+
               // 탭 바
               _buildTabBar(state),
 
@@ -222,6 +225,182 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
         ),
       ],
     );
+  }
+
+  /// 필터 바 - 카테고리 및 난이도 필터
+  Widget _buildFilterBar() {
+    final provider = ref.read(wrongAnswerProvider.notifier);
+    final state = ref.watch(wrongAnswerProvider);
+    final categories = provider.availableCategories;
+    final difficulties = provider.availableDifficulties;
+
+    // 필터가 없으면 표시하지 않음
+    if (categories.isEmpty && difficulties.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingL,
+        vertical: AppDimensions.paddingS,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 카테고리 필터
+          if (categories.isNotEmpty) ...[
+            Row(
+              children: [
+                Text(
+                  '카테고리',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                if (state.selectedCategory != null || state.selectedDifficulty != null)
+                  GestureDetector(
+                    onTap: () {
+                      provider.clearFilters();
+                      AppHapticFeedback.lightImpact();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.errorRed.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '전체 보기',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.errorRed,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: categories.map((category) {
+                  final isSelected = state.selectedCategory == category;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(category),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        provider.setCategory(selected ? category : null);
+                        AppHapticFeedback.selectionClick();
+                      },
+                      backgroundColor: AppColors.background,
+                      selectedColor: AppColors.mathBlue,
+                      labelStyle: TextStyle(
+                        color: isSelected ? AppColors.surface : AppColors.textPrimary,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: isSelected ? AppColors.mathBlue : AppColors.borderLight,
+                          width: 1.5,
+                        ),
+                      ),
+                      showCheckmark: false,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          // 난이도 필터
+          if (difficulties.isNotEmpty) ...[
+            Text(
+              '난이도',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: difficulties.map((difficulty) {
+                  final isSelected = state.selectedDifficulty == difficulty;
+                  final color = _getDifficultyColor(difficulty);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Lv $difficulty'),
+                          const SizedBox(width: 4),
+                          ...List.generate(
+                            difficulty,
+                            (index) => Icon(
+                              Icons.star,
+                              size: 12,
+                              color: isSelected ? AppColors.surface : color,
+                            ),
+                          ),
+                        ],
+                      ),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        provider.setDifficulty(selected ? difficulty : null);
+                        AppHapticFeedback.selectionClick();
+                      },
+                      backgroundColor: AppColors.background,
+                      selectedColor: color,
+                      labelStyle: TextStyle(
+                        color: isSelected ? AppColors.surface : AppColors.textPrimary,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: isSelected ? color : AppColors.borderLight,
+                          width: 1.5,
+                        ),
+                      ),
+                      showCheckmark: false,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// 난이도별 색상
+  Color _getDifficultyColor(int difficulty) {
+    switch (difficulty) {
+      case 1:
+        return AppColors.successGreen;
+      case 2:
+        return AppColors.mathYellow;
+      case 3:
+        return AppColors.mathOrange;
+      case 4:
+        return AppColors.mathRed;
+      case 5:
+        return AppColors.mathPurple;
+      default:
+        return AppColors.mathBlue;
+    }
   }
 
   /// 탭 바 - Duolingo 스타일

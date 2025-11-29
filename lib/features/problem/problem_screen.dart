@@ -13,6 +13,7 @@ import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
 import '../../data/providers/lesson_provider.dart';
 import '../../data/providers/error_note_provider.dart';
+import '../../data/providers/wrong_answer_provider.dart'; // 오답 노트 추가
 import '../../data/providers/achievement_provider.dart';
 import '../../data/providers/hint_provider.dart';
 import '../../data/providers/study_history_provider.dart';
@@ -931,11 +932,17 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       await AppHapticFeedback.error();
       await SoundEffects.playWrong();
 
-      // 오답: 오답 노트에 저장
+      // 오답: 오답 노트에 저장 (기존 error_note와 새로운 wrong_answer 모두 저장)
       await ref.read(errorNoteProvider.notifier).addErrorNote(
             userId: userId,
             problem: _currentProblem,
             userAnswer: _currentProblem.options![_selectedAnswerIndex!],
+          );
+
+      // 새로운 오답 노트 시스템에도 저장
+      await ref.read(wrongAnswerProvider.notifier).addWrongAnswer(
+            problem: _currentProblem,
+            selectedAnswerIndex: _selectedAnswerIndex!,
           );
     }
 
@@ -1058,11 +1065,17 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       await AppHapticFeedback.error();
       await SoundEffects.playWrong();
 
-      // 오답: 오답 노트에 저장
+      // 오답: 오답 노트에 저장 (기존 error_note와 새로운 wrong_answer 모두 저장)
       await ref.read(errorNoteProvider.notifier).addErrorNote(
             userId: userId,
             problem: _currentProblem,
             userAnswer: userAnswer,
+          );
+
+      // 새로운 오답 노트 시스템에도 저장 (주관식은 selectedAnswerIndex 없음)
+      await ref.read(wrongAnswerProvider.notifier).addWrongAnswer(
+            problem: _currentProblem,
+            selectedAnswerIndex: null, // 주관식은 인덱스 없음
           );
     }
 

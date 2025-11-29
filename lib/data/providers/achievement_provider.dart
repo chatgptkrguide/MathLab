@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/achievement.dart';
 import '../models/user.dart';
 import 'user_provider.dart';
+import 'auth_provider.dart';
 import '../../shared/utils/logger.dart';
 import '../../data/services/local_storage_service.dart';
 
@@ -53,7 +54,15 @@ class AchievementProvider extends StateNotifier<AchievementState> {
   final Ref _ref;
   final LocalStorageService _storage = LocalStorageService();
 
-  static const String _storageKey = 'achievements_state';
+  /// 현재 계정 ID 기반 저장소 키
+  String? get _storageKey {
+    final currentAccount = _ref.read(currentAccountProvider);
+    if (currentAccount == null) {
+      Logger.warning('No logged in account', tag: 'AchievementProvider');
+      return null;
+    }
+    return 'achievements_${currentAccount.id}';
+  }
 
   AchievementProvider(this._ref)
       : super(const AchievementState(
@@ -327,7 +336,14 @@ class AchievementProvider extends StateNotifier<AchievementState> {
   /// 상태 로드
   Future<void> _loadState() async {
     try {
-      final data = await _storage.loadMap(_storageKey);
+      final key = _storageKey;
+      if (key == null) {
+        // 로그인된 계정 없음 - 기본 상태 유지
+        Logger.info('No account logged in, skipping achievement state load', tag: 'AchievementProvider');
+        return;
+      }
+
+      final data = await _storage.loadMap(key);
       if (data != null) {
         final unlockedIds = List<String>.from(data['unlockedIds'] ?? []);
         final progressMap = Map<String, int>.from(data['progressMap'] ?? {});
@@ -382,6 +398,12 @@ class AchievementProvider extends StateNotifier<AchievementState> {
   /// 상태 저장
   Future<void> _saveState() async {
     try {
+      final key = _storageKey;
+      if (key == null) {
+        Logger.warning('Cannot save achievement state - no logged in account', tag: 'AchievementProvider');
+        return;
+      }
+
       final progressMap = <String, int>{};
       final unlockedDates = <String, String>{};
 
@@ -394,15 +416,15 @@ class AchievementProvider extends StateNotifier<AchievementState> {
         }
       }
 
-      await _storage.saveMap(_storageKey, {
+      await _storage.saveMap(key, {
         'unlockedIds': state.unlockedIds,
         'progressMap': progressMap,
         'unlockedDates': unlockedDates,
       });
 
-      Logger.info('Achievement state saved');
+      Logger.info('Achievement state saved for account', tag: 'AchievementProvider');
     } catch (e) {
-      Logger.error('Failed to save achievement state', error: e);
+      Logger.error('Failed to save achievement state', error: e, tag: 'AchievementProvider');
     }
   }
 

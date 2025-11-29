@@ -4,7 +4,7 @@ import 'problem.dart';
 class WrongAnswer {
   final String id;
   final Problem problem;
-  final int selectedAnswerIndex;
+  final int? selectedAnswerIndex; // 객관식 선택 인덱스 (주관식은 null)
   final DateTime timestamp;
   final int reviewCount; // 복습 횟수
   final DateTime? lastReviewDate; // 마지막 복습 날짜
@@ -13,7 +13,7 @@ class WrongAnswer {
   const WrongAnswer({
     required this.id,
     required this.problem,
-    required this.selectedAnswerIndex,
+    this.selectedAnswerIndex, // 주관식 지원을 위해 optional로 변경
     required this.timestamp,
     this.reviewCount = 0,
     this.lastReviewDate,
@@ -96,7 +96,7 @@ class WrongAnswer {
     return WrongAnswer(
       id: json['id'] as String,
       problem: Problem.fromJson(json['problem'] as Map<String, dynamic>),
-      selectedAnswerIndex: json['selectedAnswerIndex'] as int,
+      selectedAnswerIndex: json['selectedAnswerIndex'] as int?, // nullable로 변경
       timestamp: DateTime.parse(json['timestamp'] as String),
       reviewCount: json['reviewCount'] as int? ?? 0,
       lastReviewDate: json['lastReviewDate'] != null

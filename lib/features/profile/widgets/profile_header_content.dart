@@ -29,11 +29,11 @@ class ProfileHeaderContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 24), // 30 → 24
-            // 프로필 사진
+            const SizedBox(height: 20),
+            // 프로필 사진 - 듀오링고 스타일: 더 크게
             Container(
-              width: 64, // 70 → 64
-              height: 64,
+              width: 90, // 64 → 90 (듀오링고 스타일)
+              height: 90,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: AppColors.mathButtonGradient,
@@ -41,11 +41,21 @@ class ProfileHeaderContent extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
-                    blurRadius: 10, // 12 → 10
-                    offset: const Offset(0, 4), // 6 → 4
+                    color: AppColors.mathButtonBlue.withValues(alpha: 0.4),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
+                // 듀오링고 스타일: 테두리 추가
+                border: Border.all(
+                  color: Colors.white,
+                  width: 4,
+                ),
               ),
               child: Center(
                 child: Text(
@@ -53,21 +63,21 @@ class ProfileHeaderContent extends StatelessWidget {
                       ? user!.name[0]
                       : '학',
                   style: const TextStyle(
-                    fontSize: 28, // 32 → 28
+                    fontSize: 40, // 28 → 40 (더 크게)
                     fontWeight: FontWeight.bold,
                     color: AppColors.surface,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 10), // 12 → 10
+            const SizedBox(height: 12),
             // 이름
             Text(
               user?.name ?? '학습자',
               style: AppTextStyles.headlineLarge.copyWith(
                 color: AppColors.surface,
                 fontWeight: FontWeight.bold,
-                fontSize: 20, // 22 → 20
+                fontSize: 26, // 20 → 26 (더 크게)
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,

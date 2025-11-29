@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
-import '../../../shared/widgets/layout/adaptive_app_header.dart';
+import '../../../shared/utils/level_badge_mapper.dart';
 import '../../practice/practice_screen.dart';
 import '../../level_test/level_test_screen.dart';
 import '../../achievements/achievements_screen.dart';
@@ -123,90 +123,244 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
     );
   }
 
-  /// User Profile Card - 프로필 사진 + 이름 + 스탯
+  /// User Profile Card - 프로필 사진 + 이름 + 스탯 (게임 스타일)
   Widget _buildUserProfileCard(user) {
+    final userLevel = user?.level ?? 1;
+    final tierColor = Color(LevelBadgeMapper.getTierColor(userLevel));
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            tierColor.withOpacity(0.15),
+            tierColor.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: tierColor.withOpacity(0.3),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
+            color: tierColor.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Column(
+      child: Stack(
         children: [
-          Row(
-            children: [
-              // 프로필 사진
-              CircleAvatar(
-                radius: 46,
-                backgroundColor: const Color(0xFFE8F4FD),
-                child: CircleAvatar(
-                  radius: 42,
-                  backgroundColor: Colors.white,
-                  backgroundImage: user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
-                      ? NetworkImage(user.avatarUrl)
-                      : null,
-                  child: user?.avatarUrl == null || user!.avatarUrl.isEmpty
-                      ? Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.grey.shade400,
-                        )
-                      : null,
-                ),
+          // Background decoration circles
+          Positioned(
+            right: -30,
+            top: -30,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: tierColor.withOpacity(0.1),
               ),
+            ),
+          ),
+          Positioned(
+            left: -20,
+            bottom: -20,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: tierColor.withOpacity(0.08),
+              ),
+            ),
+          ),
 
-              const SizedBox(width: 20),
-
-              // 이름 + 스탯
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // Main content
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Text(
-                      user?.name ?? '고 1',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // 스탯 행 (XP, 스트릭, 레벨)
-                    Row(
+                    // 프로필 사진 with rank badge
+                    Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        Expanded(child: _buildMiniStat('💎', '${user?.xp ?? 549}')),
-                        const SizedBox(width: 4),
-                        Expanded(child: _buildMiniStat('🔥', '${user?.streakDays ?? 6}')),
-                        const SizedBox(width: 4),
-                        Expanded(child: _buildMiniStat('🏅', 'Lv${user?.level ?? 1}')),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [tierColor, tierColor.withOpacity(0.7)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: tierColor.withOpacity(0.4),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(3),
+                          child: CircleAvatar(
+                            radius: 43,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundColor: const Color(0xFFF5F5F5),
+                              backgroundImage: user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
+                                  ? NetworkImage(user.avatarUrl)
+                                  : null,
+                              child: user?.avatarUrl == null || user!.avatarUrl.isEmpty
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 45,
+                                      color: Colors.grey.shade400,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        // Rank badge icon
+                        Positioned(
+                          bottom: -5,
+                          right: -5,
+                          child: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: tierColor,
+                                width: 2.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: tierColor.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                LevelBadgeMapper.getBadgeImagePath(userLevel),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.emoji_events,
+                                    size: 20,
+                                    color: tierColor,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
+                    ),
+
+                    const SizedBox(width: 20),
+
+                    // 이름 + 티어 + 스탯
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.name ?? '고 1',
+                            style: AppTextStyles.headlineMedium.copyWith(
+                              color: const Color(0xFF1A1A1A),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Tier badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [tierColor, tierColor.withOpacity(0.8)],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: tierColor.withOpacity(0.3),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.emoji_events, color: Colors.white, size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  LevelBadgeMapper.getRankName(userLevel),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // 스탯 행 (XP, 스트릭, 레벨)
+                          Row(
+                            children: [
+                              Expanded(child: _buildMiniStat('💎', '${user?.xp ?? 549}', AppColors.mathBlue)),
+                              const SizedBox(width: 4),
+                              Expanded(child: _buildMiniStat('🔥', '${user?.streakDays ?? 6}', AppColors.mathOrange)),
+                              const SizedBox(width: 4),
+                              Expanded(child: _buildMiniStat('🏅', 'Lv${userLevel}', tierColor)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMiniStat(String emoji, String value) {
+  Widget _buildMiniStat(String emoji, String value, Color accentColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        gradient: LinearGradient(
+          colors: [
+            accentColor.withOpacity(0.15),
+            accentColor.withOpacity(0.05),
+          ],
+        ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: accentColor.withOpacity(0.3),
+          width: 1.5,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -219,10 +373,10 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
               value,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A1A),
+                color: accentColor.withOpacity(0.9),
               ),
             ),
           ),
@@ -231,15 +385,33 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
     );
   }
 
-  /// Level Progress Card - 레벨 진행률
+  /// Level Progress Card - 레벨 진행률 (게임 스타일)
   Widget _buildLevelProgressCard() {
+    final userLevel = 1; // TODO: Get from user provider
+    final tierColor = Color(LevelBadgeMapper.getTierColor(userLevel));
+    final rankName = LevelBadgeMapper.getRankName(userLevel);
+    final progress = 0.5; // TODO: Calculate actual progress
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [Colors.white, tierColor.withOpacity(0.05)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: tierColor.withOpacity(0.2),
+          width: 2,
+        ),
         boxShadow: [
+          BoxShadow(
+            color: tierColor.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
@@ -249,18 +421,36 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // 레벨 아이콘
+          // 레벨 아이콘 with rank badge
           Container(
-            width: 60,
-            height: 60,
+            width: 65,
+            height: 65,
             decoration: BoxDecoration(
-              color: Colors.red.shade700,
-              borderRadius: BorderRadius.circular(15),
+              gradient: LinearGradient(
+                colors: [tierColor, tierColor.withOpacity(0.8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: tierColor.withOpacity(0.4),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            child: const Icon(
-              Icons.military_tech,
-              color: Colors.white,
-              size: 32,
+            padding: const EdgeInsets.all(8),
+            child: Image.asset(
+              LevelBadgeMapper.getBadgeImagePath(userLevel),
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.emoji_events,
+                  color: Colors.white,
+                  size: 32,
+                );
+              },
             ),
           ),
 
@@ -274,20 +464,36 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'H Lv1',
-                      style: TextStyle(
+                    Text(
+                      rankName,
+                      style: AppTextStyles.titleLarge.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
+                        color: tierColor,
                       ),
                     ),
-                    Text(
-                      '50%',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade600,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.mathGold.withOpacity(0.2),
+                            AppColors.mathGold.withOpacity(0.1),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.mathGold.withOpacity(0.4),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        '${(progress * 100).toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.mathGold,
+                        ),
                       ),
                     ),
                   ],
@@ -295,12 +501,35 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: 0.5,
-                    minHeight: 14,
-                    backgroundColor: const Color(0xFFE0E0E0),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.pink.shade300,
+                  child: Container(
+                    height: 14,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFE0E0E0),
+                          Colors.grey.shade200,
+                        ],
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        FractionallySizedBox(
+                          widthFactor: progress,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [tierColor, tierColor.withOpacity(0.7)],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: tierColor.withOpacity(0.4),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -312,15 +541,35 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
     );
   }
 
-  /// Daily Goal Card - 일일 목표
+  /// Daily Goal Card - 일일 목표 (게임 스타일)
   Widget _buildDailyGoalCard() {
+    const currentXP = 80;
+    const goalXP = 100;
+    const progress = currentXP / goalXP;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            AppColors.mathTeal.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.mathTeal.withOpacity(0.2),
+          width: 2,
+        ),
         boxShadow: [
+          BoxShadow(
+            color: AppColors.mathTeal.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
@@ -332,14 +581,28 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
         children: [
           // 목표 아이콘
           Container(
-            width: 60,
-            height: 60,
+            width: 65,
+            height: 65,
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF3E0),
-              borderRadius: BorderRadius.circular(15),
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.mathTeal,
+                  AppColors.mathTeal.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.mathTeal.withOpacity(0.4),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: const Center(
-              child: Text('🎯', style: TextStyle(fontSize: 30)),
+              child: Text('🎯', style: TextStyle(fontSize: 32)),
             ),
           ),
 
@@ -350,31 +613,83 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '오늘의 목표',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A1A),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '오늘의 목표',
+                      style: AppTextStyles.titleLarge.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.mathTeal,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.mathGreen.withOpacity(0.2),
+                            AppColors.mathGreen.withOpacity(0.1),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.mathGreen.withOpacity(0.4),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        '${(progress * 100).toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.mathGreen,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
-                  '80 / 100 XP',
+                  '$currentXP / $goalXP XP',
                   style: TextStyle(
                     fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: Colors.grey.shade600,
                   ),
                 ),
                 const SizedBox(height: 10),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: 0.8,
-                    minHeight: 12,
-                    backgroundColor: const Color(0xFFE0E0E0),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFF45A6AD),
+                  child: Container(
+                    height: 12,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFE0E0E0),
+                          Colors.grey.shade200,
+                        ],
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        FractionallySizedBox(
+                          widthFactor: progress,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [AppColors.mathTeal, AppColors.mathGreen],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.mathTeal,
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -543,6 +858,17 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
 
   Widget _buildStatCard(String title, String value, String emoji) {
     // MediaQuery를 사용하여 화면 너비 기준으로 카드 너비 계산
+    // 색상 매핑
+    final statColors = {
+      'Challenges': AppColors.mathOrange,
+      'Lessons Passed': AppColors.mathBlue,
+      'Total Diamonds': AppColors.mathPurple,
+      'Total Lifetime': AppColors.mathTeal,
+      'Correct Practices': AppColors.mathGreen,
+      'Top 3 Position': AppColors.mathGold,
+    };
+    final accentColor = statColors[title] ?? AppColors.primary;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // 화면 너비에서 마진(24*2) 및 간격(12)을 뺀 후 2로 나누기
@@ -553,9 +879,25 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
           width: cardWidth,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            gradient: LinearGradient(
+              colors: [
+                Colors.white,
+                accentColor.withOpacity(0.08),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: accentColor.withOpacity(0.2),
+              width: 1.5,
+            ),
             boxShadow: [
+              BoxShadow(
+                color: accentColor.withOpacity(0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 8,
@@ -566,22 +908,38 @@ class ProfileDetailScreenV3New extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 28)),
-              const SizedBox(height: 8),
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      accentColor.withOpacity(0.2),
+                      accentColor.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                ),
+              ),
+              const SizedBox(height: 12),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 12,
+                  fontWeight: FontWeight.w600,
                   color: Colors.grey.shade600,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
+                  color: accentColor,
                 ),
               ),
             ],

@@ -1,21 +1,44 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/local_storage_service.dart';
 import '../../shared/utils/logger.dart';
+import 'auth_provider.dart';
 
 /// 레슨 진행 상태 관리
 class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
-  LessonProgressNotifier() : super({}) {
-    _loadProgress();
+  final Ref ref;
+  final LocalStorageService _storage = LocalStorageService();
+
+  LessonProgressNotifier(this.ref) : super({}) {
+    _initialize();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
-  static const String _storageKey = 'lesson_progress';
+  /// 현재 계정 ID 기반 저장소 키
+  String? get _storageKey {
+    final currentAccount = ref.read(currentAccountProvider);
+    if (currentAccount == null) {
+      Logger.warning('No logged in account', tag: 'LessonProgress');
+      return null;
+    }
+    return 'lesson_progress_${currentAccount.id}';
+  }
+
+  /// 초기화 및 데이터 로드
+  Future<void> _initialize() async {
+    await _loadProgress();
+  }
 
   /// 진행 상태 로드
   Future<void> _loadProgress() async {
     try {
-      final progressData = await _storage.getString(_storageKey);
-      if (progressData != null) {
+      final key = _storageKey;
+      if (key == null) {
+        // 로그인된 계정 없음 - 빈 상태로 초기화
+        state = {};
+        return;
+      }
+
+      final progressData = await _storage.getString(key);
+      if (progressData != null && progressData.isNotEmpty) {
         // JSON 형태로 저장된 진행 상태 파싱
         final Map<String, dynamic> parsed = {};
         progressData.split(',').forEach((entry) {
@@ -26,6 +49,8 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
         });
         state = Map<String, int>.from(parsed);
         Logger.info('레슨 진행 상태 로드 완료', tag: 'LessonProgress');
+      } else {
+        state = {};
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -34,17 +59,24 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
         stackTrace: stackTrace,
         tag: 'LessonProgress',
       );
+      state = {};
     }
   }
 
   /// 진행 상태 저장
   Future<void> _saveProgress() async {
     try {
+      final key = _storageKey;
+      if (key == null) {
+        Logger.warning('Cannot save lesson progress - no logged in account', tag: 'LessonProgress');
+        return;
+      }
+
       // Map을 간단한 문자열 형태로 변환 (grade:index,grade:index,...)
       final progressString = state.entries
           .map((e) => '${e.key}:${e.value}')
           .join(',');
-      await _storage.setString(_storageKey, progressString);
+      await _storage.setString(key, progressString);
       Logger.debug('레슨 진행 상태 저장 완료', tag: 'LessonProgress');
     } catch (e, stackTrace) {
       Logger.error(
@@ -78,8 +110,11 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
   /// 진행 상태 초기화 (테스트용)
   Future<void> resetProgress() async {
     state = {};
-    await _storage.remove(_storageKey);
-    Logger.warning('레슨 진행 상태 초기화', tag: 'LessonProgress');
+    final key = _storageKey;
+    if (key != null) {
+      await _storage.remove(key);
+      Logger.warning('레슨 진행 상태 초기화', tag: 'LessonProgress');
+    }
   }
 
   /// 특정 학년의 진행 상태 초기화
@@ -95,7 +130,7 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
 /// 레슨 진행 상태 프로바이더
 final lessonProgressProvider =
     StateNotifierProvider<LessonProgressNotifier, Map<String, int>>((ref) {
-  return LessonProgressNotifier();
+  return LessonProgressNotifier(ref);
 });
 
 /// 특정 학년의 현재 레슨 인덱스 프로바이더

@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../shared/constants/app_colors.dart';
 import '../shared/themes/app_theme.dart';
 import '../features/onboarding/onboarding_screen.dart';
+import '../features/auth/views/views.dart';
 import 'auth_wrapper.dart';
 
 /// GoMath 앱의 메인 위젯
@@ -42,6 +43,10 @@ class MathLabApp extends StatelessWidget {
       routes: {
         '/onboarding': (context) => const OnboardingScreen(),
         '/home': (context) => const AuthWrapper(),
+        '/auth/welcome': (context) => const WelcomeView(),
+        '/auth/login': (context) => const LoginView(),
+        '/auth/signup': (context) => const SignUpView(),
+        '/auth/switch-account': (context) => const AccountSwitcherView(),
       },
 
       // 글로벌 설정

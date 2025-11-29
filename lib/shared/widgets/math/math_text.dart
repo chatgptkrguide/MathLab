@@ -147,10 +147,10 @@ class MathText extends StatelessWidget {
   String _convertLatexToUnicode(String latex) {
     String result = latex;
 
-    // $$...$$제거 (디스플레이 수식)
-    result = result.replaceAll(r'$$', '');
-    // $...$ 제거 (인라인 수식)
-    result = result.replaceAll(r'$', '');
+    // $, $$ 제거 (디스플레이 및 인라인 수식 구분자)
+    // 이중 달러 기호를 먼저 제거한 후 단일 달러 기호 제거
+    result = result.replaceAll('\$\$', '');  // 이중 달러 기호 제거
+    result = result.replaceAll('\$', '');    // 단일 달러 기호 제거
 
     // 제곱근
     result = result.replaceAll(r'\sqrt[3]', '∛');
