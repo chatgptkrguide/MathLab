@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/wrong_answer.dart';
 import '../models/problem.dart';
+import '../repositories/wrong_answer_repository.dart';
+import '../services/local_storage_service.dart';
+import '../services/firestore_service.dart';
 import '../../shared/utils/logger.dart';
-import '../../data/services/local_storage_service.dart';
 import 'auth_provider.dart';
 
 /// 오답 노트 상태
@@ -70,9 +72,9 @@ class WrongAnswerState {
 /// 오답 노트 Provider
 class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
   final Ref ref; // Riverpod Ref for accessing current account
-  final LocalStorageService _storage = LocalStorageService();
+  final WrongAnswerRepository _wrongAnswerRepository;
 
-  WrongAnswerProvider(this.ref)
+  WrongAnswerProvider(this.ref, this._wrongAnswerRepository)
       : super(const WrongAnswerState(
           wrongAnswers: [],
           totalCount: 0,
@@ -82,14 +84,14 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     _initialize();
   }
 
-  /// 현재 계정 ID 기반 저장소 키
-  String? get _storageKey {
+  /// 현재 계정 ID
+  String? get _accountId {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
       Logger.warning('No logged in account', tag: 'WrongAnswerProvider');
       return null;
     }
-    return 'wrong_answers_${currentAccount.id}';
+    return currentAccount.id;
   }
 
   /// 초기화 및 데이터 로드
@@ -100,44 +102,38 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
   /// 오답 로드
   Future<void> _loadWrongAnswers() async {
     try {
-      final key = _storageKey;
-      if (key == null) {
+      final accountId = _accountId;
+      if (accountId == null) {
         // 로그인된 계정 없음 - 빈 상태로 초기화
         _updateState([]);
         return;
       }
 
-      final data = await _storage.loadMap(key);
-      if (data != null) {
-        final wrongAnswers = (data['wrongAnswers'] as List?)
-            ?.map((json) => WrongAnswer.fromJson(json))
-            .toList() ?? [];
+      // Repository를 통해 오답 목록 로드 (로컬 우선)
+      final wrongAnswers = await _wrongAnswerRepository.get(accountId);
 
-        _updateState(wrongAnswers);
-        Logger.info('Loaded ${wrongAnswers.length} wrong answers for account', tag: 'WrongAnswerProvider');
-      } else {
-        _updateState([]);
-      }
+      _updateState(wrongAnswers);
+      Logger.info('Loaded ${wrongAnswers.length} wrong answers for account', tag: 'WrongAnswerProvider');
     } catch (e) {
       Logger.error('Failed to load wrong answers', error: e, tag: 'WrongAnswerProvider');
       _updateState([]);
     }
   }
 
-  /// 오답 저장
+  /// 오답 저장 (로컬만 - 복습/삭제 등 상태 변경 시 사용)
+  /// 주의: 새 오답 추가는 addWrongAnswer에서 Repository를 통해 처리
   Future<void> _saveWrongAnswers() async {
     try {
-      final key = _storageKey;
-      if (key == null) {
+      final accountId = _accountId;
+      if (accountId == null) {
         Logger.warning('Cannot save wrong answers - no logged in account', tag: 'WrongAnswerProvider');
         return;
       }
 
-      await _storage.saveMap(key, {
-        'wrongAnswers': state.wrongAnswers.map((wa) => wa.toJson()).toList(),
-      });
+      // 로컬에만 저장 (복습 상태 등 로컬 변경사항)
+      await _wrongAnswerRepository.saveToLocal(accountId, state.wrongAnswers);
 
-      Logger.info('Saved ${state.wrongAnswers.length} wrong answers for account', tag: 'WrongAnswerProvider');
+      Logger.debug('Saved ${state.wrongAnswers.length} wrong answers to local storage', tag: 'WrongAnswerProvider');
     } catch (e) {
       Logger.error('Failed to save wrong answers', error: e, tag: 'WrongAnswerProvider');
     }
@@ -163,42 +159,48 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     required Problem problem,
     int? selectedAnswerIndex, // 주관식 지원을 위해 optional로 변경
   }) async {
+    final accountId = _accountId;
+    if (accountId == null) {
+      Logger.warning('Cannot add wrong answer - no logged in account', tag: 'WrongAnswerProvider');
+      return;
+    }
+
     // 이미 존재하는지 확인
     final existingIndex = state.wrongAnswers.indexWhere(
       (wa) => wa.problem.id == problem.id,
     );
 
-    List<WrongAnswer> updatedList;
+    WrongAnswer wrongAnswer;
 
     if (existingIndex != -1) {
       // 이미 존재하면 업데이트
       final existing = state.wrongAnswers[existingIndex];
-      final updated = existing.copyWith(
+      wrongAnswer = existing.copyWith(
         selectedAnswerIndex: selectedAnswerIndex,
         timestamp: DateTime.now(),
         isMastered: false, // 다시 틀렸으므로 미완료 처리
       );
 
-      updatedList = [...state.wrongAnswers];
-      updatedList[existingIndex] = updated;
-
       Logger.info('Updated existing wrong answer: ${problem.id}');
     } else {
       // 새로 추가
-      final wrongAnswer = WrongAnswer(
+      wrongAnswer = WrongAnswer(
         id: 'wa_${DateTime.now().millisecondsSinceEpoch}',
         problem: problem,
         selectedAnswerIndex: selectedAnswerIndex, // nullable 허용
         timestamp: DateTime.now(),
       );
 
-      updatedList = [...state.wrongAnswers, wrongAnswer];
-
       Logger.info('Added new wrong answer: ${problem.id}');
     }
 
-    _updateState(updatedList);
-    await _saveWrongAnswers();
+    // Repository를 통해 저장 (로컬 + Firebase 동기화)
+    final success = await _wrongAnswerRepository.add(accountId, wrongAnswer);
+
+    if (success) {
+      // 성공 시 상태 업데이트
+      await _loadWrongAnswers(); // 재로드하여 최신 상태 반영
+    }
   }
 
   /// 복습 완료 (정답 처리)
@@ -353,8 +355,17 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
   }
 }
 
+/// WrongAnswerRepository Provider
+final wrongAnswerRepositoryProvider = Provider<WrongAnswerRepository>((ref) {
+  return WrongAnswerRepository(
+    localStorageService: LocalStorageService(),
+    firestoreService: FirestoreService(),
+  );
+});
+
 /// Provider 정의
 final wrongAnswerProvider =
     StateNotifierProvider<WrongAnswerProvider, WrongAnswerState>((ref) {
-  return WrongAnswerProvider(ref);
+  final wrongAnswerRepository = ref.watch(wrongAnswerRepositoryProvider);
+  return WrongAnswerProvider(ref, wrongAnswerRepository);
 });
