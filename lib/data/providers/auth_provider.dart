@@ -23,6 +23,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _initialize() async {
     await _initializeSocialAuth();
     await _checkExistingLogin();
+
+    // 데이터 마이그레이션 (1회만 실행)
+    await _runMigrationIfNeeded();
   }
 
   /// 소셜 로그인 초기화
@@ -517,23 +520,229 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return 'user_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}';
   }
 
+  // ==================== 데이터 마이그레이션 ====================
+
+  /// 마이그레이션 실행 (1회만)
+  Future<void> _runMigrationIfNeeded() async {
+    try {
+      final migrationDone = await _storage.getString('migration_v1_done');
+
+      if (migrationDone == 'true') {
+        Logger.debug('마이그레이션 이미 완료됨', tag: 'AuthProvider');
+        return;
+      }
+
+      Logger.info('데이터 마이그레이션 시작...', tag: 'AuthProvider');
+
+      // 현재 로그인된 계정이 있으면 전역 데이터를 해당 계정으로 마이그레이션
+      if (state.currentAccount != null) {
+        await _migrateGlobalDataToAccountBased(state.currentAccount!.id);
+      }
+
+      // 마이그레이션 완료 플래그 설정
+      await _storage.setString('migration_v1_done', 'true');
+
+      Logger.info('데이터 마이그레이션 완료', tag: 'AuthProvider');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '데이터 마이그레이션 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+    }
+  }
+
+  /// 전역 데이터를 계정별 데이터로 마이그레이션
+  Future<void> _migrateGlobalDataToAccountBased(String accountId) async {
+    try {
+      Logger.info(
+        '전역 데이터를 계정별로 마이그레이션: $accountId',
+        tag: 'AuthProvider',
+      );
+
+      // 마이그레이션할 전역 키 목록
+      final globalKeys = [
+        'wrong_answers', // → wrong_answers_{accountId}
+        'league', // → league_{accountId}
+        'messages', // → messages_{accountId}
+        'friends', // → friends_{accountId}
+        'achievements', // → achievements_{accountId}
+        'study_history', // → study_history_{accountId}
+        'lesson_progress', // → lesson_progress_{accountId}
+      ];
+
+      int migratedCount = 0;
+
+      for (final oldKey in globalKeys) {
+        final newKey = '${oldKey}_$accountId';
+
+        // 새 키가 이미 있으면 스킵
+        final hasNewKey = await _storage.containsKey(newKey);
+        if (hasNewKey) {
+          Logger.debug('이미 마이그레이션됨: $newKey', tag: 'AuthProvider');
+          continue;
+        }
+
+        // 전역 키에 데이터가 있는지 확인
+        final hasOldKey = await _storage.containsKey(oldKey);
+        if (!hasOldKey) {
+          Logger.debug('전역 데이터 없음: $oldKey', tag: 'AuthProvider');
+          continue;
+        }
+
+        // 전역 데이터를 계정별로 복사
+        final data = await _storage.getString(oldKey);
+        if (data != null && data.isNotEmpty) {
+          await _storage.setString(newKey, data);
+          migratedCount++;
+
+          Logger.info(
+            '마이그레이션: $oldKey → $newKey',
+            tag: 'AuthProvider',
+          );
+
+          // 전역 키는 마이그레이션 후 삭제
+          await _storage.remove(oldKey);
+        }
+      }
+
+      Logger.info(
+        '$migratedCount개 데이터 마이그레이션 완료',
+        tag: 'AuthProvider',
+      );
+    } catch (e, stackTrace) {
+      Logger.error(
+        '전역 데이터 마이그레이션 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+    }
+  }
+
+  /// 게스트 계정의 데이터를 정식 계정으로 이전
+  Future<bool> migrateGuestToRegularAccount({
+    required String guestAccountId,
+    required String newAccountId,
+  }) async {
+    try {
+      Logger.info(
+        '게스트 데이터 이전: $guestAccountId → $newAccountId',
+        tag: 'AuthProvider',
+      );
+
+      // 이전할 데이터 키 목록
+      final keysToMigrate = [
+        'wrong_answers',
+        'league',
+        'messages',
+        'friends',
+        'achievements',
+        'study_history',
+        'lesson_progress',
+      ];
+
+      int migratedCount = 0;
+
+      for (final key in keysToMigrate) {
+        final oldKey = '${key}_$guestAccountId';
+        final newKey = '${key}_$newAccountId';
+
+        // 게스트 계정에 데이터가 있는지 확인
+        final hasOldData = await _storage.containsKey(oldKey);
+        if (!hasOldData) {
+          continue;
+        }
+
+        final data = await _storage.getString(oldKey);
+        if (data != null && data.isNotEmpty) {
+          // 새 계정에 데이터가 이미 있으면 건너뛰기
+          final hasNewData = await _storage.containsKey(newKey);
+          if (hasNewData) {
+            Logger.warning(
+              '이미 데이터 존재: $newKey (스킵)',
+              tag: 'AuthProvider',
+            );
+            continue;
+          }
+
+          // 데이터 복사
+          await _storage.setString(newKey, data);
+          migratedCount++;
+
+          Logger.info(
+            '데이터 이전: $oldKey → $newKey',
+            tag: 'AuthProvider',
+          );
+
+          // 게스트 데이터 삭제
+          await _storage.remove(oldKey);
+        }
+      }
+
+      Logger.info(
+        '$migratedCount개 데이터 이전 완료',
+        tag: 'AuthProvider',
+      );
+
+      // 게스트 계정 삭제
+      await deleteAccount(guestAccountId);
+
+      return true;
+    } catch (e, stackTrace) {
+      Logger.error(
+        '게스트 데이터 이전 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
+      return false;
+    }
+  }
+
   /// 사용자 데이터 삭제
   Future<void> _deleteUserData(String accountId) async {
-    // 해당 사용자의 모든 데이터 키를 삭제
-    final keys = [
-      'user_$accountId',
-      'problemResults_$accountId',
-      'achievements_$accountId',
-      'learningStats_$accountId',
-      'errorNotes_$accountId',
-      'lessons_$accountId',
-    ];
+    try {
+      // 해당 사용자의 모든 데이터 키를 삭제
+      final keys = [
+        'user_$accountId',
+        'problemResults_$accountId',
+        'achievements_$accountId',
+        'learningStats_$accountId',
+        'errorNotes_$accountId',
+        'lessons_$accountId',
+        // Phase 1 멀티테넌트 키들
+        'wrong_answers_$accountId',
+        'league_$accountId',
+        'messages_$accountId',
+        'friends_$accountId',
+        'study_history_$accountId',
+        'lesson_progress_$accountId',
+      ];
 
-    for (final key in keys) {
-      await _storage.remove(key);
+      int deletedCount = 0;
+
+      for (final key in keys) {
+        final exists = await _storage.containsKey(key);
+        if (exists) {
+          await _storage.remove(key);
+          deletedCount++;
+        }
+      }
+
+      Logger.info(
+        '사용자 데이터 삭제 완료: $accountId ($deletedCount개)',
+        tag: 'AuthProvider',
+      );
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 데이터 삭제 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'AuthProvider',
+      );
     }
-
-    Logger.info('사용자 데이터 삭제 완료: $accountId', tag: 'AuthProvider');
   }
 
   /// 에러 클리어

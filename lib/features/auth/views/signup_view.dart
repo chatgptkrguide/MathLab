@@ -43,6 +43,12 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
     setState(() => _isLoading = true);
 
     try {
+      // 현재 게스트 계정 확인
+      final currentAuthState = ref.read(authProvider);
+      final isGuest = currentAuthState.isGuest;
+      final guestAccountId = isGuest ? currentAuthState.currentAccount?.id : null;
+
+      // 회원가입 진행
       final success = await ref.read(authProvider.notifier).signUp(
             email: _emailController.text.trim(),
             displayName: _nameController.text.trim(),
@@ -50,6 +56,29 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
           );
 
       if (success && mounted) {
+        // 게스트에서 정식 회원으로 전환된 경우 데이터 이전
+        if (isGuest && guestAccountId != null) {
+          final newAccountId = ref.read(authProvider).currentAccount?.id;
+          if (newAccountId != null && newAccountId != guestAccountId) {
+            final migrationSuccess = await ref
+                .read(authProvider.notifier)
+                .migrateGuestToRegularAccount(
+                  guestAccountId: guestAccountId,
+                  newAccountId: newAccountId,
+                );
+
+            if (migrationSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('게스트 데이터를 성공적으로 이전했습니다!'),
+                  backgroundColor: Colors.green,
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+          }
+        }
+
         Navigator.pushReplacementNamed(context, '/home');
       } else if (mounted) {
         // signUp already shows error in state, just check for success

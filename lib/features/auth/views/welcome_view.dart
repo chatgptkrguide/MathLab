@@ -79,7 +79,7 @@ class _GuestLoginButton extends ConsumerWidget {
     return OutlinedButton(
       onPressed: () async {
         try {
-          await ref.read(authProviderNotifier.notifier).signInAsGuest();
+          await ref.read(authProvider.notifier).signInAsGuest();
           if (context.mounted) {
             Navigator.pushReplacementNamed(context, '/home');
           }
