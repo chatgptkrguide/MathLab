@@ -21,8 +21,6 @@ export 'cards/achievement_card.dart';
 export 'cards/daily_goal_card.dart';
 export 'cards/duolingo_card.dart';
 export 'cards/lesson_card.dart';
-export 'cards/progress_card.dart';
-export 'cards/special_progress_card.dart';
 export 'cards/stat_card.dart';
 
 // Drawers
@@ -31,8 +29,7 @@ export 'drawers/top_slide_drawer.dart';
 
 // Feedback
 export 'feedback/animated_snackbar.dart';
-// Note: EmptyState from layout is used instead (feedback version has different API)
-// export 'feedback/empty_state.dart';
+export 'feedback/empty_state.dart';
 export 'feedback/error_display.dart';
 export 'feedback/feedback.dart';
 export 'feedback/loading_overlay.dart';
@@ -45,7 +42,6 @@ export 'images/optimized_network_image.dart';
 
 // Indicators
 export 'indicators/circular_level_badge.dart';
-export 'indicators/duolingo_circular_progress.dart';
 export 'indicators/loading_widgets.dart';
 
 // Inputs
@@ -55,7 +51,6 @@ export 'inputs/short_answer_input.dart';
 export 'layout/adaptive_app_header.dart';
 export 'layout/common_app_bar.dart';
 export 'layout/custom_bottom_nav.dart';
-export 'layout/empty_state.dart';
 export 'layout/grade_tab_bar.dart';
 export 'layout/lesson_path_widget.dart';
 export 'layout/responsive_wrapper.dart';

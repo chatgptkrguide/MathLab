@@ -662,16 +662,6 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                                 ],
                               ],
                             ),
-                            if (participant.badges.isNotEmpty) ...[
-                              const SizedBox(height: 6),
-                              Wrap(
-                                spacing: 4,
-                                runSpacing: 4,
-                                children: participant.badges.take(3).map((badge) {
-                                  return _buildBadgeChip(badge);
-                                }).toList(),
-                              ),
-                            ],
                           ],
                         ),
                       ),

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user_model.dart';
+import '../models/user.dart' as app_user;
 
 /// Firebase Authentication 서비스
 class AuthService {
@@ -125,7 +125,7 @@ class AuthService {
 
   /// 사용자 프로필 생성 (Firestore)
   Future<void> _createUserProfile(User user) async {
-    final userModel = UserModel(
+    final userModel = app_user.User(
       uid: user.uid,
       email: user.email!,
       displayName: user.displayName,
@@ -155,11 +155,11 @@ class AuthService {
   }
 
   /// 사용자 프로필 가져오기
-  Future<UserModel?> getUserProfile(String uid) async {
+  Future<app_user.User?> getUserProfile(String uid) async {
     try {
       final doc = await _firestore.collection('users').doc(uid).get();
       if (doc.exists) {
-        return UserModel.fromFirestore(doc);
+        return app_user.User.fromFirestore(doc);
       }
       return null;
     } catch (e) {
@@ -168,12 +168,12 @@ class AuthService {
   }
 
   /// 사용자 프로필 스트림
-  Stream<UserModel?> userProfileStream(String uid) {
+  Stream<app_user.User?> userProfileStream(String uid) {
     return _firestore
         .collection('users')
         .doc(uid)
         .snapshots()
-        .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
+        .map((doc) => doc.exists ? app_user.User.fromFirestore(doc) : null);
   }
 
   /// Firebase Auth 예외 처리

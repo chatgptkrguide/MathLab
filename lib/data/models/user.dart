@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'school_level.dart';
 
 /// 사용자 정보 모델
@@ -61,6 +62,29 @@ class User {
     );
   }
 
+  /// Firestore DocumentSnapshot으로부터 User 객체 생성
+  factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
+    final createdAt = (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+
+    return User(
+      id: doc.id,
+      name: data['displayName'] as String? ?? data['name'] as String? ?? '',
+      email: data['email'] as String,
+      joinDate: createdAt,
+      level: data['level'] as int? ?? 1,
+      xp: data['totalXP'] as int? ?? 0,
+      streakDays: data['streak'] as int? ?? 0,
+      currentGrade: data['currentGrade'] as String? ?? '중1',
+      avatarUrl: data['photoURL'] as String? ?? data['avatarUrl'] as String? ?? '',
+      hearts: data['hearts'] as int? ?? 5,
+      dailyXP: data['dailyXP'] as int? ?? 0,
+      lastXPResetDate: (data['lastXPResetDate'] as Timestamp?)?.toDate() ?? createdAt,
+      lastStudyDate: (data['lastStudyDate'] as Timestamp?)?.toDate(),
+      lastHeartUpdateTime: (data['lastHeartUpdateTime'] as Timestamp?)?.toDate(),
+    );
+  }
+
   /// User 객체를 JSON으로 변환
   Map<String, dynamic> toJson() {
     return {
@@ -78,6 +102,28 @@ class User {
       'lastXPResetDate': lastXPResetDate.toIso8601String(),
       'lastStudyDate': lastStudyDate?.toIso8601String(),
       'lastHeartUpdateTime': lastHeartUpdateTime?.toIso8601String(),
+    };
+  }
+
+  /// Firestore에 저장할 데이터로 변환
+  Map<String, dynamic> toFirestore() {
+    return {
+      'email': email,
+      'displayName': name,
+      'name': name,
+      'photoURL': avatarUrl,
+      'avatarUrl': avatarUrl,
+      'currentGrade': currentGrade,
+      'totalXP': xp,
+      'level': level,
+      'streak': streakDays,
+      'hearts': hearts,
+      'dailyXP': dailyXP,
+      'lastStudyDate': lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
+      'lastXPResetDate': Timestamp.fromDate(lastXPResetDate),
+      'lastHeartUpdateTime': lastHeartUpdateTime != null ? Timestamp.fromDate(lastHeartUpdateTime!) : null,
+      'createdAt': Timestamp.fromDate(joinDate),
+      'updatedAt': Timestamp.now(),
     };
   }
 
@@ -114,6 +160,12 @@ class User {
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
       lastHeartUpdateTime: lastHeartUpdateTime ?? this.lastHeartUpdateTime,
     );
+  }
+
+  /// 레벨 계산 (XP 기반) - Firestore 호환성을 위한 static 메서드
+  static int calculateLevel(int xp) {
+    // 레벨 = sqrt(XP / 100) + 1
+    return (xp / 100).floor() + 1;
   }
 
   /// 다음 레벨까지 필요한 XP 계산

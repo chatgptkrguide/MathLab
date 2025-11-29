@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user_model.dart';
+import '../models/user.dart';
 import '../models/progress_model.dart';
 import '../models/wrong_answer.dart';
 import '../models/league.dart';
@@ -18,7 +18,7 @@ class FirestoreService {
   // ==================== 사용자 프로필 ====================
 
   /// 사용자 프로필 저장 (생성 또는 업데이트)
-  Future<void> saveUserProfile(String uid, UserModel user) async {
+  Future<void> saveUserProfile(String uid, User user) async {
     try {
       Logger.info('Firestore에 사용자 프로필 저장: $uid', tag: 'FirestoreService');
 
@@ -40,7 +40,7 @@ class FirestoreService {
   }
 
   /// 사용자 프로필 조회
-  Future<UserModel?> getUserProfile(String uid) async {
+  Future<User?> getUserProfile(String uid) async {
     try {
       Logger.info('Firestore에서 사용자 프로필 조회: $uid', tag: 'FirestoreService');
 
@@ -51,7 +51,7 @@ class FirestoreService {
         return null;
       }
 
-      return UserModel.fromFirestore(doc);
+      return User.fromFirestore(doc);
     } catch (e, stackTrace) {
       Logger.error(
         '사용자 프로필 조회 실패',
@@ -64,11 +64,11 @@ class FirestoreService {
   }
 
   /// 사용자 프로필 실시간 감지
-  Stream<UserModel?> watchUserProfile(String uid) {
+  Stream<User?> watchUserProfile(String uid) {
     try {
       return _firestore.collection('users').doc(uid).snapshots().map((snapshot) {
         if (!snapshot.exists) return null;
-        return UserModel.fromFirestore(snapshot);
+        return User.fromFirestore(snapshot);
       });
     } catch (e, stackTrace) {
       Logger.error(
@@ -104,7 +104,7 @@ class FirestoreService {
 
         final currentXP = userDoc.data()!['totalXP'] as int? ?? 0;
         final newTotalXP = currentXP + xp;
-        final newLevel = UserModel.calculateLevel(newTotalXP);
+        final newLevel = User.calculateLevel(newTotalXP);
 
         final updateData = {
           'totalXP': newTotalXP,
@@ -363,7 +363,7 @@ class FirestoreService {
   // ==================== 리더보드 ====================
 
   /// 주간 리더보드 가져오기
-  Future<List<UserModel>> getWeeklyLeaderboard({int limit = 50}) async {
+  Future<List<User>> getWeeklyLeaderboard({int limit = 50}) async {
     try {
       final snapshot = await _firestore
           .collection('users')
@@ -372,7 +372,7 @@ class FirestoreService {
           .get();
 
       return snapshot.docs
-          .map((doc) => UserModel.fromFirestore(doc))
+          .map((doc) => User.fromFirestore(doc))
           .toList();
     } catch (e) {
       throw Exception('리더보드 조회 실패: $e');
