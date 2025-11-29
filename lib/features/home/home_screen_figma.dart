@@ -8,13 +8,14 @@ import '../lessons/figma/lessons_screen_figma.dart';
 import '../daily_reward/daily_reward_screen.dart';
 import '../profile/figma/profile_detail_screen_v3_new.dart';
 import '../leaderboard/leaderboard_screen.dart';
-import '../problems/problem_solving_screen.dart';
+import '../problem/problem_screen.dart';
 import '../messages/messages_screen.dart';
 import '../friends/friends_screen.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/navigation_provider.dart';
 import '../../data/providers/message_provider.dart';
 import '../../data/providers/friend_provider.dart';
+import '../../data/providers/problem_provider.dart';
 import '../../data/services/korean_math_curriculum.dart';
 import '../../data/models/models.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
@@ -847,67 +848,71 @@ class HomeScreenFigma extends ConsumerWidget {
   Widget _buildLessonOption(BuildContext context, Lesson lesson) {
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          Navigator.pop(context);
-          // 학습 페이지로 이동
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProblemSolvingScreen(
-                lessonId: lesson.id,
-                lessonTitle: lesson.title,
-              ),
-            ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          child: Row(
-            children: [
-              // 아이콘
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+      child: Consumer(
+        builder: (context, ref, child) => InkWell(
+          onTap: () {
+            Navigator.pop(context);
+            // 문제 데이터 가져오기
+            final problems = ref.read(problemProvider.notifier).getProblemsByLesson(lesson.id);
+            // 학습 페이지로 이동
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProblemScreen(
+                  lessonId: lesson.id,
+                  problems: problems,
                 ),
-                child: Center(
-                  child: Text(
-                    lesson.icon,
-                    style: const TextStyle(fontSize: 24),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            child: Row(
+              children: [
+                // 아이콘
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A90E2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      lesson.icon,
+                      style: const TextStyle(fontSize: 24),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lesson.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lesson.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A1A1A),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      lesson.description,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
+                      const SizedBox(height: 4),
+                      Text(
+                        lesson.description,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-            ],
+                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              ],
+            ),
           ),
         ),
       ),

@@ -9,10 +9,11 @@ import '../../../shared/constants/app_text_styles.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/providers/lesson_progress_provider.dart';
 import '../../../data/providers/level_skip_provider.dart';
+import '../../../data/providers/problem_provider.dart';
 import '../../../data/services/korean_math_curriculum.dart';
 import '../../practice/practice_screen.dart';
 import '../../level_test/level_test_screen.dart';
-import '../../problems/problem_solving_screen.dart';
+import '../../problem/problem_screen.dart';
 import '../../level_skip/level_skip_test_screen.dart';
 
 /// Figma 디자인 "01" 학습 페이지 100% 재현
@@ -452,20 +453,17 @@ class LessonsScreenFigma extends ConsumerWidget {
     final displayGrade = user?.currentGrade ?? '중1';
     final curriculumLessons = KoreanMathCurriculum.getLessonsByGrade(displayGrade);
 
-    // 레슨 타이틀 찾기
-    final lesson = curriculumLessons.firstWhere(
-      (lesson) => lesson.id == lessonId,
-      orElse: () => curriculumLessons.first,
-    );
+    // 문제 데이터 가져오기
+    final problems = ref.read(problemProvider.notifier).getProblemsByLesson(lessonId);
 
     // 문제 풀이 화면으로 이동
     if (context.mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProblemSolvingScreen(
+          builder: (context) => ProblemScreen(
             lessonId: lessonId,
-            lessonTitle: lesson.title,
+            problems: problems,
           ),
         ),
       );
