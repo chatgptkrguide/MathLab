@@ -1,14 +1,87 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../models/progress_model.dart';
+import '../models/wrong_answer.dart';
+import '../models/league.dart';
+import '../../shared/utils/logger.dart';
 
 /// Firestore 데이터베이스 서비스
+/// Phase 2: Firebase 통합을 위한 확장 버전
 class FirestoreService {
+  // Singleton 패턴
+  static final FirestoreService _instance = FirestoreService._internal();
+  factory FirestoreService() => _instance;
+  FirestoreService._internal();
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // ==================== 사용자 프로필 ====================
 
-  /// 사용자 프로필 업데이트
+  /// 사용자 프로필 저장 (생성 또는 업데이트)
+  Future<void> saveUserProfile(String uid, UserModel user) async {
+    try {
+      Logger.info('Firestore에 사용자 프로필 저장: $uid', tag: 'FirestoreService');
+
+      await _firestore.collection('users').doc(uid).set(
+        user.toFirestore(),
+        SetOptions(merge: true),
+      );
+
+      Logger.info('사용자 프로필 저장 완료', tag: 'FirestoreService');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 프로필 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('사용자 프로필 저장 실패: $e');
+    }
+  }
+
+  /// 사용자 프로필 조회
+  Future<UserModel?> getUserProfile(String uid) async {
+    try {
+      Logger.info('Firestore에서 사용자 프로필 조회: $uid', tag: 'FirestoreService');
+
+      final doc = await _firestore.collection('users').doc(uid).get();
+
+      if (!doc.exists) {
+        Logger.warning('사용자 프로필을 찾을 수 없음: $uid', tag: 'FirestoreService');
+        return null;
+      }
+
+      return UserModel.fromFirestore(doc);
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 프로필 조회 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('사용자 프로필 조회 실패: $e');
+    }
+  }
+
+  /// 사용자 프로필 실시간 감지
+  Stream<UserModel?> watchUserProfile(String uid) {
+    try {
+      return _firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+        if (!snapshot.exists) return null;
+        return UserModel.fromFirestore(snapshot);
+      });
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 프로필 스트림 생성 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      return Stream.value(null);
+    }
+  }
+
+  /// 사용자 프로필 업데이트 (기존 메서드 유지)
   Future<void> updateUserProfile(String userId, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('users').doc(userId).update({
@@ -322,6 +395,162 @@ class FirestoreService {
       return higherUsers.docs.length + 1;
     } catch (e) {
       throw Exception('사용자 순위 조회 실패: $e');
+    }
+  }
+
+  // ==================== 오답 노트 ====================
+
+  /// 오답 저장 (서브컬렉션)
+  Future<void> saveWrongAnswer(String uid, WrongAnswer wrongAnswer) async {
+    try {
+      Logger.info('Firestore에 오답 저장: ${wrongAnswer.id}', tag: 'FirestoreService');
+
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('wrongAnswers')
+          .doc(wrongAnswer.id)
+          .set({
+        'problemId': wrongAnswer.problem.id,
+        'selectedAnswerIndex': wrongAnswer.selectedAnswerIndex,
+        'timestamp': Timestamp.fromDate(wrongAnswer.timestamp),
+        'reviewCount': wrongAnswer.reviewCount,
+        'lastReviewDate': wrongAnswer.lastReviewDate != null
+            ? Timestamp.fromDate(wrongAnswer.lastReviewDate!)
+            : null,
+        'isMastered': wrongAnswer.isMastered,
+        'syncedAt': Timestamp.fromDate(DateTime.now()),
+      }, SetOptions(merge: true));
+
+      Logger.info('오답 저장 완료', tag: 'FirestoreService');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '오답 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('오답 저장 실패: $e');
+    }
+  }
+
+  /// 오답 목록 조회
+  Future<List<Map<String, dynamic>>> getWrongAnswers(String uid) async {
+    try {
+      Logger.info('Firestore에서 오답 목록 조회: $uid', tag: 'FirestoreService');
+
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('wrongAnswers')
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      return snapshot.docs.map((doc) => {
+        'id': doc.id,
+        ...doc.data(),
+      }).toList();
+    } catch (e, stackTrace) {
+      Logger.error(
+        '오답 목록 조회 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('오답 목록 조회 실패: $e');
+    }
+  }
+
+  /// 오답 실시간 감지
+  Stream<List<Map<String, dynamic>>> watchWrongAnswers(String uid) {
+    try {
+      return _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('wrongAnswers')
+          .orderBy('timestamp', descending: true)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs.map((doc) => {
+          'id': doc.id,
+          ...doc.data(),
+        }).toList();
+      });
+    } catch (e, stackTrace) {
+      Logger.error(
+        '오답 스트림 생성 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      return Stream.value([]);
+    }
+  }
+
+  // ==================== 리그 ====================
+
+  /// 현재 리그 조회
+  Future<League?> getCurrentLeague(String leagueId) async {
+    try {
+      Logger.info('Firestore에서 리그 조회: $leagueId', tag: 'FirestoreService');
+
+      final doc = await _firestore.collection('leagues').doc(leagueId).get();
+
+      if (!doc.exists) {
+        Logger.warning('리그를 찾을 수 없음: $leagueId', tag: 'FirestoreService');
+        return null;
+      }
+
+      return League.fromFirestore(doc);
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그 조회 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('리그 조회 실패: $e');
+    }
+  }
+
+  /// 리그 실시간 감지
+  Stream<League?> watchLeague(String leagueId) {
+    try {
+      return _firestore.collection('leagues').doc(leagueId).snapshots().map((snapshot) {
+        if (!snapshot.exists) return null;
+        return League.fromFirestore(snapshot);
+      });
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그 스트림 생성 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      return Stream.value(null);
+    }
+  }
+
+  /// 리그 참가자 업데이트
+  Future<void> updateLeagueParticipant(String leagueId, Map<String, dynamic> participant) async {
+    try {
+      Logger.info('리그 참가자 업데이트: $leagueId', tag: 'FirestoreService');
+
+      // TODO: Firestore transaction을 사용하여 참가자 정보 업데이트
+      await _firestore.collection('leagues').doc(leagueId).update({
+        'participants': FieldValue.arrayUnion([participant]),
+        'updatedAt': Timestamp.fromDate(DateTime.now()),
+      });
+
+      Logger.info('리그 참가자 업데이트 완료', tag: 'FirestoreService');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그 참가자 업데이트 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('리그 참가자 업데이트 실패: $e');
     }
   }
 }
