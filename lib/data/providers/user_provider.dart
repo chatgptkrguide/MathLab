@@ -3,28 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
 import '../services/local_storage_service.dart';
+import '../services/firestore_service.dart';
 import '../services/notification_service.dart';
+import '../repositories/user_repository.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../shared/utils/logger.dart';
 
 /// 사용자 정보 상태 관리
 class UserNotifier extends StateNotifier<User?> {
-  UserNotifier() : super(null) {
+  final UserRepository _userRepository;
+
+  UserNotifier(this._userRepository) : super(null) {
     _loadUser();
   }
 
   final MockDataService _dataService = MockDataService();
-  final LocalStorageService _storage = LocalStorageService();
 
   /// 앱 시작 시 사용자 정보 로드
   Future<void> _loadUser() async {
     try {
       Logger.info('사용자 정보 로드 시작', tag: 'UserProvider');
 
-      final user = await _storage.loadSecureObject<User>(
-        key: GameConstants.userStorageKey,
-        fromJson: User.fromJson,
-      );
+      // Repository를 통해 사용자 정보 로드 (로컬 우선)
+      final user = await _userRepository.get(GameConstants.userStorageKey);
 
       if (user != null) {
         // 저장된 사용자 정보가 있으면 로드
@@ -100,10 +101,8 @@ class UserNotifier extends StateNotifier<User?> {
   /// 특정 계정의 사용자 정보 로드
   Future<void> loadUserByAccount(String accountId) async {
     try {
-      final user = await _storage.loadSecureObject<User>(
-        key: 'user_$accountId',
-        fromJson: User.fromJson,
-      );
+      // Repository를 통해 사용자 정보 로드
+      final user = await _userRepository.get('user_$accountId');
 
       if (user != null) {
         // 저장된 사용자 정보가 있으면 로드
@@ -135,11 +134,8 @@ class UserNotifier extends StateNotifier<User?> {
     if (state == null) return;
 
     try {
-      await _storage.saveSecureObject<User>(
-        key: GameConstants.userStorageKey,
-        data: state!,
-        toJson: (user) => user.toJson(),
-      );
+      // Repository를 통해 사용자 정보 저장 (로컬 + Firebase 동기화)
+      await _userRepository.save(GameConstants.userStorageKey, state!);
       Logger.debug('사용자 정보 저장 완료', tag: 'UserProvider');
     } catch (e, stackTrace) {
       Logger.error(
@@ -392,9 +388,6 @@ class UserNotifier extends StateNotifier<User?> {
     state = _dataService.getSampleUser();
     await _saveUser();
 
-    // Storage 클리어
-    await _storage.remove(GameConstants.lastStudyDateKey);
-
     Logger.info('사용자 데이터 초기화 완료', tag: 'UserProvider');
   }
 
@@ -491,9 +484,18 @@ class UserNotifier extends StateNotifier<User?> {
   }
 }
 
+/// UserRepository Provider
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  return UserRepository(
+    localStorageService: LocalStorageService(),
+    firestoreService: FirestoreService(),
+  );
+});
+
 /// 사용자 정보 프로바이더
 final userProvider = StateNotifierProvider<UserNotifier, User?>((ref) {
-  return UserNotifier();
+  final userRepository = ref.watch(userRepositoryProvider);
+  return UserNotifier(userRepository);
 });
 
 /// 사용자 정보를 감시하는 편의 프로바이더들

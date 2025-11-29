@@ -1,5 +1,5 @@
 import 'base_repository.dart';
-import '../models/user_model.dart';
+import '../models/user.dart';
 import '../services/local_storage_service.dart';
 import '../services/firestore_service.dart';
 import '../../shared/utils/logger.dart';
@@ -10,7 +10,7 @@ import '../../shared/utils/logger.dart';
 /// - 사용자 프로필 CRUD
 /// - 로컬 + Firebase 동기화
 /// - 충돌 해결 (Last-Write-Wins)
-class UserRepository extends BaseRepository<UserModel> {
+class UserRepository extends BaseRepository<User> {
   UserRepository({
     required LocalStorageService localStorageService,
     required FirestoreService firestoreService,
@@ -22,7 +22,7 @@ class UserRepository extends BaseRepository<UserModel> {
   // ==================== 로컬 스토리지 ====================
 
   @override
-  Future<UserModel?> getFromLocal(String accountId) async {
+  Future<User?> getFromLocal(String accountId) async {
     try {
       final storageKey = 'user_$accountId';
       final json = await localStorageService.loadMap(storageKey);
@@ -32,7 +32,7 @@ class UserRepository extends BaseRepository<UserModel> {
         return null;
       }
 
-      return UserModel.fromJson(json);
+      return User.fromJson(json);
     } catch (e, stackTrace) {
       Logger.error(
         '로컬 사용자 프로필 조회 실패',
@@ -45,7 +45,7 @@ class UserRepository extends BaseRepository<UserModel> {
   }
 
   @override
-  Future<void> saveToLocal(String accountId, UserModel data) async {
+  Future<void> saveToLocal(String accountId, User data) async {
     try {
       final storageKey = 'user_$accountId';
       await localStorageService.saveMap(storageKey, data.toJson());
@@ -80,13 +80,11 @@ class UserRepository extends BaseRepository<UserModel> {
   // ==================== Firebase ====================
 
   @override
-  Future<UserModel?> getFromFirebase(String accountId) async {
+  Future<User?> getFromFirebase(String accountId) async {
     try {
-      // accountId는 로컬 식별자이고, Firebase UID가 필요함
-      // 실제로는 AuthProvider에서 UID를 가져와야 함
-      // 현재는 accountId를 UID로 사용 (향후 수정 필요)
-
-      return await firestoreService.getUserProfile(accountId);
+      // TODO: Firebase 연결 시 User ↔ UserModel 변환 또는 모델 통합 필요
+      Logger.warning('Firebase 연결 미구현 - 로컬만 사용', tag: 'UserRepository');
+      return null;
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 사용자 프로필 조회 실패',
@@ -99,10 +97,10 @@ class UserRepository extends BaseRepository<UserModel> {
   }
 
   @override
-  Future<void> saveToFirebase(String accountId, UserModel data) async {
+  Future<void> saveToFirebase(String accountId, User data) async {
     try {
-      // TODO: 실제 Firebase UID 사용
-      await firestoreService.saveUserProfile(accountId, data);
+      // TODO: Firebase 연결 시 User ↔ UserModel 변환 또는 모델 통합 필요
+      Logger.warning('Firebase 연결 미구현 - 로컬만 사용', tag: 'UserRepository');
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 사용자 프로필 저장 실패',
@@ -136,19 +134,28 @@ class UserRepository extends BaseRepository<UserModel> {
   // ==================== 충돌 해결 ====================
 
   @override
-  Future<UserModel?> mergeData(UserModel local, UserModel remote) async {
+  Future<User?> mergeData(User local, User remote) async {
     // Last-Write-Wins 전략
-    // updatedAt 필드가 있다면 비교해서 최신 것 사용
-    // 현재 UserModel에 updatedAt 필드가 없으므로 remote 우선
+    // lastStudyDate 필드로 비교해서 최신 것 사용
 
-    Logger.debug('사용자 프로필 충돌 해결: remote 우선', tag: 'UserRepository');
-    return remote;
+    final localDate = local.lastStudyDate ?? local.joinDate;
+    final remoteDate = remote.lastStudyDate ?? remote.joinDate;
+
+    if (remoteDate.isAfter(localDate)) {
+      Logger.debug('사용자 프로필 충돌 해결: remote 우선', tag: 'UserRepository');
+      return remote;
+    } else {
+      Logger.debug('사용자 프로필 충돌 해결: local 우선', tag: 'UserRepository');
+      return local;
+    }
   }
 
   // ==================== 추가 메서드 ====================
 
   /// 사용자 프로필 실시간 감지 (Firebase Stream)
-  Stream<UserModel?> watchUserProfile(String uid) {
-    return firestoreService.watchUserProfile(uid);
+  /// TODO: Firebase 연결 시 User 타입으로 변환 필요
+  Stream<User?> watchUserProfile(String uid) {
+    // 현재는 로컬만 사용하므로 빈 스트림 반환
+    return Stream.value(null);
   }
 }
