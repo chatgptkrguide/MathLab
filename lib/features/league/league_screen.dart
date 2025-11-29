@@ -132,7 +132,20 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
     bool canPromote,
     bool isRelegationZone,
   ) {
-    final daysLeft = league.weekEndDate.difference(DateTime.now()).inDays;
+    final timeLeft = league.weekEndDate.difference(DateTime.now());
+    final daysLeft = timeLeft.inDays;
+    final hoursLeft = timeLeft.inHours % 24;
+    final minutesLeft = timeLeft.inMinutes % 60;
+
+    // 시간 문자열 생성
+    String timeString = '';
+    if (daysLeft > 0) {
+      timeString = '$daysLeft일 ${hoursLeft}시간';
+    } else if (hoursLeft > 0) {
+      timeString = '$hoursLeft시간 ${minutesLeft}분';
+    } else {
+      timeString = '$minutesLeft분';
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -254,7 +267,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                       const Icon(Icons.timer, color: Colors.white, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        '$daysLeft일 후 승급/강등',
+                        '$timeString 후 승급/강등',
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.white,
@@ -911,116 +924,144 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
           final isSelected = tier == selectedTier;
           final isCurrentUserTier = tier == currentTier;
 
+          // 도달하지 못한 리그인지 확인 (현재 티어보다 높은 티어)
+          final isLocked = currentTier != null && tier.index > currentTier.index;
+
           return GestureDetector(
-            onTap: () {
+            onTap: isLocked ? null : () {
               setState(() {
                 selectedTier = tier;
               });
             },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              width: isSelected ? 100 : 80,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isSelected
+            child: Opacity(
+              opacity: isLocked ? 0.3 : 1.0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                width: isSelected ? 100 : 80,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isLocked
+                        ? [
+                            Colors.grey.withOpacity(0.3),
+                            Colors.grey.withOpacity(0.2),
+                          ]
+                        : isSelected
+                            ? [
+                                Color(tier.color),
+                                Color(tier.color).withOpacity(0.8),
+                              ]
+                            : [
+                                Color(tier.color).withOpacity(0.3),
+                                Color(tier.color).withOpacity(0.2),
+                              ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: isSelected
+                      ? Border.all(
+                          color: Colors.white,
+                          width: 3,
+                        )
+                      : null,
+                  boxShadow: isSelected
                       ? [
-                          Color(tier.color),
-                          Color(tier.color).withOpacity(0.8),
+                          BoxShadow(
+                            color: Color(tier.color).withOpacity(0.5),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
                         ]
                       : [
-                          Color(tier.color).withOpacity(0.3),
-                          Color(tier.color).withOpacity(0.2),
-                        ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: isSelected
-                    ? Border.all(
-                        color: Colors.white,
-                        width: 3,
-                      )
-                    : null,
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: Color(tier.color).withOpacity(0.5),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ]
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              child: Stack(
-                children: [
-                  // 티어 아이콘
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // 랭크 아이콘 이미지
-                        Image.asset(
-                          tier.iconPath,
-                          width: isSelected ? 50 : 40,
-                          height: isSelected ? 50 : 40,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            // 이미지 로드 실패 시 이모티콘 표시
-                            return Text(
-                              tier.iconEmoji,
-                              style: TextStyle(
-                                fontSize: isSelected ? 40 : 32,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          tier.displayName.replaceAll(' 리그', ''),
-                          style: TextStyle(
-                            fontSize: isSelected ? 13 : 11,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                            color: isSelected ? Colors.white : Colors.white70,
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // 현재 사용자 티어 표시
-                  if (isCurrentUserTier)
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.mathYellow,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.mathYellow.withOpacity(0.5),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+                        ],
+                ),
+                child: Stack(
+                  children: [
+                    // 티어 아이콘
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (isLocked) ...[
+                            // 잠긴 리그는 실루엣만 표시
+                            Container(
+                              width: isSelected ? 50 : 40,
+                              height: isSelected ? 50 : 40,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.lock,
+                                color: Colors.white70,
+                                size: 24,
+                              ),
+                            ),
+                          ] else ...[
+                            // 랭크 아이콘 이미지
+                            Image.asset(
+                              tier.iconPath,
+                              width: isSelected ? 50 : 40,
+                              height: isSelected ? 50 : 40,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                // 이미지 로드 실패 시 이모티콘 표시
+                                return Text(
+                                  tier.iconEmoji,
+                                  style: TextStyle(
+                                    fontSize: isSelected ? 40 : 32,
+                                  ),
+                                );
+                              },
                             ),
                           ],
-                        ),
-                        child: const Icon(
-                          Icons.star,
-                          color: Colors.white,
-                          size: 12,
-                        ),
+                          const SizedBox(height: 4),
+                          Text(
+                            tier.displayName.replaceAll(' 리그', ''),
+                            style: TextStyle(
+                              fontSize: isSelected ? 13 : 11,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                              color: isLocked ? Colors.white38 : (isSelected ? Colors.white : Colors.white70),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                ],
+                    // 현재 사용자 티어 표시
+                    if (isCurrentUserTier && !isLocked)
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColors.mathYellow,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.mathYellow.withOpacity(0.5),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.star,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           );
