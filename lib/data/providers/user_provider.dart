@@ -22,15 +22,17 @@ class UserNotifier extends StateNotifier<User?> {
   /// 앱 시작 시 사용자 정보 로드
   Future<void> _loadUser() async {
     try {
-      Logger.info('사용자 정보 로드 시작', tag: 'UserProvider');
+      // 현재 사용자에 맞는 스토리지 키 생성
+      final storageKey = _getStorageKey();
+      Logger.info('사용자 정보 로드 시작 (키: $storageKey)', tag: 'UserProvider');
 
       // Repository를 통해 사용자 정보 로드 (로컬 우선)
-      final user = await _userRepository.get(GameConstants.userStorageKey);
+      final user = await _userRepository.get(storageKey);
 
       if (user != null) {
         // 저장된 사용자 정보가 있으면 로드
         state = user;
-        Logger.info('사용자 정보 로드 성공: ${user.name}', tag: 'UserProvider');
+        Logger.info('사용자 정보 로드 성공: ${user.name} (키: $storageKey)', tag: 'UserProvider');
 
         // 스트릭 확인 및 업데이트
         await checkAndUpdateStreak();
@@ -41,7 +43,7 @@ class UserNotifier extends StateNotifier<User?> {
         // 없으면 샘플 사용자 생성
         state = _dataService.getSampleUser();
         await _saveUser();
-        Logger.info('새 사용자 생성: ${state?.name}', tag: 'UserProvider');
+        Logger.info('새 사용자 생성: ${state?.name} (키: $storageKey)', tag: 'UserProvider');
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -98,21 +100,41 @@ class UserNotifier extends StateNotifier<User?> {
     Logger.info('하트 전체 구매 완료: ${GameConstants.maxHearts}개', tag: 'UserProvider');
   }
 
+  /// 스토리지 키 생성 헬퍼 메서드
+  ///
+  /// 전략:
+  /// - 기본 사용자(id가 없거나 'default'): GameConstants.userStorageKey ('user')
+  /// - 특정 계정: 'user_$accountId'
+  String _getStorageKey([String? accountId]) {
+    final targetId = accountId ?? state?.id;
+
+    // 기본 사용자 또는 ID가 없는 경우
+    if (targetId == null || targetId.isEmpty || targetId == 'default') {
+      return GameConstants.userStorageKey; // 'user'
+    }
+
+    // 특정 계정
+    return 'user_$targetId';
+  }
+
   /// 특정 계정의 사용자 정보 로드
   Future<void> loadUserByAccount(String accountId) async {
     try {
+      // 스토리지 키 생성
+      final storageKey = _getStorageKey(accountId);
+
       // Repository를 통해 사용자 정보 로드
-      final user = await _userRepository.get('user_$accountId');
+      final user = await _userRepository.get(storageKey);
 
       if (user != null) {
         // 저장된 사용자 정보가 있으면 로드
         state = user;
-        Logger.info('계정 로드 성공: $accountId', tag: 'UserProvider');
+        Logger.info('계정 로드 성공: $accountId (키: $storageKey)', tag: 'UserProvider');
       } else {
         // 없으면 새 사용자 생성
         state = _dataService.getSampleUser().copyWith(id: accountId);
         await _saveUser();
-        Logger.info('새 계정 생성: $accountId', tag: 'UserProvider');
+        Logger.info('새 계정 생성: $accountId (키: $storageKey)', tag: 'UserProvider');
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -134,9 +156,12 @@ class UserNotifier extends StateNotifier<User?> {
     if (state == null) return;
 
     try {
+      // 현재 사용자에 맞는 스토리지 키 생성
+      final storageKey = _getStorageKey();
+
       // Repository를 통해 사용자 정보 저장 (로컬 + Firebase 동기화)
-      await _userRepository.save(GameConstants.userStorageKey, state!);
-      Logger.debug('사용자 정보 저장 완료', tag: 'UserProvider');
+      await _userRepository.save(storageKey, state!);
+      Logger.debug('사용자 정보 저장 완료 (키: $storageKey)', tag: 'UserProvider');
     } catch (e, stackTrace) {
       Logger.error(
         '사용자 정보 저장 실패',

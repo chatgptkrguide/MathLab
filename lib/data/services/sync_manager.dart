@@ -28,8 +28,9 @@ class SyncManager {
   final Connectivity _connectivity = Connectivity();
 
   // Repository 인스턴스 (initialize에서 주입받음)
-  UserRepository? _userRepository;
-  WrongAnswerRepository? _wrongAnswerRepository;
+  // late final로 선언하여 초기화 보장 및 null 체크 제거
+  late final UserRepository _userRepository;
+  late final WrongAnswerRepository _wrongAnswerRepository;
 
   // 동기화 상태 스트림
   final _syncStatusController = StreamController<SyncStatus>.broadcast();
@@ -288,17 +289,13 @@ class SyncManager {
 
   /// 사용자 프로필 업로드
   Future<void> _uploadUserProfile(SyncTask task) async {
-    if (_userRepository == null) {
-      throw Exception('UserRepository가 초기화되지 않았습니다');
-    }
-
     try {
       // task.data에서 User 객체 복원
       final userData = task.data['user'] as Map<String, dynamic>;
       final user = User.fromJson(userData);
 
       // Repository를 통해 Firebase에 업로드
-      await _userRepository!.saveToFirebase(task.accountId, user);
+      await _userRepository.saveToFirebase(task.accountId, user);
 
       Logger.info('사용자 프로필 업로드 완료: ${task.accountId}', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -314,17 +311,13 @@ class SyncManager {
 
   /// 오답 업로드
   Future<void> _uploadWrongAnswer(SyncTask task) async {
-    if (_wrongAnswerRepository == null) {
-      throw Exception('WrongAnswerRepository가 초기화되지 않았습니다');
-    }
-
     try {
       // task.data에서 WrongAnswer 객체 복원
       final wrongAnswerData = task.data['wrongAnswer'] as Map<String, dynamic>;
       final wrongAnswer = WrongAnswer.fromJson(wrongAnswerData);
 
       // Repository를 통해 Firebase에 업로드
-      await _wrongAnswerRepository!.saveToFirebase(task.accountId, wrongAnswer);
+      await _wrongAnswerRepository.saveToFirebase(task.accountId, wrongAnswer);
 
       Logger.info('오답 업로드 완료: ${wrongAnswer.id}', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -340,17 +333,13 @@ class SyncManager {
 
   /// 사용자 프로필 다운로드
   Future<void> _downloadUserProfile(SyncTask task) async {
-    if (_userRepository == null) {
-      throw Exception('UserRepository가 초기화되지 않았습니다');
-    }
-
     try {
       // Repository를 통해 Firebase에서 다운로드
-      final user = await _userRepository!.getFromFirebase(task.accountId);
+      final user = await _userRepository.getFromFirebase(task.accountId);
 
       if (user != null) {
         // 로컬에 저장
-        await _userRepository!.saveToLocal(task.accountId, user);
+        await _userRepository.saveToLocal(task.accountId, user);
         Logger.info('사용자 프로필 다운로드 완료: ${task.accountId}', tag: 'SyncManager');
       } else {
         Logger.warning('Firebase에 사용자 프로필 없음: ${task.accountId}', tag: 'SyncManager');
@@ -368,17 +357,13 @@ class SyncManager {
 
   /// 오답 목록 다운로드
   Future<void> _downloadWrongAnswers(SyncTask task) async {
-    if (_wrongAnswerRepository == null) {
-      throw Exception('WrongAnswerRepository가 초기화되지 않았습니다');
-    }
-
     try {
       // Repository를 통해 Firebase에서 다운로드
-      final wrongAnswers = await _wrongAnswerRepository!.getFromFirebase(task.accountId);
+      final wrongAnswers = await _wrongAnswerRepository.getFromFirebase(task.accountId);
 
       if (wrongAnswers.isNotEmpty) {
         // 로컬에 저장
-        await _wrongAnswerRepository!.saveToLocal(task.accountId, wrongAnswers);
+        await _wrongAnswerRepository.saveToLocal(task.accountId, wrongAnswers);
         Logger.info('오답 목록 다운로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
       } else {
         Logger.debug('Firebase에 오답 목록 없음: ${task.accountId}', tag: 'SyncManager');
@@ -458,26 +443,22 @@ class SyncManager {
       Logger.info('로컬 → Firebase 업로드 시작', tag: 'SyncManager');
 
       // 1. 사용자 프로필 업로드
-      if (_userRepository != null) {
-        final user = await _userRepository!.getFromLocal(accountId);
-        if (user != null) {
-          await _userRepository!.saveToFirebase(accountId, user);
-          Logger.debug('사용자 프로필 업로드 완료', tag: 'SyncManager');
-        }
+      final user = await _userRepository.getFromLocal(accountId);
+      if (user != null) {
+        await _userRepository.saveToFirebase(accountId, user);
+        Logger.debug('사용자 프로필 업로드 완료', tag: 'SyncManager');
       }
 
       // 2. 오답 목록 업로드
-      if (_wrongAnswerRepository != null) {
-        final wrongAnswers = await _wrongAnswerRepository!.getFromLocal(accountId);
-        for (final wrongAnswer in wrongAnswers) {
-          try {
-            await _wrongAnswerRepository!.saveToFirebase(accountId, wrongAnswer);
-          } catch (e) {
-            Logger.warning('오답 업로드 실패: ${wrongAnswer.id} - $e', tag: 'SyncManager');
-          }
+      final wrongAnswers = await _wrongAnswerRepository.getFromLocal(accountId);
+      for (final wrongAnswer in wrongAnswers) {
+        try {
+          await _wrongAnswerRepository.saveToFirebase(accountId, wrongAnswer);
+        } catch (e) {
+          Logger.warning('오답 업로드 실패: ${wrongAnswer.id} - $e', tag: 'SyncManager');
         }
-        Logger.debug('오답 목록 업로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
       }
+      Logger.debug('오답 목록 업로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
 
       // TODO: 학습 기록, 리그 데이터 업로드 추가
 
@@ -501,35 +482,31 @@ class SyncManager {
       Logger.info('Firebase → 로컬 다운로드 시작', tag: 'SyncManager');
 
       // 1. 사용자 프로필 다운로드
-      if (_userRepository != null) {
-        final remoteUser = await _userRepository!.getFromFirebase(accountId);
-        if (remoteUser != null) {
-          final localUser = await _userRepository!.getFromLocal(accountId);
+      final remoteUser = await _userRepository.getFromFirebase(accountId);
+      if (remoteUser != null) {
+        final localUser = await _userRepository.getFromLocal(accountId);
 
-          // 충돌 해결 (Local-First: 로컬 우선, Remote가 더 최신이면 덮어쓰기)
-          if (localUser != null) {
-            final merged = await _userRepository!.mergeData(localUser, remoteUser);
-            if (merged != null) {
-              await _userRepository!.saveToLocal(accountId, merged);
-            }
-          } else {
-            await _userRepository!.saveToLocal(accountId, remoteUser);
+        // 충돌 해결 (Local-First: 로컬 우선, Remote가 더 최신이면 덮어쓰기)
+        if (localUser != null) {
+          final merged = await _userRepository.mergeData(localUser, remoteUser);
+          if (merged != null) {
+            await _userRepository.saveToLocal(accountId, merged);
           }
-          Logger.debug('사용자 프로필 다운로드 완료', tag: 'SyncManager');
+        } else {
+          await _userRepository.saveToLocal(accountId, remoteUser);
         }
+        Logger.debug('사용자 프로필 다운로드 완료', tag: 'SyncManager');
       }
 
       // 2. 오답 목록 다운로드
-      if (_wrongAnswerRepository != null) {
-        final remoteAnswers = await _wrongAnswerRepository!.getFromFirebase(accountId);
-        if (remoteAnswers.isNotEmpty) {
-          final localAnswers = await _wrongAnswerRepository!.getFromLocal(accountId);
+      final remoteAnswers = await _wrongAnswerRepository.getFromFirebase(accountId);
+      if (remoteAnswers.isNotEmpty) {
+        final localAnswers = await _wrongAnswerRepository.getFromLocal(accountId);
 
-          // 병합: 양쪽 데이터 통합 (중복 제거)
-          final merged = _mergeWrongAnswers(localAnswers, remoteAnswers);
-          await _wrongAnswerRepository!.saveToLocal(accountId, merged);
-          Logger.debug('오답 목록 다운로드 완료: ${merged.length}개', tag: 'SyncManager');
-        }
+        // 병합: 양쪽 데이터 통합 (중복 제거)
+        final merged = _mergeWrongAnswers(localAnswers, remoteAnswers);
+        await _wrongAnswerRepository.saveToLocal(accountId, merged);
+        Logger.debug('오답 목록 다운로드 완료: ${merged.length}개', tag: 'SyncManager');
       }
 
       // TODO: 학습 기록, 리그 데이터 다운로드 추가

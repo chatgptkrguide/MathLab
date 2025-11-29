@@ -155,12 +155,15 @@ abstract class BaseRepository<T> {
   // ==================== 추상 메서드 (서브클래스에서 구현) ====================
 
   /// 로컬 스토리지에서 데이터 조회
+  /// [accountId]는 스토리지 키로 사용됨 (예: 'user', 'user_account123')
   Future<T?> getFromLocal(String accountId);
 
   /// 로컬 스토리지에 데이터 저장
+  /// [accountId]는 스토리지 키로 사용됨 (예: 'user', 'user_account123')
   Future<void> saveToLocal(String accountId, T data);
 
   /// 로컬 스토리지에서 데이터 삭제
+  /// [accountId]는 스토리지 키로 사용됨 (예: 'user', 'user_account123')
   Future<void> deleteFromLocal(String accountId);
 
   /// Firebase에서 데이터 조회

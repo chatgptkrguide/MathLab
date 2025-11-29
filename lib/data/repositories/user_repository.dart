@@ -22,13 +22,12 @@ class UserRepository extends BaseRepository<User> {
   // ==================== 로컬 스토리지 ====================
 
   @override
-  Future<User?> getFromLocal(String accountId) async {
+  Future<User?> getFromLocal(String storageKey) async {
     try {
-      final storageKey = 'user_$accountId';
       final json = await localStorageService.loadMap(storageKey);
 
       if (json == null || json.isEmpty) {
-        Logger.debug('로컬에 사용자 프로필 없음: $accountId', tag: 'UserRepository');
+        Logger.debug('로컬에 사용자 프로필 없음: $storageKey', tag: 'UserRepository');
         return null;
       }
 
@@ -45,11 +44,10 @@ class UserRepository extends BaseRepository<User> {
   }
 
   @override
-  Future<void> saveToLocal(String accountId, User data) async {
+  Future<void> saveToLocal(String storageKey, User data) async {
     try {
-      final storageKey = 'user_$accountId';
       await localStorageService.saveMap(storageKey, data.toJson());
-      Logger.debug('로컬에 사용자 프로필 저장 완료: $accountId', tag: 'UserRepository');
+      Logger.debug('로컬에 사용자 프로필 저장 완료: $storageKey', tag: 'UserRepository');
     } catch (e, stackTrace) {
       Logger.error(
         '로컬 사용자 프로필 저장 실패',
@@ -62,11 +60,10 @@ class UserRepository extends BaseRepository<User> {
   }
 
   @override
-  Future<void> deleteFromLocal(String accountId) async {
+  Future<void> deleteFromLocal(String storageKey) async {
     try {
-      final storageKey = 'user_$accountId';
       await localStorageService.delete(storageKey);
-      Logger.debug('로컬 사용자 프로필 삭제 완료: $accountId', tag: 'UserRepository');
+      Logger.debug('로컬 사용자 프로필 삭제 완료: $storageKey', tag: 'UserRepository');
     } catch (e, stackTrace) {
       Logger.error(
         '로컬 사용자 프로필 삭제 실패',
