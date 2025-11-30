@@ -32,3 +32,8 @@ export 'assignment.dart';
 export 'assignment_submission.dart';
 export 'weekly_test.dart';
 export 'weekly_test_submission.dart';
+
+// Premium & Subscription Models
+export 'premium_tier.dart';
+export 'subscription_status.dart';
+export 'subscription.dart';
