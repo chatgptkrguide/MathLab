@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/providers/premium_providers.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 import '../../../shared/utils/level_badge_mapper.dart';
+import '../../../shared/widgets/premium/premium_badge.dart';
 import '../../settings/settings_screen.dart';
 import '../edit_profile_screen.dart';
+import '../../premium/premium_upgrade_screen.dart';
+import '../../premium/subscription_management_screen.dart';
 
 /// Figma 디자인 "05" 프로필 상세 페이지 - Figma Page 5 디자인 완벽 구현
 class ProfileDetailScreenV3New extends ConsumerStatefulWidget {
@@ -212,13 +216,24 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      user?.name ?? 'Jojo Selvey',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
-                      ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            user?.name ?? 'Jojo Selvey',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A1A1A),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const PremiumBadge(
+                          size: PremiumBadgeSize.small,
+                          style: PremiumBadgeStyle.iconOnly,
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -874,22 +889,29 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
 
   /// Premium Upgrade Card
   Widget _buildPremiumCard() {
+    final isPremiumActive = ref.watch(isPremiumActiveProvider);
+    final premiumStatusText = ref.watch(premiumStatusTextProvider);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            const Color(0xFFE3F2FD),
-            const Color(0xFFBBDEFB).withOpacity(0.5),
-          ],
+          colors: isPremiumActive
+              ? AppColors.premiumGradient.map((c) => c.withOpacity(0.2)).toList()
+              : [
+                  const Color(0xFFE3F2FD),
+                  const Color(0xFFBBDEFB).withOpacity(0.5),
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.mathBlue.withOpacity(0.2),
+            color: isPremiumActive
+                ? AppColors.premiumGold.withOpacity(0.2)
+                : AppColors.mathBlue.withOpacity(0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -901,17 +923,29 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Upgrade to Premium',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A1A),
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      isPremiumActive ? '프리미엄 회원' : 'Upgrade to Premium',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isPremiumActive ? AppColors.premiumGold : const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                    if (isPremiumActive) ...[
+                      const SizedBox(width: 8),
+                      const PremiumBadge(
+                        size: PremiumBadgeSize.small,
+                        style: PremiumBadgeStyle.iconOnly,
+                        showTooltip: false,
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Get benefit from our premium',
+                  isPremiumActive ? premiumStatusText : 'Get benefit from our premium',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey.shade700,
@@ -923,10 +957,24 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
           const SizedBox(width: 12),
           ElevatedButton(
             onPressed: () {
-              // TODO: 프리미엄 업그레이드 로직
+              if (isPremiumActive) {
+                // Premium user: Navigate to subscription management
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const SubscriptionManagementScreen(),
+                  ),
+                );
+              } else {
+                // Free user: Navigate to premium upgrade
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const PremiumUpgradeScreen(),
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mathBlue,
+              backgroundColor: isPremiumActive ? AppColors.premiumGold : AppColors.mathBlue,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -934,9 +982,9 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
               ),
               elevation: 3,
             ),
-            child: const Text(
-              'Upgrade',
-              style: TextStyle(
+            child: Text(
+              isPremiumActive ? '관리' : 'Upgrade',
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),

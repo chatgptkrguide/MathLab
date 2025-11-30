@@ -58,5 +58,9 @@ export 'layout/responsive_wrapper.dart';
 // Math
 export 'math/math_text.dart';
 
+// Premium
+export 'premium/premium_badge.dart';
+export 'premium/feature_gate_widget.dart';
+
 // Other widgets
 export 'study_timer_widget.dart';

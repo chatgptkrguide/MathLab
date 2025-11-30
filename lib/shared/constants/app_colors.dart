@@ -204,6 +204,31 @@ class AppColors {
   static const List<Color> orangeGradient = mathOrangeGradient;
 
   // ==========================================
+  // 11. 프리미엄 전용 색상 (Premium Colors)
+  // ==========================================
+
+  /// 프리미엄 골드 색상
+  static const Color premiumGold = Color(0xFFFFD700);
+
+  /// 프리미엄 퍼플 색상
+  static const Color premiumPurple = mathPurple;
+
+  /// 프리미엄 다크 퍼플
+  static const Color premiumPurpleDark = Color(0xFF9B4DCC);
+
+  /// 프리미엄 그라디언트 (골드 → 퍼플)
+  static const List<Color> premiumGradient = [
+    Color(0xFFFFD700), // Gold
+    Color(0xFFCE82FF), // Purple
+  ];
+
+  /// 프리미엄 카드 그라디언트 (어두운 골드 → 퍼플)
+  static const List<Color> premiumCardGradient = [
+    Color(0xFFFFA500), // Orange Gold
+    Color(0xFFCE82FF), // Purple
+  ];
+
+  // ==========================================
   // 10. 호환성을 위한 별칭 (Deprecated - 추후 제거 예정)
   // ==========================================
 
