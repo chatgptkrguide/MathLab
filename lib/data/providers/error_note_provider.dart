@@ -1,34 +1,55 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
+import 'base/base_notifier.dart';
 
-/// 오답 노트 상태 관리
-class ErrorNoteNotifier extends StateNotifier<List<ErrorNote>> {
-  ErrorNoteNotifier() : super([]) {
+/// 오답 노트 상태 관리 (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 SharedPreferences 제거
+class ErrorNoteNotifier extends BaseNotifier<List<ErrorNote>> {
+  static const String _storageKey = 'errorNotes';
+
+  ErrorNoteNotifier() : super([], 'ErrorNoteProvider') {
     _loadErrorNotes();
   }
 
   /// 오답 노트 데이터 로드
   Future<void> _loadErrorNotes() async {
-    final prefs = await SharedPreferences.getInstance();
-    final errorNotesJson = prefs.getStringList('errorNotes') ?? [];
-
-    final errorNotes = errorNotesJson
-        .map((json) => ErrorNote.fromJson(jsonDecode(json)))
-        .toList();
-
-    state = errorNotes;
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_storageKey);
+        if (data != null && data is List) {
+          final errorNotes = data
+              .map((json) => ErrorNote.fromJson(json as Map<String, dynamic>))
+              .toList();
+          state = errorNotes;
+          if (errorNotes.isNotEmpty) {
+            logInfo('오답 노트 ${errorNotes.length}개 로드 완료');
+          }
+        } else {
+          state = [];
+        }
+      },
+      errorMessage: '오답 노트 로드 실패',
+      fallback: () => state = [],
+    );
   }
 
   /// 오답 노트 데이터 저장
   Future<void> _saveErrorNotes() async {
-    final prefs = await SharedPreferences.getInstance();
-    final errorNotesJson = state
-        .map((note) => jsonEncode(note.toJson()))
-        .toList();
-
-    await prefs.setStringList('errorNotes', errorNotesJson);
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(
+          _storageKey,
+          state.map((note) => note.toJson()).toList(),
+        );
+        logDebug('오답 노트 ${state.length}개 저장 완료');
+      },
+      errorMessage: '오답 노트 저장 실패',
+    );
   }
 
   /// 새 오답 추가 (문제를 틀렸을 때)
@@ -37,62 +58,78 @@ class ErrorNoteNotifier extends StateNotifier<List<ErrorNote>> {
     required Problem problem,
     required String userAnswer,
   }) async {
-    final errorNote = ErrorNote(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      userId: userId,
-      problemId: problem.id,
-      lessonId: problem.lessonId ?? 'unknown',
-      question: problem.question,
-      userAnswer: userAnswer,
-      correctAnswer: problem.correctAnswer ?? '',
-      explanation: problem.explanation ?? '',
-      category: problem.category,
-      createdAt: DateTime.now(),
-      reviewDates: [],
-      status: ErrorStatus.newError,
-      difficulty: problem.difficulty,
-      tags: problem.tags,
-    );
+    await executeWithErrorHandling(
+      () async {
+        final errorNote = ErrorNote(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          userId: userId,
+          problemId: problem.id,
+          lessonId: problem.lessonId ?? 'unknown',
+          question: problem.question,
+          userAnswer: userAnswer,
+          correctAnswer: problem.correctAnswer ?? '',
+          explanation: problem.explanation ?? '',
+          category: problem.category,
+          createdAt: DateTime.now(),
+          reviewDates: [],
+          status: ErrorStatus.newError,
+          difficulty: problem.difficulty,
+          tags: problem.tags,
+        );
 
-    state = [...state, errorNote];
-    await _saveErrorNotes();
+        state = [...state, errorNote];
+        await _saveErrorNotes();
+        logInfo('오답 노트 추가: ${problem.category}');
+      },
+      errorMessage: '오답 노트 추가 실패',
+    );
   }
 
   /// 오답 복습 (복습할 때마다 호출)
   Future<void> reviewErrorNote(String errorNoteId) async {
-    final index = state.indexWhere((note) => note.id == errorNoteId);
-    if (index == -1) return;
+    await executeWithErrorHandling(
+      () async {
+        final index = state.indexWhere((note) => note.id == errorNoteId);
+        if (index == -1) {
+          logWarning('오답 노트를 찾을 수 없음: $errorNoteId');
+          return;
+        }
 
-    final errorNote = state[index];
-    final newReviewDates = [...errorNote.reviewDates, DateTime.now()];
+        final errorNote = state[index];
+        final newReviewDates = [...errorNote.reviewDates, DateTime.now()];
 
-    // 복습 횟수에 따른 상태 변경
-    ErrorStatus newStatus;
-    switch (newReviewDates.length) {
+        // 복습 횟수에 따른 상태 변경
+        final newStatus = _determineReviewStatus(newReviewDates.length);
+
+        final updatedNote = errorNote.copyWith(
+          reviewDates: newReviewDates,
+          status: newStatus,
+        );
+
+        state = [
+          ...state.take(index),
+          updatedNote,
+          ...state.skip(index + 1),
+        ];
+
+        await _saveErrorNotes();
+        logInfo('오답 복습 완료: $errorNoteId (${newReviewDates.length}회)');
+      },
+      errorMessage: '오답 복습 실패',
+    );
+  }
+
+  /// 복습 횟수에 따른 상태 결정
+  ErrorStatus _determineReviewStatus(int reviewCount) {
+    switch (reviewCount) {
       case 1:
-        newStatus = ErrorStatus.reviewing;
-        break;
+        return ErrorStatus.reviewing;
       case 2:
-        newStatus = ErrorStatus.improving;
-        break;
+        return ErrorStatus.improving;
       case 3:
       default:
-        newStatus = ErrorStatus.mastered;
-        break;
+        return ErrorStatus.mastered;
     }
-
-    final updatedNote = errorNote.copyWith(
-      reviewDates: newReviewDates,
-      status: newStatus,
-    );
-
-    state = [
-      ...state.take(index),
-      updatedNote,
-      ...state.skip(index + 1),
-    ];
-
-    await _saveErrorNotes();
   }
 
   /// 사용자별 오답 노트 조회
@@ -219,32 +256,53 @@ class ErrorNoteNotifier extends StateNotifier<List<ErrorNote>> {
 
   /// 오답 노트 삭제
   Future<void> deleteErrorNote(String errorNoteId) async {
-    state = state.where((note) => note.id != errorNoteId).toList();
-    await _saveErrorNotes();
+    await executeWithErrorHandling(
+      () async {
+        state = state.where((note) => note.id != errorNoteId).toList();
+        await _saveErrorNotes();
+        logInfo('오답 노트 삭제: $errorNoteId');
+      },
+      errorMessage: '오답 노트 삭제 실패',
+    );
   }
 
   /// 완전히 이해한 문제 처리 (마스터 상태로 변경)
   Future<void> markAsMastered(String errorNoteId) async {
-    final index = state.indexWhere((note) => note.id == errorNoteId);
-    if (index == -1) return;
+    await executeWithErrorHandling(
+      () async {
+        final index = state.indexWhere((note) => note.id == errorNoteId);
+        if (index == -1) {
+          logWarning('오답 노트를 찾을 수 없음: $errorNoteId');
+          return;
+        }
 
-    final updatedNote = state[index].copyWith(
-      status: ErrorStatus.mastered,
+        final updatedNote = state[index].copyWith(
+          status: ErrorStatus.mastered,
+        );
+
+        state = [
+          ...state.take(index),
+          updatedNote,
+          ...state.skip(index + 1),
+        ];
+
+        await _saveErrorNotes();
+        logInfo('오답 노트 마스터 처리: $errorNoteId');
+      },
+      errorMessage: '마스터 처리 실패',
     );
-
-    state = [
-      ...state.take(index),
-      updatedNote,
-      ...state.skip(index + 1),
-    ];
-
-    await _saveErrorNotes();
   }
 
   /// 오답 노트 초기화 (테스트용)
   Future<void> clearErrorNotes() async {
-    state = [];
-    await _saveErrorNotes();
+    await executeWithErrorHandling(
+      () async {
+        state = [];
+        await _saveErrorNotes();
+        logInfo('오답 노트 초기화');
+      },
+      errorMessage: '오답 노트 초기화 실패',
+    );
   }
 }
 

@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
 import '../services/mock_data_service.dart';
 import 'error_note_provider.dart';
 import 'user_provider.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 
 /// 연습 모드 상태
 class PracticeState {
@@ -40,96 +39,84 @@ class PracticeState {
   double get accuracy => currentSession?.accuracy ?? 0.0;
 }
 
-/// 연습 모드 Provider
-class PracticeProvider extends StateNotifier<PracticeState> {
+/// 연습 모드 Provider (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class PracticeProvider extends BaseNotifier<PracticeState> {
   final Ref _ref;
-  final LocalStorageService _storage = LocalStorageService();
   final MockDataService _dataService = MockDataService();
 
   static const String _storageKey = 'practice_state';
   static const String _statsKey = 'practice_stats';
 
-  PracticeProvider(this._ref) : super(const PracticeState()) {
+  PracticeProvider(this._ref) : super(const PracticeState(), 'PracticeProvider') {
     _loadState();
     _loadStats();
   }
 
   /// 상태 로드
   Future<void> _loadState() async {
-    try {
-      final data = await _storage.loadMap(_storageKey);
-      if (data != null && data['currentSession'] != null) {
-        final session = PracticeSession.fromJson(
-          data['currentSession'] as Map<String, dynamic>,
-        );
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_storageKey);
+        if (data != null && data['currentSession'] != null) {
+          final session = PracticeSession.fromJson(
+            data['currentSession'] as Map<String, dynamic>,
+          );
 
-        state = state.copyWith(
-          currentSession: session,
-          isSessionActive: !session.isCompleted,
-        );
+          state = state.copyWith(
+            currentSession: session,
+            isSessionActive: !session.isCompleted,
+          );
 
-        Logger.info('Practice state loaded', tag: 'PracticeProvider');
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to load practice state',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'PracticeProvider',
-      );
-    }
+          logInfo('연습 모드 상태 로드 완료');
+        }
+      },
+      errorMessage: '연습 모드 상태 로드 실패',
+    );
   }
 
   /// 통계 로드
   Future<void> _loadStats() async {
-    try {
-      final data = await _storage.loadMap(_statsKey);
-      if (data != null) {
-        state = state.copyWith(
-          categoryStats: Map<String, int>.from(data),
-        );
-        Logger.info('Practice stats loaded', tag: 'PracticeProvider');
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to load practice stats',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'PracticeProvider',
-      );
-    }
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_statsKey);
+        if (data != null) {
+          state = state.copyWith(
+            categoryStats: Map<String, int>.from(data),
+          );
+          logInfo('연습 모드 통계 로드 완료');
+        }
+      },
+      errorMessage: '연습 모드 통계 로드 실패',
+    );
   }
 
   /// 상태 저장
   Future<void> _saveState() async {
-    try {
-      await _storage.saveMap(_storageKey, {
-        'currentSession': state.currentSession?.toJson(),
-      });
-      Logger.debug('Practice state saved', tag: 'PracticeProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to save practice state',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'PracticeProvider',
-      );
-    }
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(_storageKey, {
+          'currentSession': state.currentSession?.toJson(),
+        });
+        logDebug('연습 모드 상태 저장 완료');
+      },
+      errorMessage: '연습 모드 상태 저장 실패',
+    );
   }
 
   /// 통계 저장
   Future<void> _saveStats() async {
-    try {
-      await _storage.saveMap(_statsKey, state.categoryStats);
-      Logger.debug('Practice stats saved', tag: 'PracticeProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to save practice stats',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'PracticeProvider',
-      );
-    }
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(_statsKey, state.categoryStats);
+        logDebug('연습 모드 통계 저장 완료');
+      },
+      errorMessage: '연습 모드 통계 저장 실패',
+    );
   }
 
   /// 새 연습 세션 시작 (카테고리별)
@@ -150,10 +137,7 @@ class PracticeProvider extends StateNotifier<PracticeState> {
 
     await _saveState();
 
-    Logger.info(
-      'Started ${category.displayName} practice with ${problems.length} problems',
-      tag: 'PracticeProvider',
-    );
+    logInfo('${category.displayName} 연습 시작: ${problems.length}문제');
   }
 
   /// 오답 노트 연습 시작
@@ -161,7 +145,7 @@ class PracticeProvider extends StateNotifier<PracticeState> {
     final errorNotes = _ref.read(errorNoteProvider);
 
     if (errorNotes.isEmpty) {
-      Logger.warning('No error notes available', tag: 'PracticeProvider');
+      logWarning('오답 노트 없음');
       return;
     }
 
@@ -196,10 +180,7 @@ class PracticeProvider extends StateNotifier<PracticeState> {
 
     await _saveState();
 
-    Logger.info(
-      'Started error note practice with ${problems.length} problems',
-      tag: 'PracticeProvider',
-    );
+    logInfo('오답 노트 연습 시작: ${problems.length}문제');
   }
 
   /// 카테고리별 문제 생성
@@ -235,7 +216,7 @@ class PracticeProvider extends StateNotifier<PracticeState> {
     // 정답 시 경험치 부여
     if (isCorrect && problem.xpReward > 0) {
       await _ref.read(userProvider.notifier).addXP(problem.xpReward);
-      Logger.info('XP +${problem.xpReward} 획득 (연습 모드)', tag: 'PracticeProvider');
+      logInfo('XP +${problem.xpReward} 획득 (연습 모드)');
     }
 
     // 통계 업데이트
@@ -270,10 +251,9 @@ class PracticeProvider extends StateNotifier<PracticeState> {
       await _updateCategoryStats(session.category);
     }
 
-    Logger.info(
-      'Answer submitted: ${isCorrect ? "Correct" : "Incorrect"}, '
-      'Progress: ${newSession.currentProblemIndex}/${session.problems.length}',
-      tag: 'PracticeProvider',
+    logInfo(
+      '답변 제출: ${isCorrect ? "정답" : "오답"}, '
+      '진행률: ${newSession.currentProblemIndex}/${session.problems.length}',
     );
   }
 
@@ -307,7 +287,7 @@ class PracticeProvider extends StateNotifier<PracticeState> {
       await _updateCategoryStats(session.category);
     }
 
-    Logger.info('Problem skipped', tag: 'PracticeProvider');
+    logInfo('문제 건너뛰기');
   }
 
   /// 카테고리별 통계 업데이트
@@ -318,10 +298,7 @@ class PracticeProvider extends StateNotifier<PracticeState> {
     state = state.copyWith(categoryStats: newStats);
     await _saveStats();
 
-    Logger.info(
-      'Category stats updated: $category completed ${newStats[category]} times',
-      tag: 'PracticeProvider',
-    );
+    logInfo('카테고리 통계 업데이트: $category ${newStats[category]}회 완료');
   }
 
   /// 세션 종료
@@ -337,14 +314,19 @@ class PracticeProvider extends StateNotifier<PracticeState> {
     );
 
     await _saveState();
-    Logger.info('Practice session ended', tag: 'PracticeProvider');
+    logInfo('연습 세션 종료');
   }
 
   /// 세션 재시작
   Future<void> resetSession() async {
-    state = const PracticeState();
-    await _storage.remove(_storageKey);
-    Logger.info('Practice session reset', tag: 'PracticeProvider');
+    await executeWithErrorHandling(
+      () async {
+        state = const PracticeState();
+        await removeFromStorage(_storageKey);
+        logInfo('연습 세션 초기화');
+      },
+      errorMessage: '연습 세션 초기화 실패',
+    );
   }
 
   /// 특정 카테고리 통계 조회
