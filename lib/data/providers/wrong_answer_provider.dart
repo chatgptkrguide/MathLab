@@ -4,7 +4,7 @@ import '../models/problem.dart';
 import '../repositories/wrong_answer_repository.dart';
 import '../services/local_storage_service.dart';
 import '../services/firestore_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 import 'auth_provider.dart';
 
 /// 오답 노트 상태
@@ -69,18 +69,25 @@ class WrongAnswerState {
   }
 }
 
-/// 오답 노트 Provider
-class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
+/// 오답 노트 Provider (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+class WrongAnswerProvider extends BaseNotifier<WrongAnswerState> {
   final Ref ref; // Riverpod Ref for accessing current account
   final WrongAnswerRepository _wrongAnswerRepository;
 
   WrongAnswerProvider(this.ref, this._wrongAnswerRepository)
-      : super(const WrongAnswerState(
-          wrongAnswers: [],
-          totalCount: 0,
-          masteredCount: 0,
-          needsReviewCount: 0,
-        )) {
+      : super(
+          const WrongAnswerState(
+            wrongAnswers: [],
+            totalCount: 0,
+            masteredCount: 0,
+            needsReviewCount: 0,
+          ),
+          'WrongAnswerProvider',
+        ) {
     _initialize();
   }
 
@@ -88,7 +95,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
   String? get _accountId {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
-      Logger.warning('No logged in account', tag: 'WrongAnswerProvider');
+      logWarning('No logged in account');
       return null;
     }
     return currentAccount.id;
@@ -113,9 +120,9 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
       final wrongAnswers = await _wrongAnswerRepository.get(accountId);
 
       _updateState(wrongAnswers);
-      Logger.info('Loaded ${wrongAnswers.length} wrong answers for account', tag: 'WrongAnswerProvider');
+      logInfo('Loaded ${wrongAnswers.length} wrong answers for account');
     } catch (e) {
-      Logger.error('Failed to load wrong answers', error: e, tag: 'WrongAnswerProvider');
+      logError('Failed to load wrong answers', error: e);
       _updateState([]);
     }
   }
@@ -126,16 +133,16 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     try {
       final accountId = _accountId;
       if (accountId == null) {
-        Logger.warning('Cannot save wrong answers - no logged in account', tag: 'WrongAnswerProvider');
+        logWarning('Cannot save wrong answers - no logged in account');
         return;
       }
 
       // 로컬에만 저장 (복습 상태 등 로컬 변경사항)
       await _wrongAnswerRepository.saveToLocal(accountId, state.wrongAnswers);
 
-      Logger.debug('Saved ${state.wrongAnswers.length} wrong answers to local storage', tag: 'WrongAnswerProvider');
+      logDebug('Saved ${state.wrongAnswers.length} wrong answers to local storage');
     } catch (e) {
-      Logger.error('Failed to save wrong answers', error: e, tag: 'WrongAnswerProvider');
+      logError('Failed to save wrong answers', error: e);
     }
   }
 
@@ -161,7 +168,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
   }) async {
     final accountId = _accountId;
     if (accountId == null) {
-      Logger.warning('Cannot add wrong answer - no logged in account', tag: 'WrongAnswerProvider');
+      logWarning('Cannot add wrong answer - no logged in account');
       return;
     }
 
@@ -181,7 +188,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
         isMastered: false, // 다시 틀렸으므로 미완료 처리
       );
 
-      Logger.info('Updated existing wrong answer: ${problem.id}');
+      logInfo('Updated existing wrong answer: ${problem.id}');
     } else {
       // 새로 추가
       wrongAnswer = WrongAnswer(
@@ -191,7 +198,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
         timestamp: DateTime.now(),
       );
 
-      Logger.info('Added new wrong answer: ${problem.id}');
+      logInfo('Added new wrong answer: ${problem.id}');
     }
 
     // Repository를 통해 저장 (로컬 + Firebase 동기화)
@@ -227,11 +234,11 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     await _saveWrongAnswers();
 
     if (isMastered) {
-      Logger.info('🎉 Mastered wrong answer: ${wrongAnswer.problem.id}');
+      logInfo('🎉 Mastered wrong answer: ${wrongAnswer.problem.id}');
     } else if (isCorrect) {
-      Logger.info('✅ Reviewed correctly: ${wrongAnswer.problem.id} ($newReviewCount/3)');
+      logInfo('✅ Reviewed correctly: ${wrongAnswer.problem.id} ($newReviewCount/3)');
     } else {
-      Logger.info('❌ Reviewed incorrectly: ${wrongAnswer.problem.id} - reset count');
+      logInfo('❌ Reviewed incorrectly: ${wrongAnswer.problem.id} - reset count');
     }
   }
 
@@ -242,7 +249,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     _updateState(updatedList);
     await _saveWrongAnswers();
 
-    Logger.info('Deleted wrong answer: $wrongAnswerId');
+    logInfo('Deleted wrong answer: $wrongAnswerId');
   }
 
   /// 필터 설정 - 카테고리
@@ -351,7 +358,7 @@ class WrongAnswerProvider extends StateNotifier<WrongAnswerState> {
     _updateState([]);
     await _saveWrongAnswers();
 
-    Logger.info('Cleared all wrong answers');
+    logInfo('Cleared all wrong answers');
   }
 }
 
