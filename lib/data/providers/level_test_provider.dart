@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/level_test.dart';
 import 'user_provider.dart';
-import '../../shared/utils/logger.dart';
-import '../services/local_storage_service.dart';
+import 'base/base_notifier.dart';
 
 /// 레벨 테스트 상태
 class LevelTestState {
@@ -54,65 +53,59 @@ class LevelTestState {
   }
 }
 
-/// 레벨 테스트 Provider
-class LevelTestProvider extends StateNotifier<LevelTestState> {
+/// 레벨 테스트 Provider (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 코드 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class LevelTestProvider extends BaseNotifier<LevelTestState> {
   final Ref _ref;
-  final LocalStorageService _storage = LocalStorageService();
 
   static const String _storageKey = 'level_test_state';
 
-  LevelTestProvider(this._ref) : super(const LevelTestState()) {
+  LevelTestProvider(this._ref)
+      : super(const LevelTestState(), 'LevelTestProvider') {
     _loadState();
   }
 
   /// 상태 로드
   Future<void> _loadState() async {
-    try {
-      final data = await _storage.loadMap(_storageKey);
-      if (data != null) {
-        final testData = data['currentTest'] as Map<String, dynamic>?;
-        if (testData != null) {
-          final test = LevelTest.fromJson(testData);
-          state = state.copyWith(
-            currentTest: test,
-            currentQuestionIndex: data['currentQuestionIndex'] ?? 0,
-            isCompleted: data['isCompleted'] ?? false,
-          );
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_storageKey);
+        if (data != null) {
+          final testData = data['currentTest'] as Map<String, dynamic>?;
+          if (testData != null) {
+            final test = LevelTest.fromJson(testData);
+            state = state.copyWith(
+              currentTest: test,
+              currentQuestionIndex: data['currentQuestionIndex'] ?? 0,
+              isCompleted: data['isCompleted'] ?? false,
+            );
 
-          Logger.info(
-            'Level test state loaded',
-            tag: 'LevelTestProvider',
-          );
+            logInfo('레벨 테스트 상태 로드 완료');
+          }
         }
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to load level test state',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'LevelTestProvider',
-      );
-    }
+      },
+      errorMessage: '레벨 테스트 상태 로드 실패',
+    );
   }
 
   /// 상태 저장
   Future<void> _saveState() async {
-    try {
-      await _storage.saveMap(_storageKey, {
-        'currentTest': state.currentTest?.toJson(),
-        'currentQuestionIndex': state.currentQuestionIndex,
-        'isCompleted': state.isCompleted,
-      });
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(_storageKey, {
+          'currentTest': state.currentTest?.toJson(),
+          'currentQuestionIndex': state.currentQuestionIndex,
+          'isCompleted': state.isCompleted,
+        });
 
-      Logger.debug('Level test state saved', tag: 'LevelTestProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to save level test state',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'LevelTestProvider',
-      );
-    }
+        logDebug('레벨 테스트 상태 저장 완료');
+      },
+      errorMessage: '레벨 테스트 상태 저장 실패',
+    );
   }
 
   /// 새 레벨 테스트 시작
@@ -131,7 +124,7 @@ class LevelTestProvider extends StateNotifier<LevelTestState> {
     );
 
     await _saveState();
-    Logger.info('New level test started', tag: 'LevelTestProvider');
+    logInfo('새로운 레벨 테스트 시작');
   }
 
   /// 테스트 문제 생성 (10문제)
@@ -257,9 +250,8 @@ class LevelTestProvider extends StateNotifier<LevelTestState> {
       await _saveState();
     }
 
-    Logger.info(
-      'Answer submitted: Q${state.currentQuestionIndex + 1}, correct: $isCorrect',
-      tag: 'LevelTestProvider',
+    logInfo(
+      '답변 제출: Q${state.currentQuestionIndex + 1}, 정답: $isCorrect',
     );
   }
 
@@ -282,9 +274,8 @@ class LevelTestProvider extends StateNotifier<LevelTestState> {
 
     await _saveState();
 
-    Logger.info(
-      'Level test completed: Level ${result.recommendedLevel}, Accuracy: ${(result.accuracy * 100).toStringAsFixed(1)}%',
-      tag: 'LevelTestProvider',
+    logInfo(
+      '레벨 테스트 완료: 레벨 ${result.recommendedLevel}, 정답률: ${(result.accuracy * 100).toStringAsFixed(1)}%',
     );
   }
 
@@ -337,8 +328,8 @@ class LevelTestProvider extends StateNotifier<LevelTestState> {
   /// 테스트 재시작
   Future<void> resetTest() async {
     state = const LevelTestState();
-    await _storage.remove(_storageKey);
-    Logger.info('Level test reset', tag: 'LevelTestProvider');
+    await removeFromStorage(_storageKey);
+    logInfo('레벨 테스트 초기화');
   }
 }
 
