@@ -1,15 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
 import 'auth_provider.dart';
+import 'base/base_notifier.dart';
 
-/// 친구 목록 관리 노티파이어
-class FriendsNotifier extends StateNotifier<List<Friend>> {
+/// 친구 목록 관리 노티파이어 (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class FriendsNotifier extends BaseNotifier<List<Friend>> {
   final Ref ref;
-  final LocalStorageService _storage = LocalStorageService();
 
-  FriendsNotifier(this.ref) : super([]) {
+  FriendsNotifier(this.ref) : super([], 'FriendProvider') {
     _initialize();
   }
 
@@ -17,7 +20,7 @@ class FriendsNotifier extends StateNotifier<List<Friend>> {
   String? get _storageKey {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
-      Logger.warning('No logged in account', tag: 'FriendProvider');
+      logWarning('계정 정보 없음');
       return null;
     }
     return 'friends_${currentAccount.id}';
@@ -30,49 +33,51 @@ class FriendsNotifier extends StateNotifier<List<Friend>> {
 
   /// 친구 목록 로드
   Future<void> _loadFriends() async {
-    try {
-      final key = _storageKey;
-      if (key == null) {
-        // 로그인된 계정 없음 - 빈 상태로 초기화
-        state = [];
-        return;
-      }
+    await executeWithErrorHandling(
+      () async {
+        final key = _storageKey;
+        if (key == null) {
+          state = [];
+          return;
+        }
 
-      final friendsList = await _storage.loadList<Friend>(
-        key: key,
-        fromJson: (json) => Friend.fromJson(json),
-      );
+        final data = await loadFromStorage(key);
+        if (data != null && data is List) {
+          final friendsList = data
+              .map((item) => Friend.fromJson(item as Map<String, dynamic>))
+              .toList();
 
-      if (friendsList.isNotEmpty) {
-        state = friendsList;
-        Logger.info('Loaded ${friendsList.length} friends for account', tag: 'FriendProvider');
-      } else {
-        state = [];
-      }
-    } catch (e) {
-      Logger.error('Failed to load friends', error: e, tag: 'FriendProvider');
-      state = [];
-    }
+          state = friendsList;
+          if (friendsList.isNotEmpty) {
+            logInfo('친구 ${friendsList.length}명 로드 완료');
+          }
+        } else {
+          state = [];
+        }
+      },
+      errorMessage: '친구 목록 로드 실패',
+      fallback: () => state = [],
+    );
   }
 
   /// 친구 목록 저장
   Future<void> _saveFriends() async {
-    try {
-      final key = _storageKey;
-      if (key == null) {
-        Logger.warning('Cannot save friends - no logged in account', tag: 'FriendProvider');
-        return;
-      }
+    await executeWithErrorHandling(
+      () async {
+        final key = _storageKey;
+        if (key == null) {
+          logWarning('친구 저장 불가 - 계정 없음');
+          return;
+        }
 
-      await _storage.saveList<Friend>(
-        key: key,
-        data: state,
-        toJson: (friend) => friend.toJson(),
-      );
-      Logger.info('Saved ${state.length} friends for account', tag: 'FriendProvider');
-    } catch (e) {
-      Logger.error('Failed to save friends', error: e, tag: 'FriendProvider');
-    }
+        await saveToStorage(
+          key,
+          state.map((friend) => friend.toJson()).toList(),
+        );
+        logInfo('친구 ${state.length}명 저장 완료');
+      },
+      errorMessage: '친구 목록 저장 실패',
+    );
   }
 
   /// 친구 요청 보내기

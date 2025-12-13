@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/league.dart';
-import '../../shared/utils/logger.dart';
-import '../../data/services/local_storage_service.dart';
 import 'auth_provider.dart';
+import 'base/base_notifier.dart';
 
 /// 리그 상태
 class LeagueState {
@@ -29,12 +28,16 @@ class LeagueState {
   }
 }
 
-/// 리그 상태 관리 Provider
-class LeagueNotifier extends StateNotifier<LeagueState> {
-  final Ref ref; // Riverpod Ref for accessing current account
-  final LocalStorageService _storage = LocalStorageService();
+/// 리그 상태 관리 Provider (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class LeagueNotifier extends BaseNotifier<LeagueState> {
+  final Ref ref;
 
-  LeagueNotifier(this.ref) : super(const LeagueState()) {
+  LeagueNotifier(this.ref) : super(const LeagueState(), 'LeagueProvider') {
     _initialize();
   }
 
@@ -42,7 +45,7 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
   String? get _storageKey {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
-      Logger.warning('No logged in account', tag: 'LeagueProvider');
+      logWarning('계정 정보 없음');
       return null;
     }
     return 'league_${currentAccount.id}';
@@ -57,64 +60,60 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
   Future<void> _loadCurrentLeague() async {
     state = state.copyWith(isLoading: true);
 
-    try {
-      final key = _storageKey;
-      if (key == null) {
-        // 로그인된 계정 없음 - 빈 상태로 초기화
-        state = state.copyWith(
-          currentLeague: null,
-          isLoading: false,
-          error: null,
-        );
-        return;
-      }
+    await executeWithErrorHandling(
+      () async {
+        final key = _storageKey;
+        if (key == null) {
+          state = state.copyWith(
+            currentLeague: null,
+            isLoading: false,
+            error: null,
+          );
+          return;
+        }
 
-      // 로컬 저장소에서 리그 데이터 로드
-      final data = await _storage.loadMap(key);
+        final data = await loadFromStorage(key);
 
-      if (data != null) {
-        final league = League.fromJson(data);
-        state = state.copyWith(
-          currentLeague: league,
-          isLoading: false,
-          error: null,
-        );
-        Logger.info('Loaded league data for account', tag: 'LeagueProvider');
-      } else {
-        // 저장된 데이터가 없으면 Mock 데이터 생성 및 저장
-        final mockLeague = _generateMockLeague();
-        await _saveLeague(mockLeague);
+        if (data != null) {
+          final league = League.fromJson(data);
+          state = state.copyWith(
+            currentLeague: league,
+            isLoading: false,
+            error: null,
+          );
+          logInfo('리그 데이터 로드 완료');
+        } else {
+          final mockLeague = _generateMockLeague();
+          await _saveLeague(mockLeague);
 
-        state = state.copyWith(
-          currentLeague: mockLeague,
-          isLoading: false,
-          error: null,
-        );
-        Logger.info('Generated and saved mock league data', tag: 'LeagueProvider');
-      }
-    } catch (e) {
-      Logger.error('Failed to load league', error: e, tag: 'LeagueProvider');
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+          state = state.copyWith(
+            currentLeague: mockLeague,
+            isLoading: false,
+            error: null,
+          );
+          logInfo('Mock 리그 데이터 생성 및 저장');
+        }
+      },
+      errorMessage: '리그 로드 실패',
+      fallback: () => state = state.copyWith(isLoading: false),
+    );
   }
 
   /// 리그 데이터 저장
   Future<void> _saveLeague(League league) async {
-    try {
-      final key = _storageKey;
-      if (key == null) {
-        Logger.warning('Cannot save league - no logged in account', tag: 'LeagueProvider');
-        return;
-      }
+    await executeWithErrorHandling(
+      () async {
+        final key = _storageKey;
+        if (key == null) {
+          logWarning('리그 저장 불가 - 계정 없음');
+          return;
+        }
 
-      await _storage.saveMap(key, league.toJson());
-      Logger.info('Saved league data for account', tag: 'LeagueProvider');
-    } catch (e) {
-      Logger.error('Failed to save league', error: e, tag: 'LeagueProvider');
-    }
+        await saveToStorage(key, league.toJson());
+        logInfo('리그 데이터 저장 완료');
+      },
+      errorMessage: '리그 저장 실패',
+    );
   }
 
   /// 리그 새로고침

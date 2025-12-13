@@ -1,15 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/problem.dart';
 import 'user_provider.dart';
-import '../../shared/utils/logger.dart';
-import '../../data/services/local_storage_service.dart';
+import 'base/base_notifier.dart';
 
 /// 힌트 상태
 class HintState {
   final String? currentProblemId;
-  final List<String> unlockedHints; // 해제된 힌트 인덱스
-  final int totalHintsUsed; // 총 사용한 힌트 수
-  final bool canUseHint; // 힌트 사용 가능 여부 (XP 충분한지)
+  final List<String> unlockedHints;
+  final int totalHintsUsed;
+  final bool canUseHint;
 
   const HintState({
     this.currentProblemId,
@@ -31,49 +30,57 @@ class HintState {
       canUseHint: canUseHint ?? this.canUseHint,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'totalHintsUsed': totalHintsUsed,
+      };
+
+  factory HintState.fromJson(Map<String, dynamic> json) {
+    return HintState(
+      totalHintsUsed: json['totalHintsUsed'] ?? 0,
+    );
+  }
 }
 
-/// 힌트 Provider
-class HintProvider extends StateNotifier<HintState> {
+/// 힌트 Provider (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - toJson/fromJson으로 직렬화 표준화
+class HintProvider extends BaseNotifier<HintState> {
   final Ref _ref;
-  final LocalStorageService _storage = LocalStorageService();
 
   static const String _storageKey = 'hint_usage';
-  static const int hintCost = 10; // 힌트 1개당 10 XP
+  static const int hintCost = 10;
 
-  HintProvider(this._ref) : super(const HintState()) {
+  HintProvider(this._ref) : super(const HintState(), 'HintProvider') {
     _loadState();
   }
 
   /// 상태 로드
   Future<void> _loadState() async {
-    try {
-      final data = await _storage.loadMap(_storageKey);
-      if (data != null) {
-        final totalHintsUsed = data['totalHintsUsed'] ?? 0;
-
-        state = state.copyWith(
-          totalHintsUsed: totalHintsUsed,
-        );
-
-        Logger.info('Hint state loaded: $totalHintsUsed hints used');
-      }
-    } catch (e) {
-      Logger.error('Failed to load hint state', error: e);
-    }
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_storageKey);
+        if (data != null) {
+          state = HintState.fromJson(data);
+          logInfo('힌트 상태 로드 완료: ${state.totalHintsUsed}개 사용');
+        }
+      },
+      errorMessage: '힌트 상태 로드 실패',
+    );
   }
 
   /// 상태 저장
   Future<void> _saveState() async {
-    try {
-      await _storage.saveMap(_storageKey, {
-        'totalHintsUsed': state.totalHintsUsed,
-      });
-
-      Logger.info('Hint state saved');
-    } catch (e) {
-      Logger.error('Failed to save hint state', error: e);
-    }
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(_storageKey, state.toJson());
+        logInfo('힌트 상태 저장 완료');
+      },
+      errorMessage: '힌트 상태 저장 실패',
+    );
   }
 
   /// 문제 시작 (힌트 초기화)
@@ -83,8 +90,7 @@ class HintProvider extends StateNotifier<HintState> {
       unlockedHints: [],
       canUseHint: _checkCanUseHint(),
     );
-
-    Logger.info('Started problem: $problemId');
+    logInfo('문제 시작: $problemId');
   }
 
   /// 힌트 사용 가능 여부 확인
@@ -95,31 +101,26 @@ class HintProvider extends StateNotifier<HintState> {
 
   /// 힌트 해제
   Future<bool> unlockHint(Problem problem, int hintIndex) async {
-    // 힌트가 있는지 확인
     if (hintIndex >= problem.hints.length) {
-      Logger.warning('Invalid hint index: $hintIndex');
+      logWarning('유효하지 않은 힌트 인덱스: $hintIndex');
       return false;
     }
 
-    // 이미 해제된 힌트인지 확인
     final hintKey = '${problem.id}_$hintIndex';
     if (state.unlockedHints.contains(hintKey)) {
-      Logger.warning('Hint already unlocked: $hintKey');
+      logWarning('이미 해제된 힌트: $hintKey');
       return false;
     }
 
-    // XP 확인
     final user = _ref.read(userProvider);
     if ((user?.xp ?? 0) < hintCost) {
-      Logger.warning('Not enough XP for hint: ${user?.xp}');
+      logWarning('XP 부족: ${user?.xp} < $hintCost');
       return false;
     }
 
-    // XP 차감
     final newXP = (user?.xp ?? 0) - hintCost;
     await _ref.read(userProvider.notifier).addXP(-hintCost);
 
-    // 힌트 해제
     final updatedHints = [...state.unlockedHints, hintKey];
     final newTotalUsed = state.totalHintsUsed + 1;
 
@@ -131,7 +132,7 @@ class HintProvider extends StateNotifier<HintState> {
 
     await _saveState();
 
-    Logger.info('Unlocked hint: $hintKey (-$hintCost XP, total hints: $newTotalUsed)');
+    logInfo('힌트 해제: $hintKey (-$hintCost XP, 총 ${newTotalUsed}개)');
 
     return true;
   }
@@ -161,16 +162,14 @@ class HintProvider extends StateNotifier<HintState> {
       currentProblemId: null,
       unlockedHints: [],
     );
-
-    Logger.info('Problem ended, hints cleared');
+    logInfo('문제 종료, 힌트 초기화');
   }
 
   /// 통계 초기화 (테스트용)
   Future<void> resetStats() async {
     state = const HintState();
     await _saveState();
-
-    Logger.info('Hint stats reset');
+    logInfo('힌트 통계 초기화');
   }
 }
 

@@ -2,19 +2,17 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
 import '../../shared/constants/game_constants.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 
-/// 문제 관련 상태 관리
+/// 문제 관련 상태 관리 (BaseNotifier 최적화 버전)
 ///
-/// 주의: 생성자에서 비동기 초기화를 수행합니다.
-/// 데이터가 로드될 때까지 state는 빈 리스트입니다.
-/// UI에서는 빈 상태를 적절히 처리해야 합니다.
-class ProblemNotifier extends StateNotifier<List<Problem>> {
-  ProblemNotifier() : super([]) {
-    // 생성자에서 비동기 초기화 - 완료를 기다리지 않음
-    // 이는 Riverpod의 일반적인 패턴이며, state가 업데이트되면 UI가 자동으로 리빌드됩니다.
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - 간결한 에러 처리 및 로깅
+class ProblemNotifier extends BaseNotifier<List<Problem>> {
+  ProblemNotifier() : super([], 'ProblemProvider') {
     _loadProblems();
   }
 
@@ -24,30 +22,25 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
   /// 문제 데이터 로드
   Future<void> _loadProblems() async {
     _isLoading = true;
-    try {
-      Logger.info('문제 데이터 로드 시작', tag: 'ProblemProvider');
+    await executeWithErrorHandling(
+      () async {
+        logInfo('문제 데이터 로드 시작');
 
-      final String data = await rootBundle.loadString('assets/data/problems.json');
-      final Map<String, dynamic> jsonData = jsonDecode(data);
-      final List<dynamic> problemsData = jsonData['problems'];
+        final String data = await rootBundle.loadString('assets/data/problems.json');
+        final Map<String, dynamic> jsonData = jsonDecode(data);
+        final List<dynamic> problemsData = jsonData['problems'];
 
-      final problems = problemsData
-          .map((problemData) => Problem.fromJson(problemData))
-          .toList();
+        final problems = problemsData
+            .map((problemData) => Problem.fromJson(problemData))
+            .toList();
 
-      state = problems;
-      Logger.info('문제 ${problems.length}개 로드 완료', tag: 'ProblemProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '문제 로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'ProblemProvider',
-      );
-      state = [];
-    } finally {
-      _isLoading = false;
-    }
+        state = problems;
+        logInfo('문제 ${problems.length}개 로드 완료');
+      },
+      errorMessage: '문제 로드 실패',
+      fallback: () => state = [],
+    );
+    _isLoading = false;
   }
 
   /// 레슨별 문제 조회
@@ -72,18 +65,14 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
         : state;
 
     if (filteredProblems.isEmpty) {
-      Logger.warning('랜덤 문제 조회 실패: 문제 없음', tag: 'ProblemProvider');
+      logWarning('랜덤 문제 조회 실패: 문제 없음');
       return [];
     }
 
-    // 원본 리스트를 변경하지 않도록 복사 후 셔플
     final shuffled = List<Problem>.from(filteredProblems)..shuffle();
     final result = shuffled.take(count).toList();
 
-    Logger.debug(
-      '랜덤 문제 ${result.length}개 조회 (카테고리: ${category ?? "전체"})',
-      tag: 'ProblemProvider',
-    );
+    logDebug('랜덤 문제 ${result.length}개 조회 (카테고리: ${category ?? "전체"})');
 
     return result;
   }
@@ -96,7 +85,7 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
         orElse: () => throw StateError('Problem not found: $problemId'),
       );
     } on StateError {
-      Logger.warning('문제를 찾을 수 없음: $problemId', tag: 'ProblemProvider');
+      logWarning('문제를 찾을 수 없음: $problemId');
       return null;
     }
   }
@@ -106,104 +95,83 @@ class ProblemNotifier extends StateNotifier<List<Problem>> {
     int userLevel, {
     int count = GameConstants.recommendedProblemCount,
   }) {
-    // 사용자 레벨에 따른 난이도 매핑
-    int targetDifficulty;
-    if (userLevel <= GameConstants.beginnerLevelMax) {
-      targetDifficulty = 1;
-    } else if (userLevel <= GameConstants.intermediateLevelMax) {
-      targetDifficulty = 2;
-    } else if (userLevel <= 15) {
-      targetDifficulty = 3;
-    } else {
-      targetDifficulty = 4;
-    }
+    final targetDifficulty = _calculateTargetDifficulty(userLevel);
 
-    // 목표 난이도와 주변 난이도 문제들 선택
     final recommendedProblems = state.where((problem) {
       return problem.difficulty >= (targetDifficulty - 1) &&
           problem.difficulty <= (targetDifficulty + 1);
     }).toList();
 
     if (recommendedProblems.isEmpty) {
-      Logger.warning(
-        '추천 문제 없음 (레벨: $userLevel, 난이도: $targetDifficulty)',
-        tag: 'ProblemProvider',
-      );
+      logWarning('추천 문제 없음 (레벨: $userLevel, 난이도: $targetDifficulty)');
       return [];
     }
 
-    // 원본 리스트를 변경하지 않도록 복사 후 셔플
     final shuffled = List<Problem>.from(recommendedProblems)..shuffle();
     final result = shuffled.take(count).toList();
 
-    Logger.info(
-      '추천 문제 ${result.length}개 (레벨: $userLevel, 난이도: $targetDifficulty)',
-      tag: 'ProblemProvider',
-    );
+    logInfo('추천 문제 ${result.length}개 (레벨: $userLevel, 난이도: $targetDifficulty)');
 
     return result;
   }
+
+  /// 사용자 레벨에 따른 난이도 계산
+  int _calculateTargetDifficulty(int userLevel) {
+    if (userLevel <= GameConstants.beginnerLevelMax) return 1;
+    if (userLevel <= GameConstants.intermediateLevelMax) return 2;
+    if (userLevel <= 15) return 3;
+    return 4;
+  }
 }
 
-/// 문제 결과 관리
+/// 문제 결과 관리 (BaseNotifier 최적화 버전)
 ///
-/// 주의: 생성자에서 비동기 초기화를 수행합니다.
-/// 데이터가 로드될 때까지 state는 빈 리스트입니다.
-/// UI에서는 빈 상태를 적절히 처리해야 합니다.
-class ProblemResultsNotifier extends StateNotifier<List<ProblemResult>> {
-  ProblemResultsNotifier() : super([]) {
-    // 생성자에서 비동기 초기화 - 완료를 기다리지 않음
-    // 이는 Riverpod의 일반적인 패턴이며, state가 업데이트되면 UI가 자동으로 리빌드됩니다.
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
+  ProblemResultsNotifier() : super([], 'ProblemResultsProvider') {
     _loadResults();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   /// 결과 데이터 로드
   Future<void> _loadResults() async {
     _isLoading = true;
-    try {
-      Logger.debug('문제 결과 로드 시작', tag: 'ProblemResultsProvider');
+    await executeWithErrorHandling(
+      () async {
+        logDebug('문제 결과 로드 시작');
 
-      final results = await _storage.loadList<ProblemResult>(
-        key: GameConstants.problemResultsKey,
-        fromJson: ProblemResult.fromJson,
-      );
-
-      state = results;
-      Logger.info('문제 결과 ${results.length}개 로드 완료', tag: 'ProblemResultsProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '문제 결과 로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'ProblemResultsProvider',
-      );
-      state = [];
-    } finally {
-      _isLoading = false;
-    }
+        final data = await loadFromStorage(GameConstants.problemResultsKey);
+        if (data != null && data is List) {
+          final results = data
+              .map((item) => ProblemResult.fromJson(item as Map<String, dynamic>))
+              .toList();
+          state = results;
+          logInfo('문제 결과 ${results.length}개 로드 완료');
+        }
+      },
+      errorMessage: '문제 결과 로드 실패',
+      fallback: () => state = [],
+    );
+    _isLoading = false;
   }
 
   /// 결과 데이터 저장
   Future<void> _saveResults() async {
-    try {
-      await _storage.saveList<ProblemResult>(
-        key: GameConstants.problemResultsKey,
-        data: state,
-        toJson: (result) => result.toJson(),
-      );
-      Logger.debug('문제 결과 저장 완료: ${state.length}개', tag: 'ProblemResultsProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '문제 결과 저장 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'ProblemResultsProvider',
-      );
-    }
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(
+          GameConstants.problemResultsKey,
+          state.map((result) => result.toJson()).toList(),
+        );
+        logDebug('문제 결과 저장 완료: ${state.length}개');
+      },
+      errorMessage: '문제 결과 저장 실패',
+    );
   }
 
   /// 새 결과 추가
@@ -315,9 +283,9 @@ class ProblemResultsNotifier extends StateNotifier<List<ProblemResult>> {
   }
 }
 
-/// 현재 학습 세션 관리
-class LearningSessionNotifier extends StateNotifier<LearningSession?> {
-  LearningSessionNotifier() : super(null);
+/// 현재 학습 세션 관리 (BaseNotifier 최적화 버전)
+class LearningSessionNotifier extends BaseNotifier<LearningSession?> {
+  LearningSessionNotifier() : super(null, 'LearningSessionProvider');
 
   /// 새 학습 세션 시작
   void startSession({
