@@ -1,68 +1,69 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 import 'user_provider.dart';
 import 'problem_provider.dart';
 
-/// 레슨 상태 관리
-class LessonNotifier extends StateNotifier<List<Lesson>> {
-  LessonNotifier(this._ref) : super([]) {
-    Logger.info('[LessonProvider] LessonNotifier 초기화', tag: 'LessonProvider');
+/// 레슨 상태 관리 (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - SharedPreferences → LocalStorageService로 통일
+/// - executeWithErrorHandling로 try-catch 자동화
+class LessonNotifier extends BaseNotifier<List<Lesson>> {
+  LessonNotifier(this._ref) : super([], 'LessonProvider') {
+    logInfo('LessonNotifier 초기화');
     _loadLessons();
   }
 
   final Ref _ref;
   static final MockDataService _dataService = MockDataService();
+  static const String _storageKey = 'lessons';
 
   /// 레슨 데이터 로드
   Future<void> _loadLessons() async {
-    Logger.info('[LessonProvider] 레슨 데이터 로드 시작', tag: 'LessonProvider');
-    final prefs = await SharedPreferences.getInstance();
-    final lessonsJson = prefs.getStringList('lessons');
+    logInfo('레슨 데이터 로드 시작');
 
-    if (lessonsJson != null && lessonsJson.isNotEmpty) {
+    final data = await loadFromStorage(_storageKey);
+
+    if (data != null && data['lessons'] != null) {
       // 저장된 레슨이 있으면 로드
-      Logger.info('[LessonProvider] 저장된 레슨 ${lessonsJson.length}개 발견', tag: 'LessonProvider');
-      final lessons = lessonsJson
-          .map((json) => Lesson.fromJson(jsonDecode(json)))
+      final lessonsList = data['lessons'] as List;
+      logInfo('저장된 레슨 ${lessonsList.length}개 발견');
+
+      final lessons = lessonsList
+          .map((json) => Lesson.fromJson(json as Map<String, dynamic>))
           .toList();
       state = lessons;
-      Logger.info('[LessonProvider] 레슨 ${lessons.length}개 로드 완료', tag: 'LessonProvider');
+      logInfo('레슨 ${lessons.length}개 로드 완료');
     } else {
       // JSON 파일에서 레슨 로드
-      Logger.info('[LessonProvider] 저장된 레슨 없음, JSON 파일에서 로드', tag: 'LessonProvider');
-      try {
-        final lessons = await _dataService.loadLessons();
+      logInfo('저장된 레슨 없음, JSON 파일에서 로드');
+
+      final lessons = await executeWithErrorHandling(
+        () async => await _dataService.loadLessons(),
+        errorMessage: 'JSON 로드 실패, 샘플 데이터 사용',
+        fallback: () => _dataService.getSampleLessons(),
+      );
+
+      if (lessons != null) {
         state = lessons;
-        Logger.info('[LessonProvider] JSON 파일에서 ${lessons.length}개 레슨 로드 완료', tag: 'LessonProvider');
-        await _saveLessons();
-      } catch (e, stackTrace) {
-        Logger.error(
-          '[LessonProvider] JSON 로드 실패, 샘플 데이터 사용',
-          error: e,
-          stackTrace: stackTrace,
-          tag: 'LessonProvider',
-        );
-        state = _dataService.getSampleLessons();
+        logInfo('JSON 파일에서 ${lessons.length}개 레슨 로드 완료');
         await _saveLessons();
       }
     }
 
     // 첫 번째 레슨은 항상 잠금 해제
     await _unlockFirstLesson();
-    Logger.info('[LessonProvider] 레슨 로드 완료', tag: 'LessonProvider');
+    logInfo('레슨 로드 완료');
   }
 
   /// 레슨 데이터 저장
   Future<void> _saveLessons() async {
-    final prefs = await SharedPreferences.getInstance();
-    final lessonsJson = state
-        .map((lesson) => jsonEncode(lesson.toJson()))
-        .toList();
-    await prefs.setStringList('lessons', lessonsJson);
+    await saveToStorage(_storageKey, {
+      'lessons': state.map((lesson) => lesson.toJson()).toList(),
+    });
   }
 
   /// 첫 번째 레슨 잠금 해제

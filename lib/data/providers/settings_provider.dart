@@ -1,127 +1,122 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 
-/// 앱 설정 상태 관리
-class SettingsNotifier extends StateNotifier<AppSettings> {
-  SettingsNotifier() : super(const AppSettings()) {
+/// 앱 설정 상태 관리 (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - updateAndSave로 상태 업데이트 + 저장 단순화
+/// - 자동 에러 처리로 try-catch 제거
+class SettingsNotifier extends BaseNotifier<AppSettings> {
+  SettingsNotifier() : super(const AppSettings(), 'SettingsProvider') {
     _loadSettings();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
   static const String _settingsKey = 'app_settings';
 
   /// 앱 시작 시 설정 로드
   Future<void> _loadSettings() async {
-    try {
-      Logger.info('설정 로드 시작', tag: 'SettingsProvider');
-
-      final settings = await _storage.loadObject<AppSettings>(
-        key: _settingsKey,
-        fromJson: AppSettings.fromJson,
-      );
-
-      if (settings != null) {
-        state = settings;
-        Logger.info('설정 로드 성공: ${settings.toString()}', tag: 'SettingsProvider');
-      } else {
-        // 기본 설정 사용
-        Logger.info('기본 설정 사용', tag: 'SettingsProvider');
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        '설정 로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SettingsProvider',
-      );
-    }
-  }
-
-  /// 설정 저장
-  Future<void> _saveSettings() async {
-    try {
-      await _storage.saveObject<AppSettings>(
-        key: _settingsKey,
-        data: state,
-        toJson: (settings) => settings.toJson(),
-      );
-      Logger.debug('설정 저장 완료', tag: 'SettingsProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '설정 저장 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SettingsProvider',
-      );
+    final data = await loadFromStorage(_settingsKey);
+    if (data != null) {
+      state = AppSettings.fromJson(data);
+      logInfo('설정 로드 성공: ${state.toString()}');
+    } else {
+      logInfo('기본 설정 사용');
     }
   }
 
   /// 알림 설정 변경
   Future<void> setNotificationsEnabled(bool enabled) async {
-    state = state.copyWith(notificationsEnabled: enabled);
-    await _saveSettings();
-    Logger.info('알림 설정 변경: $enabled', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(notificationsEnabled: enabled),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('알림 설정 변경: $enabled');
   }
 
   /// 사운드 설정 변경
   Future<void> setSoundEnabled(bool enabled) async {
-    state = state.copyWith(soundEnabled: enabled);
-    await _saveSettings();
-    Logger.info('사운드 설정 변경: $enabled', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(soundEnabled: enabled),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('사운드 설정 변경: $enabled');
   }
 
   /// 진동 설정 변경
   Future<void> setVibrationEnabled(bool enabled) async {
-    state = state.copyWith(vibrationEnabled: enabled);
-    await _saveSettings();
-    Logger.info('진동 설정 변경: $enabled', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(vibrationEnabled: enabled),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('진동 설정 변경: $enabled');
   }
 
   /// 언어 설정 변경
   Future<void> setLanguage(String language) async {
-    state = state.copyWith(language: language);
-    await _saveSettings();
-    Logger.info('언어 설정 변경: $language', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(language: language),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('언어 설정 변경: $language');
   }
 
   /// 일일 목표 XP 변경
   Future<void> setDailyGoalXP(int xp) async {
-    state = state.copyWith(dailyGoalXP: xp);
-    await _saveSettings();
-    Logger.info('일일 목표 변경: $xp XP', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(dailyGoalXP: xp),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('일일 목표 변경: $xp XP');
   }
 
   /// 리마인더 설정 변경
   Future<void> setReminderEnabled(bool enabled) async {
-    state = state.copyWith(reminderEnabled: enabled);
-    await _saveSettings();
-    Logger.info('리마인더 설정 변경: $enabled', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(reminderEnabled: enabled),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('리마인더 설정 변경: $enabled');
   }
 
   /// 리마인더 시간 설정
   Future<void> setReminderTime(String time) async {
-    state = state.copyWith(reminderTime: time);
-    await _saveSettings();
-    Logger.info('리마인더 시간 설정: $time', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(reminderTime: time),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('리마인더 시간 설정: $time');
   }
 
   /// 다크모드 설정 변경
   Future<void> setDarkModeEnabled(bool enabled) async {
-    state = state.copyWith(darkModeEnabled: enabled);
-    await _saveSettings();
-    Logger.info('다크모드 설정 변경: $enabled', tag: 'SettingsProvider');
+    await updateAndSave(
+      state.copyWith(darkModeEnabled: enabled),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
+    logInfo('다크모드 설정 변경: $enabled');
   }
 
   /// 설정 초기화
   Future<void> resetSettings() async {
-    Logger.warning('설정 초기화 시작', tag: 'SettingsProvider');
+    logWarning('설정 초기화 시작');
 
-    state = const AppSettings();
-    await _saveSettings();
+    await updateAndSave(
+      const AppSettings(),
+      saveKey: _settingsKey,
+      toJson: (s) => s.toJson(),
+    );
 
-    Logger.info('설정 초기화 완료', tag: 'SettingsProvider');
+    logInfo('설정 초기화 완료');
   }
 }
 
