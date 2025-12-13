@@ -1,53 +1,91 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
+import 'base/base_notifier.dart';
 
-/// 학습 통계 상태 관리
-class LearningStatsNotifier extends StateNotifier<LearningStats?> {
-  LearningStatsNotifier() : super(null) {
+/// 학습 통계 상태 관리 (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 코드 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 SharedPreferences 제거
+class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
+  static const String _storageKey = 'learningStats';
+
+  LearningStatsNotifier() : super(null, 'LearningStatsProvider') {
     _loadStats();
   }
 
   /// 통계 데이터 로드
   Future<void> _loadStats() async {
-    final prefs = await SharedPreferences.getInstance();
-    final statsJson = prefs.getString('learningStats');
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_storageKey);
 
-    if (statsJson != null) {
-      final statsData = jsonDecode(statsJson);
-      state = LearningStats.fromJson(statsData);
-    } else {
-      // 초기 통계 생성
-      state = LearningStats(
-        userId: 'user001',
-        totalXP: 0,
-        completedEpisodes: 0,
-        maxStreak: 0,
-        currentStreak: 0,
-        totalStudyTime: 0,
-        totalProblems: 0,
-        correctAnswers: 0,
-        totalSessions: 0,
-        lastStudyDate: DateTime.now(),
-        categoryStats: {
-          '기초산술': 0,
-          '대수': 0,
-          '기하': 0,
-          '통계': 0,
-        },
-      );
-      await _saveStats();
-    }
+        if (data != null) {
+          state = LearningStats.fromJson(data as Map<String, dynamic>);
+          logInfo('학습 통계 로드 완료');
+        } else {
+          // 초기 통계 생성
+          state = LearningStats(
+            userId: 'user001',
+            totalXP: 0,
+            completedEpisodes: 0,
+            maxStreak: 0,
+            currentStreak: 0,
+            totalStudyTime: 0,
+            totalProblems: 0,
+            correctAnswers: 0,
+            totalSessions: 0,
+            lastStudyDate: DateTime.now(),
+            categoryStats: {
+              '기초산술': 0,
+              '대수': 0,
+              '기하': 0,
+              '통계': 0,
+            },
+          );
+          await _saveStats();
+          logInfo('초기 학습 통계 생성 완료');
+        }
+      },
+      errorMessage: '학습 통계 로드 실패',
+      fallback: () => _initializeDefaultStats(),
+    );
+  }
+
+  /// 기본 통계 초기화
+  void _initializeDefaultStats() {
+    state = LearningStats(
+      userId: 'user001',
+      totalXP: 0,
+      completedEpisodes: 0,
+      maxStreak: 0,
+      currentStreak: 0,
+      totalStudyTime: 0,
+      totalProblems: 0,
+      correctAnswers: 0,
+      totalSessions: 0,
+      lastStudyDate: DateTime.now(),
+      categoryStats: {
+        '기초산술': 0,
+        '대수': 0,
+        '기하': 0,
+        '통계': 0,
+      },
+    );
   }
 
   /// 통계 데이터 저장
   Future<void> _saveStats() async {
     if (state == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final statsJson = jsonEncode(state!.toJson());
-    await prefs.setString('learningStats', statsJson);
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(_storageKey, state!.toJson());
+        logDebug('학습 통계 저장 완료');
+      },
+      errorMessage: '학습 통계 저장 실패',
+    );
   }
 
   /// 학습 세션 완료 시 통계 업데이트
@@ -315,25 +353,31 @@ class LearningStatsNotifier extends StateNotifier<LearningStats?> {
 
   /// 통계 초기화 (테스트용)
   Future<void> resetStats() async {
-    state = LearningStats(
-      userId: state?.userId ?? 'user001',
-      totalXP: 0,
-      completedEpisodes: 0,
-      maxStreak: 0,
-      currentStreak: 0,
-      totalStudyTime: 0,
-      totalProblems: 0,
-      correctAnswers: 0,
-      totalSessions: 0,
-      lastStudyDate: DateTime.now(),
-      categoryStats: {
-        '기초산술': 0,
-        '대수': 0,
-        '기하': 0,
-        '통계': 0,
+    await executeWithErrorHandling(
+      () async {
+        state = LearningStats(
+          userId: state?.userId ?? 'user001',
+          totalXP: 0,
+          completedEpisodes: 0,
+          maxStreak: 0,
+          currentStreak: 0,
+          totalStudyTime: 0,
+          totalProblems: 0,
+          correctAnswers: 0,
+          totalSessions: 0,
+          lastStudyDate: DateTime.now(),
+          categoryStats: {
+            '기초산술': 0,
+            '대수': 0,
+            '기하': 0,
+            '통계': 0,
+          },
+        );
+        await _saveStats();
+        logInfo('학습 통계 초기화 완료');
       },
+      errorMessage: '학습 통계 초기화 실패',
     );
-    await _saveStats();
   }
 }
 
