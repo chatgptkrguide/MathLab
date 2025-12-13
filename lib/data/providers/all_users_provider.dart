@@ -1,47 +1,45 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 
-/// 전체 사용자 목록 상태 관리
+/// 전체 사용자 목록 상태 관리 (BaseNotifier 최적화 버전)
 ///
 /// 앱의 모든 사용자를 관리하고 검색, 필터링, 추천 기능을 제공합니다.
 /// 친구 시스템, 리더보드, 리그에서 실제 사용자를 연동할 수 있도록 지원합니다.
-class AllUsersNotifier extends StateNotifier<List<User>> {
-  AllUsersNotifier() : super([]) {
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class AllUsersNotifier extends BaseNotifier<List<User>> {
+  static const String _storageKey = 'all_users';
+
+  AllUsersNotifier() : super([], 'AllUsersProvider') {
     _loadAllUsers();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
-  static const String _storageKey = 'all_users';
-
   /// 앱 시작 시 모든 사용자 로드
   Future<void> _loadAllUsers() async {
-    try {
-      Logger.info('전체 사용자 목록 로드 시작', tag: 'AllUsersProvider');
+    await executeWithErrorHandling(
+      () async {
+        logInfo('전체 사용자 목록 로드 시작');
 
-      final users = await _storage.loadList<User>(
-        key: _storageKey,
-        fromJson: User.fromJson,
-      );
+        final users = await loadList<User>(
+          key: _storageKey,
+          fromJson: User.fromJson,
+        );
 
-      if (users != null && users.isNotEmpty) {
-        state = users;
-        Logger.info('전체 사용자 목록 로드 성공: ${users.length}명', tag: 'AllUsersProvider');
-      } else {
-        // 데이터가 없으면 샘플 사용자 생성
-        await _generateSampleUsers();
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        '전체 사용자 목록 로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'AllUsersProvider',
-      );
-      // 오류 발생 시에도 샘플 사용자 생성
-      await _generateSampleUsers();
-    }
+        if (users != null && users.isNotEmpty) {
+          state = users;
+          logInfo('전체 사용자 목록 로드 성공: ${users.length}명');
+        } else {
+          // 데이터가 없으면 샘플 사용자 생성
+          await _generateSampleUsers();
+        }
+      },
+      errorMessage: '전체 사용자 목록 로드 실패',
+      fallback: () => _generateSampleUsers(),
+    );
   }
 
   /// 샘플 사용자 20명 생성 (다양한 레벨과 학년)
@@ -343,29 +341,22 @@ class AllUsersNotifier extends StateNotifier<List<User>> {
     state = sampleUsers;
     await _saveAllUsers();
 
-    Logger.info(
-      '샘플 사용자 ${sampleUsers.length}명 생성 완료',
-      tag: 'AllUsersProvider',
-    );
+    logInfo('샘플 사용자 ${sampleUsers.length}명 생성 완료');
   }
 
   /// 모든 사용자 저장
   Future<void> _saveAllUsers() async {
-    try {
-      await _storage.saveList(
-        key: _storageKey,
-        data: state,
-        toJson: (user) => user.toJson(),
-      );
-      Logger.info('전체 사용자 목록 저장 완료: ${state.length}명', tag: 'AllUsersProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '전체 사용자 목록 저장 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'AllUsersProvider',
-      );
-    }
+    await executeWithErrorHandling(
+      () async {
+        await saveList(
+          key: _storageKey,
+          data: state,
+          toJson: (user) => user.toJson(),
+        );
+        logInfo('전체 사용자 목록 저장 완료: ${state.length}명');
+      },
+      errorMessage: '전체 사용자 목록 저장 실패',
+    );
   }
 
   /// 모든 사용자 조회 (레벨순 정렬)
@@ -444,13 +435,13 @@ class AllUsersNotifier extends StateNotifier<List<User>> {
   Future<void> addUser(User user) async {
     // 중복 확인
     if (getUserById(user.id) != null) {
-      Logger.warning('이미 존재하는 사용자: ${user.id}', tag: 'AllUsersProvider');
+      logWarning('이미 존재하는 사용자: ${user.id}');
       return;
     }
 
     state = [...state, user];
     await _saveAllUsers();
-    Logger.info('새 사용자 추가: ${user.name} (${user.id})', tag: 'AllUsersProvider');
+    logInfo('새 사용자 추가: ${user.name} (${user.id})');
   }
 
   /// 사용자 정보 업데이트
@@ -460,20 +451,20 @@ class AllUsersNotifier extends StateNotifier<List<User>> {
     }).toList();
 
     await _saveAllUsers();
-    Logger.info('사용자 정보 업데이트: ${updatedUser.name}', tag: 'AllUsersProvider');
+    logInfo('사용자 정보 업데이트: ${updatedUser.name}');
   }
 
   /// 사용자 삭제
   Future<void> removeUser(String userId) async {
     final user = getUserById(userId);
     if (user == null) {
-      Logger.warning('존재하지 않는 사용자: $userId', tag: 'AllUsersProvider');
+      logWarning('존재하지 않는 사용자: $userId');
       return;
     }
 
     state = state.where((u) => u.id != userId).toList();
     await _saveAllUsers();
-    Logger.info('사용자 삭제: ${user.name} ($userId)', tag: 'AllUsersProvider');
+    logInfo('사용자 삭제: ${user.name} ($userId)');
   }
 
   /// 검색 및 필터 통합 (다중 조건)
@@ -522,9 +513,14 @@ class AllUsersNotifier extends StateNotifier<List<User>> {
 
   /// 모든 데이터 초기화 (테스트용)
   Future<void> clearAllData() async {
-    state = [];
-    await _storage.remove(_storageKey);
-    Logger.info('전체 사용자 데이터 초기화 완료', tag: 'AllUsersProvider');
+    await executeWithErrorHandling(
+      () async {
+        state = [];
+        await removeFromStorage(_storageKey);
+        logInfo('전체 사용자 데이터 초기화 완료');
+      },
+      errorMessage: '전체 사용자 데이터 초기화 실패',
+    );
   }
 
   /// 샘플 데이터 재생성
