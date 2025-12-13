@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
+
+
 
 /// 과제 상태 관리
-class AssignmentNotifier extends StateNotifier<List<Assignment>> {
+class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
   AssignmentNotifier() : super([]) {
     _loadAssignments();
   }
@@ -15,23 +16,20 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
   /// 앱 시작 시 과제 목록 로드
   Future<void> _loadAssignments() async {
     try {
-      Logger.info('과제 목록 로드 시작', tag: 'AssignmentProvider');
 
-      final assignments = await _storage.loadList<Assignment>(
+      final assignments = await loadList<Assignment>(
         key: _storageKey,
         fromJson: Assignment.fromJson,
       );
 
       if (assignments != null) {
         state = assignments;
-        Logger.info('과제 목록 로드 성공: ${assignments.length}개', tag: 'AssignmentProvider');
       }
     } catch (e, stackTrace) {
       Logger.error(
         '과제 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'AssignmentProvider',
       );
     }
   }
@@ -39,18 +37,16 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
   /// 과제 목록 저장
   Future<void> _saveAssignments() async {
     try {
-      await _storage.saveList(
+      await saveList(
         key: _storageKey,
         items: state,
         toJson: (assignment) => assignment.toJson(),
       );
-      Logger.info('과제 목록 저장 완료: ${state.length}개', tag: 'AssignmentProvider');
     } catch (e, stackTrace) {
       Logger.error(
         '과제 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'AssignmentProvider',
       );
     }
   }
@@ -59,7 +55,6 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
   Future<void> createAssignment(Assignment assignment) async {
     state = [...state, assignment];
     await _saveAssignments();
-    Logger.info('과제 생성: ${assignment.title}', tag: 'AssignmentProvider');
   }
 
   /// 과제 수정
@@ -68,7 +63,6 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
       return assignment.id == updatedAssignment.id ? updatedAssignment : assignment;
     }).toList();
     await _saveAssignments();
-    Logger.info('과제 수정: ${updatedAssignment.title}', tag: 'AssignmentProvider');
   }
 
   /// 과제 삭제
@@ -76,7 +70,6 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
     final assignment = state.firstWhere((a) => a.id == assignmentId);
     state = state.where((a) => a.id != assignmentId).toList();
     await _saveAssignments();
-    Logger.info('과제 삭제: ${assignment.title}', tag: 'AssignmentProvider');
   }
 
   /// 특정 학급의 과제 조회
@@ -111,7 +104,6 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
     state = state.map((assignment) {
       if (assignment.status == AssignmentStatus.active && assignment.isOverdue) {
         hasChanges = true;
-        Logger.info('자동 마감: ${assignment.title}', tag: 'AssignmentProvider');
         return assignment.copyWith(status: AssignmentStatus.closed);
       }
       return assignment;
@@ -131,7 +123,6 @@ class AssignmentNotifier extends StateNotifier<List<Assignment>> {
       return assignment;
     }).toList();
     await _saveAssignments();
-    Logger.info('제출 수 업데이트: $assignmentId -> $newCount', tag: 'AssignmentProvider');
   }
 }
 

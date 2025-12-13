@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
+
+import 'base/base_notifier.dart';
+
 import 'auth_provider.dart';
 
 /// 레슨 진행 상태 관리
-class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
+class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
   final Ref ref;
   final LocalStorageService _storage = LocalStorageService();
 
@@ -16,7 +17,6 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
   String? get _storageKey {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
-      Logger.warning('No logged in account', tag: 'LessonProgress');
       return null;
     }
     return 'lesson_progress_${currentAccount.id}';
@@ -48,7 +48,6 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
           }
         });
         state = Map<String, int>.from(parsed);
-        Logger.info('레슨 진행 상태 로드 완료', tag: 'LessonProgress');
       } else {
         state = {};
       }
@@ -57,7 +56,6 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
         '레슨 진행 상태 로드 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'LessonProgress',
       );
       state = {};
     }
@@ -68,7 +66,6 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
     try {
       final key = _storageKey;
       if (key == null) {
-        Logger.warning('Cannot save lesson progress - no logged in account', tag: 'LessonProgress');
         return;
       }
 
@@ -77,13 +74,11 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
           .map((e) => '${e.key}:${e.value}')
           .join(',');
       await _storage.setString(key, progressString);
-      Logger.debug('레슨 진행 상태 저장 완료', tag: 'LessonProgress');
     } catch (e, stackTrace) {
       Logger.error(
         '레슨 진행 상태 저장 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'LessonProgress',
       );
     }
   }
@@ -103,7 +98,6 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
 
     Logger.info(
       '레슨 완료: $grade - 레슨 ${currentIndex + 1}로 진행',
-      tag: 'LessonProgress',
     );
   }
 
@@ -112,8 +106,7 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
     state = {};
     final key = _storageKey;
     if (key != null) {
-      await _storage.remove(key);
-      Logger.warning('레슨 진행 상태 초기화', tag: 'LessonProgress');
+      await removeFromStorage(key);
     }
   }
 
@@ -123,7 +116,6 @@ class LessonProgressNotifier extends StateNotifier<Map<String, int>> {
     newState[grade] = 0;
     state = newState;
     await _saveProgress();
-    Logger.info('$grade 진행 상태 초기화', tag: 'LessonProgress');
   }
 }
 

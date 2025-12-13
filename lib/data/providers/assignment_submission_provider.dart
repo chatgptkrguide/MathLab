@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
+import 'base/base_notifier.dart';
+
 import './assignment_provider.dart';
-import '../../shared/utils/logger.dart';
+
 
 /// 과제 제출 상태 관리
-class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmission>> {
+class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmission>> {
   AssignmentSubmissionNotifier(this.ref) : super([]) {
     _loadSubmissions();
   }
@@ -17,23 +18,20 @@ class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmissi
   /// 앱 시작 시 제출 목록 로드
   Future<void> _loadSubmissions() async {
     try {
-      Logger.info('과제 제출 목록 로드 시작', tag: 'AssignmentSubmissionProvider');
 
-      final submissions = await _storage.loadList<AssignmentSubmission>(
+      final submissions = await loadList<AssignmentSubmission>(
         key: _storageKey,
         fromJson: AssignmentSubmission.fromJson,
       );
 
       if (submissions != null) {
         state = submissions;
-        Logger.info('과제 제출 목록 로드 성공: ${submissions.length}개', tag: 'AssignmentSubmissionProvider');
       }
     } catch (e, stackTrace) {
       Logger.error(
         '과제 제출 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'AssignmentSubmissionProvider',
       );
     }
   }
@@ -41,18 +39,16 @@ class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmissi
   /// 제출 목록 저장
   Future<void> _saveSubmissions() async {
     try {
-      await _storage.saveList(
+      await saveList(
         key: _storageKey,
         items: state,
         toJson: (submission) => submission.toJson(),
       );
-      Logger.info('과제 제출 목록 저장 완료: ${state.length}개', tag: 'AssignmentSubmissionProvider');
     } catch (e, stackTrace) {
       Logger.error(
         '과제 제출 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'AssignmentSubmissionProvider',
       );
     }
   }
@@ -61,7 +57,6 @@ class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmissi
   Future<void> createSubmission(AssignmentSubmission submission) async {
     state = [...state, submission];
     await _saveSubmissions();
-    Logger.info('과제 제출 생성: ${submission.studentName} - ${submission.assignmentId}', tag: 'AssignmentSubmissionProvider');
   }
 
   /// 과제 제출 (학생)
@@ -76,7 +71,6 @@ class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmissi
           submittedAt: DateTime.now(),
           photoUrls: photoUrls,
         );
-        Logger.info('과제 제출: ${submission.studentName}', tag: 'AssignmentSubmissionProvider');
 
         // 과제 제출 수 업데이트
         _updateAssignmentSubmissionCount(submission.assignmentId);
@@ -103,7 +97,6 @@ class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmissi
           feedback: feedback,
           score: score,
         );
-        Logger.info('과제 확인: ${submission.studentName}', tag: 'AssignmentSubmissionProvider');
         return updated;
       }
       return submission;
@@ -121,7 +114,6 @@ class AssignmentSubmissionNotifier extends StateNotifier<List<AssignmentSubmissi
           submittedAt: null,
           photoUrls: [],
         );
-        Logger.info('과제 제출 취소: ${submission.studentName}', tag: 'AssignmentSubmissionProvider');
 
         // 과제 제출 수 업데이트
         _updateAssignmentSubmissionCount(submission.assignmentId);

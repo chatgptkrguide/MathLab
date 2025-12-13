@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
+import 'base/base_notifier.dart';
 import '../services/level_skip_service.dart';
 import 'user_provider.dart';
 
@@ -203,7 +204,7 @@ class SkipTestActions {
 }
 
 /// 스킵 테스트 상태 노티파이어 (실시간 업데이트용)
-class SkipTestNotifier extends StateNotifier<AsyncValue<LevelSkipTest?>> {
+class SkipTestNotifier extends BaseNotifier<AsyncValue<LevelSkipTest?>> {
   SkipTestNotifier(this._service, this._testId)
       : super(const AsyncValue.loading()) {
     _loadTest();

@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
+
+import 'base/base_notifier.dart';
+
 import 'auth_provider.dart';
 
 /// 학습 이력 상태 관리 (날짜별 학습 완료 기록)
-class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
+class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
   final Ref ref;
   final LocalStorageService _storage = LocalStorageService();
 
@@ -16,7 +17,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
   String? get _storageKey {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
-      Logger.warning('No logged in account', tag: 'StudyHistory');
       return null;
     }
     return 'study_history_${currentAccount.id}';
@@ -47,7 +47,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
               try {
                 return DateTime.parse(s);
               } catch (e) {
-                Logger.warning('날짜 파싱 실패: $s', tag: 'StudyHistory');
                 return null;
               }
             })
@@ -55,7 +54,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
             .toSet();
 
         state = dates;
-        Logger.info('학습 이력 로드 완료: ${dates.length}일', tag: 'StudyHistory');
       } else {
         state = {};
       }
@@ -64,7 +62,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
         '학습 이력 로드 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'StudyHistory',
       );
       state = {};
     }
@@ -75,7 +72,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
     try {
       final key = _storageKey;
       if (key == null) {
-        Logger.warning('Cannot save study history - no logged in account', tag: 'StudyHistory');
         return;
       }
 
@@ -87,13 +83,11 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
 
       final historyString = dateStrings.join(',');
       await _storage.setString(key, historyString);
-      Logger.debug('학습 이력 저장 완료: ${state.length}일', tag: 'StudyHistory');
     } catch (e, stackTrace) {
       Logger.error(
         '학습 이력 저장 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'StudyHistory',
       );
     }
   }
@@ -108,7 +102,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
       final newState = Set<DateTime>.from(state)..add(today);
       state = newState;
       await _saveHistory();
-      Logger.info('오늘 학습 완료 기록: ${_dateOnlyString(today)}', tag: 'StudyHistory');
     }
   }
 
@@ -120,7 +113,6 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
       final newState = Set<DateTime>.from(state)..add(dateOnly);
       state = newState;
       await _saveHistory();
-      Logger.info('학습 완료 기록 추가: ${_dateOnlyString(dateOnly)}', tag: 'StudyHistory');
     }
   }
 
@@ -143,8 +135,7 @@ class StudyHistoryNotifier extends StateNotifier<Set<DateTime>> {
     state = {};
     final key = _storageKey;
     if (key != null) {
-      await _storage.remove(key);
-      Logger.warning('학습 이력 초기화', tag: 'StudyHistory');
+      await removeFromStorage(key);
     }
   }
 

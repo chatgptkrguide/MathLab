@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
+import 'base/base_notifier.dart';
 
 /// 리더보드 Provider
 /// 주간/월간/전체 순위 데이터를 관리합니다
@@ -42,7 +43,7 @@ class LeaderboardState {
 }
 
 /// 리더보드 Notifier
-class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
+class LeaderboardNotifier extends BaseNotifier<LeaderboardState> {
   final Ref ref;
 
   LeaderboardNotifier(this.ref) : super(const LeaderboardState()) {

@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
+
+
 
 /// 주간테스트 상태 관리
-class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
+class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
   WeeklyTestNotifier() : super([]) {
     _loadWeeklyTests();
   }
@@ -15,23 +16,20 @@ class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
   /// 앱 시작 시 주간테스트 목록 로드
   Future<void> _loadWeeklyTests() async {
     try {
-      Logger.info('주간테스트 목록 로드 시작', tag: 'WeeklyTestProvider');
 
-      final tests = await _storage.loadList<WeeklyTest>(
+      final tests = await loadList<WeeklyTest>(
         key: _storageKey,
         fromJson: WeeklyTest.fromJson,
       );
 
       if (tests != null) {
         state = tests;
-        Logger.info('주간테스트 목록 로드 성공: ${tests.length}개', tag: 'WeeklyTestProvider');
       }
     } catch (e, stackTrace) {
       Logger.error(
         '주간테스트 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'WeeklyTestProvider',
       );
     }
   }
@@ -39,18 +37,16 @@ class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
   /// 주간테스트 목록 저장
   Future<void> _saveWeeklyTests() async {
     try {
-      await _storage.saveList(
+      await saveList(
         key: _storageKey,
         items: state,
         toJson: (test) => test.toJson(),
       );
-      Logger.info('주간테스트 목록 저장 완료: ${state.length}개', tag: 'WeeklyTestProvider');
     } catch (e, stackTrace) {
       Logger.error(
         '주간테스트 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'WeeklyTestProvider',
       );
     }
   }
@@ -59,7 +55,6 @@ class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
   Future<void> createWeeklyTest(WeeklyTest test) async {
     state = [...state, test];
     await _saveWeeklyTests();
-    Logger.info('주간테스트 생성: ${test.title}', tag: 'WeeklyTestProvider');
   }
 
   /// 주간테스트 수정
@@ -68,7 +63,6 @@ class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
       return test.id == updatedTest.id ? updatedTest : test;
     }).toList();
     await _saveWeeklyTests();
-    Logger.info('주간테스트 수정: ${updatedTest.title}', tag: 'WeeklyTestProvider');
   }
 
   /// 주간테스트 삭제
@@ -76,7 +70,6 @@ class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
     final test = state.firstWhere((t) => t.id == testId);
     state = state.where((t) => t.id != testId).toList();
     await _saveWeeklyTests();
-    Logger.info('주간테스트 삭제: ${test.title}', tag: 'WeeklyTestProvider');
   }
 
   /// 특정 학급의 주간테스트 조회
@@ -118,7 +111,6 @@ class WeeklyTestNotifier extends StateNotifier<List<WeeklyTest>> {
       return test;
     }).toList();
     await _saveWeeklyTests();
-    Logger.info('제출 수 업데이트: $testId -> $newCount', tag: 'WeeklyTestProvider');
   }
 
   /// 주차별 테스트 통계

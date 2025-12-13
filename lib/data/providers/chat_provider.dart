@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
+import 'base/base_notifier.dart';
+
 
 /// 채팅방 목록 프로바이더
 final chatRoomsProvider = StateNotifierProvider<ChatRoomsNotifier, List<ChatRoom>>((ref) {
@@ -8,7 +9,7 @@ final chatRoomsProvider = StateNotifierProvider<ChatRoomsNotifier, List<ChatRoom
 });
 
 /// 채팅방 목록 관리 노티파이어
-class ChatRoomsNotifier extends StateNotifier<List<ChatRoom>> {
+class ChatRoomsNotifier extends BaseNotifier<List<ChatRoom>> {
   ChatRoomsNotifier() : super([]) {
     _loadChatRooms();
   }
@@ -19,7 +20,7 @@ class ChatRoomsNotifier extends StateNotifier<List<ChatRoom>> {
   /// 채팅방 목록 로드
   Future<void> _loadChatRooms() async {
     try {
-      final roomsList = await _storage.loadList<ChatRoom>(
+      final roomsList = await loadList<ChatRoom>(
         key: _storageKey,
         fromJson: (json) => ChatRoom.fromJson(json),
       );
@@ -58,7 +59,7 @@ class ChatRoomsNotifier extends StateNotifier<List<ChatRoom>> {
   /// 채팅방 목록 저장
   Future<void> _saveChatRooms() async {
     try {
-      await _storage.saveList<ChatRoom>(
+      await saveList<ChatRoom>(
         key: _storageKey,
         data: state,
         toJson: (room) => room.toJson(),
@@ -118,7 +119,7 @@ final chatMessagesProvider = StateNotifierProvider.family<ChatMessagesNotifier, 
 );
 
 /// 채팅 메시지 관리 노티파이어
-class ChatMessagesNotifier extends StateNotifier<List<ChatMessage>> {
+class ChatMessagesNotifier extends BaseNotifier<List<ChatMessage>> {
   ChatMessagesNotifier(this.roomId) : super([]) {
     _loadMessages();
   }
@@ -130,7 +131,7 @@ class ChatMessagesNotifier extends StateNotifier<List<ChatMessage>> {
   /// 메시지 목록 로드
   Future<void> _loadMessages() async {
     try {
-      final messagesList = await _storage.loadList<ChatMessage>(
+      final messagesList = await loadList<ChatMessage>(
         key: _storageKey,
         fromJson: (json) => ChatMessage.fromJson(json),
       );
@@ -165,7 +166,7 @@ class ChatMessagesNotifier extends StateNotifier<List<ChatMessage>> {
   /// 메시지 목록 저장
   Future<void> _saveMessages() async {
     try {
-      await _storage.saveList<ChatMessage>(
+      await saveList<ChatMessage>(
         key: _storageKey,
         data: state,
         toJson: (msg) => msg.toJson(),
