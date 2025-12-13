@@ -1,16 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
 import '../services/notification_service.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 import 'auth_provider.dart';
 
-/// 메시지 상태 관리
-class MessageNotifier extends StateNotifier<List<Message>> {
-  final Ref ref; // Riverpod Ref for accessing current account
-  final LocalStorageService _storage = LocalStorageService();
+/// 메시지 상태 관리 (BaseNotifier 최적화 버전)
+class MessageNotifier extends BaseNotifier<List<Message>> {
+  final Ref ref;
 
-  MessageNotifier(this.ref) : super([]) {
+  MessageNotifier(this.ref) : super([], 'MessageProvider') {
     _initialize();
   }
 
@@ -18,7 +16,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
   String? get _storageKey {
     final currentAccount = ref.read(currentAccountProvider);
     if (currentAccount == null) {
-      Logger.warning('No logged in account', tag: 'MessageProvider');
+      logWarning('No logged in account');
       return null;
     }
     return 'messages_${currentAccount.id}';
@@ -39,20 +37,20 @@ class MessageNotifier extends StateNotifier<List<Message>> {
         return;
       }
 
-      final messages = await _storage.loadList<Message>(
+      final messages = await loadList<Message>(
         key: key,
         fromJson: Message.fromJson,
       );
 
       if (messages.isNotEmpty) {
         state = messages;
-        Logger.info('메시지 ${messages.length}개 로드 완료', tag: 'MessageProvider');
+        logInfo('메시지 ${messages.length}개 로드 완료');
       } else {
         // 초기 샘플 메시지 생성
         _createInitialMessages();
       }
     } catch (e) {
-      Logger.error('메시지 로드 실패', error: e, tag: 'MessageProvider');
+      logError('메시지 로드 실패', error: e);
       _createInitialMessages();
     }
   }
@@ -87,7 +85,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
 
     state = initialMessages;
     _saveMessages();
-    Logger.info('초기 메시지 생성 완료', tag: 'MessageProvider');
+    logInfo('초기 메시지 생성 완료');
   }
 
   /// 메시지 저장
@@ -95,18 +93,18 @@ class MessageNotifier extends StateNotifier<List<Message>> {
     try {
       final key = _storageKey;
       if (key == null) {
-        Logger.warning('Cannot save messages - no logged in account', tag: 'MessageProvider');
+        logWarning('Cannot save messages - no logged in account');
         return;
       }
 
-      await _storage.saveList(
+      await saveList(
         key: key,
         data: state,
         toJson: (message) => message.toJson(),
       );
-      Logger.debug('메시지 저장 완료', tag: 'MessageProvider');
+      logDebug('메시지 저장 완료');
     } catch (e) {
-      Logger.error('메시지 저장 실패', error: e, tag: 'MessageProvider');
+      logError('메시지 저장 실패', error: e);
     }
   }
 
@@ -114,7 +112,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
   Future<void> addMessage(Message message) async {
     state = [message, ...state];
     await _saveMessages();
-    Logger.info('새 메시지 추가: ${message.title}', tag: 'MessageProvider');
+    logInfo('새 메시지 추가: ${message.title}');
 
     // 중요한 메시지는 푸시 알림 전송
     if (message.isImportant && !message.isRead) {
@@ -139,7 +137,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
     ];
 
     await _saveMessages();
-    Logger.debug('메시지 읽음 표시: $messageId', tag: 'MessageProvider');
+    logDebug('메시지 읽음 표시: $messageId');
   }
 
   /// 모든 메시지 읽음 표시
@@ -153,14 +151,14 @@ class MessageNotifier extends StateNotifier<List<Message>> {
     }).toList();
 
     await _saveMessages();
-    Logger.info('모든 메시지 읽음 표시', tag: 'MessageProvider');
+    logInfo('모든 메시지 읽음 표시');
   }
 
   /// 메시지 삭제
   Future<void> deleteMessage(String messageId) async {
     state = state.where((m) => m.id != messageId).toList();
     await _saveMessages();
-    Logger.info('메시지 삭제: $messageId', tag: 'MessageProvider');
+    logInfo('메시지 삭제: $messageId');
   }
 
   /// 타입별 메시지 가져오기
@@ -181,9 +179,9 @@ class MessageNotifier extends StateNotifier<List<Message>> {
   void _sendNotification(Message message) {
     try {
       // TODO: Firebase Cloud Messaging을 통한 실제 푸시 알림 구현
-      Logger.info('푸시 알림 전송: ${message.title}', tag: 'MessageProvider');
+      logInfo('푸시 알림 전송: ${message.title}');
     } catch (e) {
-      Logger.error('푸시 알림 전송 실패', error: e, tag: 'MessageProvider');
+      logError('푸시 알림 전송 실패', error: e);
     }
   }
 
