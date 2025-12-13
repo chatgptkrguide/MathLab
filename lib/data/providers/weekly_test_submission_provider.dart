@@ -1,39 +1,36 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
-import '../services/local_storage_service.dart';
 import './weekly_test_provider.dart';
-import '../../shared/utils/logger.dart';
+import 'base/base_notifier.dart';
 
-/// 주간테스트 제출 상태 관리
-class WeeklyTestSubmissionNotifier extends StateNotifier<List<WeeklyTestSubmission>> {
-  WeeklyTestSubmissionNotifier(this.ref) : super([]) {
+/// 주간테스트 제출 상태 관리 (BaseNotifier 최적화 버전)
+class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmission>> {
+  WeeklyTestSubmissionNotifier(this.ref) : super([], 'WeeklyTestSubmissionProvider') {
     _loadSubmissions();
   }
 
   final Ref ref;
-  final LocalStorageService _storage = LocalStorageService();
   static const String _storageKey = 'weekly_test_submissions';
 
   /// 앱 시작 시 제출 목록 로드
   Future<void> _loadSubmissions() async {
     try {
-      Logger.info('주간테스트 제출 목록 로드 시작', tag: 'WeeklyTestSubmissionProvider');
+      logInfo('주간테스트 제출 목록 로드 시작');
 
-      final submissions = await _storage.loadList<WeeklyTestSubmission>(
+      final submissions = await loadList<WeeklyTestSubmission>(
         key: _storageKey,
         fromJson: WeeklyTestSubmission.fromJson,
       );
 
       if (submissions != null) {
         state = submissions;
-        Logger.info('주간테스트 제출 목록 로드 성공: ${submissions.length}개', tag: 'WeeklyTestSubmissionProvider');
+        logInfo('주간테스트 제출 목록 로드 성공: ${submissions.length}개');
       }
     } catch (e, stackTrace) {
       Logger.error(
         '주간테스트 제출 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'WeeklyTestSubmissionProvider',
       );
     }
   }
@@ -41,18 +38,17 @@ class WeeklyTestSubmissionNotifier extends StateNotifier<List<WeeklyTestSubmissi
   /// 제출 목록 저장
   Future<void> _saveSubmissions() async {
     try {
-      await _storage.saveList(
+      await saveList(
         key: _storageKey,
         items: state,
         toJson: (submission) => submission.toJson(),
       );
-      Logger.info('주간테스트 제출 목록 저장 완료: ${state.length}개', tag: 'WeeklyTestSubmissionProvider');
+      logInfo('주간테스트 제출 목록 저장 완료: ${state.length}개');
     } catch (e, stackTrace) {
       Logger.error(
         '주간테스트 제출 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,
-        tag: 'WeeklyTestSubmissionProvider',
       );
     }
   }
@@ -61,7 +57,7 @@ class WeeklyTestSubmissionNotifier extends StateNotifier<List<WeeklyTestSubmissi
   Future<void> createSubmission(WeeklyTestSubmission submission) async {
     state = [...state, submission];
     await _saveSubmissions();
-    Logger.info('주간테스트 제출 생성: ${submission.studentName} - ${submission.weeklyTestId}', tag: 'WeeklyTestSubmissionProvider');
+    logInfo('주간테스트 제출 생성: ${submission.studentName} - ${submission.weeklyTestId}');
   }
 
   /// OMR 제출 (학생)
@@ -76,7 +72,7 @@ class WeeklyTestSubmissionNotifier extends StateNotifier<List<WeeklyTestSubmissi
           submittedAt: DateTime.now(),
           omrPhotoUrl: omrPhotoUrl,
         );
-        Logger.info('OMR 제출: ${submission.studentName}', tag: 'WeeklyTestSubmissionProvider');
+        logInfo('OMR 제출: ${submission.studentName}');
 
         // 주간테스트 제출 수 업데이트
         _updateTestSubmissionCount(submission.weeklyTestId);
@@ -102,7 +98,7 @@ class WeeklyTestSubmissionNotifier extends StateNotifier<List<WeeklyTestSubmissi
           gradedAt: DateTime.now(),
           feedback: feedback,
         );
-        Logger.info('채점 완료: ${submission.studentName} - $score점', tag: 'WeeklyTestSubmissionProvider');
+        logInfo('채점 완료: ${submission.studentName} - $score점');
         return updated;
       }
       return submission;
@@ -120,7 +116,7 @@ class WeeklyTestSubmissionNotifier extends StateNotifier<List<WeeklyTestSubmissi
           submittedAt: null,
           omrPhotoUrl: null,
         );
-        Logger.info('제출 취소: ${submission.studentName}', tag: 'WeeklyTestSubmissionProvider');
+        logInfo('제출 취소: ${submission.studentName}');
 
         // 주간테스트 제출 수 업데이트
         _updateTestSubmissionCount(submission.weeklyTestId);
