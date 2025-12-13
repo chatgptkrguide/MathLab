@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/daily_challenge.dart';
 import 'user_provider.dart';
-import '../../shared/utils/logger.dart';
-import '../services/local_storage_service.dart';
+import 'base/base_notifier.dart';
 
 /// 일일 챌린지 상태
 class DailyChallengeState {
@@ -39,84 +38,80 @@ class DailyChallengeState {
   }
 }
 
-/// 일일 챌린지 Provider
-class DailyChallengeProvider extends StateNotifier<DailyChallengeState> {
+/// 일일 챌린지 Provider (BaseNotifier 최적화 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - LocalStorageService 상속으로 필드 제거
+class DailyChallengeProvider extends BaseNotifier<DailyChallengeState> {
   final Ref _ref;
-  final LocalStorageService _storage = LocalStorageService();
 
   static const String _storageKey = 'daily_challenges_state';
   static const int challengeCount = 3; // 하루 3개 챌린지
 
   DailyChallengeProvider(this._ref)
-      : super(DailyChallengeState(
-          challenges: [],
-          lastGeneratedDate: DateTime.now(),
-          completedCount: 0,
-        )) {
+      : super(
+          DailyChallengeState(
+            challenges: [],
+            lastGeneratedDate: DateTime.now(),
+            completedCount: 0,
+          ),
+          'DailyChallengeProvider',
+        ) {
     _loadState();
   }
 
   /// 상태 로드
   Future<void> _loadState() async {
-    try {
-      final data = await _storage.loadMap(_storageKey);
-      if (data != null) {
-        final lastGeneratedDate = data['lastGeneratedDate'] != null
-            ? DateTime.parse(data['lastGeneratedDate'])
-            : DateTime.now();
+    await executeWithErrorHandling(
+      () async {
+        final data = await loadFromStorage(_storageKey);
+        if (data != null) {
+          final lastGeneratedDate = data['lastGeneratedDate'] != null
+              ? DateTime.parse(data['lastGeneratedDate'])
+              : DateTime.now();
 
-        // 챌린지 리스트 복원
-        final challengesData = data['challenges'] as List<dynamic>?;
-        final challenges = challengesData
-                ?.map((c) => DailyChallenge.fromJson(c as Map<String, dynamic>))
-                .toList() ??
-            [];
+          // 챌린지 리스트 복원
+          final challengesData = data['challenges'] as List<dynamic>?;
+          final challenges = challengesData
+                  ?.map((c) => DailyChallenge.fromJson(c as Map<String, dynamic>))
+                  .toList() ??
+              [];
 
-        state = state.copyWith(
-          challenges: challenges,
-          lastGeneratedDate: lastGeneratedDate,
-          completedCount: challenges.where((c) => c.isCompleted).length,
-        );
+          state = state.copyWith(
+            challenges: challenges,
+            lastGeneratedDate: lastGeneratedDate,
+            completedCount: challenges.where((c) => c.isCompleted).length,
+          );
 
-        Logger.info(
-          'Daily challenges loaded: ${challenges.length} challenges',
-          tag: 'DailyChallengeProvider',
-        );
+          logInfo('일일 챌린지 로드 완료: ${challenges.length}개');
 
-        // 날짜가 바뀌었으면 새 챌린지 생성
-        await _checkAndGenerateNewChallenges();
-      } else {
-        // 최초 실행: 챌린지 생성
-        await _generateDailyChallenges();
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to load daily challenges',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'DailyChallengeProvider',
-      );
-      await _generateDailyChallenges();
-    }
+          // 날짜가 바뀌었으면 새 챌린지 생성
+          await _checkAndGenerateNewChallenges();
+        } else {
+          // 최초 실행: 챌린지 생성
+          await _generateDailyChallenges();
+        }
+      },
+      errorMessage: '일일 챌린지 로드 실패',
+      fallback: () => _generateDailyChallenges(),
+    );
   }
 
   /// 상태 저장
   Future<void> _saveState() async {
-    try {
-      await _storage.saveMap(_storageKey, {
-        'lastGeneratedDate': state.lastGeneratedDate.toIso8601String(),
-        'challenges': state.challenges.map((c) => c.toJson()).toList(),
-      });
+    await executeWithErrorHandling(
+      () async {
+        await saveToStorage(_storageKey, {
+          'lastGeneratedDate': state.lastGeneratedDate.toIso8601String(),
+          'challenges': state.challenges.map((c) => c.toJson()).toList(),
+        });
 
-      Logger.debug('Daily challenges saved', tag: 'DailyChallengeProvider');
-    } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to save daily challenges',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'DailyChallengeProvider',
-      );
-    }
+        logDebug('일일 챌린지 저장 완료');
+      },
+      errorMessage: '일일 챌린지 저장 실패',
+    );
   }
 
   /// 날짜 체크 및 새 챌린지 생성
@@ -132,7 +127,7 @@ class DailyChallengeProvider extends StateNotifier<DailyChallengeState> {
     // 날짜가 바뀌었으면 새 챌린지 생성
     if (today.isAfter(lastGenerated)) {
       await _generateDailyChallenges();
-      Logger.info('New daily challenges generated', tag: 'DailyChallengeProvider');
+      logInfo('새로운 일일 챌린지 생성');
     }
   }
 
@@ -158,10 +153,7 @@ class DailyChallengeProvider extends StateNotifier<DailyChallengeState> {
     );
 
     await _saveState();
-    Logger.info(
-      'Generated ${challenges.length} daily challenges',
-      tag: 'DailyChallengeProvider',
-    );
+    logInfo('일일 챌린지 ${challenges.length}개 생성 완료');
   }
 
   /// 챌린지 타입별 생성
@@ -254,10 +246,7 @@ class DailyChallengeProvider extends StateNotifier<DailyChallengeState> {
         // 완료되었으면 XP 지급
         if (newChallenge.completed && !challenge.completed) {
           _ref.read(userProvider.notifier).addXP(challenge.xpReward);
-          Logger.info(
-            'Challenge completed: ${challenge.title} (+${challenge.xpReward} XP)',
-            tag: 'DailyChallengeProvider',
-          );
+          logInfo('챌린지 완료: ${challenge.title} (+${challenge.xpReward} XP)');
         }
 
         return newChallenge.copyWith(isCompleted: newChallenge.completed);
