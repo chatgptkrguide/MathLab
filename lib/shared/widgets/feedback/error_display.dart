@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_dimensions.dart';
-import '../buttons/primary_button.dart';
+import '../buttons/unified_button.dart';
 
 /// 에러 표시 위젯
 ///
@@ -193,7 +193,7 @@ class ErrorDisplay extends StatelessWidget {
                 // 재시도 버튼
                 if (onRetry != null)
                   Expanded(
-                    child: PrimaryButton(
+                    child: UnifiedButton(
                       text: retryButtonText ?? '다시 시도',
                       onPressed: onRetry!,
                     ),

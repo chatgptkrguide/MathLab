@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_dimensions.dart';
-import '../buttons/primary_button.dart';
+import '../buttons/unified_button.dart';
 
 /// 빈 상태 표시 위젯
 ///
@@ -182,7 +182,7 @@ class EmptyState extends StatelessWidget {
             // 액션 버튼
             if (actionText != null && onAction != null) ...[
               const SizedBox(height: AppDimensions.spacingXL),
-              PrimaryButton(
+              UnifiedButton(
                 text: actionText!,
                 onPressed: onAction!,
               ),

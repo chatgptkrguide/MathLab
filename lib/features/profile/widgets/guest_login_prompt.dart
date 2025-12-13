@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/constants.dart';
-import '../../../shared/widgets/buttons/animated_button.dart';
+import '../../../shared/widgets/buttons/unified_button.dart';
 import '../../auth/auth_screen.dart';
 
 /// 게스트 로그인 유도 위젯
@@ -67,7 +67,7 @@ class GuestLoginPrompt extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppDimensions.spacingM),
-          AnimatedButton(
+          UnifiedButton(
             text: '로그인하러 가기',
             onPressed: () => _navigateToLogin(context),
             backgroundColor: AppColors.mathYellow,

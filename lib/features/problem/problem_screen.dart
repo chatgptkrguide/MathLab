@@ -5,23 +5,26 @@ import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
-import '../../shared/widgets/animations/fade_in_widget.dart';
-import '../../shared/widgets/math/math_text.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/problem_provider.dart';
 import '../../data/providers/lesson_provider.dart';
 import '../../data/providers/error_note_provider.dart';
-import '../../data/providers/wrong_answer_provider.dart'; // 오답 노트 추가
+import '../../data/providers/wrong_answer_provider.dart';
 import '../../data/providers/achievement_provider.dart';
 import '../../data/providers/hint_provider.dart';
 import '../../data/providers/study_history_provider.dart';
 import '../../data/services/sound_service.dart';
-import 'widgets/problem_option_button.dart';
 import 'widgets/problem_result_dialog.dart';
 import 'widgets/xp_gain_animation.dart';
 import 'widgets/hint_section.dart';
+import 'widgets/problem_header.dart';
+import 'widgets/problem_question.dart';
+import 'widgets/problem_options.dart';
+import 'widgets/problem_answer_input.dart';
+import 'widgets/problem_explanation.dart';
+import 'widgets/problem_controls.dart';
 
 /// 문제 풀이 화면
 /// 실제 Problem 데이터 기반, 경험치/뱃지 시스템 통합
@@ -139,7 +142,6 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   Problem get _currentProblem => widget.problems[_currentProblemIndex];
   double get _progress => (_currentProblemIndex + 1) / widget.problems.length;
-  bool get _isLastProblem => _currentProblemIndex == widget.problems.length - 1;
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +158,12 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
           child: ResponsiveWrapper(
             child: Column(
               children: [
-                _buildHeader(),
+                ProblemHeader(
+                  progress: _progress,
+                  currentStreak: _currentStreak,
+                  showStreakAnimation: _showStreakAnimation,
+                  onClose: _showExitDialog,
+                ),
                 Expanded(
                   child: FadeTransition(
                     opacity: _fadeAnimation,
@@ -172,171 +179,6 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
         ),
         // Floating hint button (답 제출 전에만 표시)
         floatingActionButton: _buildFloatingHintButton(),
-      ),
-    );
-  }
-
-  /// 헤더 (뒤로가기 + 진행률 + XP) - Duolingo style
-  Widget _buildHeader() {
-    final user = ref.watch(userProvider);
-
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      child: Column(
-        children: [
-          // 뒤로가기 + 스트릭 + XP
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Duolingo-style close button
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.surface, size: 20),
-                  padding: EdgeInsets.zero,
-                  onPressed: () => _showExitDialog(),
-                ),
-              ),
-              // 연속 정답 스트릭 뱃지
-              if (_currentStreak > 0)
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.elasticOut,
-                  tween: Tween(
-                    begin: _showStreakAnimation ? 0.8 : 1.0,
-                    end: _showStreakAnimation ? 1.2 : 1.0,
-                  ),
-                  builder: (context, scale, child) {
-                    return Transform.scale(
-                      scale: scale,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _currentStreak >= 10
-                              ? AppColors.mathPurple
-                              : _currentStreak >= 5
-                                  ? AppColors.mathOrange
-                                  : AppColors.mathYellow,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (_currentStreak >= 10
-                                      ? AppColors.mathPurple
-                                      : _currentStreak >= 5
-                                          ? AppColors.mathOrange
-                                          : AppColors.mathYellow)
-                                  .withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.local_fire_department,
-                              color: AppColors.surface,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '$_currentStreak',
-                              style: const TextStyle(
-                                color: AppColors.surface,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              // Clean XP badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.diamond_outlined,
-                      color: AppColors.mathOrange,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${user?.xp ?? 0}',
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacingM),
-          // Duolingo-style progress bar
-          Stack(
-            children: [
-              // Background bar
-              Container(
-                height: 12,
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              // Progress bar with animation
-              TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeOutCubic,
-                tween: Tween(begin: 0.0, end: _progress),
-                builder: (context, value, child) {
-                  return FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: value.clamp(0.05, 1.0),
-                    child: Container(
-                      height: 12,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.mathYellow, AppColors.mathYellowDark],
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.mathYellow.withValues(alpha: 0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -360,9 +202,10 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildCategoryBadge(),
-                  const SizedBox(height: AppDimensions.spacingL),
-                  _buildQuestionText(),
+                  ProblemQuestion(
+                    problem: _currentProblem,
+                    showCategoryBadge: true,
+                  ),
                   // 힌트 섹션 (답 제출 전에만 표시)
                   if (!_isAnswerSubmitted)
                     Container(
@@ -370,146 +213,63 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                       child: HintSection(problem: _currentProblem),
                     ),
                   const SizedBox(height: AppDimensions.spacingXXL),
-                  _buildOptions(),
+                  _buildAnswerArea(),
                   if (_isAnswerSubmitted) ...[
                     const SizedBox(height: AppDimensions.spacingXL),
-                    _buildExplanation(),
+                    ProblemExplanation(
+                      problem: _currentProblem,
+                      isCorrect: _isCorrect,
+                    ),
                   ],
                 ],
               ),
             ),
           ),
-          if (_buildBottomButton() != null) _buildBottomButton()!,
-        ],
-      ),
-    );
-  }
-
-  /// 카테고리 뱃지 - GoMath flat style
-  Widget _buildCategoryBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 10,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.mathBlue, // GoMath 파란색
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.mathBlue.withValues(alpha: 0.7), // 어두운 파란색 테두리
-          width: 2,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _currentProblem.typeIcon,
-            style: const TextStyle(fontSize: 18),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            _currentProblem.category,
-            style: const TextStyle(
-              color: AppColors.surface,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
-          ),
-          // 학년 정보 표시
-          if (_currentProblem.grade != null) ...[
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 3,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.surface.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _currentProblem.grade!,
-                style: const TextStyle(
-                  color: AppColors.surface,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 3,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.mathYellow, // GoMath 노란색
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '+${_currentProblem.xpReward} XP',
-              style: const TextStyle(
-                color: AppColors.surface,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
+          ProblemControls(
+            problem: _currentProblem,
+            currentProblemIndex: _currentProblemIndex,
+            totalProblems: widget.problems.length,
+            isAnswerSelected: _selectedAnswerIndex != null,
+            isAnswerSubmitted: _isAnswerSubmitted,
+            isCorrect: _isCorrect,
+            userInput: _answerController.text,
+            onSubmit: _submitShortAnswer,
+            onNext: _nextProblem,
+            onShowResults: _showResults,
           ),
         ],
       ),
     );
   }
 
-  /// 문제 텍스트
-  Widget _buildQuestionText() {
-    return FadeInWidget(
-      child: MathText(
-        _currentProblem.question,
-        style: AppTextStyles.headlineMedium.copyWith(
-          fontWeight: FontWeight.bold,
-          height: 1.4,
-        ),
-        fontSize: 20,
-      ),
-    );
-  }
-
-  /// 선택지
-  Widget _buildOptions() {
-    // 주관식 문제인 경우 입력 필드 표시
+  /// 답안 영역 (객관식/주관식 분기)
+  Widget _buildAnswerArea() {
+    // 주관식/계산 문제인 경우
     if (_currentProblem.type == ProblemType.shortAnswer ||
         _currentProblem.type == ProblemType.calculation) {
-      return _buildAnswerInput();
+      return ProblemAnswerInput(
+        problem: _currentProblem,
+        controller: _answerController,
+        focusNode: _answerFocusNode,
+        isAnswerSubmitted: _isAnswerSubmitted,
+        isCorrect: _isCorrect,
+        correctAnswerText: _getCorrectAnswerText(),
+        onChanged: () {
+          setState(() {
+            // 입력이 있으면 버튼 활성화
+          });
+        },
+        onSubmitted: _submitShortAnswer,
+      );
     }
 
     // 객관식 문제
-    if (_currentProblem.options == null) return const SizedBox();
-
-    return Column(
-      children: List.generate(
-        _currentProblem.options!.length,
-        (index) {
-          final isCorrectAnswer = _currentProblem.correctAnswerIndex == index;
-
-          return FadeInWidget(
-            delay: Duration(milliseconds: 100 * index),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: AppDimensions.spacingM),
-              child: ProblemOptionButton(
-                optionText: _currentProblem.options![index],
-                index: index,
-                selectedIndex: _selectedAnswerIndex,
-                isAnswerSubmitted: _isAnswerSubmitted,
-                isCorrectAnswer: isCorrectAnswer,
-                onTap: () => _selectAnswer(index),
-                isPulsing: _pulsingIndex == index,
-              ),
-            ),
-          );
-        },
-      ),
+    return ProblemOptions(
+      problem: _currentProblem,
+      selectedIndex: _selectedAnswerIndex,
+      isAnswerSubmitted: _isAnswerSubmitted,
+      onSelect: _selectAnswer,
+      pulsingIndex: _pulsingIndex,
     );
   }
 
@@ -534,266 +294,6 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     return '알 수 없음';
   }
 
-  /// 주관식 답안 입력 필드
-  Widget _buildAnswerInput() {
-    return FadeInWidget(
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(
-            color: _isAnswerSubmitted
-                ? (_isCorrect ? AppColors.successGreen : AppColors.errorRed)
-                : AppColors.borderLight,
-            width: 2,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '정답을 입력하세요',
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacingS),
-            TextField(
-              controller: _answerController,
-              focusNode: _answerFocusNode,
-              enabled: !_isAnswerSubmitted,
-              keyboardType: _currentProblem.type == ProblemType.calculation
-                  ? const TextInputType.numberWithOptions(decimal: true)
-                  : TextInputType.text,
-              style: AppTextStyles.titleLarge,
-              decoration: InputDecoration(
-                hintText: _currentProblem.type == ProblemType.calculation ? '숫자를 입력하세요' : '답을 입력하세요',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  borderSide: BorderSide(color: AppColors.borderLight),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  borderSide: BorderSide(color: AppColors.borderLight),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  borderSide: BorderSide(color: AppColors.mathPurple, width: 2),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-              onChanged: (value) {
-                setState(() {
-                  // 입력이 있으면 버튼 활성화
-                });
-              },
-              onSubmitted: (_) {
-                if (_answerController.text.isNotEmpty && !_isAnswerSubmitted) {
-                  _submitShortAnswer();
-                }
-              },
-            ),
-            if (_isAnswerSubmitted && !_isCorrect) ...[
-              const SizedBox(height: AppDimensions.spacingS),
-              Text(
-                '정답: ${_getCorrectAnswerText()}',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.successGreen,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 해설
-  Widget _buildExplanation() {
-    return FadeInWidget(
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: BoxDecoration(
-          color: _isCorrect
-              ? AppColors.successGreen.withValues(alpha: 0.1)
-              : AppColors.warningOrange.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(
-            color: _isCorrect
-                ? AppColors.successGreen.withValues(alpha: 0.3)
-                : AppColors.warningOrange.withValues(alpha: 0.3),
-            width: 2,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  _isCorrect ? Icons.check_circle : Icons.lightbulb,
-                  color: _isCorrect ? AppColors.successGreen : AppColors.warningOrange,
-                  size: 24,
-                ),
-                const SizedBox(width: AppDimensions.spacingS),
-                Text(
-                  _isCorrect ? '정답입니다!' : '다시 한번 확인해보세요',
-                  style: AppTextStyles.titleLarge.copyWith(
-                    color: _isCorrect ? AppColors.successGreen : AppColors.warningOrange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppDimensions.spacingM),
-            Text(
-              _currentProblem.explanation ?? '풀이 설명이 없습니다',
-              style: AppTextStyles.bodyMedium.copyWith(
-                height: 1.6,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 하단 버튼 - Duolingo style with 3D shadow
-  Widget? _buildBottomButton() {
-    // 객관식 문제이고 답 제출 전이면 버튼 숨김
-    if (_currentProblem.type == ProblemType.multipleChoice && !_isAnswerSubmitted) {
-      return null;
-    }
-
-    final enabled = _getButtonAction() != null;
-    final buttonColor = _getButtonColor();
-    final darkerColor = _getDarkerButtonColor();
-
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight, width: 1),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Stack(
-            children: [
-              // Duolingo 3D solid shadow
-              if (enabled)
-                Positioned(
-                  top: 6,
-                  left: 0,
-                  right: 0,
-                  bottom: -6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: darkerColor,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              // Main button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _getButtonAction(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: buttonColor,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                    disabledBackgroundColor: AppColors.borderLight,
-                  ),
-                  child: Text(
-                    _getButtonText(),
-                    style: const TextStyle(
-                      color: AppColors.surface,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-        ),
-      ),
-    );
-  }
-
-  VoidCallback? _getButtonAction() {
-    // 답 제출 후에는 다음 문제 또는 결과 확인
-    if (_isAnswerSubmitted) {
-      // 2문제 완료하면 결과 확인
-      if (_currentProblemIndex >= 1 || _isLastProblem) {
-        return _showResults;
-      }
-      return _nextProblem;
-    }
-
-    // 객관식: 제출 버튼 없음 (더블 클릭으로 자동 제출)
-    if (_currentProblem.type == ProblemType.multipleChoice) {
-      return null;
-    }
-
-    // 주관식/계산: 입력이 있을 때만 제출 버튼 활성화
-    if (_currentProblem.type == ProblemType.shortAnswer ||
-        _currentProblem.type == ProblemType.calculation) {
-      return _answerController.text.isNotEmpty ? _submitShortAnswer : null;
-    }
-
-    return null;
-  }
-
-  Color _getButtonColor() {
-    if (_isAnswerSubmitted) {
-      return _isCorrect ? AppColors.successGreen : AppColors.mathButtonBlue; // GoMath 색상
-    }
-
-    // 주관식: 입력이 있으면 활성화
-    if (_currentProblem.type == ProblemType.shortAnswer ||
-        _currentProblem.type == ProblemType.calculation) {
-      return _answerController.text.isEmpty
-          ? AppColors.borderLight
-          : AppColors.successGreen;
-    }
-
-    // 객관식: 선택이 있으면 활성화
-    if (_selectedAnswerIndex == null) {
-      return AppColors.borderLight; // 비활성화 회색
-    }
-    return AppColors.successGreen; // GoMath 성공 색상
-  }
-
-  Color _getDarkerButtonColor() {
-    if (_isAnswerSubmitted) {
-      return _isCorrect
-          ? AppColors.successGreen.withValues(alpha: 0.8)
-          : AppColors.mathButtonBlueDark; // Darker mathButtonBlue (GoMath 20% darker)
-    }
-    return AppColors.successGreen.withValues(alpha: 0.8); // 어두운 초록색
-  }
-
-  String _getButtonText() {
-    if (!_isAnswerSubmitted) {
-      return '제출';
-    }
-    // 2문제 완료하면 결과 확인
-    if (_currentProblemIndex >= 1 || _isLastProblem) {
-      return '결과 확인';
-    }
-    return '다음 문제';
-  }
 
   /// 답 선택 (객관식 더블 클릭 자동 제출)
   void _selectAnswer(int index) async {
