@@ -4,7 +4,7 @@ import '../../data/models/level_test.dart';
 import '../../data/providers/level_test_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
-import '../../shared/widgets/buttons/duolingo_button.dart';
+import '../../shared/widgets/buttons/unified_button.dart';
 
 /// 레벨 테스트 화면
 class LevelTestScreen extends ConsumerStatefulWidget {
@@ -218,7 +218,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
             // 제출 버튼
             Padding(
               padding: const EdgeInsets.all(AppDimensions.paddingL),
-              child: DuolingoButton(
+              child: UnifiedButton(
                 text: '다음',
                 onPressed: _selectedAnswerIndex != null ? _submitAnswer : null,
                 isEnabled: _selectedAnswerIndex != null,
@@ -455,7 +455,7 @@ class _LevelTestResultScreen extends ConsumerWidget {
             // 시작하기 버튼
             Padding(
               padding: const EdgeInsets.all(AppDimensions.paddingL),
-              child: DuolingoButton(
+              child: UnifiedButton(
                 text: '학습 시작하기',
                 onPressed: () {
                   Navigator.of(context).pop();

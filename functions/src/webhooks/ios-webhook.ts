@@ -14,6 +14,10 @@ import {
 import {
   SubscriptionStatus
 } from '../types/subscription';
+import {
+  updateUserPremiumStatus,
+  findSubscriptionByTransactionId
+} from '../utils/user-utils';
 
 const logger = createLogger('IOSWebhook');
 
@@ -421,62 +425,6 @@ async function handlePriceIncreaseConsent(
     logger.info('User consented to price increase', {
       subscriptionId: subscription.id,
       userId: subscription.userId
-    });
-  }
-}
-
-/**
- * Transaction ID로 구독 찾기
- */
-async function findSubscriptionByTransactionId(
-  transactionId: string
-): Promise<any | null> {
-  const db = admin.firestore();
-
-  const snapshot = await db
-    .collection('subscriptions')
-    .where('transactionId', '==', transactionId)
-    .limit(1)
-    .get();
-
-  if (snapshot.empty) {
-    return null;
-  }
-
-  const doc = snapshot.docs[0];
-  return {
-    id: doc.id,
-    ...doc.data()
-  };
-}
-
-/**
- * 사용자 프리미엄 상태 업데이트
- */
-async function updateUserPremiumStatus(
-  userId: string,
-  status: SubscriptionStatus
-): Promise<void> {
-  try {
-    const db = admin.firestore();
-
-    const isPremium = status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL;
-
-    await db.collection('users').doc(userId).update({
-      isPremium,
-      premiumStatus: status,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    logger.debug('User premium status updated via webhook', {
-      userId,
-      isPremium,
-      status
-    });
-
-  } catch (error) {
-    logger.error('Failed to update user premium status', error as Error, {
-      userId
     });
   }
 }

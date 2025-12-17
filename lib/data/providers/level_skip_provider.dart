@@ -206,7 +206,7 @@ class SkipTestActions {
 /// 스킵 테스트 상태 노티파이어 (실시간 업데이트용)
 class SkipTestNotifier extends BaseNotifier<AsyncValue<LevelSkipTest?>> {
   SkipTestNotifier(this._service, this._testId)
-      : super(const AsyncValue.loading()) {
+      : super(const AsyncValue.loading(), 'SkipTestNotifier') {
     _loadTest();
   }
 

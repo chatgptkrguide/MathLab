@@ -7,9 +7,8 @@ import 'auth_provider.dart';
 /// 레슨 진행 상태 관리
 class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
   final Ref ref;
-  final LocalStorageService _storage = LocalStorageService();
 
-  LessonProgressNotifier(this.ref) : super({}) {
+  LessonProgressNotifier(this.ref) : super({}, 'LessonProgressNotifier') {
     _initialize();
   }
 
@@ -37,7 +36,7 @@ class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
         return;
       }
 
-      final progressData = await _storage.getString(key);
+      final progressData = await storage.getString(key);
       if (progressData != null && progressData.isNotEmpty) {
         // JSON 형태로 저장된 진행 상태 파싱
         final Map<String, dynamic> parsed = {};
@@ -52,7 +51,7 @@ class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
         state = {};
       }
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '레슨 진행 상태 로드 실패',
         error: e,
         stackTrace: stackTrace,
@@ -73,9 +72,9 @@ class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
       final progressString = state.entries
           .map((e) => '${e.key}:${e.value}')
           .join(',');
-      await _storage.setString(key, progressString);
+      await storage.setString(key, progressString);
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '레슨 진행 상태 저장 실패',
         error: e,
         stackTrace: stackTrace,
@@ -96,9 +95,7 @@ class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
     state = newState;
     await _saveProgress();
 
-    Logger.info(
-      '레슨 완료: $grade - 레슨 ${currentIndex + 1}로 진행',
-    );
+    logInfo('레슨 완료: $grade - 레슨 ${currentIndex + 1}로 진행');
   }
 
   /// 진행 상태 초기화 (테스트용)
@@ -106,7 +103,7 @@ class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
     state = {};
     final key = _storageKey;
     if (key != null) {
-      await removeFromStorage(key);
+      await storage.removeFromStorage(key);
     }
   }
 

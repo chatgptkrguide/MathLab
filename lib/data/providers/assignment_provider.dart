@@ -6,27 +6,25 @@ import 'base/base_notifier.dart';
 
 /// 과제 상태 관리
 class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
-  AssignmentNotifier() : super([]) {
+  AssignmentNotifier() : super([], 'AssignmentNotifier') {
     _loadAssignments();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
   static const String _storageKey = 'assignments';
 
   /// 앱 시작 시 과제 목록 로드
   Future<void> _loadAssignments() async {
     try {
-
-      final assignments = await loadList<Assignment>(
+      final assignments = await storage.loadList<Assignment>(
         key: _storageKey,
         fromJson: Assignment.fromJson,
       );
 
-      if (assignments != null) {
+      if (assignments.isNotEmpty) {
         state = assignments;
       }
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '과제 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
@@ -37,13 +35,13 @@ class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
   /// 과제 목록 저장
   Future<void> _saveAssignments() async {
     try {
-      await saveList(
+      await storage.saveList(
         key: _storageKey,
-        items: state,
+        data: state,
         toJson: (assignment) => assignment.toJson(),
       );
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '과제 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,

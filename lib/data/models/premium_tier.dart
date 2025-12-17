@@ -56,6 +56,16 @@ enum PremiumTier {
     }
   }
 
+  /// 월간 환산 가격 포맷팅 (예: "₩7,417")
+  String get formattedMonthlyEquivalent {
+    final monthlyPrice = monthlyEquivalentPrice;
+    if (monthlyPrice == 0) return '무료';
+    return '₩${monthlyPrice.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (match) => '${match[1]},',
+        )}';
+  }
+
   /// 할인율 계산 (월간 대비)
   double get discountPercentage {
     if (this == PremiumTier.free || this == PremiumTier.monthly) return 0.0;

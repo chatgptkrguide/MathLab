@@ -150,6 +150,9 @@ export function interpretCancelReason(cancelReason?: number): string {
 
 /**
  * 구독이 활성 상태인지 확인
+ *
+ * 주의: autoRenewing은 구독 활성 여부와 무관.
+ * 사용자가 취소했어도(autoRenewing=false) 만료 전까지는 활성 상태임.
  */
 export function isSubscriptionActive(
   expiryTimeMillis: string,
@@ -158,14 +161,15 @@ export function isSubscriptionActive(
   const expiryTime = parseInt(expiryTimeMillis, 10);
   const now = Date.now();
 
-  // 만료 시간이 미래이고 자동 갱신 중이면 활성
-  const isActive = expiryTime > now && autoRenewing;
+  // 만료 시간이 미래면 활성 (autoRenewing 여부와 무관)
+  const isActive = expiryTime > now;
 
   logger.debug('Android subscription active status checked', {
     expiresAt: new Date(expiryTime).toISOString(),
     currentTime: new Date(now).toISOString(),
     autoRenewing,
-    isActive
+    isActive,
+    willRenew: autoRenewing && isActive // 갱신 여부는 별도로 추적
   });
 
   return isActive;
@@ -192,27 +196,6 @@ export function isInGracePeriod(
   });
 
   return inGracePeriod;
-}
-
-/**
- * Product ID로 구독 티어 판별
- */
-export function getSubscriptionTierFromProductId(productId: string): 'monthly' | 'yearly' | 'lifetime' {
-  const lowerProductId = productId.toLowerCase();
-
-  if (lowerProductId.includes('monthly')) {
-    return 'monthly';
-  } else if (lowerProductId.includes('yearly') || lowerProductId.includes('annual')) {
-    return 'yearly';
-  } else if (lowerProductId.includes('lifetime')) {
-    return 'lifetime';
-  }
-
-  // 기본값: monthly
-  logger.warn('Could not determine subscription tier from productId, defaulting to monthly', {
-    productId
-  });
-  return 'monthly';
 }
 
 /**

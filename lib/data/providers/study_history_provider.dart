@@ -7,9 +7,8 @@ import 'auth_provider.dart';
 /// 학습 이력 상태 관리 (날짜별 학습 완료 기록)
 class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
   final Ref ref;
-  final LocalStorageService _storage = LocalStorageService();
 
-  StudyHistoryNotifier(this.ref) : super({}) {
+  StudyHistoryNotifier(this.ref) : super({}, 'StudyHistoryNotifier') {
     _initialize();
   }
 
@@ -37,7 +36,7 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
         return;
       }
 
-      final historyString = await _storage.getString(key);
+      final historyString = await storage.getString(key);
       if (historyString != null && historyString.isNotEmpty) {
         // 쉼표로 구분된 날짜 문자열 파싱 (예: "2025-01-15,2025-01-16,2025-01-17")
         final dateStrings = historyString.split(',');
@@ -58,7 +57,7 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
         state = {};
       }
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '학습 이력 로드 실패',
         error: e,
         stackTrace: stackTrace,
@@ -82,9 +81,9 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
         ..sort(); // 정렬
 
       final historyString = dateStrings.join(',');
-      await _storage.setString(key, historyString);
+      await storage.setString(key, historyString);
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '학습 이력 저장 실패',
         error: e,
         stackTrace: stackTrace,
@@ -135,7 +134,7 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
     state = {};
     final key = _storageKey;
     if (key != null) {
-      await removeFromStorage(key);
+      await storage.removeFromStorage(key);
     }
   }
 

@@ -243,24 +243,3 @@ export function isTrialPeriod(isTrialPeriodString: string): boolean {
 export function isCancelled(cancellationDateMs?: string): boolean {
   return !!cancellationDateMs;
 }
-
-/**
- * Product ID로 구독 티어 판별
- */
-export function getSubscriptionTierFromProductId(productId: string): 'monthly' | 'yearly' | 'lifetime' {
-  const lowerProductId = productId.toLowerCase();
-
-  if (lowerProductId.includes('monthly')) {
-    return 'monthly';
-  } else if (lowerProductId.includes('yearly') || lowerProductId.includes('annual')) {
-    return 'yearly';
-  } else if (lowerProductId.includes('lifetime')) {
-    return 'lifetime';
-  }
-
-  // 기본값: monthly
-  logger.warn('Could not determine subscription tier from productId, defaulting to monthly', {
-    productId
-  });
-  return 'monthly';
-}

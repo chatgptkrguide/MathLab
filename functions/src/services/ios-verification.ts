@@ -21,9 +21,9 @@ import {
   extractLatestSubscription,
   isSubscriptionActive,
   isTrialPeriod,
-  isCancelled,
-  getSubscriptionTierFromProductId
+  isCancelled
 } from '../config/ios-config';
+import { getSubscriptionTierFromProductId } from '../utils/user-utils';
 import {
   IOSReceiptVerificationRequest,
   IOSReceiptVerificationResponse,
@@ -33,6 +33,7 @@ import {
   PremiumTier,
   Platform
 } from '../types/subscription';
+import { updateUserPremiumStatus } from '../utils/user-utils';
 
 const logger = createLogger('IOSVerificationService');
 
@@ -322,40 +323,5 @@ async function saveSubscriptionToFirestore(
       userId: subscriptionData.userId
     });
     throw new Error('Failed to save subscription data');
-  }
-}
-
-/**
- * 사용자의 프리미엄 상태 업데이트
- */
-async function updateUserPremiumStatus(
-  userId: string,
-  status: SubscriptionStatus,
-  tier: PremiumTier
-): Promise<void> {
-  try {
-    const db = admin.firestore();
-
-    const isPremium = status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL;
-
-    await db.collection('users').doc(userId).update({
-      isPremium,
-      premiumTier: isPremium ? tier : null,
-      premiumStatus: status,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    logger.debug('User premium status updated', {
-      userId,
-      isPremium,
-      tier,
-      status
-    });
-
-  } catch (error) {
-    logger.error('Failed to update user premium status', error as Error, {
-      userId
-    });
-    // 프리미엄 상태 업데이트 실패는 구독 저장 실패로 이어지지 않음
   }
 }

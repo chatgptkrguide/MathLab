@@ -14,6 +14,7 @@ import {
   Platform,
   SyncResult
 } from '../types/subscription';
+import { updateUserPremiumStatus } from '../utils/user-utils';
 
 const logger = createLogger('SubscriptionSyncService');
 
@@ -179,11 +180,13 @@ async function syncIOSSubscription(
 
   // 변경 사항 추적
   if (verificationResult.expiryDate) {
-    const oldExpiry = subscription.expiryDate?.getTime();
+    // null-safe 체크: expiryDate가 null일 수 있음 (lifetime 구독)
+    const oldExpiry = subscription.expiryDate ? subscription.expiryDate.getTime() : null;
     const newExpiry = verificationResult.expiryDate.getTime();
 
     if (oldExpiry !== newExpiry) {
-      result.changes?.push(`Expiry date updated: ${subscription.expiryDate?.toISOString()} → ${verificationResult.expiryDate.toISOString()}`);
+      const oldExpiryStr = subscription.expiryDate ? subscription.expiryDate.toISOString() : 'null';
+      result.changes?.push(`Expiry date updated: ${oldExpiryStr} → ${verificationResult.expiryDate.toISOString()}`);
     }
   }
 
@@ -223,11 +226,13 @@ async function syncAndroidSubscription(
 
   // 변경 사항 추적
   if (verificationResult.expiryDate) {
-    const oldExpiry = subscription.expiryDate?.getTime();
+    // null-safe 체크: expiryDate가 null일 수 있음 (lifetime 구독)
+    const oldExpiry = subscription.expiryDate ? subscription.expiryDate.getTime() : null;
     const newExpiry = verificationResult.expiryDate.getTime();
 
     if (oldExpiry !== newExpiry) {
-      result.changes?.push(`Expiry date updated: ${subscription.expiryDate?.toISOString()} → ${verificationResult.expiryDate.toISOString()}`);
+      const oldExpiryStr = subscription.expiryDate ? subscription.expiryDate.toISOString() : 'null';
+      result.changes?.push(`Expiry date updated: ${oldExpiryStr} → ${verificationResult.expiryDate.toISOString()}`);
     }
   }
 
@@ -296,38 +301,6 @@ export async function cleanupExpiredSubscriptions(): Promise<{
   } catch (error) {
     logger.error('Expired subscription cleanup failed', error as Error);
     throw error;
-  }
-}
-
-/**
- * 사용자의 프리미엄 상태 업데이트
- */
-async function updateUserPremiumStatus(
-  userId: string,
-  status: SubscriptionStatus
-): Promise<void> {
-  try {
-    const db = admin.firestore();
-
-    const isPremium = status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL;
-
-    await db.collection('users').doc(userId).update({
-      isPremium,
-      premiumTier: isPremium ? null : null, // 만료 시 tier도 null
-      premiumStatus: status,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    logger.debug('User premium status updated', {
-      userId,
-      isPremium,
-      status
-    });
-
-  } catch (error) {
-    logger.error('Failed to update user premium status', error as Error, {
-      userId
-    });
   }
 }
 

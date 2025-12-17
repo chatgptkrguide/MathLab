@@ -37,20 +37,26 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
   // ==================== 로깅 메서드 ====================
 
   /// 정보 로그
-  void logInfo(String message, {Map<String, dynamic>? data}) {
+  void logInfo(String message) {
     Logger.info(
       message,
       tag: providerName,
-      data: data,
+    );
+  }
+
+  /// 디버그 로그
+  void logDebug(String message) {
+    Logger.debug(
+      message,
+      tag: providerName,
     );
   }
 
   /// 경고 로그
-  void logWarning(String message, {Map<String, dynamic>? data}) {
+  void logWarning(String message) {
     Logger.warning(
       message,
       tag: providerName,
-      data: data,
     );
   }
 
@@ -59,14 +65,12 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
     String message, {
     Object? error,
     StackTrace? stackTrace,
-    Map<String, dynamic>? data,
   }) {
     Logger.error(
       message,
       error: error,
       stackTrace: stackTrace,
       tag: providerName,
-      data: data,
     );
   }
 
@@ -91,7 +95,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
     Future<R> Function() operation, {
     required String errorMessage,
     R Function()? fallback,
-    bool rethrow = false,
+    bool shouldRethrow = false,
   }) async {
     try {
       return await operation();
@@ -102,7 +106,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
         stackTrace: stackTrace,
       );
 
-      if (rethrow) {
+      if (shouldRethrow) {
         rethrow;
       }
 
@@ -115,7 +119,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
     R Function() operation, {
     required String errorMessage,
     R Function()? fallback,
-    bool rethrow = false,
+    bool shouldRethrow = false,
   }) {
     try {
       return operation();
@@ -126,7 +130,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
         stackTrace: stackTrace,
       );
 
-      if (rethrow) {
+      if (shouldRethrow) {
         rethrow;
       }
 
@@ -141,7 +145,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
     await executeWithErrorHandling(
       () async {
         await storage.saveJson(key, data);
-        logInfo('데이터 저장 완료', data: {'key': key});
+        logInfo('데이터 저장 완료: $key');
       },
       errorMessage: '데이터 저장 실패',
     );
@@ -153,7 +157,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
       () async {
         final data = await storage.getJson(key);
         if (data != null) {
-          logInfo('데이터 로드 완료', data: {'key': key});
+          logInfo('데이터 로드 완료: $key');
         }
         return data;
       },
@@ -167,7 +171,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
     await executeWithErrorHandling(
       () async {
         await storage.remove(key);
-        logInfo('데이터 삭제 완료', data: {'key': key});
+        logInfo('데이터 삭제 완료: $key');
       },
       errorMessage: '데이터 삭제 실패',
     );

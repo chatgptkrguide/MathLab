@@ -7,28 +7,26 @@ import './assignment_provider.dart';
 
 /// 과제 제출 상태 관리
 class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmission>> {
-  AssignmentSubmissionNotifier(this.ref) : super([]) {
+  AssignmentSubmissionNotifier(this.ref) : super([], 'AssignmentSubmissionNotifier') {
     _loadSubmissions();
   }
 
   final Ref ref;
-  final LocalStorageService _storage = LocalStorageService();
   static const String _storageKey = 'assignment_submissions';
 
   /// 앱 시작 시 제출 목록 로드
   Future<void> _loadSubmissions() async {
     try {
-
-      final submissions = await loadList<AssignmentSubmission>(
+      final submissions = await storage.loadList<AssignmentSubmission>(
         key: _storageKey,
         fromJson: AssignmentSubmission.fromJson,
       );
 
-      if (submissions != null) {
+      if (submissions.isNotEmpty) {
         state = submissions;
       }
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '과제 제출 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
@@ -39,13 +37,13 @@ class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmissio
   /// 제출 목록 저장
   Future<void> _saveSubmissions() async {
     try {
-      await saveList(
+      await storage.saveList(
         key: _storageKey,
-        items: state,
+        data: state,
         toJson: (submission) => submission.toJson(),
       );
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '과제 제출 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,

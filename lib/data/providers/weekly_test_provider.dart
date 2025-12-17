@@ -6,27 +6,25 @@ import 'base/base_notifier.dart';
 
 /// 주간테스트 상태 관리
 class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
-  WeeklyTestNotifier() : super([]) {
+  WeeklyTestNotifier() : super([], 'WeeklyTestNotifier') {
     _loadWeeklyTests();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
   static const String _storageKey = 'weekly_tests';
 
   /// 앱 시작 시 주간테스트 목록 로드
   Future<void> _loadWeeklyTests() async {
     try {
-
-      final tests = await loadList<WeeklyTest>(
+      final tests = await storage.loadList<WeeklyTest>(
         key: _storageKey,
         fromJson: WeeklyTest.fromJson,
       );
 
-      if (tests != null) {
+      if (tests.isNotEmpty) {
         state = tests;
       }
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '주간테스트 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
@@ -37,13 +35,13 @@ class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
   /// 주간테스트 목록 저장
   Future<void> _saveWeeklyTests() async {
     try {
-      await saveList(
+      await storage.saveList(
         key: _storageKey,
-        items: state,
+        data: state,
         toJson: (test) => test.toJson(),
       );
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '주간테스트 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,

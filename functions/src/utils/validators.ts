@@ -174,6 +174,11 @@ export function validateAndroidReceiptRequest(request: any): void {
 
 /**
  * Webhook 서명 검증 (iOS)
+ *
+ * TODO: 실제 프로덕션 배포 전에 HMAC 또는 JWT 서명 검증 구현 필요
+ * 현재는 기본 검증만 수행 (보안 취약점 존재)
+ *
+ * @deprecated 프로덕션에서는 실제 암호화 서명 검증 구현 필요
  */
 export function validateWebhookSignature(
   payload: string,
@@ -184,8 +189,20 @@ export function validateWebhookSignature(
     return false;
   }
 
-  // 실제 구현은 JWT 또는 HMAC을 사용하여 서명 검증
-  // 이 부분은 ios-webhook.ts에서 구체적으로 구현됨
+  // ⚠️ 경고: 실제 서명 검증이 구현되지 않았습니다
+  // 프로덕션 배포 전에 crypto 모듈을 사용한 HMAC-SHA256 검증 구현 필요
+  // 예시:
+  // const crypto = require('crypto');
+  // const expectedSignature = crypto
+  //   .createHmac('sha256', secret)
+  //   .update(payload)
+  //   .digest('hex');
+  // return crypto.timingSafeEqual(
+  //   Buffer.from(signature),
+  //   Buffer.from(expectedSignature)
+  // );
+
+  console.warn('[SECURITY WARNING] Webhook signature validation not implemented');
   return true;
 }
 

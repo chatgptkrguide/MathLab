@@ -126,12 +126,15 @@ class AuthService {
   /// 사용자 프로필 생성 (Firestore)
   Future<void> _createUserProfile(User user) async {
     final userModel = app_user.User(
-      uid: user.uid,
+      id: user.uid,
+      name: user.displayName ?? user.email?.split('@').first ?? 'User',
       email: user.email!,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      joinDate: DateTime.now(),
+      level: 1,
+      xp: 0,
+      streakDays: 0,
+      currentGrade: '중1',
+      avatarUrl: user.photoURL ?? '',
     );
 
     await _firestore

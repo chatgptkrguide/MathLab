@@ -4,7 +4,7 @@ import '../../data/models/daily_reward.dart';
 import '../../data/providers/daily_reward_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
-import '../../shared/widgets/buttons/duolingo_button.dart';
+import '../../shared/widgets/buttons/unified_button.dart';
 
 /// 데일리 리워드 화면
 class DailyRewardScreen extends ConsumerStatefulWidget {
@@ -129,7 +129,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
         actions: [
           SizedBox(
             width: double.infinity,
-            child: DuolingoButton(
+            child: UnifiedButton(
               text: '확인',
               onPressed: () {
                 Navigator.of(context).pop();
@@ -281,7 +281,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
             if (state.canClaimToday)
               Padding(
                 padding: const EdgeInsets.all(AppDimensions.paddingL),
-                child: DuolingoButton(
+                child: UnifiedButton(
                   text: _isClaimingReward ? '받는 중...' : '오늘의 보상 받기',
                   onPressed: _isClaimingReward ? null : _claimReward,
                   isEnabled: !_isClaimingReward,

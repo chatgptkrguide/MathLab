@@ -382,6 +382,23 @@ class LocalStorageService {
     }
   }
 
+  // ========== BaseNotifier 호환 메서드 (Aliases) ==========
+
+  /// JSON 데이터 저장 (BaseNotifier 호환)
+  Future<bool> saveJson(String key, Map<String, dynamic> data) async {
+    return await saveMap(key, data);
+  }
+
+  /// JSON 데이터 로드 (BaseNotifier 호환)
+  Future<Map<String, dynamic>?> getJson(String key) async {
+    return await loadMap(key);
+  }
+
+  /// 스토리지에서 제거 (BaseNotifier 호환)
+  Future<bool> removeFromStorage(String key) async {
+    return await remove(key);
+  }
+
   // ========== 암호화된 저장소 메서드 ==========
 
   /// 암호화된 JSON 객체 저장

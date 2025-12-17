@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "421762663548",
+    "project_id": "mathlab-gomath",
+    "storage_bucket": "mathlab-gomath.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421762663548:android:8819363bb6b0f241ff35f9",
+        "android_client_info": {
+          "package_name": "com.gomath.mathlab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRNPCcqdYeWWryHfKbtVJ58da2Vh7fR3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

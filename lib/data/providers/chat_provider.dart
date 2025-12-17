@@ -10,17 +10,16 @@ final chatRoomsProvider = StateNotifierProvider<ChatRoomsNotifier, List<ChatRoom
 
 /// 채팅방 목록 관리 노티파이어
 class ChatRoomsNotifier extends BaseNotifier<List<ChatRoom>> {
-  ChatRoomsNotifier() : super([]) {
+  ChatRoomsNotifier() : super([], 'ChatRoomsNotifier') {
     _loadChatRooms();
   }
 
-  final LocalStorageService _storage = LocalStorageService();
   static const String _storageKey = 'chat_rooms';
 
   /// 채팅방 목록 로드
   Future<void> _loadChatRooms() async {
     try {
-      final roomsList = await loadList<ChatRoom>(
+      final roomsList = await storage.loadList<ChatRoom>(
         key: _storageKey,
         fromJson: (json) => ChatRoom.fromJson(json),
       );
@@ -31,7 +30,7 @@ class ChatRoomsNotifier extends BaseNotifier<List<ChatRoom>> {
         await _createDefaultChatRooms();
       }
     } catch (e) {
-      print('Failed to load chat rooms: $e');
+      logError('Failed to load chat rooms', error: e);
       await _createDefaultChatRooms();
     }
   }
@@ -59,13 +58,13 @@ class ChatRoomsNotifier extends BaseNotifier<List<ChatRoom>> {
   /// 채팅방 목록 저장
   Future<void> _saveChatRooms() async {
     try {
-      await saveList<ChatRoom>(
+      await storage.saveList<ChatRoom>(
         key: _storageKey,
         data: state,
         toJson: (room) => room.toJson(),
       );
     } catch (e) {
-      print('Failed to save chat rooms: $e');
+      logError('Failed to save chat rooms', error: e);
     }
   }
 
@@ -120,18 +119,17 @@ final chatMessagesProvider = StateNotifierProvider.family<ChatMessagesNotifier, 
 
 /// 채팅 메시지 관리 노티파이어
 class ChatMessagesNotifier extends BaseNotifier<List<ChatMessage>> {
-  ChatMessagesNotifier(this.roomId) : super([]) {
+  ChatMessagesNotifier(this.roomId) : super([], 'ChatMessagesNotifier') {
     _loadMessages();
   }
 
   final String roomId;
-  final LocalStorageService _storage = LocalStorageService();
   String get _storageKey => 'chat_messages_$roomId';
 
   /// 메시지 목록 로드
   Future<void> _loadMessages() async {
     try {
-      final messagesList = await loadList<ChatMessage>(
+      final messagesList = await storage.loadList<ChatMessage>(
         key: _storageKey,
         fromJson: (json) => ChatMessage.fromJson(json),
       );
@@ -142,7 +140,7 @@ class ChatMessagesNotifier extends BaseNotifier<List<ChatMessage>> {
         await _createDefaultMessages();
       }
     } catch (e) {
-      print('Failed to load messages: $e');
+      logError('Failed to load messages', error: e);
     }
   }
 
@@ -166,13 +164,13 @@ class ChatMessagesNotifier extends BaseNotifier<List<ChatMessage>> {
   /// 메시지 목록 저장
   Future<void> _saveMessages() async {
     try {
-      await saveList<ChatMessage>(
+      await storage.saveList<ChatMessage>(
         key: _storageKey,
         data: state,
         toJson: (msg) => msg.toJson(),
       );
     } catch (e) {
-      print('Failed to save messages: $e');
+      logError('Failed to save messages', error: e);
     }
   }
 

@@ -4,7 +4,7 @@ import '../../data/models/models.dart';
 import '../../data/providers/practice_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
-import '../../shared/widgets/buttons/duolingo_button.dart';
+import '../../shared/widgets/buttons/unified_button.dart';
 
 /// 연습 모드 카테고리 선택 화면
 class PracticeCategoryScreen extends ConsumerWidget {
@@ -476,7 +476,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                   // 제출 버튼
                   Expanded(
                     flex: 3,
-                    child: DuolingoButton(
+                    child: UnifiedButton(
                       text: '확인',
                       onPressed: _userAnswer.trim().isNotEmpty ? _submitAnswer : null,
                       isEnabled: _userAnswer.trim().isNotEmpty,
@@ -669,7 +669,7 @@ class PracticeResultScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  DuolingoButton(
+                  UnifiedButton(
                     text: '다시 풀기',
                     onPressed: () async {
                       await AppHapticFeedback.lightImpact();
