@@ -3,7 +3,6 @@ import '../models/premium_tier.dart';
 import '../models/subscription_status.dart';
 import '../models/user.dart';
 import '../repositories/subscription_repository.dart';
-import '../providers/firebase_providers.dart';
 
 /// 구독 비즈니스 로직 서비스
 ///

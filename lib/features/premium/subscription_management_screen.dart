@@ -7,7 +7,6 @@ import '../../data/providers/premium_providers.dart';
 import '../../data/providers/firebase_providers.dart';
 import '../../data/models/premium_tier.dart';
 import '../../data/models/subscription.dart';
-import '../../data/models/subscription_status.dart';
 
 /// 구독 관리 화면
 ///

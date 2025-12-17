@@ -1,5 +1,3 @@
-import '../../../shared/utils/logger.dart';
-
 /// 데이터 검증 믹스인
 ///
 /// **기능:**

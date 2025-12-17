@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../shared/figma_components/figma_user_info_bar.dart';
-import '../../../shared/widgets/drawers/learning_calendar_drawer.dart';
 import '../../../shared/widgets/drawers/top_slide_drawer.dart';
-import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 import '../../../data/providers/user_provider.dart';
