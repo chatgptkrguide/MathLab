@@ -348,9 +348,9 @@ class AllUsersNotifier extends BaseNotifier<List<User>> {
   Future<void> _saveAllUsers() async {
     await executeWithErrorHandling(
       () async {
-        await saveList(
+        await saveList<User>(
           key: _storageKey,
-          data: state,
+          items: state,
           toJson: (user) => user.toJson(),
         );
         logInfo('전체 사용자 목록 저장 완료: ${state.length}명');

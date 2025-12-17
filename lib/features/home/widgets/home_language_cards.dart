@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/models.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/providers/problem_provider.dart';
 import '../../../data/services/korean_math_curriculum.dart';
 import '../../../shared/constants/game_constants.dart';
 import '../../problem/problem_screen.dart';
@@ -328,8 +329,7 @@ class HomeLanguageCards extends ConsumerWidget {
           Navigator.pop(context);
 
           // 문제 데이터 가져오기
-          final problemsAsync = ref.read(problemsProvider(lesson.id));
-          final problems = problemsAsync.value ?? [];
+          final problems = ref.read(problemProvider);
 
           if (problems.isEmpty) {
             if (!context.mounted) return;

@@ -154,7 +154,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
 
   /// 로컬 스토리지에서 JSON 데이터 로드
   Future<Map<String, dynamic>?> loadFromStorage(String key) async {
-    return await executeWithErrorHandling(
+    return await executeWithErrorHandling<Map<String, dynamic>?>(
       () async {
         final data = await storage.getJson(key);
         if (data != null) {
@@ -181,7 +181,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
 
   /// 로컬 스토리지에서 List 데이터 로드
   Future<List<dynamic>?> loadListFromStorage(String key) async {
-    return await executeWithErrorHandling(
+    return await executeWithErrorHandling<List<dynamic>?>(
       () async {
         final jsonString = await storage.getString(key);
         if (jsonString != null && jsonString.isNotEmpty) {
@@ -207,6 +207,34 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
       },
       errorMessage: '데이터 삭제 실패',
     );
+  }
+
+  /// 제네릭 리스트 로드 헬퍼 메서드
+  Future<List<T>> loadList<T>({
+    required String key,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
+    final data = await loadListFromStorage(key);
+    if (data == null) return [];
+
+    return data
+        .map((item) => fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// 제네릭 리스트 저장 헬퍼 메서드
+  Future<void> saveList<T>({
+    required String key,
+    required List<T> items,
+    required Map<String, dynamic> Function(T) toJson,
+  }) async {
+    final data = items.map((item) => toJson(item)).toList();
+    await saveListToStorage(key, data);
+  }
+
+  /// 스토리지에서 데이터 제거 (deleteFromStorage의 별칭)
+  Future<void> removeFromStorage(String key) async {
+    await deleteFromStorage(key);
   }
 
   // ==================== 유틸리티 메서드 ====================

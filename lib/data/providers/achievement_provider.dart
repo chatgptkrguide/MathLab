@@ -291,7 +291,7 @@ class AchievementProvider extends BaseNotifier<AchievementState> {
 
   /// 업적 언락
   Future<Achievement?> unlockAchievement(String achievementId) async {
-    return await executeWithErrorHandling(
+    return await executeWithErrorHandling<Achievement?>(
       () async {
         final achievement = state.achievements.firstWhere(
           (a) => a.id == achievementId,

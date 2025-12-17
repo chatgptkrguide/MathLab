@@ -10,7 +10,7 @@ import '../../profile/figma/profile_detail_screen_v3_new.dart';
 /// - 학습 상태 메시지
 /// - 스트릭 배지 (클릭 시 프로필 상세 화면 이동)
 class HomeTopSection extends StatelessWidget {
-  final UserAccount? user;
+  final User? user;
 
   const HomeTopSection({
     super.key,

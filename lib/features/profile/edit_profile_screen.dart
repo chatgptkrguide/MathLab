@@ -22,6 +22,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _bioController;
 
   File? _selectedImage;
+  bool _isUploading = false;
 
   @override
   void initState() {

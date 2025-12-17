@@ -96,9 +96,9 @@ class MessageNotifier extends BaseNotifier<List<Message>> {
         return;
       }
 
-      await saveList(
+      await saveList<Message>(
         key: key,
-        data: state,
+        items: state,
         toJson: (message) => message.toJson(),
       );
       logDebug('메시지 저장 완료');

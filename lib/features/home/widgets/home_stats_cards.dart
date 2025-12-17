@@ -11,7 +11,7 @@ import '../../leaderboard/leaderboard_screen.dart';
 /// - 레벨 카드 (리더보드 화면으로 이동)
 /// - 연속 일수 카드 (프로필 상세 화면으로 이동)
 class HomeStatsCards extends StatelessWidget {
-  final UserAccount? user;
+  final User? user;
 
   const HomeStatsCards({
     super.key,

@@ -128,7 +128,7 @@ class UserNotifier extends BaseNotifier<User?> {
       () async {
         final storageKey = _getStorageKey();
         await _userRepository.save(storageKey, state!);
-        logInfo('사용자 정보 저장 완료 (키: $storageKey)', data: {'debug': true});
+        logInfo('사용자 정보 저장 완료 (키: $storageKey)');
       },
       errorMessage: '사용자 정보 저장 실패',
     );
@@ -204,7 +204,7 @@ class UserNotifier extends BaseNotifier<User?> {
     );
 
     if (_isSameDay(lastStudyDateOnly, today)) {
-      logInfo('오늘 이미 학습 완료', data: {'debug': true});
+      logInfo('오늘 이미 학습 완료');
       return;
     }
 
@@ -239,7 +239,7 @@ class UserNotifier extends BaseNotifier<User?> {
       );
 
       if (_isSameDay(lastStudyDateOnly, today)) {
-        logInfo('오늘 이미 학습 완료, 스트릭 유지', data: {'debug': true});
+        logInfo('오늘 이미 학습 완료, 스트릭 유지');
         return;
       } else if (_isConsecutiveDay(lastStudyDateOnly, today)) {
         newStreakDays = state!.streakDays + 1;
