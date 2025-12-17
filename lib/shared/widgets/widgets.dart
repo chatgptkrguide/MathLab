@@ -48,6 +48,9 @@ export 'indicators/loading_widgets.dart';
 // Inputs
 export 'inputs/short_answer_input.dart';
 
+// Headers
+export 'headers/common_app_header.dart';
+
 // Layout
 export 'layout/adaptive_app_header.dart';
 export 'layout/common_app_bar.dart';

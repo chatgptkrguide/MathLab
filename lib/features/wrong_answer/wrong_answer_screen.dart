@@ -4,7 +4,8 @@ import '../../data/providers/wrong_answer_provider.dart';
 import '../../data/models/wrong_answer.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/constants/figma_colors.dart';
-import '../../shared/utils/haptic_feedback.dart';
+import '../../shared/widgets/widgets.dart';
+import '../../shared/utils/utils.dart';
 import '../problem/problem_screen.dart';
 
 /// 오답 노트 화면 - 완전히 새로운 디자인
@@ -47,54 +48,13 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
         child: SafeArea(
           child: Column(
             children: [
-              // 통합 헤더 (홈 화면과 동일한 디자인)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: AppColors.headerBlueGradient,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
-                      onPressed: () {
-                        // TODO: 학년 선택 드로어 (필요시 추가)
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('학년 선택 기능 준비 중입니다'),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '오답 노트',
-                        style: AppTextStyles.headlineMedium.copyWith(
-                          color: AppColors.headerText,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
-                  ],
-                ),
+              // 공통 헤더 위젯 사용 (메뉴 버튼 포함)
+              CommonAppHeaderWithMenu(
+                title: '오답 노트',
+                onMenuPressed: () {
+                  // TODO: 학년 선택 드로어 (필요시 추가)
+                  SnackBarUtils.showInfo(context, '학년 선택 기능 준비 중입니다');
+                },
               ),
 
               // 통계 카드 (현대적인 카드 디자인)

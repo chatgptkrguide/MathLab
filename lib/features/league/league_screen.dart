@@ -4,6 +4,7 @@ import '../../data/models/league.dart';
 import '../../data/providers/league_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
+import '../../shared/widgets/widgets.dart';
 
 class LeagueScreen extends ConsumerStatefulWidget {
   const LeagueScreen({super.key});
@@ -27,35 +28,11 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // 게임 스타일 헤더
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: AppColors.headerBlueGradient,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.emoji_events, color: AppColors.mathYellow, size: 28),
-                  const SizedBox(width: 8),
-                  Text(
-                    '리그',
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      color: AppColors.headerText,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ],
-              ),
+            // 공통 헤더 위젯 사용
+            const CommonAppHeader(
+              title: '리그',
+              icon: Icons.emoji_events,
+              iconColor: AppColors.mathYellow,
             ),
 
             // 🎯 듀오링고 스타일 티어 선택 바
