@@ -41,8 +41,8 @@ class FriendsNotifier extends BaseNotifier<List<Friend>> {
           return;
         }
 
-        final data = await loadFromStorage(key);
-        if (data != null && data is List) {
+        final data = await loadListFromStorage(key);
+        if (data != null) {
           final friendsList = data
               .map((item) => Friend.fromJson(item as Map<String, dynamic>))
               .toList();
@@ -70,7 +70,7 @@ class FriendsNotifier extends BaseNotifier<List<Friend>> {
           return;
         }
 
-        await saveToStorage(
+        await saveListToStorage(
           key,
           state.map((friend) => friend.toJson()).toList(),
         );

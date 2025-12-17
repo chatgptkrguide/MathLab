@@ -85,7 +85,7 @@ class CurrentStudySessionNotifier extends BaseNotifier<StudySession?> {
 
   /// 타이머 중지 및 세션 종료
   Future<StudySession?> stopTimer() async {
-    return await executeWithErrorHandling(
+    return await executeWithErrorHandling<StudySession?>(
       () async {
         _stopWatchTimer?.onStopTimer();
         _stopWatchTimer?.dispose();

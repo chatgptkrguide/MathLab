@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/local_storage_service.dart';
 import '../../../shared/utils/logger.dart';
@@ -162,6 +163,37 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
         return data;
       },
       errorMessage: '데이터 로드 실패',
+      fallback: () => null,
+    );
+  }
+
+  /// 로컬 스토리지에 List 데이터 저장
+  Future<void> saveListToStorage(String key, List<Map<String, dynamic>> data) async {
+    await executeWithErrorHandling(
+      () async {
+        final jsonString = jsonEncode(data);
+        await storage.setString(key, jsonString);
+        logInfo('리스트 데이터 저장 완료: $key (${data.length}개 항목)');
+      },
+      errorMessage: '리스트 데이터 저장 실패',
+    );
+  }
+
+  /// 로컬 스토리지에서 List 데이터 로드
+  Future<List<dynamic>?> loadListFromStorage(String key) async {
+    return await executeWithErrorHandling(
+      () async {
+        final jsonString = await storage.getString(key);
+        if (jsonString != null && jsonString.isNotEmpty) {
+          final data = jsonDecode(jsonString);
+          if (data is List) {
+            logInfo('리스트 데이터 로드 완료: $key (${data.length}개 항목)');
+            return data;
+          }
+        }
+        return null;
+      },
+      errorMessage: '리스트 데이터 로드 실패',
       fallback: () => null,
     );
   }

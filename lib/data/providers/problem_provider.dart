@@ -145,8 +145,8 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
       () async {
         logDebug('문제 결과 로드 시작');
 
-        final data = await loadFromStorage(GameConstants.problemResultsKey);
-        if (data != null && data is List) {
+        final data = await loadListFromStorage(GameConstants.problemResultsKey);
+        if (data != null) {
           final results = data
               .map((item) => ProblemResult.fromJson(item as Map<String, dynamic>))
               .toList();
@@ -164,7 +164,7 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
   Future<void> _saveResults() async {
     await executeWithErrorHandling(
       () async {
-        await saveToStorage(
+        await saveListToStorage(
           GameConstants.problemResultsKey,
           state.map((result) => result.toJson()).toList(),
         );

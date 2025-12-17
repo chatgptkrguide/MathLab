@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import 'base/base_notifier.dart';
@@ -20,8 +19,8 @@ class ErrorNoteNotifier extends BaseNotifier<List<ErrorNote>> {
   Future<void> _loadErrorNotes() async {
     await executeWithErrorHandling(
       () async {
-        final data = await loadFromStorage(_storageKey);
-        if (data != null && data is List) {
+        final data = await loadListFromStorage(_storageKey);
+        if (data != null) {
           final errorNotes = data
               .map((json) => ErrorNote.fromJson(json as Map<String, dynamic>))
               .toList();
@@ -42,7 +41,7 @@ class ErrorNoteNotifier extends BaseNotifier<List<ErrorNote>> {
   Future<void> _saveErrorNotes() async {
     await executeWithErrorHandling(
       () async {
-        await saveToStorage(
+        await saveListToStorage(
           _storageKey,
           state.map((note) => note.toJson()).toList(),
         );

@@ -26,6 +26,41 @@ class Achievement {
     required this.rarity,
   });
 
+  /// Achievement 객체 생성 (간편 생성자)
+  ///
+  /// - [id]: 업적 고유 ID
+  /// - [title]: 업적 제목
+  /// - [description]: 업적 설명
+  /// - [icon]: 업적 아이콘 (이모지)
+  /// - [type]: 업적 타입
+  /// - [requiredValue]: 달성에 필요한 값
+  /// - [rarity]: 희귀도
+  /// - [xpReward]: 달성 시 획득 XP
+  factory Achievement.create(
+    String id,
+    String title,
+    String description,
+    String icon,
+    AchievementType type,
+    int requiredValue,
+    AchievementRarity rarity,
+    int xpReward,
+  ) {
+    return Achievement(
+      id: id,
+      title: title,
+      description: description,
+      icon: icon,
+      type: type,
+      requiredValue: requiredValue,
+      currentValue: 0, // 초기값은 0
+      isUnlocked: false, // 초기에는 잠금 상태
+      unlockedAt: null,
+      xpReward: xpReward,
+      rarity: rarity,
+    );
+  }
+
   /// JSON으로부터 Achievement 객체 생성
   factory Achievement.fromJson(Map<String, dynamic> json) {
     return Achievement(
