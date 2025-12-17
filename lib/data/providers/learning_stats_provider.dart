@@ -22,7 +22,7 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
         final data = await loadFromStorage(_storageKey);
 
         if (data != null) {
-          state = LearningStats.fromJson(data as Map<String, dynamic>);
+          state = LearningStats.fromJson(data);
           logInfo('학습 통계 로드 완료');
         } else {
           // 초기 통계 생성

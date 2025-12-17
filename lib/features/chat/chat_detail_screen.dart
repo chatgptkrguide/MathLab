@@ -245,7 +245,6 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         icon = Icons.group;
         break;
       case ChatRoomType.direct:
-      default:
         message = '대화를 시작해보세요!\n궁금한 점을 자유롭게 물어보세요.';
         icon = Icons.chat_bubble_outline;
         break;

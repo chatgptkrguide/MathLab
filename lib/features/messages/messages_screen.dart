@@ -151,7 +151,6 @@ class MessagesScreen extends ConsumerWidget {
         color = AppColors.mathPurple;
         break;
       case ChatRoomType.direct:
-      default:
         icon = Icons.person;
         color = AppColors.accentCyan;
         break;
