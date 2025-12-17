@@ -4,12 +4,12 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/widgets.dart';
-import '../../shared/utils/utils.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/error_note_provider.dart';
 import '../../data/providers/problem_provider.dart';
 import '../problem/problem_screen.dart';
+import '../error_notes/widgets/widgets.dart';
 
 /// 오답 노트 화면
 /// 실제 ErrorNoteProvider 데이터 기반으로 구현
@@ -101,9 +101,13 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                     child: Column(
                       children: [
                         _buildHeader(),
-                        _buildStatsGrid(errorStats),
+                        ErrorStatsGrid(errorStats: errorStats),
                         _buildActionButtons(filteredNotes),
-                        _buildFilterTabs(),
+                        ErrorFilterTabs(
+                          controller: _tabController,
+                          filterTabs: _filterTabs,
+                          onTabChanged: () => setState(() {}),
+                        ),
                         _buildErrorNotesList(userErrorNotes, filteredNotes),
                         if (filteredNotes.isEmpty)
                           _buildTips(),
@@ -148,105 +152,6 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 통계 카드 그리드 (2x2 그리드로 변경 - 가독성 향상)
-  Widget _buildStatsGrid(Map<String, int> errorStats) {
-    return FadeInWidget(
-      duration: const Duration(milliseconds: 600),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppDimensions.paddingL,
-          AppDimensions.paddingM,
-          AppDimensions.paddingL,
-          AppDimensions.paddingL,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    '총 오답',
-                    errorStats['total']?.toString() ?? '0',
-                    AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.spacingM),
-                Expanded(
-                  child: _buildStatCard(
-                    '미복습',
-                    errorStats['unreviewed']?.toString() ?? '0',
-                    AppColors.errorRed,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppDimensions.spacingM),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    '1회 복습',
-                    errorStats['reviewedOnce']?.toString() ?? '0',
-                    AppColors.warningOrange,
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.spacingM),
-                Expanded(
-                  child: _buildStatCard(
-                    '2회 이상',
-                    errorStats['reviewedTwice']?.toString() ?? '0',
-                    AppColors.successGreen,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 통계 카드 - GoMath flat style (더 넉넉한 여백)
-  Widget _buildStatCard(String label, String value, Color valueColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.paddingL + 4,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 2,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: valueColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacingS),
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 
   /// 액션 버튼들 (반응형 2열)
   Widget _buildActionButtons(List<ErrorNote> filteredNotes) {
@@ -346,41 +251,6 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 필터 탭바 - GoMath flat style
-  Widget _buildFilterTabs() {
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.spacingM,
-      ),
-      padding: const EdgeInsets.all(AppDimensions.paddingXS),
-      decoration: BoxDecoration(
-        color: AppColors.background, // GoMath 배경색
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        tabs: _filterTabs.map((tab) => Tab(height: 40, text: tab)).toList(),
-        labelColor: AppColors.mathBlue, // GoMath 파란색 (선택됨)
-        unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 15,
-        ),
-        indicator: BoxDecoration(
-          color: AppColors.surface, // Duolingo flat white
-          borderRadius: BorderRadius.circular(12),
-        ),
-        dividerColor: Colors.transparent,
-        indicatorPadding: const EdgeInsets.all(0),
-        onTap: (_) => setState(() {}),
-      ),
-    );
-  }
 
   /// 오답 노트 목록
   Widget _buildErrorNotesList(List<ErrorNote> allNotes, List<ErrorNote> filteredNotes) {
@@ -397,7 +267,10 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
         final errorNote = filteredNotes[index];
         return FadeInWidget(
           delay: Duration(milliseconds: 50 * index),
-          child: _buildErrorNoteCard(errorNote),
+          child: ErrorNoteCard(
+            errorNote: errorNote,
+            onTap: () => _navigateToProblemReview(errorNote),
+          ),
         );
       },
     );
@@ -413,7 +286,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
         title: '오답이 없습니다!',
         message: '완벽한 학습을 이어가고 계시네요.\n\n앞으로도 꾸준히 학습해보세요.',
         actionText: '학습하러 가기',
-        onActionPressed: () {
+        onAction: () {
           // 학습 화면으로 이동 (Lessons 탭으로 변경)
           DefaultTabController.of(context).animateTo(1);
         },
@@ -427,150 +300,6 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-  /// 오답 노트 카드 - Duolingo flat style (개선: 그림자 추가)
-  Widget _buildErrorNoteCard(ErrorNote errorNote) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
-      child: InkWell(
-        onTap: () => _showErrorNoteDetails(errorNote),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(AppDimensions.paddingL),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.borderLight,
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.borderLight.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        errorNote.question,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: AppColors.textPrimary,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                    ),
-                    const SizedBox(width: AppDimensions.spacingS),
-                    _buildStatusBadge(errorNote.status),
-                  ],
-                ),
-                const SizedBox(height: AppDimensions.spacingS),
-                Text(
-                  errorNote.category,
-                  style: const TextStyle(
-                    color: AppColors.mathBlue,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.spacingXS),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '복습 ${errorNote.reviewCount}회',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      '${errorNote.daysSinceCreated}일 전',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-                if (errorNote.needsReview) ...[
-                  const SizedBox(height: AppDimensions.spacingS),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingS,
-                      vertical: AppDimensions.spacingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.warningOrange.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                    ),
-                    child: Text(
-                      '복습이 필요한 문제입니다',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.warningOrange,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-    );
-  }
-
-  /// 상태 뱃지 - GoMath style
-  Widget _buildStatusBadge(ErrorStatus status) {
-    Color color;
-    String text;
-
-    switch (status) {
-      case ErrorStatus.newError:
-        color = AppColors.errorRed; // GoMath 빨간색
-        text = '신규';
-        break;
-      case ErrorStatus.reviewing:
-        color = AppColors.mathOrange; // GoMath 주황색
-        text = '복습중';
-        break;
-      case ErrorStatus.improving:
-        color = AppColors.mathBlue; // GoMath 파란색
-        text = '향상중';
-        break;
-      case ErrorStatus.mastered:
-        color = AppColors.successGreen; // GoMath 초록색
-        text = '완료';
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
-      ),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: AppColors.surface,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
 
   /// 학습 팁
   Widget _buildTips() {
@@ -817,7 +546,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     _startReviewSession(customSet);
   }
 
-  void _showErrorNoteDetails(ErrorNote errorNote) {
+  void _navigateToProblemReview(ErrorNote errorNote) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
