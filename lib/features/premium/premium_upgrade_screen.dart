@@ -27,7 +27,6 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
     final user = ref.watch(currentUserProvider);
     final canStartTrial = ref.watch(canStartTrialProvider);
     final isPremiumActive = ref.watch(isPremiumActiveProvider);
-    final premiumTier = ref.watch(premiumTierProvider);
 
     // 이미 프리미엄 사용자면 구독 관리 화면으로 리다이렉트
     if (isPremiumActive) {

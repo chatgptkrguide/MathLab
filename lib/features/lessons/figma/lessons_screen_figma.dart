@@ -445,10 +445,6 @@ class LessonsScreenFigma extends ConsumerWidget {
 
   /// 문제 풀이 화면으로 네비게이션
   Future<void> _navigateToProblems(BuildContext context, WidgetRef ref, String lessonId) async {
-    // 현재 학년의 교육과정 데이터 가져오기
-    final user = ref.read(userProvider);
-    final displayGrade = user?.currentGrade ?? '중1';
-    final curriculumLessons = KoreanMathCurriculum.getLessonsByGrade(displayGrade);
 
     // 문제 데이터 가져오기
     final problems = ref.read(problemProvider.notifier).getProblemsByLesson(lessonId);

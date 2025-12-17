@@ -10,7 +10,6 @@ import '../../data/models/models.dart';
 import '../../data/providers/leaderboard_provider.dart';
 import '../../data/providers/friend_provider.dart';
 import '../../data/providers/all_users_provider.dart';
-import '../../data/providers/user_provider.dart';
 import '../league/league_screen.dart';
 
 /// 리더보드 화면
@@ -600,7 +599,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   /// 친구 추가 버튼
   Widget _buildFriendButton(LeaderboardEntry entry) {
     final friends = ref.watch(friendsProvider);
-    final currentUser = ref.watch(userProvider);
 
     // 이미 친구인지 확인
     final isFriend = friends.any(

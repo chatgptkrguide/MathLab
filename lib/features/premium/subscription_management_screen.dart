@@ -30,8 +30,6 @@ class _SubscriptionManagementScreenState
   @override
   Widget build(BuildContext context) {
     final subscriptionAsync = ref.watch(userSubscriptionProvider);
-    final isPremiumActive = ref.watch(isPremiumActiveProvider);
-    final premiumStatusText = ref.watch(premiumStatusTextProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,

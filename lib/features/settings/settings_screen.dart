@@ -451,7 +451,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildLanguageOption(String language) {
-    final isSelected = _selectedLanguage == language;
     return RadioListTile<String>(
       value: language,
       groupValue: _selectedLanguage,

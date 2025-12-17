@@ -399,7 +399,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Widget _buildCalendarGrid() {
     final now = DateTime.now();
-    final user = ref.watch(userProvider);
     final studyHistory = ref.watch(studyHistoryProvider);
 
     // 현재 월의 첫날과 마지막 날

@@ -442,54 +442,6 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
           );
   }
 
-  Widget _buildBadgeChip(LeagueBadge badge) {
-    // 뱃지별 색상 매핑
-    final badgeColors = {
-      LeagueBadge.streak: AppColors.mathOrange,
-      LeagueBadge.perfect: AppColors.mathYellow,
-      LeagueBadge.topScorer: AppColors.mathPurple,
-      LeagueBadge.rising: AppColors.mathTeal,
-      LeagueBadge.veteran: AppColors.mathGold,
-    };
-
-    final badgeColor = badgeColors[badge] ?? AppColors.primary;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            badgeColor.withOpacity(0.2),
-            badgeColor.withOpacity(0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: badgeColor.withOpacity(0.4),
-          width: 1.5,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            badge.icon,
-            style: const TextStyle(fontSize: 11),
-          ),
-          const SizedBox(width: 3),
-          Text(
-            badge.displayName.replaceAll(RegExp(r'[^\w\s]'), '').trim(),
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.bold,
-              color: badgeColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // 🎯 듀오링고 스타일 티어 선택 바
   Widget _buildTierSelector(LeagueTier? currentTier) {
     // 현재 티어로 초기 선택값 설정

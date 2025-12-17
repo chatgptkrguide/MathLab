@@ -41,7 +41,6 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.watch(userProvider);
-    final allUsers = ref.watch(allUsersProvider);
     final friends = ref.watch(friendsProvider);
 
     // 현재 사용자와 이미 친구인 사용자 제외

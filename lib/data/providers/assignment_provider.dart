@@ -65,7 +65,6 @@ class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
 
   /// 과제 삭제
   Future<void> deleteAssignment(String assignmentId) async {
-    final assignment = state.firstWhere((a) => a.id == assignmentId);
     state = state.where((a) => a.id != assignmentId).toList();
     await _saveAssignments();
   }

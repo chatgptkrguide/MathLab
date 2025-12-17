@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import '../models/premium_tier.dart';
@@ -382,10 +381,8 @@ class InAppPurchaseService {
 
     // Android 검증
     if (Platform.isAndroid) {
-      final androidPurchase =
-          purchaseDetails as GooglePlayPurchaseDetails;
-
       // TODO: 서버로 영수증 전송 및 검증
+      // final androidPurchase = purchaseDetails as GooglePlayPurchaseDetails;
       // final purchaseToken = androidPurchase.verificationData.serverVerificationData;
       // await _sendToServerForVerification(purchaseToken);
 

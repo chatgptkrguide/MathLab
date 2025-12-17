@@ -104,7 +104,6 @@ class _UnifiedButtonState extends State<UnifiedButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
 
   @override
   void initState() {

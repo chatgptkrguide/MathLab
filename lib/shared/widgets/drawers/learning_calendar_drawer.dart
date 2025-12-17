@@ -11,18 +11,6 @@ class LearningCalendarDrawer extends StatefulWidget {
 }
 
 class _LearningCalendarDrawerState extends State<LearningCalendarDrawer> {
-  final DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-
-  // 학습한 날짜 (예시 데이터 - 피그마처럼 13~18일)
-  final Set<DateTime> _studiedDays = {
-    DateTime(2024, 11, 13),
-    DateTime(2024, 11, 14),
-    DateTime(2024, 11, 15),
-    DateTime(2024, 11, 16),
-    DateTime(2024, 11, 17),
-    DateTime(2024, 11, 18),
-  };
 
   final int _challengeDoneDays = 6;
   final int _remainingDays = 10;

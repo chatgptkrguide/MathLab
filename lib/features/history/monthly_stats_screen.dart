@@ -5,7 +5,6 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
-import '../../data/providers/user_provider.dart';
 import '../../data/providers/study_history_provider.dart';
 
 /// 월간 상세 통계 화면
@@ -52,7 +51,6 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
     final studyHistory = ref.watch(studyHistoryProvider);
 
     // 현재 월의 학습 기록 필터링

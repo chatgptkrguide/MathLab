@@ -135,7 +135,6 @@ class NotificationSettingsScreen extends ConsumerWidget {
         children: NotificationType.values.map((type) {
           final isEnabled = settings.isEnabled(type);
           final isFirst = type == NotificationType.values.first;
-          final isLast = type == NotificationType.values.last;
 
           return Column(
             children: [

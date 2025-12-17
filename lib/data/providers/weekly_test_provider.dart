@@ -65,7 +65,6 @@ class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
 
   /// 주간테스트 삭제
   Future<void> deleteWeeklyTest(String testId) async {
-    final test = state.firstWhere((t) => t.id == testId);
     state = state.where((t) => t.id != testId).toList();
     await _saveWeeklyTests();
   }
