@@ -2,6 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
+import '../services/local_storage_service.dart';
+import '../repositories/lesson_repository.dart';
+import '../repositories/league_repository.dart';
+import '../repositories/user_repository.dart';
 import '../models/user.dart' as app_user;
 
 /// Auth Service Provider
@@ -45,4 +49,39 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 final isEmailVerifiedProvider = Provider<bool>((ref) {
   final user = ref.watch(currentUserProvider);
   return user?.emailVerified ?? false;
+});
+
+/// Local Storage Service Provider
+final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
+  return LocalStorageService();
+});
+
+/// Lesson Repository Provider
+final lessonRepositoryProvider = Provider<LessonRepository>((ref) {
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  final localStorageService = ref.watch(localStorageServiceProvider);
+  return LessonRepository(
+    firestoreService: firestoreService,
+    localStorageService: localStorageService,
+  );
+});
+
+/// League Repository Provider
+final leagueRepositoryProvider = Provider<LeagueRepository>((ref) {
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  final localStorageService = ref.watch(localStorageServiceProvider);
+  return LeagueRepository(
+    firestoreService: firestoreService,
+    localStorageService: localStorageService,
+  );
+});
+
+/// User Repository Provider
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  final localStorageService = ref.watch(localStorageServiceProvider);
+  return UserRepository(
+    firestoreService: firestoreService,
+    localStorageService: localStorageService,
+  );
 });

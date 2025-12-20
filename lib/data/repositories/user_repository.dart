@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'base_repository.dart';
 import '../models/user.dart';
 import '../services/local_storage_service.dart';
@@ -79,9 +80,15 @@ class UserRepository extends BaseRepository<User> {
   @override
   Future<User?> getFromFirebase(String accountId) async {
     try {
-      // TODO: Firebase 연결 시 User ↔ UserModel 변환 또는 모델 통합 필요
-      Logger.warning('Firebase 연결 미구현 - 로컬만 사용', tag: 'UserRepository');
-      return null;
+      final userDoc = await firestoreService.getUserProfile(accountId);
+
+      if (userDoc == null) {
+        Logger.debug('Firestore에 사용자 프로필 없음: $accountId', tag: 'UserRepository');
+        return null;
+      }
+
+      // Firestore 데이터를 User 모델로 변환
+      return User.fromJson(userDoc.toFirestoreMap());
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 사용자 프로필 조회 실패',
@@ -96,8 +103,29 @@ class UserRepository extends BaseRepository<User> {
   @override
   Future<void> saveToFirebase(String accountId, User data) async {
     try {
-      // TODO: Firebase 연결 시 User ↔ UserModel 변환 또는 모델 통합 필요
-      Logger.warning('Firebase 연결 미구현 - 로컬만 사용', tag: 'UserRepository');
+      // User 모델을 Firestore 형식으로 변환
+      final firestoreData = {
+        'uid': data.id,
+        'email': data.email,
+        'name': data.name,
+        'photoURL': data.photoUrl,
+        'avatarUrl': data.avatarUrl,
+        'level': data.level,
+        'totalXP': data.xp,
+        'xp': data.xp,
+        'streak': data.streakDays,
+        'streakDays': data.streakDays,
+        'lastStudyDate': data.lastStudyDate?.toIso8601String(),
+        'currentGrade': data.currentGrade,
+        'hearts': data.hearts,
+        'dailyXP': data.dailyXP,
+        'isPremium': data.isPremium,
+        'premiumTier': data.premiumTier.value,
+        'updatedAt': DateTime.now().toIso8601String(),
+      };
+
+      await firestoreService.updateUserProfile(accountId, firestoreData);
+      Logger.debug('Firestore에 사용자 프로필 저장 완료: $accountId', tag: 'UserRepository');
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 사용자 프로필 저장 실패',
@@ -150,9 +178,89 @@ class UserRepository extends BaseRepository<User> {
   // ==================== 추가 메서드 ====================
 
   /// 사용자 프로필 실시간 감지 (Firebase Stream)
-  /// TODO: Firebase 연결 시 User 타입으로 변환 필요
   Stream<User?> watchUserProfile(String uid) {
-    // 현재는 로컬만 사용하므로 빈 스트림 반환
-    return Stream.value(null);
+    try {
+      return firestoreService.watchUserProfile(uid).map((userDoc) {
+        if (userDoc == null) return null;
+
+        try {
+          return User.fromJson(userDoc.toFirestoreMap());
+        } catch (e) {
+          Logger.error(
+            'User 모델 변환 실패',
+            error: e,
+            tag: 'UserRepository',
+          );
+          return null;
+        }
+      });
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 프로필 실시간 감지 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserRepository',
+      );
+      return Stream.value(null);
+    }
+  }
+
+  /// XP 업데이트 (낙관적 업데이트)
+  Future<void> updateXP(String uid, int xpToAdd) async {
+    try {
+      // 로컬 업데이트
+      final storageKey = 'user_$uid';
+      final user = await getFromLocal(storageKey);
+
+      if (user != null) {
+        final updatedUser = user.copyWith(xp: user.xp + xpToAdd);
+        await saveToLocal(storageKey, updatedUser);
+      }
+
+      // Firestore 업데이트
+      final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+      final userDoc = await userDocRef.get();
+
+      if (userDoc.exists) {
+        final currentXP = userDoc.data()?['totalXP'] ?? 0;
+        final newLevel = User.calculateLevel(currentXP + xpToAdd);
+
+        await userDocRef.update({
+          'totalXP': currentXP + xpToAdd,
+          'xp': currentXP + xpToAdd,
+          'level': newLevel,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+      Logger.info('XP 업데이트 완료: +$xpToAdd', tag: 'UserRepository');
+    } catch (e, stackTrace) {
+      Logger.error(
+        'XP 업데이트 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserRepository',
+      );
+      throw Exception('XP 업데이트 실패: $e');
+    }
+  }
+
+  /// 스트릭 업데이트
+  Future<void> updateStreak(String uid, int newStreak) async {
+    try {
+      await firestoreService.updateUserProfile(uid, {
+        'streak': newStreak,
+        'lastStudyDate': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+      Logger.info('스트릭 업데이트 완료: $newStreak', tag: 'UserRepository');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '스트릭 업데이트 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserRepository',
+      );
+      throw Exception('스트릭 업데이트 실패: $e');
+    }
   }
 }

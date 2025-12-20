@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
 import '../../shared/utils/logger.dart';
 
 /// 파일 업로드 결과
@@ -30,6 +32,9 @@ class FileUploadService {
   factory FileUploadService() => _instance;
   FileUploadService._internal();
 
+  /// Firebase Storage 인스턴스
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
   /// 과제 사진 업로드
   ///
   /// [assignmentId]: 과제 ID
@@ -57,13 +62,24 @@ class FileUploadService {
         return UploadResult.failure('파일 크기가 10MB를 초과합니다');
       }
 
-      // TODO: Firebase Storage 업로드 로직 구현
-      // 현재는 로컬 경로를 그대로 반환 (개발 단계)
+      // Firebase Storage 업로드 경로 생성
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final mockUrl = 'assignments/$assignmentId/$studentId/photo_$timestamp.jpg';
+      final extension = path.extension(imagePath);
+      final fileName = 'photo_$timestamp$extension';
+      final storagePath = 'users/$studentId/assignments/$assignmentId/$fileName';
 
-      Logger.info('과제 사진 업로드 성공: $mockUrl', tag: 'FileUploadService');
-      return UploadResult.success(mockUrl);
+      // Firebase Storage에 업로드
+      final ref = _storage.ref().child(storagePath);
+      final uploadTask = ref.putFile(file);
+
+      // 업로드 완료 대기
+      final snapshot = await uploadTask;
+
+      // 다운로드 URL 가져오기
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      Logger.info('과제 사진 업로드 성공: $downloadUrl', tag: 'FileUploadService');
+      return UploadResult.success(downloadUrl);
 
     } catch (e, stackTrace) {
       Logger.error(
@@ -125,13 +141,24 @@ class FileUploadService {
         return UploadResult.failure('파일 크기가 15MB를 초과합니다');
       }
 
-      // TODO: Firebase Storage 업로드 로직 구현
-      // 현재는 로컬 경로를 그대로 반환 (개발 단계)
+      // Firebase Storage 업로드 경로 생성
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final mockUrl = 'weekly_tests/$weeklyTestId/$studentId/omr_$timestamp.jpg';
+      final extension = path.extension(imagePath);
+      final fileName = 'omr_$timestamp$extension';
+      final storagePath = 'users/$studentId/weekly_tests/$weeklyTestId/$fileName';
 
-      Logger.info('OMR 사진 업로드 성공: $mockUrl', tag: 'FileUploadService');
-      return UploadResult.success(mockUrl);
+      // Firebase Storage에 업로드
+      final ref = _storage.ref().child(storagePath);
+      final uploadTask = ref.putFile(file);
+
+      // 업로드 완료 대기
+      final snapshot = await uploadTask;
+
+      // 다운로드 URL 가져오기
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      Logger.info('OMR 사진 업로드 성공: $downloadUrl', tag: 'FileUploadService');
+      return UploadResult.success(downloadUrl);
 
     } catch (e, stackTrace) {
       Logger.error(
@@ -146,15 +173,18 @@ class FileUploadService {
 
   /// 파일 삭제
   ///
-  /// [fileUrl]: 삭제할 파일의 URL
+  /// [fileUrl]: 삭제할 파일의 URL (Firebase Storage URL)
   ///
   /// Returns: true if successful
   Future<bool> deleteFile(String fileUrl) async {
     try {
       Logger.info('파일 삭제 시작: $fileUrl', tag: 'FileUploadService');
 
-      // TODO: Firebase Storage 삭제 로직 구현
-      // 현재는 로그만 남김 (개발 단계)
+      // Firebase Storage URL에서 Reference 생성
+      final ref = _storage.refFromURL(fileUrl);
+
+      // 파일 삭제
+      await ref.delete();
 
       Logger.info('파일 삭제 성공: $fileUrl', tag: 'FileUploadService');
       return true;
@@ -167,6 +197,65 @@ class FileUploadService {
         tag: 'FileUploadService',
       );
       return false;
+    }
+  }
+
+  /// 프로필 이미지 업로드
+  ///
+  /// [userId]: 사용자 ID
+  /// [imagePath]: 업로드할 프로필 이미지 경로
+  ///
+  /// Returns: UploadResult with success status and file URL
+  Future<UploadResult> uploadProfileImage({
+    required String userId,
+    required String imagePath,
+  }) async {
+    try {
+      Logger.info('프로필 이미지 업로드 시작: $userId', tag: 'FileUploadService');
+
+      // 파일 존재 확인
+      final file = File(imagePath);
+      if (!await file.exists()) {
+        return UploadResult.failure('파일을 찾을 수 없습니다');
+      }
+
+      // 파일 크기 확인 (5MB 제한)
+      final fileSize = await file.length();
+      if (fileSize > 5 * 1024 * 1024) {
+        return UploadResult.failure('파일 크기가 5MB를 초과합니다');
+      }
+
+      // 이미지 파일 형식 확인
+      final extension = path.extension(imagePath).toLowerCase();
+      if (!['.jpg', '.jpeg', '.png', '.gif'].contains(extension)) {
+        return UploadResult.failure('지원하지 않는 이미지 형식입니다');
+      }
+
+      // Firebase Storage 업로드 경로 생성
+      final fileName = 'avatar$extension';
+      final storagePath = 'users/$userId/profile/$fileName';
+
+      // Firebase Storage에 업로드
+      final ref = _storage.ref().child(storagePath);
+      final uploadTask = ref.putFile(file);
+
+      // 업로드 완료 대기
+      final snapshot = await uploadTask;
+
+      // 다운로드 URL 가져오기
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      Logger.info('프로필 이미지 업로드 성공: $downloadUrl', tag: 'FileUploadService');
+      return UploadResult.success(downloadUrl);
+
+    } catch (e, stackTrace) {
+      Logger.error(
+        '프로필 이미지 업로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FileUploadService',
+      );
+      return UploadResult.failure('업로드 중 오류가 발생했습니다: ${e.toString()}');
     }
   }
 

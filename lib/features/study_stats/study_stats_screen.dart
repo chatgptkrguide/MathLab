@@ -86,7 +86,6 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
             // 헤더
             AdaptiveAppHeader(
               title: '학습 통계',
-              showBackButton: true,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.calendar_today),

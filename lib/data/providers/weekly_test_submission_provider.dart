@@ -22,12 +22,10 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
         fromJson: WeeklyTestSubmission.fromJson,
       );
 
-      if (submissions != null) {
-        state = submissions;
-        logInfo('주간테스트 제출 목록 로드 성공: ${submissions.length}개');
-      }
+      state = submissions;
+      logInfo('주간테스트 제출 목록 로드 성공: ${submissions.length}개');
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '주간테스트 제출 목록 로드 실패',
         error: e,
         stackTrace: stackTrace,
@@ -45,7 +43,7 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
       );
       logInfo('주간테스트 제출 목록 저장 완료: ${state.length}개');
     } catch (e, stackTrace) {
-      Logger.error(
+      logError(
         '주간테스트 제출 목록 저장 실패',
         error: e,
         stackTrace: stackTrace,

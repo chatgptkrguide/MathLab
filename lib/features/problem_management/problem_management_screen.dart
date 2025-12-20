@@ -30,7 +30,6 @@ class _ProblemManagementScreenState
             // 헤더
             const AdaptiveAppHeader(
               title: '문제 관리',
-              showBackButton: true,
             ),
 
             // 통계 요약

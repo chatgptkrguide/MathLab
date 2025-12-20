@@ -2,23 +2,24 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
-import '../services/local_storage_service.dart';
-import '../services/firestore_service.dart';
 import '../services/notification_service.dart';
 import '../repositories/user_repository.dart';
 import '../../shared/constants/game_constants.dart';
 import 'base/base_notifier.dart';
+import 'league_provider.dart';
+import 'firebase_providers.dart';
 
-/// 사용자 정보 상태 관리 (BaseNotifier 최적화 버전)
+/// 사용자 정보 상태 관리 (Firestore 연동 버전)
 ///
 /// **개선사항:**
 /// - BaseNotifier 상속으로 중복 로깅 제거
 /// - executeWithErrorHandling로 try-catch 자동화
-/// - Repository 패턴은 유지
+/// - Firestore XP 동기화 (League와 연동)
 class UserNotifier extends BaseNotifier<User?> {
   final UserRepository _userRepository;
+  final Ref _ref;
 
-  UserNotifier(this._userRepository) : super(null, 'UserProvider') {
+  UserNotifier(this._userRepository, this._ref) : super(null, 'UserProvider') {
     _loadUser();
   }
 
@@ -143,7 +144,7 @@ class UserNotifier extends BaseNotifier<User?> {
     logInfo('학년 변경: $newGrade');
   }
 
-  /// XP 추가
+  /// XP 추가 (Firestore 및 League 동기화)
   Future<void> addXP(int xp) async {
     if (state == null) return;
 
@@ -156,6 +157,7 @@ class UserNotifier extends BaseNotifier<User?> {
     final newLevel = (currentXP ~/ GameConstants.xpPerLevel) + 1;
     final leveledUp = newLevel > currentLevel;
 
+    // 로컬 state 즉시 업데이트
     state = state!.copyWith(
       xp: currentXP,
       level: newLevel,
@@ -165,9 +167,44 @@ class UserNotifier extends BaseNotifier<User?> {
     await _saveUser();
     logInfo('XP 추가: +$xp XP (총 $currentXP XP, 오늘 $currentDailyXP XP, 레벨 $newLevel)');
 
+    // Firestore 동기화 (백그라운드)
+    _syncXPToFirestore(xp).catchError((error, stackTrace) {
+      logError('Firestore XP 동기화 실패', error: error, stackTrace: stackTrace);
+    });
+
+    // League 동기화 (백그라운드)
+    _syncXPToLeague(xp).catchError((error, stackTrace) {
+      logError('League XP 동기화 실패', error: error, stackTrace: stackTrace);
+    });
+
     if (leveledUp) {
       await _onLevelUp(newLevel);
     }
+  }
+
+  /// Firestore XP 동기화
+  Future<void> _syncXPToFirestore(int xpGained) async {
+    if (state == null) return;
+
+    await executeWithErrorHandling(
+      () async {
+        await _userRepository.updateXP(state!.id, xpGained);
+        logInfo('Firestore XP 동기화 완료: +$xpGained');
+      },
+      errorMessage: 'Firestore XP 동기화 실패',
+    );
+  }
+
+  /// League XP 동기화
+  Future<void> _syncXPToLeague(int xpGained) async {
+    await executeWithErrorHandling(
+      () async {
+        final leagueNotifier = _ref.read(leagueProvider.notifier);
+        await leagueNotifier.updateUserXP(xpGained);
+        logInfo('League XP 동기화 완료: +$xpGained');
+      },
+      errorMessage: 'League XP 동기화 실패',
+    );
   }
 
   /// 레벨업 처리
@@ -435,18 +472,10 @@ class UserNotifier extends BaseNotifier<User?> {
   }
 }
 
-/// UserRepository Provider
-final userRepositoryProvider = Provider<UserRepository>((ref) {
-  return UserRepository(
-    localStorageService: LocalStorageService(),
-    firestoreService: FirestoreService(),
-  );
-});
-
 /// 사용자 정보 프로바이더
 final userProvider = StateNotifierProvider<UserNotifier, User?>((ref) {
   final userRepository = ref.watch(userRepositoryProvider);
-  return UserNotifier(userRepository);
+  return UserNotifier(userRepository, ref);
 });
 
 /// 사용자 정보를 감시하는 편의 프로바이더들

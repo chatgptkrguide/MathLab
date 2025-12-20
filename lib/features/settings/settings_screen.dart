@@ -511,15 +511,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             TextButton(
               onPressed: () async {
+                // Context를 미리 저장
+                final navigator = Navigator.of(context);
+                final messenger = ScaffoldMessenger.of(context);
+
                 // 진행 상태 초기화
                 await ref.read(lessonProgressProvider.notifier).resetProgress();
                 await ref.read(userProvider.notifier).resetUser();
 
                 if (mounted) {
-                  Navigator.pop(context); // 다이얼로그 닫기
+                  navigator.pop(); // 다이얼로그 닫기
 
                   // 성공 메시지
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     const SnackBar(
                       content: Text('학습 진행 상태가 초기화되었습니다.'),
                       backgroundColor: AppColors.success,
@@ -554,12 +558,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             TextButton(
               onPressed: () async {
+                // Context를 미리 저장
+                final navigator = Navigator.of(context);
+
                 // 로그아웃 실행
                 await ref.read(authProvider.notifier).signOut();
                 if (mounted) {
                   // 로그인 화면으로 이동하고 네비게이션 스택 전체 클리어
-                  Navigator.pushAndRemoveUntil(
-                    context,
+                  navigator.pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => const AuthScreen()),
                     (route) => false,
                   );

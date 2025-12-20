@@ -1,69 +1,123 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
+import '../repositories/lesson_repository.dart';
 import 'base/base_notifier.dart';
 import 'user_provider.dart';
 import 'problem_provider.dart';
+import 'firebase_providers.dart';
 
-/// 레슨 상태 관리 (BaseNotifier 최적화 버전)
+/// 레슨 상태 관리 (Firestore 연동 버전)
 ///
 /// **개선사항:**
-/// - BaseNotifier 상속으로 중복 로깅 제거
-/// - SharedPreferences → LocalStorageService로 통일
-/// - executeWithErrorHandling로 try-catch 자동화
+/// - LessonRepository 연결로 Firestore 실시간 동기화
+/// - 로컬 + Firebase 자동 동기화
+/// - 실시간 레슨 업데이트 스트림
 class LessonNotifier extends BaseNotifier<List<Lesson>> {
-  LessonNotifier(this._ref) : super([], 'LessonProvider') {
-    logInfo('LessonNotifier 초기화');
+  LessonNotifier(this._ref, this._repository) : super([], 'LessonProvider') {
+    logInfo('LessonNotifier 초기화 (Firestore 연동)');
     _loadLessons();
+    _setupRealtimeSync();
   }
 
   final Ref _ref;
+  final LessonRepository _repository;
   static final MockDataService _dataService = MockDataService();
-  static const String _storageKey = 'lessons';
+  String get _storageKey => 'lessons_${_getCurrentUserId()}';
 
-  /// 레슨 데이터 로드
-  Future<void> _loadLessons() async {
-    logInfo('레슨 데이터 로드 시작');
-
-    final data = await loadFromStorage(_storageKey);
-
-    if (data != null && data['lessons'] != null) {
-      // 저장된 레슨이 있으면 로드
-      final lessonsList = data['lessons'] as List;
-      logInfo('저장된 레슨 ${lessonsList.length}개 발견');
-
-      final lessons = lessonsList
-          .map((json) => Lesson.fromJson(json as Map<String, dynamic>))
-          .toList();
-      state = lessons;
-      logInfo('레슨 ${lessons.length}개 로드 완료');
-    } else {
-      // JSON 파일에서 레슨 로드
-      logInfo('저장된 레슨 없음, JSON 파일에서 로드');
-
-      final lessons = await executeWithErrorHandling(
-        () async => await _dataService.loadLessons(),
-        errorMessage: 'JSON 로드 실패, 샘플 데이터 사용',
-        fallback: () => _dataService.getSampleLessons(),
-      );
-
-      if (lessons != null) {
-        state = lessons;
-        logInfo('JSON 파일에서 ${lessons.length}개 레슨 로드 완료');
-        await _saveLessons();
-      }
-    }
-
-    // 첫 번째 레슨은 항상 잠금 해제
-    await _unlockFirstLesson();
-    logInfo('레슨 로드 완료');
+  /// 현재 사용자 ID 가져오기
+  String _getCurrentUserId() {
+    final user = _ref.read(userProvider);
+    return user?.id ?? 'default';
   }
 
-  /// 레슨 데이터 저장
-  Future<void> _saveLessons() async {
-    await saveToStorage(_storageKey, {
-      'lessons': state.map((lesson) => lesson.toJson()).toList(),
+  /// 실시간 동기화 설정
+  void _setupRealtimeSync() {
+    // Firestore 실시간 스트림 감지
+    _repository.watchLessons().listen((lessons) {
+      if (lessons.isNotEmpty) {
+        state = lessons;
+        logInfo('실시간 레슨 업데이트: ${lessons.length}개');
+      }
     });
+  }
+
+  /// 레슨 데이터 로드 (로컬 → Firebase → 병합)
+  Future<void> _loadLessons() async {
+    logInfo('레슨 데이터 로드 시작 (Firestore 연동)');
+
+    await executeWithErrorHandling(
+      () async {
+        final userId = _getCurrentUserId();
+
+        // 1. 로컬 데이터 먼저 로드 (빠른 UI 표시)
+        final localLessons = await _repository.getFromLocal(_storageKey);
+        if (localLessons != null && localLessons.isNotEmpty) {
+          state = localLessons;
+          logInfo('로컬 레슨 ${localLessons.length}개 로드 완료');
+        }
+
+        // 2. Firebase 데이터 로드
+        final remoteLessons = await _repository.getFromFirebase(userId);
+
+        if (remoteLessons != null && remoteLessons.isNotEmpty) {
+          // 3. 병합 (Firebase 기본 정보 + 로컬 진행률)
+          if (localLessons != null) {
+            final merged = await _repository.mergeData(localLessons, remoteLessons);
+            if (merged != null) {
+              state = merged;
+              await _repository.saveToLocal(_storageKey, merged);
+              logInfo('로컬-Firebase 병합 완료: ${merged.length}개');
+            }
+          } else {
+            state = remoteLessons;
+            await _repository.saveToLocal(_storageKey, remoteLessons);
+            logInfo('Firebase 레슨 ${remoteLessons.length}개 로드 완료');
+          }
+        } else if (localLessons == null || localLessons.isEmpty) {
+          // 4. Firebase에도 없으면 JSON에서 초기 로드
+          logInfo('Firebase에 레슨 없음, JSON에서 초기 로드');
+          final lessons = await _dataService.loadLessons();
+
+          if (lessons.isNotEmpty) {
+            state = lessons;
+            await _repository.saveToLocal(_storageKey, lessons);
+            await _repository.saveToFirebase(userId, lessons);
+            logInfo('JSON에서 ${lessons.length}개 레슨 로드 및 Firebase 업로드');
+          }
+        }
+
+        // 첫 번째 레슨 잠금 해제
+        await _unlockFirstLesson();
+        logInfo('레슨 로드 완료');
+      },
+      errorMessage: '레슨 로드 실패',
+      fallback: () async {
+        // 최후의 수단: 샘플 데이터
+        state = _dataService.getSampleLessons();
+        await _repository.saveToLocal(_storageKey, state);
+      },
+    );
+  }
+
+  /// 레슨 데이터 저장 (로컬 + Firebase 동시)
+  Future<void> _saveLessons() async {
+    await executeWithErrorHandling(
+      () async {
+        final userId = _getCurrentUserId();
+
+        // 로컬 저장
+        await _repository.saveToLocal(_storageKey, state);
+
+        // Firebase 저장 (백그라운드)
+        _repository.saveToFirebase(userId, state).catchError((error, stackTrace) {
+          logError('Firebase 저장 실패 (백그라운드)', error: error, stackTrace: stackTrace);
+        });
+
+        logInfo('레슨 저장 완료 (로컬 + Firebase)');
+      },
+      errorMessage: '레슨 저장 실패',
+    );
   }
 
   /// 첫 번째 레슨 잠금 해제
@@ -76,7 +130,7 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
     }
   }
 
-  /// 레슨 진행률 업데이트
+  /// 레슨 진행률 업데이트 (Firestore 동기화)
   Future<void> updateLessonProgress(
     String lessonId,
     int completedProblems, {
@@ -86,17 +140,31 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
     if (index == -1) return;
 
     final lesson = state[index];
+    final now = DateTime.now();
+    final isCompleting = completedProblems >= lesson.totalProblems && !lesson.isCompleted;
+
     final updatedLesson = lesson.copyWith(
       completedProblems: completedProblems,
       isUnlocked: lesson.isUnlocked || unlock,
-      completedAt: lesson.isCompleted ? DateTime.now() : lesson.completedAt,
+      completedAt: isCompleting ? now : lesson.completedAt,
     );
 
+    // 로컬 state 업데이트
     state = [
       ...state.take(index),
       updatedLesson,
       ...state.skip(index + 1),
     ];
+
+    // Firestore 업데이트 (백그라운드)
+    _repository.updateLessonProgress(
+      lessonId: lessonId,
+      completedProblems: completedProblems,
+      isUnlocked: unlock ? true : null,
+      completedAt: isCompleting ? now : null,
+    ).catchError((error, stackTrace) {
+      logError('Firestore 진행률 업데이트 실패', error: error, stackTrace: stackTrace);
+    });
 
     await _saveLessons();
 
@@ -233,7 +301,8 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
 
 /// 프로바이더들
 final lessonProvider = StateNotifierProvider<LessonNotifier, List<Lesson>>((ref) {
-  return LessonNotifier(ref);
+  final lessonRepository = ref.watch(lessonRepositoryProvider);
+  return LessonNotifier(ref, lessonRepository);
 });
 
 /// 편의 프로바이더들

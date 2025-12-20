@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/league.dart';
-import 'auth_provider.dart';
+import '../repositories/league_repository.dart';
+import 'user_provider.dart';
+import 'firebase_providers.dart';
 import 'base/base_notifier.dart';
 
 /// 리그 상태
@@ -28,91 +30,101 @@ class LeagueState {
   }
 }
 
-/// 리그 상태 관리 Provider (BaseNotifier 최적화 버전)
+/// 리그 상태 관리 Provider (Firestore 연동 버전)
 ///
 /// **개선사항:**
-/// - BaseNotifier 상속으로 중복 로깅 제거
-/// - executeWithErrorHandling로 try-catch 자동화
-/// - LocalStorageService 상속으로 필드 제거
+/// - LeagueRepository 연결로 Firestore 실시간 동기화
+/// - 로컬 + Firebase 자동 동기화
+/// - 실시간 리그 업데이트 스트림
 class LeagueNotifier extends BaseNotifier<LeagueState> {
-  final Ref ref;
-
-  LeagueNotifier(this.ref) : super(const LeagueState(), 'LeagueProvider') {
+  LeagueNotifier(this._ref, this._repository)
+      : super(const LeagueState(), 'LeagueProvider') {
+    logInfo('LeagueNotifier 초기화 (Firestore 연동)');
     _initialize();
   }
 
-  /// 현재 계정 ID 기반 저장소 키
-  String? get _storageKey {
-    final currentAccount = ref.read(currentAccountProvider);
-    if (currentAccount == null) {
-      logWarning('계정 정보 없음');
-      return null;
-    }
-    return 'league_${currentAccount.id}';
+  final Ref _ref;
+  final LeagueRepository _repository;
+  String get _storageKey => 'league_${_getCurrentUserId()}';
+
+  /// 현재 사용자 ID 가져오기
+  String _getCurrentUserId() {
+    final user = _ref.read(userProvider);
+    return user?.id ?? 'default';
   }
 
-  /// 초기화 및 데이터 로드
+  /// 초기화 및 실시간 동기화 설정
   Future<void> _initialize() async {
     await _loadCurrentLeague();
+    _setupRealtimeSync();
   }
 
-  /// 현재 리그 정보 로드
+  /// 실시간 동기화 설정
+  void _setupRealtimeSync() {
+    // Firestore 실시간 스트림 감지
+    _repository.watchCurrentLeague().listen((league) {
+      if (league != null) {
+        state = state.copyWith(
+          currentLeague: league,
+          isLoading: false,
+          error: null,
+        );
+        logInfo('실시간 리그 업데이트: ${league.tier}');
+      }
+    });
+  }
+
+  /// 현재 리그 정보 로드 (로컬 → Firebase → 병합)
   Future<void> _loadCurrentLeague() async {
+    logInfo('리그 데이터 로드 시작 (Firestore 연동)');
     state = state.copyWith(isLoading: true);
 
     await executeWithErrorHandling(
       () async {
-        final key = _storageKey;
-        if (key == null) {
+        final userId = _getCurrentUserId();
+
+        // 1. 로컬 데이터 먼저 로드 (빠른 UI 표시)
+        final localLeague = await _repository.getFromLocal(_storageKey);
+        if (localLeague != null) {
+          state = state.copyWith(
+            currentLeague: localLeague,
+            isLoading: false,
+            error: null,
+          );
+          logInfo('로컬 리그 데이터 로드 완료');
+        }
+
+        // 2. Firebase에서 현재 주간 리그 로드
+        final remoteLeague = await _repository.getFromFirebase();
+
+        if (remoteLeague != null) {
+          // 3. Firebase 데이터로 업데이트
+          state = state.copyWith(
+            currentLeague: remoteLeague,
+            isLoading: false,
+            error: null,
+          );
+          await _repository.saveToLocal(_storageKey, remoteLeague);
+          logInfo('Firebase 리그 데이터 로드 완료');
+
+          // 4. 사용자가 참가하지 않았다면 자동 참가
+          if (!remoteLeague.isUserParticipant(userId)) {
+            await joinCurrentLeague();
+          }
+        } else if (localLeague == null) {
+          // 5. Firebase에도 없고 로컬에도 없으면 새 리그 생성
+          logInfo('리그 데이터 없음, 새 리그 생성 필요');
           state = state.copyWith(
             currentLeague: null,
             isLoading: false,
             error: null,
           );
-          return;
         }
 
-        final data = await loadFromStorage(key);
-
-        if (data != null) {
-          final league = League.fromJson(data);
-          state = state.copyWith(
-            currentLeague: league,
-            isLoading: false,
-            error: null,
-          );
-          logInfo('리그 데이터 로드 완료');
-        } else {
-          final mockLeague = _generateMockLeague();
-          await _saveLeague(mockLeague);
-
-          state = state.copyWith(
-            currentLeague: mockLeague,
-            isLoading: false,
-            error: null,
-          );
-          logInfo('Mock 리그 데이터 생성 및 저장');
-        }
+        logInfo('리그 로드 완료');
       },
       errorMessage: '리그 로드 실패',
       fallback: () => state = state.copyWith(isLoading: false),
-    );
-  }
-
-  /// 리그 데이터 저장
-  Future<void> _saveLeague(League league) async {
-    await executeWithErrorHandling(
-      () async {
-        final key = _storageKey;
-        if (key == null) {
-          logWarning('리그 저장 불가 - 계정 없음');
-          return;
-        }
-
-        await saveToStorage(key, league.toJson());
-        logInfo('리그 데이터 저장 완료');
-      },
-      errorMessage: '리그 저장 실패',
     );
   }
 
@@ -121,136 +133,100 @@ class LeagueNotifier extends BaseNotifier<LeagueState> {
     await _loadCurrentLeague();
   }
 
-  /// Mock 데이터 생성 (개발용)
-  League _generateMockLeague() {
-    final now = DateTime.now();
-    // 7일 주기로 변경 (듀오링고 스타일)
-    final daysIntoCurrentCycle = now.difference(DateTime(2024, 1, 1)).inDays % 7;
-    final cycleStart = now.subtract(Duration(days: daysIntoCurrentCycle));
-    final cycleEnd = cycleStart.add(const Duration(days: 7));
+  /// 현재 리그 참가
+  Future<void> joinCurrentLeague() async {
+    await executeWithErrorHandling(
+      () async {
+        final userId = _getCurrentUserId();
+        final user = _ref.read(userProvider);
 
-    final participants = [
-      const LeagueParticipant(
-        userId: 'user1',
-        userName: '수학천재',
-        weeklyXp: 2450,
-        rank: 1,
-        badges: [LeagueBadge.topScorer, LeagueBadge.perfect, LeagueBadge.veteran],
-      ),
-      const LeagueParticipant(
-        userId: 'user2',
-        userName: '열공러',
-        weeklyXp: 2180,
-        rank: 2,
-        badges: [LeagueBadge.streak, LeagueBadge.veteran],
-      ),
-      const LeagueParticipant(
-        userId: 'user3',
-        userName: '문제풀이왕',
-        weeklyXp: 1980,
-        rank: 3,
-        badges: [LeagueBadge.perfect],
-      ),
-      const LeagueParticipant(
-        userId: 'current_user',
-        userName: '나',
-        weeklyXp: 1750,
-        rank: 4,
-        badges: [LeagueBadge.rising, LeagueBadge.streak],
-      ),
-      const LeagueParticipant(
-        userId: 'user5',
-        userName: '수포자탈출',
-        weeklyXp: 1650,
-        rank: 5,
-        badges: [LeagueBadge.rising],
-      ),
-      const LeagueParticipant(
-        userId: 'user6',
-        userName: '매일학습',
-        weeklyXp: 1450,
-        rank: 6,
-        badges: [LeagueBadge.streak],
-      ),
-      const LeagueParticipant(
-        userId: 'user7',
-        userName: '꾸준이',
-        weeklyXp: 1350,
-        rank: 7,
-        badges: [LeagueBadge.veteran],
-      ),
-      const LeagueParticipant(
-        userId: 'user8',
-        userName: '열심히',
-        weeklyXp: 1250,
-        rank: 8,
-        badges: [],
-      ),
-      const LeagueParticipant(
-        userId: 'user9',
-        userName: '노력파',
-        weeklyXp: 1150,
-        rank: 9,
-        badges: [LeagueBadge.rising],
-      ),
-      const LeagueParticipant(
-        userId: 'user10',
-        userName: '성실함',
-        weeklyXp: 1050,
-        rank: 10,
-        badges: [LeagueBadge.streak],
-      ),
-      const LeagueParticipant(
-        userId: 'user11',
-        userName: '시작이반',
-        weeklyXp: 950,
-        rank: 11,
-        badges: [],
-      ),
-      const LeagueParticipant(
-        userId: 'user12',
-        userName: '도전자',
-        weeklyXp: 850,
-        rank: 12,
-        badges: [],
-      ),
-      const LeagueParticipant(
-        userId: 'user13',
-        userName: '초보학습',
-        weeklyXp: 750,
-        rank: 13,
-        badges: [],
-      ),
-      const LeagueParticipant(
-        userId: 'user14',
-        userName: '새싹',
-        weeklyXp: 650,
-        rank: 14,
-        badges: [],
-      ),
-      const LeagueParticipant(
-        userId: 'user15',
-        userName: '파이팅',
-        weeklyXp: 550,
-        rank: 15,
-        badges: [],
-      ),
-    ];
+        if (user == null) {
+          logWarning('사용자 정보 없음');
+          return;
+        }
 
-    return League(
-      // 🎮 듀오링고 스타일 티어 시스템
-      // 티어 변경 테스트: bronze, silver, gold, platinum, diamond, champion
-      tier: LeagueTier.silver, // <- 여기서 티어 변경 가능
-      participants: participants,
-      weekStartDate: cycleStart,
-      weekEndDate: cycleEnd,
+        await _repository.joinLeague(
+          userId: userId,
+          userName: user.name,
+          avatarUrl: user.photoUrl,
+        );
+
+        logInfo('리그 참가 완료');
+        await refreshLeague();
+      },
+      errorMessage: '리그 참가 실패',
+    );
+  }
+
+  /// XP 업데이트 (Firestore 동기화)
+  Future<void> updateUserXP(int xpGained) async {
+    await executeWithErrorHandling(
+      () async {
+        final userId = _getCurrentUserId();
+        final currentLeague = state.currentLeague;
+
+        if (currentLeague == null) {
+          logWarning('리그 정보 없음 - XP 업데이트 불가');
+          return;
+        }
+
+        // 현재 사용자의 주간 XP 계산
+        final participant = currentLeague.participants.firstWhere(
+          (p) => p.userId == userId,
+          orElse: () => const LeagueParticipant(
+            userId: '',
+            userName: '',
+            weeklyXp: 0,
+            rank: 0,
+            badges: [],
+          ),
+        );
+
+        final newWeeklyXp = participant.weeklyXp + xpGained;
+
+        // Firestore 업데이트
+        await _repository.updateUserXP(
+          userId: userId,
+          weeklyXp: newWeeklyXp,
+          tier: currentLeague.tier,
+        );
+
+        logInfo('리그 XP 업데이트 완료: +$xpGained (총: $newWeeklyXp)');
+        // 실시간 스트림이 자동으로 state 업데이트
+      },
+      errorMessage: 'XP 업데이트 실패',
+    );
+  }
+
+  /// 뱃지 추가
+  Future<void> addBadge(LeagueBadge badge) async {
+    await executeWithErrorHandling(
+      () async {
+        final userId = _getCurrentUserId();
+        final currentLeague = state.currentLeague;
+
+        if (currentLeague == null) {
+          logWarning('리그 정보 없음 - 뱃지 추가 불가');
+          return;
+        }
+
+        await _repository.addBadge(
+          userId: userId,
+          badge: badge,
+          tier: currentLeague.tier,
+        );
+
+        logInfo('뱃지 추가 완료: $badge');
+      },
+      errorMessage: '뱃지 추가 실패',
     );
   }
 }
 
 /// 리그 Provider 정의
 final leagueProvider = StateNotifierProvider<LeagueNotifier, LeagueState>((ref) {
-  return LeagueNotifier(ref);
+  final leagueRepository = ref.watch(leagueRepositoryProvider);
+  return LeagueNotifier(ref, leagueRepository);
 });
 
 /// 현재 사용자의 리그 순위 Provider

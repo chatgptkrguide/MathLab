@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/problem.dart';
-import '../../../data/providers/hint_provider.dart';
+import '../../../data/providers/hint_provider_optimized.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../shared/constants/constants.dart';
 import '../../../shared/utils/haptic_feedback.dart';
@@ -52,7 +52,7 @@ class _HintSectionState extends ConsumerState<HintSection>
       return const SizedBox.shrink();
     }
 
-    final hintState = ref.watch(hintProvider);
+    final hintState = ref.watch(hintProviderOptimized);
     final user = ref.watch(userProvider);
     final userXP = user?.xp ?? 0;
 
@@ -195,7 +195,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                               hintIndex: index,
                               hintText: widget.problem.hints[index],
                               isUnlocked: isUnlocked,
-                              canUnlock: userXP >= HintProvider.hintCost,
+                              canUnlock: userXP >= HintProviderOptimized.hintCost,
                               onUnlock: () => _unlockHint(context, index),
                             );
                           },
@@ -211,7 +211,7 @@ class _HintSectionState extends ConsumerState<HintSection>
   }
 
   int _getUnlockedCount() {
-    final hintState = ref.watch(hintProvider);
+    final hintState = ref.watch(hintProviderOptimized);
     int count = 0;
     for (int i = 0; i < widget.problem.hints.length; i++) {
       // hintState를 통해 unlock 여부 확인
@@ -228,7 +228,7 @@ class _HintSectionState extends ConsumerState<HintSection>
     int hintIndex,
   ) async {
     final success = await ref
-        .read(hintProvider.notifier)
+        .read(hintProviderOptimized.notifier)
         .unlockHint(widget.problem, hintIndex);
 
     if (success) {
@@ -247,7 +247,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                 const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
-                    '힌트가 잠금 해제되었습니다! (-${HintProvider.hintCost} XP)',
+                    '힌트가 잠금 해제되었습니다! (-${HintProviderOptimized.hintCost} XP)',
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.surface,
                       fontWeight: FontWeight.w600,
@@ -281,7 +281,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                 const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
-                    'XP가 부족합니다 (필요: ${HintProvider.hintCost} XP)',
+                    'XP가 부족합니다 (필요: ${HintProviderOptimized.hintCost} XP)',
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.surface,
                       fontWeight: FontWeight.w600,
@@ -469,7 +469,7 @@ class _HintItemState extends State<_HintItem>
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${HintProvider.hintCost} XP 필요',
+                    '${HintProviderOptimized.hintCost} XP 필요',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -537,7 +537,7 @@ class _HintItemState extends State<_HintItem>
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '${HintProvider.hintCost}',
+                            '${HintProviderOptimized.hintCost}',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,

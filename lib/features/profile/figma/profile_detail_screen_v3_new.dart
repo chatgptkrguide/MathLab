@@ -955,38 +955,41 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
             ),
           ),
           const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed: () {
-              if (isPremiumActive) {
-                // Premium user: Navigate to subscription management
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const SubscriptionManagementScreen(),
-                  ),
-                );
-              } else {
-                // Free user: Navigate to premium upgrade
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const PremiumUpgradeScreen(),
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isPremiumActive ? AppColors.premiumGold : AppColors.mathBlue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          SizedBox(
+            width: 100,
+            child: ElevatedButton(
+              onPressed: () {
+                if (isPremiumActive) {
+                  // Premium user: Navigate to subscription management
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SubscriptionManagementScreen(),
+                    ),
+                  );
+                } else {
+                  // Free user: Navigate to premium upgrade
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const PremiumUpgradeScreen(),
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isPremiumActive ? AppColors.premiumGold : AppColors.mathBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
               ),
-              elevation: 3,
-            ),
-            child: Text(
-              isPremiumActive ? '관리' : 'Upgrade',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+              child: Text(
+                isPremiumActive ? '관리' : 'Upgrade',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

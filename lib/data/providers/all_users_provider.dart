@@ -29,7 +29,7 @@ class AllUsersNotifier extends BaseNotifier<List<User>> {
           fromJson: User.fromJson,
         );
 
-        if (users != null && users.isNotEmpty) {
+        if (users.isNotEmpty) {
           state = users;
           logInfo('전체 사용자 목록 로드 성공: ${users.length}명');
         } else {

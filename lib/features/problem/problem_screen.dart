@@ -13,7 +13,7 @@ import '../../data/providers/lesson_provider.dart';
 import '../../data/providers/error_note_provider.dart';
 import '../../data/providers/wrong_answer_provider.dart';
 import '../../data/providers/achievement_provider.dart';
-import '../../data/providers/hint_provider.dart';
+import '../../data/providers/hint_provider_optimized.dart';
 import '../../data/providers/study_history_provider.dart';
 import '../../data/services/sound_service.dart';
 import 'widgets/problem_result_dialog.dart';
@@ -89,7 +89,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
     // 첫 문제의 힌트 시스템 초기화
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
+      ref.read(hintProviderOptimized.notifier).startProblem(_currentProblem.id);
     });
   }
 
@@ -125,7 +125,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // Future로 래핑하여 위젯 트리 빌드 완료 후에 실행
     if (mounted) {
       Future(() {
-        ref.read(hintProvider.notifier).endProblem();
+        ref.read(hintProviderOptimized.notifier).endProblem();
       });
     }
     super.deactivate();
@@ -275,20 +275,17 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
   /// 정답 텍스트 가져오기
   String _getCorrectAnswerText() {
-    // 주관식 문제의 경우
-    if (_currentProblem.correctAnswer != null) {
-      return _currentProblem.correctAnswer!;
+    // 주관식 문제의 경우 (answer가 String인 경우)
+    if (_currentProblem.answer is String) {
+      return _currentProblem.answer as String;
     }
 
-    // 객관식 문제의 경우
-    final options = _currentProblem.options;
-    final correctIndex = _currentProblem.correctAnswerIndex;
-
-    if (options != null &&
-        correctIndex != null &&
-        correctIndex >= 0 &&
-        correctIndex < options.length) {
-      return options[correctIndex];
+    // 객관식 문제의 경우 (answer가 int인 경우)
+    if (_currentProblem.answer is int && _currentProblem.choices.isNotEmpty) {
+      final correctIndex = _currentProblem.answer as int;
+      if (correctIndex >= 0 && correctIndex < _currentProblem.choices.length) {
+        return _currentProblem.choices[correctIndex];
+      }
     }
 
     return '알 수 없음';
@@ -433,10 +430,16 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       await SoundEffects.playWrong();
 
       // 오답: 오답 노트에 저장 (기존 error_note와 새로운 wrong_answer 모두 저장)
+      final userAnswer = _currentProblem.choices.isNotEmpty &&
+                         _selectedAnswerIndex != null &&
+                         _selectedAnswerIndex! < _currentProblem.choices.length
+          ? _currentProblem.choices[_selectedAnswerIndex!]
+          : '선택 없음';
+
       await ref.read(errorNoteProvider.notifier).addErrorNote(
             userId: userId,
             problem: _currentProblem,
-            userAnswer: _currentProblem.options![_selectedAnswerIndex!],
+            userAnswer: userAnswer,
           );
 
       // 새로운 오답 노트 시스템에도 저장
@@ -462,7 +465,12 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
     // 답안 정규화 (공백 제거, 소문자 변환 등)
     final userAnswer = _answerController.text.trim();
-    final correctAnswer = _currentProblem.correctAnswer?.trim() ?? '';
+
+    // 정답 가져오기 (answer 필드가 String인 경우)
+    String correctAnswer = '';
+    if (_currentProblem.answer is String) {
+      correctAnswer = (_currentProblem.answer as String).trim();
+    }
 
     // 정답 체크 (대소문자 구분 없음, 공백 무시)
     if (_currentProblem.type == ProblemType.calculation) {
@@ -725,7 +733,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     _stopwatch.start();
 
     // 다음 문제의 힌트 시스템 초기화
-    ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
+    ref.read(hintProviderOptimized.notifier).startProblem(_currentProblem.id);
 
     // 페이드 인 애니메이션
     await _transitionController.forward(from: 0.0);
@@ -834,7 +842,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       return null;
     }
 
-    final hintState = ref.watch(hintProvider);
+    final hintState = ref.watch(hintProviderOptimized);
 
     // 잠금 해제된 힌트 개수 계산
     int unlockedCount = 0;
@@ -894,7 +902,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     _stopwatch.start();
 
     // 첫 문제의 힌트 시스템 초기화
-    ref.read(hintProvider.notifier).startProblem(_currentProblem.id);
+    ref.read(hintProviderOptimized.notifier).startProblem(_currentProblem.id);
 
     _transitionController.reset();
     _transitionController.forward();

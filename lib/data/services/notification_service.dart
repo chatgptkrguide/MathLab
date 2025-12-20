@@ -158,6 +158,41 @@ class NotificationService {
     );
   }
 
+  /// Public method for showing notifications
+  Future<void> showNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'mathlab_channel',
+      'MathLab Notifications',
+      channelDescription: '학습 알림 및 리마인더',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _localNotifications.show(
+      DateTime.now().millisecondsSinceEpoch % 100000,
+      title,
+      body,
+      details,
+      payload: payload,
+    );
+  }
+
   /// 알림 탭 핸들러
   void _onNotificationTapped(NotificationResponse response) {
     Logger.info(

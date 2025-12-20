@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
-import '../../../shared/widgets/fade_in_widget.dart';
+import '../../../shared/widgets/animations/fade_in_widget.dart';
 
 /// 오답 노트 통계 그리드 위젯
 ///

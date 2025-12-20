@@ -104,7 +104,6 @@ class _UnifiedButtonState extends State<UnifiedButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -306,7 +305,6 @@ class _UnifiedButtonState extends State<UnifiedButton>
 
   void _onTapDown() async {
     if (widget.enableAnimation) {
-      setState(() => _isPressed = true);
       await _scaleController.forward();
     }
     if (widget.enableHaptic) {
@@ -317,14 +315,12 @@ class _UnifiedButtonState extends State<UnifiedButton>
   void _onTapUp() async {
     if (widget.enableAnimation) {
       await _scaleController.reverse();
-      setState(() => _isPressed = false);
     }
   }
 
   void _onTapCancel() async {
     if (widget.enableAnimation) {
       await _scaleController.reverse();
-      setState(() => _isPressed = false);
     }
   }
 

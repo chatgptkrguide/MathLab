@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/wrong_answer_provider.dart';
 import '../../data/models/wrong_answer.dart';
 import '../../shared/constants/constants.dart';
-import '../../shared/constants/figma_colors.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../shared/utils/utils.dart';
 import '../problem/problem_screen.dart';

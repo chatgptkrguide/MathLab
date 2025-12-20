@@ -42,6 +42,7 @@ dependencies:
 
   # 로컬 저장소
   shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0  # 보안 저장소 (iOS Keychain, Android KeyStore)
   encrypt: ^5.0.3  # AES 암호화
   crypto: ^3.0.3  # 해시 함수
 
@@ -70,6 +71,7 @@ dependencies:
   cloud_firestore: ^5.6.0
   firebase_storage: ^12.4.0
   firebase_analytics: ^11.4.0
+  firebase_crashlytics: ^4.2.0  # 크래시 리포팅
   firebase_messaging: ^15.1.7  # 푸시 알림
 
   # 로컬 알림

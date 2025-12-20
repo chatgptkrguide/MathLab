@@ -146,6 +146,7 @@ class User {
       'totalXP': xp,
       'level': level,
       'streak': streakDays,
+      'streakDays': streakDays,
       'hearts': hearts,
       'dailyXP': dailyXP,
       'lastStudyDate': lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
@@ -159,6 +160,9 @@ class User {
       'updatedAt': Timestamp.now(),
     };
   }
+
+  /// toFirestore의 alias (backward compatibility)
+  Map<String, dynamic> toFirestoreMap() => toFirestore();
 
   /// User 객체 복사 (일부 값 변경)
   User copyWith({
@@ -280,6 +284,9 @@ class User {
 
   /// 학년 번호 (1-6 또는 1-3)
   int get gradeNumber => SchoolLevel.getGradeNumber(currentGrade);
+
+  /// photoUrl getter (avatarUrl의 alias)
+  String? get photoUrl => avatarUrl.isEmpty ? null : avatarUrl;
 
   @override
   String toString() {

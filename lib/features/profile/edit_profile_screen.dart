@@ -22,7 +22,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _bioController;
 
   File? _selectedImage;
-  bool _isUploading = false;
 
   @override
   void initState() {
@@ -453,10 +452,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final user = ref.read(userProvider);
     if (user == null) return;
 
-    setState(() {
-      _isUploading = true;
-    });
-
     if (!mounted) return;
     LoadingOverlay.show(context, message: '프로필 저장 중...');
 
@@ -508,12 +503,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isUploading = false;
-        });
-      }
     }
   }
 }

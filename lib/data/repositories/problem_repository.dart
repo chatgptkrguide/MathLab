@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import '../models/problem.dart';
 import '../models/school_level.dart';
+import '../../shared/utils/logger.dart';
 
 /// 문제 데이터 저장소
 class ProblemRepository {
@@ -27,7 +28,7 @@ class ProblemRepository {
         final problem = await loadProblem('assets/problems/polynomials/polynomial_001.json');
         problems.add(problem);
       } catch (e) {
-        print('문제 로드 오류: $e');
+        Logger.error('문제 로드 오류: $e');
       }
     }
 
@@ -52,14 +53,14 @@ class ProblemRepository {
       // allProblems.addAll(elementaryProblems);
 
       if (allProblems.isEmpty) {
-        print('[ProblemRepository] 로드된 문제가 없습니다.');
+        Logger.debug('[ProblemRepository] 로드된 문제가 없습니다.');
       } else {
-        print('[ProblemRepository] 총 ${allProblems.length}개 문제 로드 (학년별 폴더)');
+        Logger.debug('[ProblemRepository] 총 ${allProblems.length}개 문제 로드 (학년별 폴더)');
       }
 
       return allProblems;
     } catch (e) {
-      print('전체 문제 로드 오류: $e');
+      Logger.error('전체 문제 로드 오류: $e');
       return [];
     }
   }
@@ -130,10 +131,10 @@ class ProblemRepository {
         }).toList();
 
         problems.addAll(loadedProblems);
-        print('[ProblemRepository] $schoolLevel/$gradeFolder에서 ${loadedProblems.length}개 문제 로드');
+        Logger.debug('[ProblemRepository] $schoolLevel/$gradeFolder에서 ${loadedProblems.length}개 문제 로드');
       } catch (e) {
         // 파일이 없으면 스킵 (정상 동작)
-        print('[ProblemRepository] $schoolLevel/$gradeFolder 문제 파일 없음 (스킵)');
+        Logger.debug('[ProblemRepository] $schoolLevel/$gradeFolder 문제 파일 없음 (스킵)');
       }
     }
 
@@ -170,7 +171,7 @@ class ProblemRepository {
     }).toList();
 
     if (filteredProblems.isNotEmpty) {
-      print('[ProblemRepository] 레슨 $lessonId에 ${filteredProblems.length}개 문제 로드 (학년별 폴더)');
+      Logger.debug('[ProblemRepository] 레슨 $lessonId에 ${filteredProblems.length}개 문제 로드 (학년별 폴더)');
       return filteredProblems;
     }
 
@@ -178,15 +179,15 @@ class ProblemRepository {
     try {
       final koreanProblems = await _loadKoreanCurriculumProblems(lessonId);
       if (koreanProblems.isNotEmpty) {
-        print('[ProblemRepository] 한국 교육과정 문제 ${koreanProblems.length}개 로드: $lessonId');
+        Logger.debug('[ProblemRepository] 한국 교육과정 문제 ${koreanProblems.length}개 로드: $lessonId');
         return koreanProblems;
       }
     } catch (e) {
-      print('[ProblemRepository] 한국 교육과정 문제 로드 실패: $e');
+      Logger.debug('[ProblemRepository] 한국 교육과정 문제 로드 실패: $e');
     }
 
     // 3단계: 적절한 문제가 없으면 "준비중" 메시지 표시
-    print('[ProblemRepository] 레슨 $lessonId에 적절한 문제가 없습니다. 준비중 메시지 표시');
+    Logger.debug('[ProblemRepository] 레슨 $lessonId에 적절한 문제가 없습니다. 준비중 메시지 표시');
     return [_generateSingleProblem(lessonId)];
   }
 
@@ -207,7 +208,7 @@ class ProblemRepository {
       }).toList();
 
       if (filteredProblems.isNotEmpty) {
-        print('[ProblemRepository] 레슨 $lessonId, 학년 $grade에 ${filteredProblems.length}개 문제 로드');
+        Logger.debug('[ProblemRepository] 레슨 $lessonId, 학년 $grade에 ${filteredProblems.length}개 문제 로드');
         return filteredProblems;
       }
 
@@ -215,18 +216,18 @@ class ProblemRepository {
       try {
         final koreanProblems = await _loadKoreanCurriculumProblems(lessonId);
         if (koreanProblems.isNotEmpty) {
-          print('[ProblemRepository] 한국 교육과정 문제 ${koreanProblems.length}개 로드: $lessonId (학년: $grade)');
+          Logger.debug('[ProblemRepository] 한국 교육과정 문제 ${koreanProblems.length}개 로드: $lessonId (학년: $grade)');
           return koreanProblems;
         }
       } catch (e) {
-        print('[ProblemRepository] 한국 교육과정 문제 로드 실패: $e');
+        Logger.debug('[ProblemRepository] 한국 교육과정 문제 로드 실패: $e');
       }
 
       // 4단계: 적절한 문제가 없으면 "준비중" 메시지 표시
-      print('[ProblemRepository] 레슨 $lessonId, 학년 $grade에 적절한 문제가 없습니다. 준비중 메시지 표시');
+      Logger.debug('[ProblemRepository] 레슨 $lessonId, 학년 $grade에 적절한 문제가 없습니다. 준비중 메시지 표시');
       return [_generateSingleProblem(lessonId)];
     } catch (e) {
-      print('[ProblemRepository] 문제 로드 오류 (레슨: $lessonId, 학년: $grade): $e');
+      Logger.debug('[ProblemRepository] 문제 로드 오류 (레슨: $lessonId, 학년: $grade): $e');
       return [_generateSingleProblem(lessonId)];
     }
   }
@@ -324,7 +325,7 @@ class ProblemRepository {
   }) async {
     // 학교급이 해당 학년을 포함하는지 확인
     if (!schoolLevel.containsGrade(grade)) {
-      print('[ProblemRepository] 학년 $grade은(는) ${schoolLevel.displayName}에 속하지 않습니다.');
+      Logger.debug('[ProblemRepository] 학년 $grade은(는) ${schoolLevel.displayName}에 속하지 않습니다.');
       return [];
     }
 

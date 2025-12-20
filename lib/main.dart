@@ -8,7 +8,6 @@ import 'app/app.dart';
 import 'shared/constants/app_colors.dart';
 import 'data/services/notification_service.dart';
 import 'data/services/sound_service.dart';
-import 'data/services/sync_manager.dart';
 import 'shared/utils/logger.dart';
 
 /// MathLab 앱의 진입점
@@ -21,13 +20,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // SyncManager 초기화 (Firebase 초기화 후 실행)
-  try {
-    await SyncManager().initialize();
-    Logger.info('SyncManager initialized successfully', tag: 'Main');
-  } catch (e) {
-    Logger.error('Failed to initialize SyncManager', error: e, tag: 'Main');
-  }
+  // SyncManager는 Provider를 통해 초기화됨 (AuthWrapper에서 처리)
+  Logger.info('Firebase initialized successfully', tag: 'Main');
 
   // Timezone 초기화 (알림 스케줄링용)
   await initializeTimezone();

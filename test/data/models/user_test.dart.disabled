@@ -1,0 +1,282 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mathlab/data/models/models.dart';
+
+void main() {
+  group('User Model', () {
+    test('should create valid User instance', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: '테스트 사용자',
+        photoURL: 'https://example.com/photo.jpg',
+        level: 5,
+        xp: 1250,
+        streak: 7,
+        hearts: 5,
+        coins: 500,
+        isPremium: false,
+        createdAt: DateTime(2024, 1, 1),
+        lastActiveAt: DateTime(2024, 1, 15),
+      );
+
+      expect(user.id, 'user123');
+      expect(user.email, 'test@example.com');
+      expect(user.displayName, '테스트 사용자');
+      expect(user.level, 5);
+      expect(user.xp, 1250);
+      expect(user.streak, 7);
+      expect(user.hearts, 5);
+      expect(user.coins, 500);
+      expect(user.isPremium, false);
+    });
+
+    test('should convert User to JSON', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: '테스트',
+        level: 3,
+        xp: 750,
+        streak: 5,
+        hearts: 5,
+        coins: 200,
+        isPremium: false,
+        createdAt: DateTime(2024, 1, 1),
+        lastActiveAt: DateTime(2024, 1, 10),
+      );
+
+      final json = user.toJson();
+
+      expect(json['id'], 'user123');
+      expect(json['email'], 'test@example.com');
+      expect(json['displayName'], '테스트');
+      expect(json['level'], 3);
+      expect(json['xp'], 750);
+      expect(json['streak'], 5);
+      expect(json['isPremium'], false);
+    });
+
+    test('should create User from JSON', () {
+      final json = {
+        'id': 'user456',
+        'email': 'user@example.com',
+        'displayName': 'User 456',
+        'level': 10,
+        'xp': 5000,
+        'streak': 30,
+        'hearts': 5,
+        'coins': 1000,
+        'isPremium': true,
+        'createdAt': '2024-01-01T00:00:00.000',
+        'lastActiveAt': '2024-01-20T10:30:00.000',
+      };
+
+      final user = User.fromJson(json);
+
+      expect(user.id, 'user456');
+      expect(user.email, 'user@example.com');
+      expect(user.displayName, 'User 456');
+      expect(user.level, 10);
+      expect(user.xp, 5000);
+      expect(user.streak, 30);
+      expect(user.isPremium, true);
+    });
+
+    test('should support copyWith for updates', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: 'Original',
+        level: 1,
+        xp: 0,
+        streak: 0,
+        hearts: 5,
+        coins: 0,
+        isPremium: false,
+        createdAt: DateTime(2024, 1, 1),
+        lastActiveAt: DateTime(2024, 1, 1),
+      );
+
+      final updated = user.copyWith(
+        displayName: 'Updated',
+        level: 2,
+        xp: 100,
+        streak: 1,
+      );
+
+      expect(updated.id, 'user123'); // unchanged
+      expect(updated.email, 'test@example.com'); // unchanged
+      expect(updated.displayName, 'Updated'); // changed
+      expect(updated.level, 2); // changed
+      expect(updated.xp, 100); // changed
+      expect(updated.streak, 1); // changed
+      expect(updated.hearts, 5); // unchanged
+    });
+
+    test('should calculate correct level from XP', () {
+      // Level 1: 0 XP
+      expect(User.getLevelFromXP(0), 1);
+
+      // Level 2: 100 XP
+      expect(User.getLevelFromXP(100), 2);
+
+      // Level 5: 1000 XP
+      expect(User.getLevelFromXP(1000), 5);
+
+      // Level 10: 5000 XP
+      expect(User.getLevelFromXP(5000), 10);
+    });
+
+    test('should calculate XP required for next level', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: 'Test',
+        level: 5,
+        xp: 1250,
+        streak: 0,
+        hearts: 5,
+        coins: 0,
+        isPremium: false,
+        createdAt: DateTime.now(),
+        lastActiveAt: DateTime.now(),
+      );
+
+      final xpForNextLevel = user.xpRequiredForNextLevel();
+
+      expect(xpForNextLevel, greaterThan(0));
+      expect(xpForNextLevel, lessThanOrEqualTo(500)); // Typical XP gap
+    });
+
+    test('should validate streak increment', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: 'Test',
+        level: 1,
+        xp: 0,
+        streak: 5,
+        hearts: 5,
+        coins: 0,
+        isPremium: false,
+        createdAt: DateTime.now(),
+        lastActiveAt: DateTime.now().subtract(const Duration(days: 1)),
+      );
+
+      final updated = user.copyWith(
+        streak: user.streak + 1,
+        lastActiveAt: DateTime.now(),
+      );
+
+      expect(updated.streak, 6);
+      expect(updated.lastActiveAt.day, DateTime.now().day);
+    });
+
+    test('should validate streak reset', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: 'Test',
+        level: 1,
+        xp: 0,
+        streak: 10,
+        hearts: 5,
+        coins: 0,
+        isPremium: false,
+        createdAt: DateTime.now(),
+        lastActiveAt: DateTime.now().subtract(const Duration(days: 2)),
+      );
+
+      // Streak should reset if last active was more than 1 day ago
+      final daysSinceLastActive = DateTime.now()
+          .difference(user.lastActiveAt)
+          .inDays;
+
+      expect(daysSinceLastActive, greaterThan(1));
+
+      final updated = user.copyWith(
+        streak: 0, // Reset streak
+        lastActiveAt: DateTime.now(),
+      );
+
+      expect(updated.streak, 0);
+    });
+
+    test('should handle premium status correctly', () {
+      final freeUser = User(
+        id: 'user1',
+        email: 'free@example.com',
+        displayName: 'Free User',
+        level: 1,
+        xp: 0,
+        streak: 0,
+        hearts: 5,
+        coins: 0,
+        isPremium: false,
+        createdAt: DateTime.now(),
+        lastActiveAt: DateTime.now(),
+      );
+
+      final premiumUser = freeUser.copyWith(isPremium: true);
+
+      expect(freeUser.isPremium, false);
+      expect(premiumUser.isPremium, true);
+    });
+
+    test('should handle hearts correctly', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: 'Test',
+        level: 1,
+        xp: 0,
+        streak: 0,
+        hearts: 5,
+        coins: 0,
+        isPremium: false,
+        createdAt: DateTime.now(),
+        lastActiveAt: DateTime.now(),
+      );
+
+      // Lose a heart
+      final afterMistake = user.copyWith(hearts: user.hearts - 1);
+      expect(afterMistake.hearts, 4);
+
+      // Gain a heart (max 5)
+      final afterRestore = afterMistake.copyWith(hearts: afterMistake.hearts + 1);
+      expect(afterRestore.hearts, 5);
+
+      // Should not exceed max hearts (5)
+      final maxHearts = user.copyWith(hearts: 6);
+      expect(maxHearts.hearts, lessThanOrEqualTo(5));
+    });
+
+    test('should handle coins correctly', () {
+      final user = User(
+        id: 'user123',
+        email: 'test@example.com',
+        displayName: 'Test',
+        level: 1,
+        xp: 0,
+        streak: 0,
+        hearts: 5,
+        coins: 100,
+        isPremium: false,
+        createdAt: DateTime.now(),
+        lastActiveAt: DateTime.now(),
+      );
+
+      // Earn coins
+      final afterEarning = user.copyWith(coins: user.coins + 50);
+      expect(afterEarning.coins, 150);
+
+      // Spend coins
+      final afterSpending = afterEarning.copyWith(coins: afterEarning.coins - 30);
+      expect(afterSpending.coins, 120);
+
+      // Cannot go negative
+      final negativeCoins = user.copyWith(coins: -10);
+      expect(negativeCoins.coins, greaterThanOrEqualTo(0));
+    });
+  });
+}

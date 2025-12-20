@@ -6,8 +6,12 @@ import '../models/sync_status.dart';
 import '../models/sync_task.dart';
 import '../models/user.dart';
 import '../models/wrong_answer.dart';
+import '../models/lesson.dart';
+import '../models/league.dart';
 import '../repositories/user_repository.dart';
 import '../repositories/wrong_answer_repository.dart';
+import '../repositories/lesson_repository.dart';
+import '../repositories/league_repository.dart';
 import '../../shared/utils/logger.dart';
 
 /// 동기화 관리자
@@ -31,6 +35,8 @@ class SyncManager {
   // late final로 선언하여 초기화 보장 및 null 체크 제거
   late final UserRepository _userRepository;
   late final WrongAnswerRepository _wrongAnswerRepository;
+  late final LessonRepository _lessonRepository;
+  late final LeagueRepository _leagueRepository;
 
   // 동기화 상태 스트림
   final _syncStatusController = StreamController<SyncStatus>.broadcast();
@@ -56,6 +62,8 @@ class SyncManager {
   Future<void> initialize({
     UserRepository? userRepository,
     WrongAnswerRepository? wrongAnswerRepository,
+    LessonRepository? lessonRepository,
+    LeagueRepository? leagueRepository,
   }) async {
     try {
       Logger.info('SyncManager 초기화 시작', tag: 'SyncManager');
@@ -68,6 +76,16 @@ class SyncManager {
           );
       _wrongAnswerRepository = wrongAnswerRepository ??
           WrongAnswerRepository(
+            localStorageService: _localStorage,
+            firestoreService: _firestore,
+          );
+      _lessonRepository = lessonRepository ??
+          LessonRepository(
+            localStorageService: _localStorage,
+            firestoreService: _firestore,
+          );
+      _leagueRepository = leagueRepository ??
+          LeagueRepository(
             localStorageService: _localStorage,
             firestoreService: _firestore,
           );
@@ -263,13 +281,11 @@ class SyncManager {
         break;
 
       case SyncTaskType.uploadStudyHistory:
-        // TODO: StudyHistoryRepository 구현 후 추가
-        Logger.debug('학습 기록 업로드: ${task.accountId} (미구현)', tag: 'SyncManager');
+        await _uploadLessons(task);
         break;
 
       case SyncTaskType.uploadLeague:
-        // TODO: LeagueRepository 구현 후 추가
-        Logger.debug('리그 데이터 업로드: ${task.accountId} (미구현)', tag: 'SyncManager');
+        await _uploadLeague(task);
         break;
 
       case SyncTaskType.downloadUserProfile:
@@ -281,9 +297,80 @@ class SyncManager {
         break;
 
       case SyncTaskType.downloadStudyHistory:
-        // TODO: StudyHistoryRepository 구현 후 추가
-        Logger.debug('학습 기록 다운로드: ${task.accountId} (미구현)', tag: 'SyncManager');
+        await _downloadLessons(task);
         break;
+    }
+  }
+
+  /// 레슨 데이터 업로드
+  Future<void> _uploadLessons(SyncTask task) async {
+    try {
+      final lessonsData = task.data['lessons'] as List<dynamic>;
+      final lessons = lessonsData
+          .map((lessonJson) => Lesson.fromJson(lessonJson as Map<String, dynamic>))
+          .toList();
+
+      await _lessonRepository.saveToFirebase(task.accountId, lessons);
+
+      Logger.info('레슨 데이터 업로드 완료: ${lessons.length}개', tag: 'SyncManager');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '레슨 데이터 업로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
+    }
+  }
+
+  /// 리그 데이터 업로드
+  Future<void> _uploadLeague(SyncTask task) async {
+    try {
+      final leagueData = task.data['league'] as Map<String, dynamic>;
+      final league = League.fromJson(leagueData);
+
+      await _leagueRepository.saveToFirebase(task.accountId, league);
+
+      Logger.info('리그 데이터 업로드 완료: ${league.tier}', tag: 'SyncManager');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그 데이터 업로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
+    }
+  }
+
+  /// 레슨 데이터 다운로드
+  Future<void> _downloadLessons(SyncTask task) async {
+    try {
+      final remoteLessons = await _lessonRepository.getFromFirebase(task.accountId);
+
+      if (remoteLessons != null && remoteLessons.isNotEmpty) {
+        final localLessons = await _lessonRepository.getFromLocal('lessons_${task.accountId}');
+
+        // 병합: 기본 정보는 Firebase, 진행률은 로컬 우선
+        if (localLessons != null) {
+          final merged = await _lessonRepository.mergeData(localLessons, remoteLessons);
+          if (merged != null) {
+            await _lessonRepository.saveToLocal('lessons_${task.accountId}', merged);
+          }
+        } else {
+          await _lessonRepository.saveToLocal('lessons_${task.accountId}', remoteLessons);
+        }
+        Logger.info('레슨 데이터 다운로드 완료: ${remoteLessons.length}개', tag: 'SyncManager');
+      }
+    } catch (e, stackTrace) {
+      Logger.error(
+        '레슨 데이터 다운로드 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+      rethrow;
     }
   }
 
@@ -460,7 +547,19 @@ class SyncManager {
       }
       Logger.debug('오답 목록 업로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
 
-      // TODO: 학습 기록, 리그 데이터 업로드 추가
+      // 3. 레슨 데이터 업로드
+      final lessons = await _lessonRepository.getFromLocal('lessons_$accountId');
+      if (lessons != null && lessons.isNotEmpty) {
+        await _lessonRepository.saveToFirebase(accountId, lessons);
+        Logger.debug('레슨 데이터 업로드 완료: ${lessons.length}개', tag: 'SyncManager');
+      }
+
+      // 4. 리그 데이터 업로드
+      final league = await _leagueRepository.getFromLocal('league_$accountId');
+      if (league != null) {
+        await _leagueRepository.saveToFirebase(accountId, league);
+        Logger.debug('리그 데이터 업로드 완료: ${league.tier}', tag: 'SyncManager');
+      }
 
       Logger.info('업로드 완료', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -509,7 +608,39 @@ class SyncManager {
         Logger.debug('오답 목록 다운로드 완료: ${merged.length}개', tag: 'SyncManager');
       }
 
-      // TODO: 학습 기록, 리그 데이터 다운로드 추가
+      // 3. 레슨 데이터 다운로드
+      final remoteLessons = await _lessonRepository.getFromFirebase(accountId);
+      if (remoteLessons != null && remoteLessons.isNotEmpty) {
+        final localLessons = await _lessonRepository.getFromLocal('lessons_$accountId');
+
+        // 병합: 기본 정보는 Firebase, 진행률은 로컬 우선
+        if (localLessons != null) {
+          final mergedLessons = await _lessonRepository.mergeData(localLessons, remoteLessons);
+          if (mergedLessons != null) {
+            await _lessonRepository.saveToLocal('lessons_$accountId', mergedLessons);
+          }
+        } else {
+          await _lessonRepository.saveToLocal('lessons_$accountId', remoteLessons);
+        }
+        Logger.debug('레슨 데이터 다운로드 완료: ${remoteLessons.length}개', tag: 'SyncManager');
+      }
+
+      // 4. 리그 데이터 다운로드
+      final remoteLeague = await _leagueRepository.getFromFirebase(accountId);
+      if (remoteLeague != null) {
+        final localLeague = await _leagueRepository.getFromLocal('league_$accountId');
+
+        // 병합: 리그 데이터는 Firebase 우선 (서버 데이터가 항상 최신)
+        if (localLeague != null) {
+          final mergedLeague = await _leagueRepository.mergeData(localLeague, remoteLeague);
+          if (mergedLeague != null) {
+            await _leagueRepository.saveToLocal('league_$accountId', mergedLeague);
+          }
+        } else {
+          await _leagueRepository.saveToLocal('league_$accountId', remoteLeague);
+        }
+        Logger.debug('리그 데이터 다운로드 완료: ${remoteLeague.tier}', tag: 'SyncManager');
+      }
 
       Logger.info('다운로드 완료', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -546,5 +677,69 @@ class SyncManager {
     }
 
     return merged.values.toList();
+  }
+
+  // ==================== 실시간 스트림 ====================
+
+  /// 사용자 프로필 실시간 감지
+  Stream<User?> watchUserProfile(String userId) {
+    return _userRepository.watchUserProfile(userId);
+  }
+
+  /// 레슨 데이터 실시간 감지
+  Stream<List<Lesson>> watchLessons() {
+    return _lessonRepository.watchLessons();
+  }
+
+  /// 리그 순위 실시간 감지
+  Stream<League?> watchLeague(String userId) {
+    return _leagueRepository.watchCurrentLeague(userId);
+  }
+
+  /// 전체 실시간 동기화 시작 (앱 시작 시 호출)
+  ///
+  /// User, Lesson, League 데이터를 실시간으로 감지하고 자동 업데이트
+  Future<void> startRealtimeSync(String userId) async {
+    if (!_isOnline) {
+      Logger.warning('오프라인 상태 - 실시간 동기화 건너뜀', tag: 'SyncManager');
+      return;
+    }
+
+    try {
+      Logger.info('실시간 동기화 시작: $userId', tag: 'SyncManager');
+
+      // 사용자 프로필 실시간 감지 및 로컬 저장
+      watchUserProfile(userId).listen((user) async {
+        if (user != null) {
+          await _userRepository.saveToLocal('user_$userId', user);
+          Logger.debug('사용자 프로필 실시간 업데이트', tag: 'SyncManager');
+        }
+      });
+
+      // 레슨 데이터 실시간 감지 및 로컬 저장
+      watchLessons().listen((lessons) async {
+        if (lessons.isNotEmpty) {
+          await _lessonRepository.saveToLocal('lessons_$userId', lessons);
+          Logger.debug('레슨 데이터 실시간 업데이트: ${lessons.length}개', tag: 'SyncManager');
+        }
+      });
+
+      // 리그 순위 실시간 감지 및 로컬 저장
+      watchLeague(userId).listen((league) async {
+        if (league != null) {
+          await _leagueRepository.saveToLocal('league_$userId', league);
+          Logger.debug('리그 데이터 실시간 업데이트: ${league.tier}', tag: 'SyncManager');
+        }
+      });
+
+      Logger.info('실시간 동기화 활성화 완료', tag: 'SyncManager');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '실시간 동기화 시작 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'SyncManager',
+      );
+    }
   }
 }

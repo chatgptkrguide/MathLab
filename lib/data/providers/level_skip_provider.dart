@@ -3,6 +3,7 @@ import '../models/models.dart';
 import 'base/base_notifier.dart';
 import '../services/level_skip_service.dart';
 import 'user_provider.dart';
+import '../../shared/utils/logger.dart';
 
 /// LevelSkipService 싱글톤 제공
 final levelSkipServiceProvider = Provider<LevelSkipService>((ref) {
@@ -113,7 +114,7 @@ class SkipTestActions {
 
       return test;
     } catch (e) {
-      print('Failed to create skip test: $e');
+      Logger.error('Failed to create skip test', error: e, tag: 'LevelSkip');
       return null;
     }
   }
@@ -129,7 +130,7 @@ class SkipTestActions {
 
       return test;
     } catch (e) {
-      print('Failed to start skip test: $e');
+      Logger.error('Failed to start skip test', error: e, tag: 'LevelSkip');
       return null;
     }
   }
@@ -153,7 +154,7 @@ class SkipTestActions {
 
       return test;
     } catch (e) {
-      print('Failed to submit answer: $e');
+      Logger.error('Failed to submit answer', error: e, tag: 'LevelSkip');
       return null;
     }
   }
@@ -168,7 +169,7 @@ class SkipTestActions {
       _ref.invalidate(skipTestProvider(testId));
       _ref.invalidate(skipTestHistoryProvider);
     } catch (e) {
-      print('Failed to cancel skip test: $e');
+      Logger.error('Failed to cancel skip test', error: e, tag: 'LevelSkip');
     }
   }
 
@@ -182,7 +183,7 @@ class SkipTestActions {
       _ref.invalidate(skipTestProvider(testId));
       _ref.invalidate(skipTestHistoryProvider);
     } catch (e) {
-      print('Failed to delete skip test: $e');
+      Logger.error('Failed to delete skip test', error: e, tag: 'LevelSkip');
     }
   }
 
@@ -198,7 +199,7 @@ class SkipTestActions {
       _ref.invalidate(skipTestResultsProvider);
       _ref.invalidate(skipTestHistoryProvider);
     } catch (e) {
-      print('Failed to clear user data: $e');
+      Logger.error('Failed to clear user data', error: e, tag: 'LevelSkip');
     }
   }
 }

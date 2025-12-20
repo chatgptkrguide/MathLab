@@ -102,3 +102,12 @@ app.*.map.json
 !web/icons/*.png
 !web/favicon.png
 .vercel
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Auto-generated config files
+*.deeplink-config
+firestore.indexes.json

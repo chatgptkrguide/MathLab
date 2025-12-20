@@ -22,7 +22,6 @@ class ChatRoomsScreen extends ConsumerWidget {
             // 헤더
             const AdaptiveAppHeader(
               title: '메시지',
-              showBackButton: false,
             ),
 
             // 채팅방 목록

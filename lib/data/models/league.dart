@@ -199,6 +199,11 @@ class League {
     required this.weekEndDate,
   });
 
+  /// 사용자가 리그에 참가 중인지 확인
+  bool isUserParticipant(String userId) {
+    return participants.any((p) => p.userId == userId);
+  }
+
   /// 현재 사용자의 순위 찾기
   int? getUserRank(String userId) {
     final participant = participants.firstWhere(

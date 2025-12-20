@@ -39,22 +39,24 @@ class ProblemOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 선택지가 없으면 빈 위젯 반환
-    if (problem.options == null || problem.options!.isEmpty) {
+    if (problem.choices.isEmpty) {
       return const SizedBox.shrink();
     }
 
     return Column(
       children: List.generate(
-        problem.options!.length,
+        problem.choices.length,
         (index) {
-          final isCorrectAnswer = problem.correctAnswerIndex == index;
+          // answer가 int인 경우 정답 인덱스로 사용
+          final correctAnswerIndex = problem.answer is int ? problem.answer as int : -1;
+          final isCorrectAnswer = correctAnswerIndex == index;
 
           return FadeInWidget(
             delay: Duration(milliseconds: 100 * index),
             child: Padding(
               padding: const EdgeInsets.only(bottom: AppDimensions.spacingM),
               child: ProblemOptionButton(
-                optionText: problem.options![index],
+                optionText: problem.choices[index],
                 index: index,
                 selectedIndex: selectedIndex,
                 isAnswerSubmitted: isAnswerSubmitted,
