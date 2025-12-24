@@ -140,10 +140,56 @@ class UserRepository extends BaseRepository<User> {
   @override
   Future<void> deleteFromFirebase(String accountId) async {
     try {
-      // Firestore에는 사용자 프로필 삭제 메서드가 없으므로
-      // 필요 시 구현
-      Logger.warning(
-        'Firebase 사용자 프로필 삭제는 구현되지 않음',
+      Logger.info(
+        'Firebase에서 사용자 데이터 완전 삭제 시작: $accountId',
+        tag: 'UserRepository',
+      );
+
+      final batch = FirebaseFirestore.instance.batch();
+
+      // 1. 사용자 프로필 삭제
+      final userRef = FirebaseFirestore.instance.collection('users').doc(accountId);
+      batch.delete(userRef);
+
+      // 2. 사용자의 오답 노트 서브컬렉션 삭제
+      final wrongAnswersSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(accountId)
+          .collection('wrongAnswers')
+          .get();
+
+      for (final doc in wrongAnswersSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // 3. 진행률 데이터 삭제 (userId로 필터링)
+      final progressSnapshot = await FirebaseFirestore.instance
+          .collection('progress')
+          .where('userId', isEqualTo: accountId)
+          .get();
+
+      for (final doc in progressSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // 4. 일일 학습 기록 삭제
+      final dailyStudiesSnapshot = await FirebaseFirestore.instance
+          .collection('daily_studies')
+          .where('userId', isEqualTo: accountId)
+          .get();
+
+      for (final doc in dailyStudiesSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // 5. 리그에서 사용자 제거 (트랜잭션으로 별도 처리)
+      await _removeUserFromLeagues(accountId);
+
+      // Batch 커밋
+      await batch.commit();
+
+      Logger.info(
+        'Firebase에서 사용자 데이터 완전 삭제 완료: $accountId',
         tag: 'UserRepository',
       );
     } catch (e, stackTrace) {
@@ -153,6 +199,62 @@ class UserRepository extends BaseRepository<User> {
         stackTrace: stackTrace,
         tag: 'UserRepository',
       );
+      throw Exception('Firebase 사용자 데이터 삭제 실패: $e');
+    }
+  }
+
+  /// 리그에서 사용자 제거
+  Future<void> _removeUserFromLeagues(String userId) async {
+    try {
+      final leaguesSnapshot = await FirebaseFirestore.instance
+          .collection('leagues')
+          .where('participants', arrayContains: {'userId': userId})
+          .get();
+
+      for (final leagueDoc in leaguesSnapshot.docs) {
+        final leagueRef = leagueDoc.reference;
+
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          final leagueSnapshot = await transaction.get(leagueRef);
+
+          if (!leagueSnapshot.exists) return;
+
+          final data = leagueSnapshot.data()!;
+          final participants = List<Map<String, dynamic>>.from(
+            data['participants'] as List? ?? [],
+          );
+
+          // 해당 사용자 제거
+          participants.removeWhere((p) => p['userId'] == userId);
+
+          // 순위 재계산
+          participants.sort((a, b) {
+            final aXp = a['xp'] as int? ?? 0;
+            final bXp = b['xp'] as int? ?? 0;
+            return bXp.compareTo(aXp);
+          });
+
+          for (int i = 0; i < participants.length; i++) {
+            participants[i]['rank'] = i + 1;
+          }
+
+          transaction.update(leagueRef, {
+            'participants': participants,
+            'participantCount': participants.length,
+            'updatedAt': Timestamp.fromDate(DateTime.now()),
+          });
+        });
+      }
+
+      Logger.info('리그에서 사용자 제거 완료: $userId', tag: 'UserRepository');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그에서 사용자 제거 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'UserRepository',
+      );
+      // 리그 제거 실패는 치명적이지 않으므로 예외를 던지지 않음
     }
   }
 

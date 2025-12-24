@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -75,16 +76,37 @@ class SocialAuthService {
     try {
       Logger.info('Google 로그인 시작', tag: 'SocialAuth');
 
-      // Google 계정 선택 화면 표시
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      // Google 계정 선택 화면 표시 (타임아웃: 60초)
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn().timeout(
+        const Duration(seconds: 60),
+        onTimeout: () {
+          Logger.warning('Google 로그인 타임아웃', tag: 'SocialAuth');
+          throw TimeoutException('Google 로그인 시간이 초과되었습니다');
+        },
+      );
 
       if (googleUser == null) {
         Logger.info('Google 로그인 취소됨', tag: 'SocialAuth');
         return null; // 사용자가 로그인 취소
       }
 
-      // 인증 정보 가져오기
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      // 인증 정보 가져오기 (타임아웃: 30초)
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication.timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          Logger.warning('Google 인증 정보 가져오기 타임아웃', tag: 'SocialAuth');
+          throw TimeoutException('Google 인증 정보를 가져오는 시간이 초과되었습니다');
+        },
+      );
+
+      // Access Token 또는 ID Token이 없으면 에러
+      if (googleAuth.accessToken == null && googleAuth.idToken == null) {
+        Logger.error(
+          'Google 인증 토큰이 없습니다',
+          tag: 'SocialAuth',
+        );
+        throw Exception('Google 인증에 실패했습니다. 다시 시도해주세요.');
+      }
 
       Logger.info(
         'Google 로그인 성공: ${googleUser.email}',
@@ -100,6 +122,13 @@ class SocialAuthService {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
+    } on TimeoutException catch (e) {
+      Logger.error(
+        'Google 로그인 타임아웃',
+        error: e,
+        tag: 'SocialAuth',
+      );
+      rethrow;
     } catch (e, stackTrace) {
       Logger.error(
         'Google 로그인 실패',
@@ -107,7 +136,15 @@ class SocialAuthService {
         stackTrace: stackTrace,
         tag: 'SocialAuth',
       );
-      return null;
+
+      // 사용자 친화적 에러 메시지
+      if (e.toString().contains('network')) {
+        throw Exception('네트워크 연결을 확인해주세요');
+      } else if (e.toString().contains('PlatformException')) {
+        throw Exception('Google 로그인 설정에 문제가 있습니다. SHA-1 인증서를 확인해주세요.');
+      }
+
+      rethrow;
     }
   }
 

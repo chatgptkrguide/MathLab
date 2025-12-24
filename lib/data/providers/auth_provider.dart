@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_account.dart';
@@ -257,15 +258,18 @@ class AuthNotifier extends BaseNotifier<AuthState> {
 
   // ==================== 소셜 로그인 ====================
 
-  /// 소셜 로그인 공통 처리
+  /// 소셜 로그인 공통 처리 (재시도 로직 포함)
   Future<bool> _handleSocialLogin(
     Future<SocialAuthResult?> Function() socialAuthMethod,
-    String provider,
-  ) async {
-    return await executeWithErrorHandling(
-      () async {
-        state = state.copyWith(isLoading: true);
-        logInfo('$provider 로그인 시도');
+    String provider, {
+    int maxRetries = 2,
+  }) async {
+    int retryCount = 0;
+
+    while (retryCount <= maxRetries) {
+      try {
+        state = state.copyWith(isLoading: true, error: null);
+        logInfo('$provider 로그인 시도 (${retryCount + 1}/${maxRetries + 1})');
 
         final result = await socialAuthMethod();
 
@@ -273,6 +277,13 @@ class AuthNotifier extends BaseNotifier<AuthState> {
           state = state.copyWith(isLoading: false);
           logInfo('$provider 로그인 취소됨');
           return false;
+        }
+
+        // 토큰 유효성 검증
+        if (provider == 'Google') {
+          if (result.accessToken == null && result.idToken == null) {
+            throw Exception('Google 인증 토큰이 없습니다');
+          }
         }
 
         final existingAccounts = await _loadAccounts();
@@ -293,9 +304,13 @@ class AuthNotifier extends BaseNotifier<AuthState> {
         }
 
         if (existingAccount != null) {
-          return await signIn(existingAccount.email);
+          final success = await signIn(existingAccount.email);
+          if (success) {
+            logInfo('$provider 기존 계정 로그인 성공');
+          }
+          return success;
         } else {
-          return await signUp(
+          final success = await signUp(
             email: result.email.isNotEmpty
                 ? result.email
                 : '${provider.toLowerCase()}_${result.userId}@mathlab.com',
@@ -303,14 +318,62 @@ class AuthNotifier extends BaseNotifier<AuthState> {
             grade: GameConstants.defaultGrade,
             accountType: AccountType.student,
           );
+          if (success) {
+            logInfo('$provider 신규 계정 생성 및 로그인 성공');
+          }
+          return success;
         }
-      },
-      errorMessage: '$provider 로그인 실패',
-      fallback: () {
-        state = state.copyWith(isLoading: false);
+      } on TimeoutException catch (e) {
+        logWarning('$provider 로그인 타임아웃: ${e.message}');
+
+        if (retryCount < maxRetries) {
+          retryCount++;
+          await Future.delayed(Duration(seconds: retryCount)); // 지수 백오프
+          continue;
+        }
+
+        state = state.copyWith(
+          isLoading: false,
+          error: '$provider 로그인 시간이 초과되었습니다. 다시 시도해주세요.',
+        );
         return false;
-      },
-    ) ?? false;
+      } catch (e, stackTrace) {
+        logError('$provider 로그인 실패', error: e, stackTrace: stackTrace);
+
+        // 네트워크 오류인 경우 재시도
+        final isNetworkError = e.toString().contains('network') ||
+            e.toString().contains('SocketException') ||
+            e.toString().contains('Connection');
+
+        if (isNetworkError && retryCount < maxRetries) {
+          retryCount++;
+          logInfo('네트워크 오류 - 재시도 $retryCount/$maxRetries');
+          await Future.delayed(Duration(seconds: retryCount));
+          continue;
+        }
+
+        // 사용자 친화적 에러 메시지
+        String errorMessage = '$provider 로그인에 실패했습니다';
+
+        if (e.toString().contains('SHA-1')) {
+          errorMessage = 'Google 로그인 설정이 완료되지 않았습니다. 관리자에게 문의하세요.';
+        } else if (isNetworkError) {
+          errorMessage = '네트워크 연결을 확인해주세요';
+        } else if (e.toString().contains('cancelled') || e.toString().contains('cancel')) {
+          errorMessage = '로그인이 취소되었습니다';
+        }
+
+        state = state.copyWith(isLoading: false, error: errorMessage);
+        return false;
+      }
+    }
+
+    // 최대 재시도 초과
+    state = state.copyWith(
+      isLoading: false,
+      error: '$provider 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.',
+    );
+    return false;
   }
 
   /// Google 로그인

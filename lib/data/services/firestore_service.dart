@@ -531,15 +531,69 @@ class FirestoreService {
     }
   }
 
-  /// 리그 참가자 업데이트
-  Future<void> updateLeagueParticipant(String leagueId, Map<String, dynamic> participant) async {
+  /// 리그 참가자 업데이트 (트랜잭션 사용)
+  Future<void> updateLeagueParticipant(
+    String leagueId,
+    String userId,
+    Map<String, dynamic> participantData,
+  ) async {
     try {
-      Logger.info('리그 참가자 업데이트: $leagueId', tag: 'FirestoreService');
+      Logger.info('리그 참가자 업데이트: $leagueId, $userId', tag: 'FirestoreService');
 
-      // TODO: Firestore transaction을 사용하여 참가자 정보 업데이트
-      await _firestore.collection('leagues').doc(leagueId).update({
-        'participants': FieldValue.arrayUnion([participant]),
-        'updatedAt': Timestamp.fromDate(DateTime.now()),
+      final leagueRef = _firestore.collection('leagues').doc(leagueId);
+
+      await _firestore.runTransaction((transaction) async {
+        final leagueDoc = await transaction.get(leagueRef);
+
+        if (!leagueDoc.exists) {
+          throw Exception('리그를 찾을 수 없습니다: $leagueId');
+        }
+
+        final data = leagueDoc.data()!;
+        final participants = List<Map<String, dynamic>>.from(
+          data['participants'] as List? ?? [],
+        );
+
+        // 기존 참가자 찾기
+        final existingIndex = participants.indexWhere(
+          (p) => p['userId'] == userId,
+        );
+
+        if (existingIndex >= 0) {
+          // 기존 참가자 업데이트
+          participants[existingIndex] = {
+            ...participants[existingIndex],
+            ...participantData,
+            'updatedAt': Timestamp.fromDate(DateTime.now()),
+          };
+        } else {
+          // 새 참가자 추가
+          participants.add({
+            'userId': userId,
+            ...participantData,
+            'joinedAt': Timestamp.fromDate(DateTime.now()),
+            'updatedAt': Timestamp.fromDate(DateTime.now()),
+          });
+        }
+
+        // 순위 재계산 (XP 기준 내림차순)
+        participants.sort((a, b) {
+          final aXp = a['xp'] as int? ?? 0;
+          final bXp = b['xp'] as int? ?? 0;
+          return bXp.compareTo(aXp);
+        });
+
+        // 순위 업데이트
+        for (int i = 0; i < participants.length; i++) {
+          participants[i]['rank'] = i + 1;
+        }
+
+        // Firestore 업데이트
+        transaction.update(leagueRef, {
+          'participants': participants,
+          'participantCount': participants.length,
+          'updatedAt': Timestamp.fromDate(DateTime.now()),
+        });
       });
 
       Logger.info('리그 참가자 업데이트 완료', tag: 'FirestoreService');
@@ -551,6 +605,101 @@ class FirestoreService {
         tag: 'FirestoreService',
       );
       throw Exception('리그 참가자 업데이트 실패: $e');
+    }
+  }
+
+  /// 리그 생성
+  Future<void> createLeague(League league) async {
+    try {
+      Logger.info('리그 생성: ${league.id}', tag: 'FirestoreService');
+
+      await _firestore
+          .collection('leagues')
+          .doc(league.id)
+          .set(league.toFirestore());
+
+      Logger.info('리그 생성 완료', tag: 'FirestoreService');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그 생성 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('리그 생성 실패: $e');
+    }
+  }
+
+  /// 리그 종료 처리
+  Future<void> finalizeLeague(String leagueId) async {
+    try {
+      Logger.info('리그 종료 처리: $leagueId', tag: 'FirestoreService');
+
+      final leagueRef = _firestore.collection('leagues').doc(leagueId);
+
+      await _firestore.runTransaction((transaction) async {
+        final leagueDoc = await transaction.get(leagueRef);
+
+        if (!leagueDoc.exists) {
+          throw Exception('리그를 찾을 수 없습니다: $leagueId');
+        }
+
+        final data = leagueDoc.data()!;
+        final participants = List<Map<String, dynamic>>.from(
+          data['participants'] as List? ?? [],
+        );
+
+        // 최종 순위 확정
+        participants.sort((a, b) {
+          final aXp = a['xp'] as int? ?? 0;
+          final bXp = b['xp'] as int? ?? 0;
+          return bXp.compareTo(aXp);
+        });
+
+        for (int i = 0; i < participants.length; i++) {
+          participants[i]['finalRank'] = i + 1;
+        }
+
+        // 리그 종료 상태 업데이트
+        transaction.update(leagueRef, {
+          'participants': participants,
+          'status': 'completed',
+          'endedAt': Timestamp.fromDate(DateTime.now()),
+          'updatedAt': Timestamp.fromDate(DateTime.now()),
+        });
+      });
+
+      Logger.info('리그 종료 처리 완료', tag: 'FirestoreService');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '리그 종료 처리 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('리그 종료 처리 실패: $e');
+    }
+  }
+
+  /// 사용자를 리그에 할당
+  Future<void> assignUserToLeague(String userId, String leagueId) async {
+    try {
+      Logger.info('사용자를 리그에 할당: $userId → $leagueId', tag: 'FirestoreService');
+
+      await _firestore.collection('users').doc(userId).update({
+        'currentLeagueId': leagueId,
+        'updatedAt': Timestamp.fromDate(DateTime.now()),
+      });
+
+      Logger.info('사용자 리그 할당 완료', tag: 'FirestoreService');
+    } catch (e, stackTrace) {
+      Logger.error(
+        '사용자 리그 할당 실패',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'FirestoreService',
+      );
+      throw Exception('사용자 리그 할당 실패: $e');
     }
   }
 }
