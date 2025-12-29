@@ -5,6 +5,7 @@ import '../base/base_model.dart';
 
 /// 사용자 정보 모델
 class User implements BaseModel {
+  @override
   final String id;
   final String name;
   final String email;
@@ -19,6 +20,7 @@ class User implements BaseModel {
   final DateTime lastXPResetDate; // 마지막 XP 리셋 날짜
   final DateTime? lastStudyDate; // 마지막 학습 날짜 (스트릭 계산용)
   final DateTime? lastHeartUpdateTime; // 마지막 하트 업데이트 시간 (재생 계산용)
+  final DateTime? updatedAt; // 마지막 업데이트 시간
 
   // ====== 프리미엄 관련 필드 ======
   final bool isPremium; // 프리미엄 사용자 여부
@@ -41,6 +43,7 @@ class User implements BaseModel {
     DateTime? lastXPResetDate,
     this.lastStudyDate, // 마지막 학습 날짜 (nullable)
     this.lastHeartUpdateTime, // 마지막 하트 업데이트 시간 (nullable)
+    this.updatedAt, // 마지막 업데이트 시간 (nullable)
     this.isPremium = false, // 기본값: 무료 사용자
     this.premiumTier = PremiumTier.free, // 기본값: 무료 등급
     this.premiumExpiryDate, // 기본값: null (무료 사용자는 만료일 없음)
@@ -70,6 +73,9 @@ class User implements BaseModel {
           : null,
       lastHeartUpdateTime: json['lastHeartUpdateTime'] != null
           ? DateTime.parse(json['lastHeartUpdateTime'] as String)
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
           : null,
       isPremium: json['isPremium'] as bool? ?? false,
       premiumTier: json['premiumTier'] != null
@@ -102,6 +108,7 @@ class User implements BaseModel {
       lastXPResetDate: (data['lastXPResetDate'] as Timestamp?)?.toDate() ?? createdAt,
       lastStudyDate: (data['lastStudyDate'] as Timestamp?)?.toDate(),
       lastHeartUpdateTime: (data['lastHeartUpdateTime'] as Timestamp?)?.toDate(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
       isPremium: data['isPremium'] as bool? ?? false,
       premiumTier: data['premiumTier'] != null
           ? PremiumTier.fromString(data['premiumTier'] as String)
@@ -112,6 +119,7 @@ class User implements BaseModel {
   }
 
   /// User 객체를 JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -128,6 +136,7 @@ class User implements BaseModel {
       'lastXPResetDate': lastXPResetDate.toIso8601String(),
       'lastStudyDate': lastStudyDate?.toIso8601String(),
       'lastHeartUpdateTime': lastHeartUpdateTime?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
       'isPremium': isPremium,
       'premiumTier': premiumTier.value,
       'premiumExpiryDate': premiumExpiryDate?.toIso8601String(),
@@ -136,6 +145,7 @@ class User implements BaseModel {
   }
 
   /// Firestore에 저장할 데이터로 변환
+  @override
   Map<String, dynamic> toFirestore() {
     return {
       'email': email,
@@ -181,6 +191,7 @@ class User implements BaseModel {
     DateTime? lastXPResetDate,
     DateTime? lastStudyDate,
     DateTime? lastHeartUpdateTime,
+    DateTime? updatedAt,
     bool? isPremium,
     PremiumTier? premiumTier,
     DateTime? premiumExpiryDate,
@@ -201,6 +212,7 @@ class User implements BaseModel {
       lastXPResetDate: lastXPResetDate ?? this.lastXPResetDate,
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
       lastHeartUpdateTime: lastHeartUpdateTime ?? this.lastHeartUpdateTime,
+      updatedAt: updatedAt ?? this.updatedAt,
       isPremium: isPremium ?? this.isPremium,
       premiumTier: premiumTier ?? this.premiumTier,
       premiumExpiryDate: premiumExpiryDate ?? this.premiumExpiryDate,

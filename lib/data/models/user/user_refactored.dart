@@ -34,14 +34,14 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
   final bool hasHadTrial;
 
   // Constants
-  static const int DEFAULT_HEARTS = 5;
-  static const int MAX_HEARTS = 5;
-  static const int HEART_REGEN_MINUTES = 30;
-  static const int XP_PER_LEVEL = 100;
-  static const int TRIAL_DAYS = 7;
+  static const int defaultHearts = 5;
+  static const int maxHearts = 5;
+  static const int heartRegenMinutes = 30;
+  static const int xpPerLevel = 100;
+  static const int trialDays = 7;
 
   const User({
-    required String id,
+    required super.id,
     required this.name,
     required this.email,
     required this.createdAt,
@@ -51,7 +51,7 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
     this.level = 1,
     this.xp = 0,
     this.streakDays = 0,
-    this.hearts = DEFAULT_HEARTS,
+    this.hearts = defaultHearts,
     this.dailyXP = 0,
     DateTime? lastXPResetDate,
     this.lastStudyDate,
@@ -60,8 +60,7 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
     this.premiumTier = PremiumTier.free,
     this.premiumExpiryDate,
     this.hasHadTrial = false,
-  })  : lastXPResetDate = lastXPResetDate ?? createdAt,
-        super(id: id);
+  }) : lastXPResetDate = lastXPResetDate ?? createdAt;
 
   // ========================================
   // Factory Constructors
@@ -107,7 +106,7 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
       level: json.getValue('level', 1),
       xp: json.getValue('xp', 0),
       streakDays: json.getValue('streakDays', 0),
-      hearts: json.getValue('hearts', DEFAULT_HEARTS),
+      hearts: json.getValue('hearts', defaultHearts),
       dailyXP: json.getValue('dailyXP', 0),
       lastXPResetDate: json.getDateTime('lastXPResetDate') ?? createdAt,
       lastStudyDate: json.getDateTime('lastStudyDate'),
@@ -152,7 +151,7 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
       level: data['level'] ?? 1,
       xp: data['totalXP'] ?? data['xp'] ?? 0,
       streakDays: data['streak'] ?? data['streakDays'] ?? 0,
-      hearts: data['hearts'] ?? DEFAULT_HEARTS,
+      hearts: data['hearts'] ?? defaultHearts,
       dailyXP: data['dailyXP'] ?? 0,
       lastXPResetDate: parseTimestamp(data['lastXPResetDate']) ?? createdAt,
       lastStudyDate: parseTimestamp(data['lastStudyDate']),
@@ -302,18 +301,18 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
   }
 
   /// Calculate current level from XP
-  int get calculatedLevel => (xp / XP_PER_LEVEL).floor() + 1;
+  int get calculatedLevel => (xp / xpPerLevel).floor() + 1;
 
   /// XP needed for next level
   int get xpToNextLevel {
-    final currentLevelXP = level * XP_PER_LEVEL;
+    final currentLevelXP = level * xpPerLevel;
     final progress = xp % currentLevelXP;
     return currentLevelXP - progress;
   }
 
   /// Progress in current level (0.0 to 1.0)
   double get levelProgress {
-    final currentLevelXP = level * XP_PER_LEVEL;
+    final currentLevelXP = level * xpPerLevel;
     final progress = xp % currentLevelXP;
     return progress / currentLevelXP;
   }
@@ -336,15 +335,15 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
   int get gradeNumber => SchoolLevel.getGradeNumber(currentGrade);
 
   /// Check if hearts need regeneration
-  bool get needsHeartRegen => hearts < MAX_HEARTS;
+  bool get needsHeartRegen => hearts < maxHearts;
 
   /// Calculate hearts to regenerate
   int calculateHeartsToRegen() {
     if (!needsHeartRegen || lastHeartUpdateTime == null) return 0;
 
     final minutesSinceUpdate = DateTime.now().difference(lastHeartUpdateTime!).inMinutes;
-    final heartsToRegen = (minutesSinceUpdate / HEART_REGEN_MINUTES).floor();
-    final maxRegen = MAX_HEARTS - hearts;
+    final heartsToRegen = (minutesSinceUpdate / heartRegenMinutes).floor();
+    final maxRegen = maxHearts - hearts;
 
     return heartsToRegen > maxRegen ? maxRegen : heartsToRegen;
   }
@@ -354,7 +353,7 @@ class User extends BaseDataModel with TimestampMixin, SerializableMixin, Equatab
     if (!needsHeartRegen || lastHeartUpdateTime == null) return null;
 
     final minutesSinceUpdate = DateTime.now().difference(lastHeartUpdateTime!).inMinutes;
-    final remainingMinutes = HEART_REGEN_MINUTES - (minutesSinceUpdate % HEART_REGEN_MINUTES);
+    final remainingMinutes = heartRegenMinutes - (minutesSinceUpdate % heartRegenMinutes);
 
     return Duration(minutes: remainingMinutes);
   }

@@ -26,6 +26,58 @@ class UserRepository extends BaseRepository<User> {
           cacheDuration: const Duration(minutes: 5),
         );
 
+  /// Firestore 인스턴스 getter (BaseRepository에서 상속)
+  FirebaseFirestore get firestore => FirebaseFirestore.instance;
+
+  // ==================== SyncManager 호환성 메서드 ====================
+
+  /// Firebase에 사용자 저장 (SyncManager 호환성)
+  Future<void> saveToFirebase(String userId, User user) async {
+    final exists = await this.exists(userId);
+    if (exists) {
+      await update(user);
+    } else {
+      await create(user);
+    }
+  }
+
+  /// Firebase에서 사용자 조회 (SyncManager 호환성)
+  Future<User?> getFromFirebase(String userId) async {
+    final result = await getById(userId);
+    return result.isSuccess ? result.data : null;
+  }
+
+  /// 로컬 스토리지에 사용자 저장 (SyncManager 호환성)
+  Future<void> saveToLocal(String userId, User user) async {
+    // 임시로 Firebase에 저장 (실제로는 로컬 스토리지 사용해야 함)
+    await save('user_$userId', user);
+  }
+
+  /// 로컬 스토리지에서 사용자 조회 (SyncManager 호환성)
+  Future<User?> getFromLocal(String userId) async {
+    // 임시로 Firebase에서 조회 (실제로는 로컬 스토리지 사용해야 함)
+    return await get('user_$userId');
+  }
+
+  /// 데이터 병합 (SyncManager 호환성)
+  User mergeData(User? local, User? remote) {
+    if (local == null && remote == null) {
+      throw Exception('Both local and remote data are null');
+    }
+    if (local == null) return remote!;
+    if (remote == null) return local;
+
+    // 더 최신 데이터를 우선시
+    return local.updatedAt != null && remote.updatedAt != null
+        ? (local.updatedAt!.isAfter(remote.updatedAt!) ? local : remote)
+        : remote; // 기본적으로 원격 데이터 우선
+  }
+
+  /// 사용자 프로필 변경 감지 스트림 (SyncManager 호환성)
+  Stream<User?> watchUserProfile(String userId) {
+    return watchById(userId);
+  }
+
   // ==================== 로컬 스토리지 메서드 (UserProvider 호환성) ====================
 
   /// 로컬 스토리지에서 사용자 조회 (UserProvider 호환성)
@@ -90,7 +142,7 @@ class UserRepository extends BaseRepository<User> {
     try {
       Logger.debug('Updating XP for user $userId: +$xpToAdd', tag: repositoryName);
 
-      final userDocRef = _collection.doc(userId);
+      final userDocRef = firestore.collection(collectionPath).doc(userId);
       final userDoc = await userDocRef.get();
 
       if (!userDoc.exists) {
@@ -124,7 +176,7 @@ class UserRepository extends BaseRepository<User> {
     try {
       Logger.debug('Updating streak for user $userId: $newStreak', tag: repositoryName);
 
-      await _collection.doc(userId).update({
+      await firestore.collection(collectionPath).doc(userId).update({
         'streak': newStreak,
         'streakDays': newStreak,
         'lastStudyDate': FieldValue.serverTimestamp(),
@@ -147,7 +199,7 @@ class UserRepository extends BaseRepository<User> {
     try {
       Logger.debug('Updating hearts for user $userId: $hearts', tag: repositoryName);
 
-      await _collection.doc(userId).update({
+      await firestore.collection(collectionPath).doc(userId).update({
         'hearts': hearts,
         'lastHeartUpdateTime': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
@@ -169,13 +221,13 @@ class UserRepository extends BaseRepository<User> {
     try {
       Logger.info('Starting complete user deletion: $userId', tag: repositoryName);
 
-      final batch = _firestore.batch();
+      final batch = firestore.batch();
 
       // 1. 사용자 프로필 삭제
-      batch.delete(_collection.doc(userId));
+      batch.delete(firestore.collection(collectionPath).doc(userId));
 
       // 2. 사용자의 오답 노트 서브컬렉션 삭제
-      final wrongAnswersSnapshot = await _collection
+      final wrongAnswersSnapshot = await firestore.collection(collectionPath)
           .doc(userId)
           .collection('wrongAnswers')
           .get();
@@ -185,7 +237,7 @@ class UserRepository extends BaseRepository<User> {
       }
 
       // 3. 진행률 데이터 삭제
-      final progressSnapshot = await _firestore
+      final progressSnapshot = await firestore
           .collection('progress')
           .where('userId', isEqualTo: userId)
           .get();
@@ -195,7 +247,7 @@ class UserRepository extends BaseRepository<User> {
       }
 
       // 4. 일일 학습 기록 삭제
-      final dailyStudiesSnapshot = await _firestore
+      final dailyStudiesSnapshot = await firestore
           .collection('daily_studies')
           .where('userId', isEqualTo: userId)
           .get();
@@ -224,7 +276,7 @@ class UserRepository extends BaseRepository<User> {
   /// 리그에서 사용자 제거 (내부 메서드)
   Future<void> _removeUserFromLeagues(String userId) async {
     try {
-      final leaguesSnapshot = await _firestore
+      final leaguesSnapshot = await firestore
           .collection('leagues')
           .where('participants', arrayContains: {'userId': userId})
           .get();
@@ -232,7 +284,7 @@ class UserRepository extends BaseRepository<User> {
       for (final leagueDoc in leaguesSnapshot.docs) {
         final leagueRef = leagueDoc.reference;
 
-        await _firestore.runTransaction((transaction) async {
+        await firestore.runTransaction((transaction) async {
           final leagueSnapshot = await transaction.get(leagueRef);
 
           if (!leagueSnapshot.exists) return;

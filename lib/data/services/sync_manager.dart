@@ -69,11 +69,7 @@ class SyncManager {
       Logger.info('SyncManager 초기화 시작', tag: 'SyncManager');
 
       // Repository 주입
-      _userRepository = userRepository ??
-          UserRepository(
-            localStorageService: _localStorage,
-            firestoreService: _firestore,
-          );
+      _userRepository = userRepository ?? UserRepository();
       _wrongAnswerRepository = wrongAnswerRepository ??
           WrongAnswerRepository(
             localStorageService: _localStorage,
@@ -587,10 +583,8 @@ class SyncManager {
 
         // 충돌 해결 (Local-First: 로컬 우선, Remote가 더 최신이면 덮어쓰기)
         if (localUser != null) {
-          final merged = await _userRepository.mergeData(localUser, remoteUser);
-          if (merged != null) {
-            await _userRepository.saveToLocal(accountId, merged);
-          }
+          final merged = _userRepository.mergeData(localUser, remoteUser);
+          await _userRepository.saveToLocal(accountId, merged);
         } else {
           await _userRepository.saveToLocal(accountId, remoteUser);
         }
