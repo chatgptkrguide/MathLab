@@ -32,7 +32,20 @@ class UserNotifier extends BaseNotifier<User?> {
         final storageKey = _getStorageKey();
         logInfo('사용자 정보 로드 시작 (키: $storageKey)');
 
-        final user = await _userRepository.get(storageKey);
+        // 1. 먼저 로컬 저장소 확인
+        User? user = await _userRepository.get(storageKey);
+
+        // 2. 로컬에 없고 ID가 있으면 Firestore에서 확인
+        if (user == null && state?.id != null && state!.id.isNotEmpty && state!.id != 'default') {
+          logInfo('로컬에 사용자 없음, Firestore 확인: ${state!.id}');
+          user = await _userRepository.getFromFirebase(state!.id);
+
+          // 3. Firestore에서 가져온 사용자 정보를 로컬에 저장
+          if (user != null) {
+            await _userRepository.saveToLocal(state!.id, user);
+            logInfo('Firestore에서 기존 사용자 로드: ${user.name} (Level: ${user.level}, XP: ${user.xp})');
+          }
+        }
 
         if (user != null) {
           state = user;
@@ -40,6 +53,7 @@ class UserNotifier extends BaseNotifier<User?> {
           await checkAndUpdateStreak();
           await _updateHeartsBasedOnTime();
         } else {
+          // 4. Firestore에도 없는 경우에만 새 사용자 생성
           state = _dataService.getSampleUser();
           await _saveUser();
           logInfo('새 사용자 생성: ${state?.name} (키: $storageKey)');
@@ -101,14 +115,36 @@ class UserNotifier extends BaseNotifier<User?> {
     await executeWithErrorHandling(
       () async {
         final storageKey = _getStorageKey(accountId);
-        final user = await _userRepository.get(storageKey);
+
+        // 1. 먼저 로컬 저장소 확인
+        User? user = await _userRepository.get(storageKey);
+
+        // 2. 로컬에 없으면 Firestore에서 확인
+        if (user == null) {
+          logInfo('로컬에 사용자 없음, Firestore 확인: $accountId');
+          user = await _userRepository.getFromFirebase(accountId);
+
+          // 3. Firestore에서 가져온 사용자 정보를 로컬에 저장
+          if (user != null) {
+            await _userRepository.saveToLocal(accountId, user);
+            logInfo('Firestore에서 기존 사용자 로드: ${user.name} (Level: ${user.level}, XP: ${user.xp})');
+          }
+        }
 
         if (user != null) {
           state = user;
           logInfo('계정 로드 성공: $accountId (키: $storageKey)');
+
+          // 스트릭과 하트 업데이트
+          await checkAndUpdateStreak();
+          await _updateHeartsBasedOnTime();
         } else {
+          // 4. Firestore에도 없는 경우에만 새 사용자 생성
           state = _dataService.getSampleUser().copyWith(id: accountId);
           await _saveUser();
+
+          // Firebase에도 저장
+          await _userRepository.saveToFirebase(accountId, state!);
           logInfo('새 계정 생성: $accountId (키: $storageKey)');
         }
       },
