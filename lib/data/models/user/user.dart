@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../learning/school_level.dart';
 import '../subscription/premium_tier.dart';
+import '../base/base_model.dart';
 
 /// 사용자 정보 모델
-class User {
+class User implements BaseModel {
   final String id;
   final String name;
   final String email;

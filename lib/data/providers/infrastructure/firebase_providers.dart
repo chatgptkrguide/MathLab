@@ -78,10 +78,5 @@ final leagueRepositoryProvider = Provider<LeagueRepository>((ref) {
 
 /// User Repository Provider
 final userRepositoryProvider = Provider<UserRepository>((ref) {
-  final firestoreService = ref.watch(firestoreServiceProvider);
-  final localStorageService = ref.watch(localStorageServiceProvider);
-  return UserRepository(
-    firestoreService: firestoreService,
-    localStorageService: localStorageService,
-  );
+  return UserRepository();
 });
