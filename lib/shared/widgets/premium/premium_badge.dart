@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
-import '../../../data/providers/premium_providers.dart';
+import '../../../data/providers/subscription/premium_providers.dart';
 
 /// 프리미엄 뱃지 위젯
 ///
@@ -95,7 +95,7 @@ class PremiumBadge extends ConsumerWidget {
         boxShadow: animate
             ? [
                 BoxShadow(
-                  color: AppColors.premiumGold.withOpacity(0.5),
+                  color: AppColors.premiumGold.withValues(alpha: 0.5),
                   blurRadius: 8,
                   spreadRadius: 2,
                 ),
@@ -127,7 +127,7 @@ class PremiumBadge extends ConsumerWidget {
         boxShadow: animate
             ? [
                 BoxShadow(
-                  color: AppColors.premiumGold.withOpacity(0.3),
+                  color: AppColors.premiumGold.withValues(alpha: 0.3),
                   blurRadius: 8,
                 ),
               ]
@@ -198,7 +198,7 @@ class PremiumBadge extends ConsumerWidget {
         boxShadow: animate
             ? [
                 BoxShadow(
-                  color: AppColors.premiumGold.withOpacity(0.5),
+                  color: AppColors.premiumGold.withValues(alpha: 0.5),
                   blurRadius: 12,
                   spreadRadius: 3,
                 ),
@@ -430,7 +430,7 @@ class PremiumStatusIndicator extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -463,7 +463,7 @@ class PremiumStatusIndicator extends ConsumerWidget {
             Text(
               remainingText,
               style: AppTextStyles.bodySmall.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ],

@@ -77,7 +77,7 @@ class _AnimatedImageState extends State<AnimatedImage>
             // 플레이스홀더
             if (!_isLoaded && !_hasError)
               widget.placeholder ??
-                  SkeletonLoading(
+                  skeletonLoading(
                     width: widget.width ?? double.infinity,
                     height: widget.height ?? 200,
                     borderRadius: widget.borderRadius != null

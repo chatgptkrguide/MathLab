@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/models.dart';
-import '../../../data/providers/friend_provider.dart';
+import '../../../data/providers/user/friend_provider.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/utils/level_badge_mapper.dart';
 import '../../friends/friends_screen.dart';
@@ -47,7 +47,7 @@ class HomeFriendsActivity extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -114,7 +114,7 @@ class HomeFriendsActivity extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
+          color: AppColors.primary.withValues(alpha: 0.2),
           width: 2,
           style: BorderStyle.solid,
         ),
@@ -192,7 +192,7 @@ class HomeFriendsActivity extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -208,7 +208,7 @@ class HomeFriendsActivity extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.accentCyan.withOpacity(0.1),
+                color: AppColors.accentCyan.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Center(

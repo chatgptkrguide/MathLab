@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 import '../../data/models/models.dart';
-import '../../data/providers/study_timer_provider.dart';
-import '../../data/providers/user_provider.dart';
+import '../../data/providers/learning/study_timer_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../constants/app_colors.dart';
 
 /// 공부 타이머 위젯
@@ -112,7 +112,7 @@ class _StudyTimerWidgetState extends ConsumerState<StudyTimerWidget> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -189,9 +189,9 @@ class StudyTimerDisplay extends ConsumerWidget {
     final secs = seconds % 60;
 
     if (hours > 0) {
-      return '${hours}시간 ${minutes}분';
+      return '$hours시간 $minutes분';
     }
-    return '${minutes}분 ${secs}초';
+    return '$minutes분 $secs초';
   }
 
   @override

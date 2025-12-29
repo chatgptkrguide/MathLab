@@ -1,7 +1,7 @@
-import '../models/subscription.dart';
-import '../models/premium_tier.dart';
-import '../models/subscription_status.dart';
-import '../models/user.dart';
+import '../models/subscription/subscription.dart';
+import '../models/subscription/premium_tier.dart';
+import '../models/subscription/subscription_status.dart';
+import '../models/user/user.dart';
 import '../repositories/subscription_repository.dart';
 
 /// 구독 비즈니스 로직 서비스

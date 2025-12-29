@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user.dart';
-import '../models/progress_model.dart';
-import '../models/wrong_answer.dart';
-import '../models/league.dart';
+import '../models/user/user.dart';
+import '../models/learning/progress_model.dart';
+import '../models/learning/wrong_answer.dart';
+import '../models/gamification/league.dart';
 import '../../shared/utils/logger.dart';
 
 /// Firestore 데이터베이스 서비스
@@ -334,7 +334,7 @@ class FirestoreService {
         await dailyRef.set(dailyStudy.toFirestore());
       }
     } catch (e) {
-      print('일일 학습 기록 실패: $e');
+      Logger.error('일일 학습 기록 실패', error: e, tag: 'FirestoreService');
     }
   }
 

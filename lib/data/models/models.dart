@@ -1,40 +1,53 @@
 // 모든 데이터 모델을 한번에 export하는 barrel 파일
-export 'user.dart';
-export 'user_account.dart';
-export 'lesson.dart';
-export 'episode.dart';
-export 'achievement.dart';
-export 'learning_stats.dart';
-export 'error_note.dart';
-export 'problem.dart';
-export 'problem_result.dart';
-export 'leaderboard_entry.dart';
-export 'league.dart';
-export 'daily_reward.dart';
-export 'daily_challenge.dart';
-export 'level_test.dart';
-export 'practice_session.dart';
-export 'app_settings.dart';
-export 'message.dart';
-export 'chat_room.dart';
-export 'friend.dart';
-export 'study_session.dart';
-export 'problem_status.dart';
-export 'academic_record.dart';
-export 'course_enrollment.dart';
-export 'league_tier.dart';
-export 'notification_settings.dart';
-export 'level_skip_test.dart';
-export 'school_level.dart';
 
-// Phase 1: 선생님-학생 관리 시스템 데이터 모델
-export 'user_role.dart';
-export 'assignment.dart';
-export 'assignment_submission.dart';
-export 'weekly_test.dart';
-export 'weekly_test_submission.dart';
+// User Models
+export 'user/user.dart';
+export 'user/user_account.dart';
+export 'user/user_role.dart';
+export 'user/friend.dart';
+export 'user/app_settings.dart';
+export 'user/notification_settings.dart';
 
-// Premium & Subscription Models
-export 'premium_tier.dart';
-export 'subscription_status.dart';
-export 'subscription.dart';
+// Learning Models
+export 'learning/lesson.dart';
+export 'learning/episode.dart';
+export 'learning/problem.dart';
+export 'learning/problem_result.dart';
+export 'learning/problem_status.dart';
+export 'learning/learning_stats.dart';
+export 'learning/study_session.dart';
+export 'learning/practice_session.dart';
+export 'learning/error_note.dart';
+export 'learning/wrong_answer.dart';
+export 'learning/level_test.dart';
+export 'learning/level_skip_test.dart';
+export 'learning/course_enrollment.dart';
+export 'learning/academic_record.dart';
+export 'learning/assignment.dart';
+export 'learning/assignment_submission.dart';
+export 'learning/weekly_test.dart';
+export 'learning/weekly_test_submission.dart';
+export 'learning/progress_model.dart';
+export 'learning/school_level.dart';
+
+// Gamification Models
+export 'gamification/achievement.dart';
+export 'gamification/daily_challenge.dart';
+export 'gamification/daily_reward.dart';
+export 'gamification/heart_config.dart';
+export 'gamification/leaderboard_entry.dart';
+export 'gamification/league.dart';
+export 'gamification/league_tier.dart';
+
+// Subscription Models
+export 'subscription/subscription.dart';
+export 'subscription/subscription_status.dart';
+export 'subscription/premium_tier.dart';
+
+// Communication Models
+export 'communication/chat_room.dart';
+export 'communication/message.dart';
+
+// Sync Models
+export 'sync/sync_status.dart';
+export 'sync/sync_task.dart';

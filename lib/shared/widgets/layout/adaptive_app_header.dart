@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
-import '../../../data/providers/user_provider.dart';
+import '../../../data/providers/user/user_provider.dart';
 
 /// 모든 탭에서 사용할 수 있는 적응형 앱 헤더
 ///
@@ -85,7 +85,7 @@ class AdaptiveAppHeader extends ConsumerWidget {
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: (backgroundColor ?? AppColors.mathBlue).withOpacity(0.3),
+                  color: (backgroundColor ?? AppColors.mathBlue).withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -166,7 +166,7 @@ class AdaptiveAppHeader extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface.withOpacity(0.15),
+        color: AppColors.surface.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(

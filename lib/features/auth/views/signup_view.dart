@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../data/providers/auth_provider.dart';
+import '../../../data/providers/auth/auth_provider.dart';
+import '../../../data/services/analytics_service.dart';
 
 /// 회원가입 화면
 class SignUpView extends ConsumerStatefulWidget {
@@ -56,6 +57,16 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
           );
 
       if (success && mounted) {
+        // Analytics: 회원가입 성공 기록
+        await AnalyticsService().logEvent(
+          name: 'sign_up',
+          parameters: {
+            'method': 'email',
+            'grade': _gradeController.text.trim(),
+            'is_guest_conversion': isGuest,
+          },
+        );
+
         // 게스트에서 정식 회원으로 전환된 경우 데이터 이전
         if (isGuest && guestAccountId != null) {
           final newAccountId = ref.read(authProvider).currentAccount?.id;
@@ -66,6 +77,8 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   guestAccountId: guestAccountId,
                   newAccountId: newAccountId,
                 );
+
+            if (!mounted) return;
 
             if (migrationSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -79,6 +92,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
           }
         }
 
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/home');
       } else if (mounted) {
         // signUp already shows error in state, just check for success

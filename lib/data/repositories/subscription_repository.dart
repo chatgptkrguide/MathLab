@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/subscription.dart';
-import '../models/premium_tier.dart';
-import '../models/subscription_status.dart';
+import '../models/subscription/subscription.dart';
+import '../models/subscription/premium_tier.dart';
+import '../models/subscription/subscription_status.dart';
 
 /// 구독 정보 저장소
 ///

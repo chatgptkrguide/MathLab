@@ -111,3 +111,41 @@ app.*.map.json
 # Auto-generated config files
 *.deeplink-config
 firestore.indexes.json
+
+# ========================================
+# 보안 관련 파일 (SECURITY SENSITIVE)
+# ========================================
+
+# 환경 변수 파일
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Firebase 설정 파일 (API 키 포함)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Android 서명 키 파일
+*.jks
+*.keystore
+key.properties
+android/key.properties
+
+# iOS 인증서 및 프로비저닝
+*.p12
+*.cer
+*.mobileprovision
+*.certSigningRequest
+ios/Runner/GoogleService-Info.plist
+ios/exportOptions.plist
+
+# API Keys 및 Secrets
+**/secrets.json
+**/credentials.json
+api_keys.dart
+secrets.dart
+
+# 소셜 로그인 설정 (OAuth)
+oauth_config.json
+kakao_config.json

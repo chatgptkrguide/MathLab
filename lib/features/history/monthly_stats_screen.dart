@@ -5,7 +5,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
-import '../../data/providers/study_history_provider.dart';
+import '../../data/providers/learning/study_history_provider.dart';
 
 /// 월간 상세 통계 화면
 class MonthlyStatsScreen extends ConsumerStatefulWidget {
@@ -469,7 +469,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: percentage / 100,
-                    backgroundColor: AppColors.progressBackground,
+                    backgroundColor: AppColors.disabled,
                     valueColor: AlwaysStoppedAnimation(AppColors.mathBlue),
                     minHeight: 8,
                     borderRadius: BorderRadius.circular(4),
@@ -550,7 +550,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
                         Container(
                           height: 24,
                           decoration: BoxDecoration(
-                            color: AppColors.progressBackground,
+                            color: AppColors.disabled,
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
-import '../../data/providers/premium_providers.dart';
-import '../../data/providers/firebase_providers.dart';
-import '../../data/models/premium_tier.dart';
+import '../../data/providers/subscription/premium_providers.dart';
+import '../../data/providers/infrastructure/firebase_providers.dart';
+import '../../data/models/subscription/premium_tier.dart';
 import '../../data/services/premium_feature_service.dart';
 
 /// 프리미엄 업그레이드 화면
@@ -127,7 +127,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -155,7 +155,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
           Text(
             '무제한 학습과 모든 프리미엄 기능을\n지금 바로 사용해보세요!',
             style: AppTextStyles.bodyLarge.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
             textAlign: TextAlign.center,
           ),
@@ -177,7 +177,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -391,7 +391,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.premiumGold.withOpacity(0.3),
+                    color: AppColors.premiumGold.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -562,7 +562,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
             '• 계정은 현재 기간이 끝나기 24시간 이내에 갱신 비용이 청구됩니다.\n'
             '• 구독은 사용자가 관리하며, 구매 후 사용자의 계정 설정으로 이동하여 자동 갱신을 끌 수 있습니다.',
             style: AppTextStyles.bodySmall.copyWith(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 11,
             ),
             textAlign: TextAlign.center,
@@ -586,7 +586,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
               Text(
                 ' • ',
                 style: AppTextStyles.labelSmall.copyWith(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
               TextButton(

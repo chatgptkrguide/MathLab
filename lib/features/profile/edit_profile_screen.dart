@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../shared/constants/constants.dart';
-import '../../data/providers/user_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../../shared/widgets/feedback/feedback.dart';
 
 /// 프로필 편집 화면
@@ -141,45 +141,70 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  /// 프로필 이미지
+  /// 프로필 이미지 (일관된 디자인: 90x90, 파란 그라디언트, 흰색 테두리)
   Widget _buildProfileImage() {
     final user = ref.watch(userProvider);
 
     return Stack(
       children: [
         Container(
-          width: 120,
-          height: 120,
+          width: 90,
+          height: 90,
           decoration: BoxDecoration(
-            color: AppColors.mathYellow,
+            gradient: const LinearGradient(
+              colors: AppColors.mathButtonGradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.mathBlue,
+              color: Colors.white,
               width: 4,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.mathBlue.withValues(alpha: 0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: ClipOval(
             child: _selectedImage != null
                 ? Image.file(
                     _selectedImage!,
                     fit: BoxFit.cover,
-                    width: 120,
-                    height: 120,
+                    width: 90,
+                    height: 90,
                   )
                 : user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
                     ? Image.network(
                         user.avatarUrl,
                         fit: BoxFit.cover,
-                        width: 120,
-                        height: 120,
+                        width: 90,
+                        height: 90,
                         errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Text('👤', style: TextStyle(fontSize: 60)),
+                          return Center(
+                            child: Text(
+                              user.name[0],
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.surface,
+                              ),
+                            ),
                           );
                         },
                       )
-                    : const Center(
-                        child: Text('👤', style: TextStyle(fontSize: 60)),
+                    : Center(
+                        child: Text(
+                          user?.name[0] ?? '학',
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.surface,
+                          ),
+                        ),
                       ),
           ),
         ),

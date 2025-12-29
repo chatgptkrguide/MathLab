@@ -89,6 +89,10 @@ dependencies:
 
   # 시간 표시
   timeago: ^3.7.0
+  intl: ^0.20.2  # 국제화 및 날짜/시간 포맷팅
+
+  # 파일 경로
+  path: ^1.9.0  # 파일 경로 조작
 
   # URL 런처 (이메일, 전화번호 등)
   url_launcher: ^6.2.2

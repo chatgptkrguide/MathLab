@@ -54,17 +54,19 @@ class _SplashScreenState extends State<SplashScreen>
       _checkOnboardingStatus(),
     ]);
 
-    if (mounted) {
-      final isOnboardingCompleted =
-          await OnboardingScreen.isOnboardingCompleted();
+    if (!mounted) return;
 
-      if (isOnboardingCompleted) {
-        // 온보딩 완료 → 홈 화면
-        Navigator.of(context).pushReplacementNamed('/home');
-      } else {
-        // 온보딩 미완료 → 온보딩 화면
-        Navigator.of(context).pushReplacementNamed('/onboarding');
-      }
+    final isOnboardingCompleted =
+        await OnboardingScreen.isOnboardingCompleted();
+
+    if (!mounted) return;
+
+    if (isOnboardingCompleted) {
+      // 온보딩 완료 → 홈 화면
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else {
+      // 온보딩 미완료 → 온보딩 화면
+      Navigator.of(context).pushReplacementNamed('/onboarding');
     }
   }
 

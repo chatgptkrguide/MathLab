@@ -69,9 +69,7 @@ class LeagueService {
       TierInfo? league = await getTierInfo(userId);
 
       // 리그 정보가 없으면 초기화
-      if (league == null) {
-        league = await initializeLeague(userId);
-      }
+      league ??= await initializeLeague(userId);
 
       // 복구 중인 경우 문제 수 증가
       int problemsSolvedSinceDemotion = league.problemsSolvedSinceDemotion;

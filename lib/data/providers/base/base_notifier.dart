@@ -210,9 +210,9 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
   }
 
   /// 제네릭 리스트 로드 헬퍼 메서드
-  Future<List<T>> loadList<T>({
+  Future<List<E>> loadList<E>({
     required String key,
-    required T Function(Map<String, dynamic>) fromJson,
+    required E Function(Map<String, dynamic>) fromJson,
   }) async {
     final data = await loadListFromStorage(key);
     if (data == null) return [];
@@ -223,10 +223,10 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
   }
 
   /// 제네릭 리스트 저장 헬퍼 메서드
-  Future<void> saveList<T>({
+  Future<void> saveList<E>({
     required String key,
-    required List<T> items,
-    required Map<String, dynamic> Function(T) toJson,
+    required List<E> items,
+    required Map<String, dynamic> Function(E) toJson,
   }) async {
     final data = items.map((item) => toJson(item)).toList();
     await saveListToStorage(key, data);

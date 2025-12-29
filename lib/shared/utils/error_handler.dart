@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'logger.dart';
 
 /// 앱 전체 에러 핸들러
@@ -271,11 +270,11 @@ class ApiException extends AppException {
   final dynamic response;
 
   ApiException({
-    required String message,
+    required super.message,
     required this.statusCode,
     this.response,
-    String? code,
-  }) : super(message: message, code: code, details: response);
+    super.code,
+  }) : super(details: response);
 }
 
 /// 네트워크 예외
@@ -283,26 +282,26 @@ class NetworkException extends AppException {
   final int statusCode;
 
   NetworkException({
-    required String message,
+    required super.message,
     required this.statusCode,
-    String? code,
-  }) : super(message: message, code: code);
+    super.code,
+  });
 }
 
 /// 인증 예외
 class AuthException extends AppException {
   AuthException({
-    required String message,
-    String? code,
-  }) : super(message: message, code: code);
+    required super.message,
+    super.code,
+  });
 }
 
 /// Firestore 예외
 class FirestoreException extends AppException {
   FirestoreException({
-    required String message,
-    String? code,
-  }) : super(message: message, code: code);
+    required super.message,
+    super.code,
+  });
 }
 
 /// 검증 예외
@@ -310,26 +309,26 @@ class ValidationException extends AppException {
   final Map<String, String>? errors;
 
   ValidationException({
-    required String message,
+    required super.message,
     this.errors,
-  }) : super(message: message, details: errors);
+  }) : super(details: errors);
 }
 
 /// 권한 예외
 class PermissionException extends AppException {
   PermissionException({
-    required String message,
-    String? code,
-  }) : super(message: message, code: code);
+    required super.message,
+    super.code,
+  });
 }
 
 /// 비즈니스 로직 예외
 class BusinessException extends AppException {
   BusinessException({
-    required String message,
-    String? code,
-    dynamic details,
-  }) : super(message: message, code: code, details: details);
+    required super.message,
+    super.code,
+    super.details,
+  });
 }
 
 // ==================== 재시도 유틸리티 ====================

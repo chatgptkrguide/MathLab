@@ -60,7 +60,7 @@ class GradeTabBar extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: AppTextStyles.titleMedium.copyWith(
                     color: isSelected
-                        ? AppColors.primaryBlue
+                        ? AppColors.mathBlue
                         : AppColors.textSecondary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),

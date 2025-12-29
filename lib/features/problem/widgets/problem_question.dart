@@ -91,7 +91,7 @@ class ProblemQuestion extends StatelessWidget {
                 vertical: 3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surface.withOpacity(0.2),
+                color: AppColors.surface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -155,7 +155,7 @@ class ProblemQuestion extends StatelessWidget {
           return Container(
             height: 150,
             decoration: BoxDecoration(
-              color: AppColors.surface.withOpacity(0.1),
+              color: AppColors.surface.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(

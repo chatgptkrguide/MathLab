@@ -108,7 +108,7 @@ class AchievementCard extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
-                  color: AppColors.progressBackground,
+                  color: AppColors.disabled,
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),

@@ -15,7 +15,7 @@ class AppTheme {
 
       // 색상 스키마 - 새 디자인
       colorScheme: const ColorScheme.light(
-        primary: AppColors.primaryGreen,
+        primary: AppColors.mathGreen,
         secondary: AppColors.accentCyan,
         surface: AppColors.surface,
         error: AppColors.errorRed,
@@ -55,7 +55,7 @@ class AppTheme {
       // 버튼 테마
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryBlue,
+          backgroundColor: AppColors.mathBlue,
           foregroundColor: AppColors.surface,
           elevation: AppDimensions.cardElevation,
           padding: const EdgeInsets.symmetric(
@@ -74,9 +74,9 @@ class AppTheme {
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryBlue,
+          foregroundColor: AppColors.mathBlue,
           backgroundColor: AppColors.surface,
-          side: const BorderSide(color: AppColors.primaryBlue, width: 2),
+          side: const BorderSide(color: AppColors.mathBlue, width: 2),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
             vertical: AppDimensions.paddingM,
@@ -93,7 +93,7 @@ class AppTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primaryBlue,
+          foregroundColor: AppColors.mathBlue,
           backgroundColor: AppColors.surface.withValues(alpha: 0.1),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
@@ -122,7 +122,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-          borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
+          borderSide: const BorderSide(color: AppColors.mathBlue, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
@@ -136,13 +136,13 @@ class AppTheme {
 
       // 탭 테마
       tabBarTheme: TabBarThemeData(
-        labelColor: AppColors.primaryBlue,
+        labelColor: AppColors.mathBlue,
         unselectedLabelColor: AppColors.textSecondary,
         labelStyle: AppTextStyles.titleMedium,
         unselectedLabelStyle: AppTextStyles.bodyMedium,
         indicator: const UnderlineTabIndicator(
           borderSide: BorderSide(
-            color: AppColors.primaryBlue,
+            color: AppColors.mathBlue,
             width: 2,
           ),
         ),
@@ -151,7 +151,7 @@ class AppTheme {
       // 하단 네비게이션 테마
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
-        selectedItemColor: AppColors.primaryBlue,
+        selectedItemColor: AppColors.mathBlue,
         unselectedItemColor: AppColors.textSecondary,
         selectedLabelStyle: AppTextStyles.labelSmall,
         unselectedLabelStyle: AppTextStyles.labelSmall,
@@ -161,14 +161,14 @@ class AppTheme {
 
       // 진행률 인디케이터 테마
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.primaryBlue,
-        linearTrackColor: AppColors.progressBackground,
+        color: AppColors.mathBlue,
+        linearTrackColor: AppColors.disabled,
       ),
 
       // 칩 테마
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.background,
-        selectedColor: AppColors.primaryBlue,
+        selectedColor: AppColors.mathBlue,
         labelStyle: AppTextStyles.labelMedium,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/activity_notification_provider.dart';
+import '../../data/providers/communication/activity_notification_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
 
@@ -237,9 +237,9 @@ class NotificationSettingsScreen extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -319,12 +319,12 @@ class NotificationSettingsScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.warning
-                            : AppColors.warning.withOpacity(0.1),
+                            : AppColors.warning.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isSelected
                               ? AppColors.warning
-                              : AppColors.warning.withOpacity(0.3),
+                              : AppColors.warning.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Center(

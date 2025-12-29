@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/game_constants.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
-import '../../data/providers/user_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
 import 'widgets/home_header.dart';
 import 'widgets/home_top_section.dart';
@@ -51,7 +52,7 @@ class HomeScreenFigma extends ConsumerWidget {
               const SizedBox(height: 32),
 
               // 오늘의 목표 카드
-              _buildTodayGoalCard(context),
+              _buildTodayGoalCard(context, user),
 
               const SizedBox(height: 20),
 
@@ -90,7 +91,11 @@ class HomeScreenFigma extends ConsumerWidget {
   }
 
   /// 오늘의 목표 카드 (Figma 디자인)
-  Widget _buildTodayGoalCard(BuildContext context) {
+  Widget _buildTodayGoalCard(BuildContext context, user) {
+    final dailyXP = user?.dailyXP ?? 0;
+    final dailyGoal = GameConstants.dailyGoalXP;
+    final progress = dailyXP / dailyGoal;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: GestureDetector(
@@ -103,12 +108,12 @@ class HomeScreenFigma extends ConsumerWidget {
             ),
           );
         },
-        child: const DailyGoalCard(
+        child: DailyGoalCard(
           icon: '📚',
           title: '오늘의 목표',
-          progress: 0.8,
-          current: 80,
-          total: 100,
+          progress: progress.clamp(0.0, 1.0),
+          current: dailyXP,
+          total: dailyGoal,
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../data/providers/auth_provider.dart';
+import '../../../data/providers/auth/auth_provider.dart';
 
 /// 앱 첫 화면 - 로그인/회원가입 선택
 class WelcomeView extends ConsumerWidget {

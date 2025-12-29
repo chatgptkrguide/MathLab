@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/providers/user_provider.dart';
-import '../../../data/providers/premium_providers.dart';
+import '../../../data/models/user/user.dart';
+import '../../../data/providers/user/user_provider.dart';
+import '../../../data/providers/subscription/premium_providers.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 import '../../../shared/utils/level_badge_mapper.dart';
@@ -141,11 +142,11 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
   }
 
   /// User Profile Card - Figma 디자인과 동일 (Edit Profile 버튼 + 레벨 진행률 통합)
-  Widget _buildUserProfileCard(user, BuildContext context) {
+  Widget _buildUserProfileCard(User? user, BuildContext context) {
     final userLevel = user?.level ?? 1;
     final tierColor = Color(LevelBadgeMapper.getTierColor(userLevel));
     final rankName = LevelBadgeMapper.getRankName(userLevel);
-    final progress = 0.56; // 56% (Figma 디자인 기준)
+    final progress = user?.levelProgress ?? 0.0;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -154,7 +155,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         gradient: LinearGradient(
           colors: [
             Colors.white,
-            const Color(0xFFE3F2FD).withOpacity(0.5),
+            const Color(0xFFE3F2FD).withValues(alpha: 0.5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -162,7 +163,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -173,38 +174,44 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
           // 프로필 사진 + 이름 + Edit 버튼 + 알림 아이콘
           Row(
             children: [
-              // 프로필 사진 (노란색 배경)
+              // 프로필 사진 (파란 그라디언트 배경, 원형, 통일된 디자인)
               Container(
                 width: 90,
                 height: 90,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFFF176), Color(0xFFFFD54F)],
+                    colors: AppColors.mathButtonGradient,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 4,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orange.withOpacity(0.3),
+                      color: AppColors.mathBlue.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                    ? ClipOval(
                         child: Image.network(
                           user.avatarUrl,
                           fit: BoxFit.cover,
                         ),
                       )
                     : Center(
-                        child: Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.orange.shade800,
+                        child: Text(
+                          user?.name[0] ?? '학',
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.surface,
+                          ),
                         ),
                       ),
               ),
@@ -311,12 +318,12 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                 height: 50,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [tierColor, tierColor.withOpacity(0.7)],
+                    colors: [tierColor, tierColor.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: tierColor.withOpacity(0.3),
+                      color: tierColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -402,8 +409,10 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
     );
   }
 
-  /// 팔로워 / XP / 팔로잉 통계 (간단한 3개 섹션)
+  /// 레벨 / XP / 스트릭 통계 (일관된 디자인)
   Widget _buildFollowerStats() {
+    final user = ref.watch(userProvider);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -412,7 +421,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -421,19 +430,19 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem('팔로워', '1,820'),
+          _buildStatItem('레벨', 'Lv${user?.level ?? 1}'),
           Container(
             width: 1,
             height: 40,
             color: Colors.grey.shade300,
           ),
-          _buildStatItem('XP', '12,695'),
+          _buildStatItem('XP', '${user?.xp ?? 549}'),
           Container(
             width: 1,
             height: 40,
             color: Colors.grey.shade300,
           ),
-          _buildStatItem('팔로잉', '284'),
+          _buildStatItem('스트릭', '${user?.streakDays ?? 0}일'),
         ],
       ),
     );
@@ -474,7 +483,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         gradient: LinearGradient(
           colors: [
             const Color(0xFFE3F2FD),
-            const Color(0xFFBBDEFB).withOpacity(0.5),
+            const Color(0xFFBBDEFB).withValues(alpha: 0.5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -482,7 +491,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.mathBlue.withOpacity(0.2),
+            color: AppColors.mathBlue.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -499,7 +508,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -554,7 +563,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -605,7 +614,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -663,12 +672,12 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -754,12 +763,12 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -772,7 +781,7 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
             height: 60,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
               ),
               shape: BoxShape.circle,
             ),
@@ -844,19 +853,19 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         gradient: LinearGradient(
           colors: [
             Colors.white,
-            accentColor.withOpacity(0.08),
+            accentColor.withValues(alpha: 0.08),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: accentColor.withOpacity(0.2),
+          color: accentColor.withValues(alpha: 0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: accentColor.withOpacity(0.15),
+            color: accentColor.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -898,10 +907,10 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isPremiumActive
-              ? AppColors.premiumGradient.map((c) => c.withOpacity(0.2)).toList()
+              ? AppColors.premiumGradient.map((c) => c.withValues(alpha: 0.2)).toList()
               : [
                   const Color(0xFFE3F2FD),
-                  const Color(0xFFBBDEFB).withOpacity(0.5),
+                  const Color(0xFFBBDEFB).withValues(alpha: 0.5),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -910,8 +919,8 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
         boxShadow: [
           BoxShadow(
             color: isPremiumActive
-                ? AppColors.premiumGold.withOpacity(0.2)
-                : AppColors.mathBlue.withOpacity(0.2),
+                ? AppColors.premiumGold.withValues(alpha: 0.2)
+                : AppColors.mathBlue.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

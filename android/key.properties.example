@@ -1,0 +1,24 @@
+# Android Release Signing Configuration
+#
+# 이 파일을 'key.properties'로 복사하고 실제 값으로 채워주세요.
+# ⚠️  key.properties 파일은 .gitignore에 포함되어 Git에 추가되지 않습니다.
+#
+# 1. Keystore 생성 방법:
+#    keytool -genkey -v -keystore upload-keystore.jks \
+#      -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 \
+#      -alias upload
+#
+# 2. 생성된 upload-keystore.jks 파일을 android/ 폴더에 저장
+#
+# 3. 아래 정보를 입력:
+
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=upload
+storeFile=upload-keystore.jks
+
+# 참고:
+# - storePassword: keystore 생성 시 입력한 비밀번호
+# - keyPassword: key 생성 시 입력한 비밀번호
+# - keyAlias: key의 별칭 (기본값: upload)
+# - storeFile: keystore 파일 경로 (android/ 폴더 기준 상대 경로)

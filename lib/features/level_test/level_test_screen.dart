@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/level_test.dart';
-import '../../data/providers/level_test_provider.dart';
+import '../../data/models/learning/level_test.dart';
+import '../../data/providers/assessment/level_test_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../shared/widgets/buttons/unified_button.dart';
@@ -77,6 +77,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
           icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () async {
             await AppHapticFeedback.lightImpact();
+            if (!context.mounted) return;
+
             final shouldExit = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
@@ -94,9 +96,10 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                 ],
               ),
             );
-            if (shouldExit == true && mounted) {
-              Navigator.of(context).pop();
-            }
+
+            if (shouldExit != true) return;
+            if (!context.mounted) return;
+            Navigator.of(context).pop();
           },
         ),
       ),

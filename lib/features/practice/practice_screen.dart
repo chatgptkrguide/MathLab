@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/practice_provider.dart';
+import '../../data/providers/learning/practice_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../shared/widgets/buttons/unified_button.dart';
+import 'widgets/widgets.dart';
 
 /// 연습 모드 카테고리 선택 화면
 class PracticeCategoryScreen extends ConsumerWidget {
@@ -73,152 +74,13 @@ class PracticeCategoryScreen extends ConsumerWidget {
               // 카테고리 버튼들
               ...PracticeCategory.values.map((category) => Padding(
                 padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
-                child: _CategoryCard(category: category),
+                child: PracticeCategoryCard(category: category),
               )),
             ],
           ),
         ),
       ),
     );
-  }
-}
-
-/// 카테고리 카드
-class _CategoryCard extends ConsumerWidget {
-  final PracticeCategory category;
-
-  const _CategoryCard({required this.category});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final stats = ref.watch(practiceProvider);
-    final count = stats.categoryStats[category.displayName] ?? 0;
-
-    return GestureDetector(
-      onTap: () async {
-        await AppHapticFeedback.lightImpact();
-
-        // 카테고리별 연습 시작
-        if (category == PracticeCategory.errorNote) {
-          await ref.read(practiceProvider.notifier).startErrorNotePractice();
-        } else {
-          await ref.read(practiceProvider.notifier).startCategoryPractice(category);
-        }
-
-        if (context.mounted) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const PracticeScreen(),
-            ),
-          );
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: AppColors.borderLight),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.borderLight.withValues(alpha: 0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // 아이콘
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: _getCategoryColor(category).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-              ),
-              child: Center(
-                child: Icon(
-                  _getCategoryIcon(category),
-                  size: 32,
-                  color: _getCategoryColor(category),
-                ),
-              ),
-            ),
-            const SizedBox(width: AppDimensions.spacingL),
-
-            // 정보
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    category.displayName,
-                    style: AppTextStyles.titleLarge.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    category.description,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  if (count > 0) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      '$count번 연습함',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-
-            // 화살표
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getCategoryColor(PracticeCategory category) {
-    switch (category) {
-      case PracticeCategory.basicArithmetic:
-        return AppColors.successGreen;
-      case PracticeCategory.algebra:
-        return AppColors.primary;
-      case PracticeCategory.geometry:
-        return AppColors.warning;
-      case PracticeCategory.statistics:
-        return Colors.purple;
-      case PracticeCategory.errorNote:
-        return AppColors.error;
-    }
-  }
-
-  IconData _getCategoryIcon(PracticeCategory category) {
-    switch (category) {
-      case PracticeCategory.basicArithmetic:
-        return Icons.calculate;
-      case PracticeCategory.algebra:
-        return Icons.functions;
-      case PracticeCategory.geometry:
-        return Icons.hexagon_outlined;
-      case PracticeCategory.statistics:
-        return Icons.bar_chart;
-      case PracticeCategory.errorNote:
-        return Icons.error_outline;
-    }
   }
 }
 
@@ -308,6 +170,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
           icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () async {
             await AppHapticFeedback.lightImpact();
+            if (!context.mounted) return;
+
             final shouldExit = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
@@ -325,9 +189,10 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                 ],
               ),
             );
-            if (shouldExit == true && mounted) {
-              Navigator.of(context).pop();
-            }
+
+            if (shouldExit != true) return;
+            if (!context.mounted) return;
+            Navigator.of(context).pop();
           },
         ),
       ),
@@ -427,7 +292,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                         problem.options!.length,
                         (index) => Padding(
                           padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
-                          child: _OptionButton(
+                          child: PracticeOptionButton(
                             option: problem.options![index],
                             index: index,
                             isSelected: _userAnswer == problem.options![index],
@@ -485,89 +350,6 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 선택지 버튼 (레벨 테스트와 동일)
-class _OptionButton extends StatelessWidget {
-  final String option;
-  final int index;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _OptionButton({
-    required this.option,
-    required this.index,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppDimensions.paddingL),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.successGreen : AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(
-            color: isSelected ? AppColors.successGreen : AppColors.borderLight,
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: [
-            if (isSelected)
-              BoxShadow(
-                color: AppColors.successGreen.withValues(alpha: 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              )
-            else
-              BoxShadow(
-                color: AppColors.borderLight.withValues(alpha: 0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.surface : AppColors.successGreen.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.surface : AppColors.successGreen,
-                  width: 2,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  String.fromCharCode(65 + index), // A, B, C, D
-                  style: TextStyle(
-                    color: isSelected ? AppColors.successGreen : AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: AppDimensions.spacingM),
-            Expanded(
-              child: Text(
-                option,
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: isSelected ? AppColors.surface : AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
             ),
           ],
@@ -638,21 +420,21 @@ class PracticeResultScreen extends ConsumerWidget {
                     const SizedBox(height: AppDimensions.paddingXL),
 
                     // 통계 카드들
-                    _StatCard(
+                    PracticeStatCard(
                       icon: Icons.check_circle,
                       label: '정답',
                       value: '${session.correctCount}/${session.totalProblems}',
                       color: AppColors.success,
                     ),
                     const SizedBox(height: AppDimensions.paddingM),
-                    _StatCard(
+                    PracticeStatCard(
                       icon: Icons.percent,
                       label: '정답률',
                       value: '${(session.accuracy * 100).toStringAsFixed(1)}%',
                       color: AppColors.primary,
                     ),
                     const SizedBox(height: AppDimensions.paddingM),
-                    _StatCard(
+                    PracticeStatCard(
                       icon: Icons.skip_next,
                       label: '건너뛴 문제',
                       value: '${session.skippedCount}개',
@@ -711,50 +493,3 @@ class PracticeResultScreen extends ConsumerWidget {
   }
 }
 
-/// 통계 카드 (레벨 테스트와 동일)
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(width: AppDimensions.spacingM),
-          Expanded(
-            child: Text(
-              label,
-              style: AppTextStyles.bodyLarge.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: AppTextStyles.titleLarge.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

@@ -89,11 +89,11 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
 
     if (widget.showResult) {
       if (widget.isCorrect) {
-        borderLight = AppColors.duolingoGreen;
-        backgroundColor = AppColors.duolingoGreen.withValues(alpha: 0.1);
+        borderLight = AppColors.mathGreen;
+        backgroundColor = AppColors.mathGreen.withValues(alpha: 0.1);
         suffixIcon = const Icon(
           Icons.check_circle,
-          color: AppColors.duolingoGreen,
+          color: AppColors.mathGreen,
         );
       } else {
         borderLight = AppColors.duolingoRed;
@@ -133,7 +133,7 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                     boxShadow: widget.showResult && widget.isCorrect
                         ? [
                             BoxShadow(
-                              color: AppColors.duolingoGreen.withValues(alpha: 0.2),
+                              color: AppColors.mathGreen.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -149,7 +149,7 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                     style: AppTextStyles.headlineMedium.copyWith(
                       fontWeight: FontWeight.bold,
                       color: widget.showResult
-                          ? (widget.isCorrect ? AppColors.duolingoGreen : AppColors.duolingoRed)
+                          ? (widget.isCorrect ? AppColors.mathGreen : AppColors.duolingoRed)
                           : AppColors.textPrimary,
                     ),
                     decoration: InputDecoration(
@@ -172,14 +172,14 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                       children: [
                         const Icon(
                           Icons.lightbulb_outline,
-                          color: AppColors.duolingoBlue,
+                          color: AppColors.mathBlue,
                           size: 16,
                         ),
                         const SizedBox(width: AppDimensions.spacingS),
                         Text(
                           '정답: ${widget.correctAnswer}',
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.duolingoBlue,
+                            color: AppColors.mathBlue,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

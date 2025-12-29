@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../data/models/league.dart';
+import '../../../data/models/gamification/league.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
@@ -33,9 +33,9 @@ class LeagueHeader extends StatelessWidget {
     // 시간 문자열 생성
     String timeString = '';
     if (daysLeft > 0) {
-      timeString = '$daysLeft일 ${hoursLeft}시간';
+      timeString = '$daysLeft일 $hoursLeft시간';
     } else if (hoursLeft > 0) {
-      timeString = '$hoursLeft시간 ${minutesLeft}분';
+      timeString = '$hoursLeft시간 $minutesLeft분';
     } else {
       timeString = '$minutesLeft분';
     }
@@ -46,7 +46,7 @@ class LeagueHeader extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Color(league.tier.color),
-            Color(league.tier.color).withOpacity(0.8),
+            Color(league.tier.color).withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -54,12 +54,12 @@ class LeagueHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Color(league.tier.color).withOpacity(0.4),
+            color: Color(league.tier.color).withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -76,7 +76,7 @@ class LeagueHeader extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -88,7 +88,7 @@ class LeagueHeader extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -106,11 +106,11 @@ class LeagueHeader extends StatelessWidget {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
@@ -150,7 +150,7 @@ class LeagueHeader extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -180,7 +180,7 @@ class LeagueHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -203,7 +203,7 @@ class LeagueHeader extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.mathYellow.withOpacity(0.2),
+                              color: AppColors.mathYellow.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -242,7 +242,7 @@ class LeagueHeader extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: (canPromote ? AppColors.mathGreen : AppColors.mathRed)
-                              .withOpacity(0.4),
+                              .withValues(alpha: 0.4),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),

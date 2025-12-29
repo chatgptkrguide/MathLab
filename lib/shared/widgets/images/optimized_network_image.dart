@@ -102,7 +102,7 @@ class OptimizedNetworkImage extends StatelessWidget {
       height: height,
       color: AppColors.borderLight,
       child: Center(
-        child: SkeletonLoading(
+        child: skeletonLoading(
           width: width ?? double.infinity,
           height: height ?? 200,
         ),

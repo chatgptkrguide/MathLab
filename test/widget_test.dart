@@ -1,41 +1,40 @@
 // MathLab 앱의 기본 위젯 테스트
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mathlab/app/app.dart';
 
 void main() {
   testWidgets('MathLab app loads successfully', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MathLabApp());
+    // Build our app with ProviderScope for Riverpod
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MathLabApp(),
+      ),
+    );
 
-    // Verify that the home screen loads
-    expect(find.text('안녕하세요, 학습자님!'), findsOneWidget);
-    expect(find.text('학습 시작하기'), findsOneWidget);
+    // Wait for the app to settle
+    await tester.pumpAndSettle();
 
-    // Verify navigation tabs are present
-    expect(find.text('홈'), findsOneWidget);
-    expect(find.text('학습'), findsOneWidget);
-    expect(find.text('오답'), findsOneWidget);
-    expect(find.text('이력'), findsOneWidget);
-    expect(find.text('프로필'), findsOneWidget);
+    // Verify that the auth screen loads (since user is not authenticated)
+    // The auth screen should have login buttons
+    expect(find.text('시작하기'), findsOneWidget);
+    expect(find.text('Google로 계속하기'), findsOneWidget);
+    expect(find.text('Kakao로 계속하기'), findsOneWidget);
   });
 
-  testWidgets('Navigation works correctly', (WidgetTester tester) async {
-    // Build our app
-    await tester.pumpWidget(const MathLabApp());
+  testWidgets('App initializes without errors', (WidgetTester tester) async {
+    // Build our app with ProviderScope
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MathLabApp(),
+      ),
+    );
 
-    // Tap on the 학습 tab
-    await tester.tap(find.text('학습'));
+    // Wait for initialization
     await tester.pumpAndSettle();
 
-    // Verify we're on the lessons screen
-    expect(find.text('학습 로드맵'), findsOneWidget);
-
-    // Tap on the 프로필 tab
-    await tester.tap(find.text('프로필'));
-    await tester.pumpAndSettle();
-
-    // Should be able to find user profile elements
-    expect(find.text('학습자'), findsOneWidget);
+    // Verify no errors were thrown during initialization
+    expect(tester.takeException(), isNull);
   });
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
-import '../../../data/providers/message_provider.dart';
+import '../../../data/providers/communication/message_provider.dart';
 import '../../messages/messages_screen.dart';
 
 /// 홈 화면 헤더

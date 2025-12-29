@@ -171,7 +171,7 @@ class AppTextStyles {
   static const TextStyle progressText = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w500,
-    color: AppColors.primaryBlue,
+    color: AppColors.mathBlue,
     height: 1.2,
     fontFamily: 'Inter', // 진행률 숫자는 Inter
     fontFamilyFallback: ['Roboto', 'NotoSansKR'],

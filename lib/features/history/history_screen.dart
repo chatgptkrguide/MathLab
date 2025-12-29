@@ -6,8 +6,8 @@ import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/dialogs/grade_selection_dialog.dart';
-import '../../data/providers/user_provider.dart';
-import '../../data/providers/study_history_provider.dart';
+import '../../data/providers/user/user_provider.dart';
+import '../../data/providers/learning/study_history_provider.dart';
 import 'monthly_stats_screen.dart';
 
 /// 학습 이력 화면 (Figma 디자인 03)
@@ -165,7 +165,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         Container(
           height: 16,
           decoration: BoxDecoration(
-            color: AppColors.progressBackground,
+            color: AppColors.disabled,
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             boxShadow: [
               BoxShadow(
@@ -492,7 +492,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   ) : null,
                   boxShadow: isCompleted ? [
                     BoxShadow(
-                      color: AppColors.mathBlue.withOpacity(0.3),
+                      color: AppColors.mathBlue.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

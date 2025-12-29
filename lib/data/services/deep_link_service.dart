@@ -80,6 +80,7 @@ class DeepLinkService {
         tag: 'DeepLink',
       );
       // 에러 발생 시 홈 화면으로 이동
+      if (!context.mounted) return;
       await _navigateToHome(context);
     }
   }
@@ -278,6 +279,7 @@ class DeepLinkService {
         stackTrace: stackTrace,
         tag: 'DeepLink',
       );
+      if (!context.mounted) return;
       await _navigateToHome(context);
     }
   }

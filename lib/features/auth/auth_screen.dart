@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../data/providers/auth_provider.dart';
+import '../../data/providers/auth/auth_provider.dart';
 
 /// 피그마 "00 홈1" 디자인 기반 로그인 화면
 /// 다크 퍼플 배경 + Chatbot 캐릭터 + 로그인 버튼들

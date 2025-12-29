@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/auth/auth_screen.dart';
-import '../data/providers/auth_provider.dart';
-import '../data/providers/user_provider.dart';
-import '../data/providers/sync_manager_provider.dart';
-import '../data/providers/fcm_provider.dart';
+import '../data/providers/auth/auth_provider.dart';
+import '../data/providers/user/user_provider.dart';
+import '../data/providers/infrastructure/sync_manager_provider.dart';
+import '../data/providers/communication/fcm_provider.dart';
 import '../shared/utils/logger.dart';
 import 'main_navigation.dart';
 

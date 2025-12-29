@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../data/providers/auth_provider.dart';
+import '../../../data/providers/auth/auth_provider.dart';
 
 /// 로그인 화면
 class LoginView extends ConsumerStatefulWidget {

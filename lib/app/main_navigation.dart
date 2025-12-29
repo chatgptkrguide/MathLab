@@ -8,8 +8,8 @@ import '../features/lessons/figma/lessons_screen_figma.dart';
 import '../features/wrong_answer/wrong_answer_screen.dart';
 import '../features/profile/figma/profile_detail_screen_v3_new.dart';
 import '../features/league/league_screen.dart';
-import '../data/providers/navigation_provider.dart';
-import '../data/providers/fcm_provider.dart';
+import '../data/providers/infrastructure/navigation_provider.dart';
+import '../data/providers/communication/fcm_provider.dart';
 import '../data/services/deep_link_service.dart';
 import '../shared/utils/logger.dart';
 

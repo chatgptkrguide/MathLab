@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
-import '../../../data/providers/user_provider.dart';
+import '../../../data/providers/user/user_provider.dart';
 
 /// 문제 풀이 화면 헤더
 ///

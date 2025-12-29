@@ -137,7 +137,7 @@ class _UnifiedButtonState extends State<UnifiedButton>
     if (color == AppColors.mathOrange) return AppColors.mathOrangeDark;
     if (color == AppColors.mathRed) return AppColors.mathRedDark;
     if (color == AppColors.mathPurple) return AppColors.mathPurpleDark;
-    if (color == AppColors.successGreen) return AppColors.duolingoGreenDark;
+    if (color == AppColors.successGreen) return AppColors.mathGreenDark;
     if (color == AppColors.mathBlue) return AppColors.mathBlueDark;
 
     // Default: darken by 20%

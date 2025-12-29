@@ -152,7 +152,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
             : AppColors.mathRed; // GoMath red
       } else if (widget.isCorrectAnswer) {
         // 정답 표시 (연한 초록색)
-        return AppColors.highlightGreen; // Light green (successGreen 80% lighter)
+        return AppColors.successGreen.withValues(alpha: 0.2); // Light green
       } else {
         return AppColors.surface;
       }
@@ -166,7 +166,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? AppColors.duolingoGreenDark // Darker green (successGreen 20% darker)
+            ? AppColors.mathGreenDark // Darker green (successGreen 20% darker)
             : AppColors.mathRedDark; // Darker red (mathRed 20% darker)
       } else if (widget.isCorrectAnswer) {
         return AppColors.successGreen; // GoMath green
@@ -196,7 +196,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
-            ? AppColors.duolingoGreenDark // Darker green (successGreen 20% darker)
+            ? AppColors.mathGreenDark // Darker green (successGreen 20% darker)
             : AppColors.mathRedDark; // Darker red (mathRed 20% darker)
       }
       return AppColors.borderLight;

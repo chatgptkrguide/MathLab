@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/models.dart';
-import '../../../data/providers/user_provider.dart';
-import '../../../data/providers/problem_provider.dart';
+import '../../../data/providers/user/user_provider.dart';
+import '../../../data/providers/learning/problem_provider.dart';
 import '../../../data/services/korean_math_curriculum.dart';
 import '../../../shared/constants/game_constants.dart';
 import '../../problem/problem_screen.dart';
@@ -42,7 +42,7 @@ class HomeLanguageCards extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -100,7 +100,7 @@ class HomeLanguageCards extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -218,6 +218,7 @@ class HomeLanguageCards extends ConsumerWidget {
           ProviderScope.containerOf(context).read(userProvider.notifier).updateGrade(grade);
           // 단원 선택 모달 표시
           Future.delayed(const Duration(milliseconds: GameConstants.normalAnimationMs), () {
+            if (!context.mounted) return;
             _showLessonSelectionModal(context, ref, grade);
           });
         },
@@ -360,7 +361,7 @@ class HomeLanguageCards extends ConsumerWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: const Color(0xFF4A90E2).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

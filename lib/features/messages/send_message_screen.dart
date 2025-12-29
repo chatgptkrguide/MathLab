@@ -4,7 +4,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
-import '../../data/providers/message_provider.dart';
+import '../../data/providers/communication/message_provider.dart';
 import '../../data/models/models.dart';
 
 /// 메시지 보내기 화면 (질문/문의 작성)
@@ -132,10 +132,10 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.mathBlue.withOpacity(0.1),
+        color: AppColors.mathBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.mathBlue.withOpacity(0.3),
+          color: AppColors.mathBlue.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

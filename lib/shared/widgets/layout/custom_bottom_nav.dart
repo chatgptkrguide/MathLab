@@ -30,13 +30,13 @@ class CustomBottomNavigation extends StatelessWidget {
           color: AppColors.surface,
           border: Border(
             top: BorderSide(
-              color: AppColors.borderLight.withOpacity(0.1),
+              color: AppColors.borderLight.withValues(alpha: 0.1),
               width: 0.5,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -170,7 +170,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     isSelected ? _getSelectedIcon(icon) : icon,
-                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.6),
+                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withValues(alpha: 0.6),
                     size: isSelected ? 24 : 22,
                   ),
                 ),
@@ -179,7 +179,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
-                      color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.7),
+                      color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withValues(alpha: 0.7),
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                       fontSize: isSelected ? 10 : 9,
                       height: 1.0,

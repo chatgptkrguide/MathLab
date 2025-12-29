@@ -130,10 +130,10 @@ class AppColors {
   static const List<Color> headerBlueGradient = mathBlueGradient;
 
   /// 헤더 버튼 배경 (반투명 흰색)
-  static Color get headerButtonBackground => surface.withOpacity(0.2);
+  static Color get headerButtonBackground => surface.withValues(alpha: 0.2);
 
   /// 헤더 버튼 테두리 (반투명 흰색)
-  static Color get headerButtonBorder => surface.withOpacity(0.3);
+  static Color get headerButtonBorder => surface.withValues(alpha: 0.3);
 
   /// 헤더 텍스트 색상 (흰색)
   static const Color headerText = surface;
@@ -185,7 +185,7 @@ class AppColors {
   static const Color levelGoldDark = Color(0xFFCCAD00);  // Darker gold
   static const Color levelSilverDark = Color(0xFF9A9A9A);  // Darker silver
   static const Color levelBronzeDark = Color(0xFFA46628);  // Darker bronze
-  static const Color duolingoGreenDark = Color(0xFF46A301);  // Darker green
+  static const Color mathGreenDark = Color(0xFF46A301);  // Darker green
 
   // Additional colors
   static const Color successGreen = mathGreen;
@@ -232,21 +232,21 @@ class AppColors {
   // 10. 호환성을 위한 별칭 (Deprecated - 추후 제거 예정)
   // ==========================================
 
-  @deprecated
+  @Deprecated('Use mathGreen instead')
   static const Color duolingoGreen = mathGreen;
 
-  @deprecated
+  @Deprecated('Use mathBlue instead')
   static const Color duolingoBlue = mathBlue;
 
-  @deprecated
+  @Deprecated('Use mathGreen instead')
   static const Color primaryGreen = mathGreen;
 
-  @deprecated
+  @Deprecated('Use mathBlue instead')
   static const Color primaryBlue = mathBlue;
 
-  @deprecated
+  @Deprecated('Use disabled instead')
   static const Color progressBackground = Color(0xFFE5E5E5);
 
-  @deprecated
+  @Deprecated('Use successGreen.withValues(alpha: 0.2) instead')
   static const Color highlightGreen = Color(0xFFD4F4DD);
 }

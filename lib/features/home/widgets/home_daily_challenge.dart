@@ -53,7 +53,7 @@ class HomeDailyChallenge extends StatelessWidget {
                       '오늘의 챌린지 미션을 완료해 보세요',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                     const SizedBox(height: 12),

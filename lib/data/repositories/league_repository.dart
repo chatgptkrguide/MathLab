@@ -1,7 +1,5 @@
 import 'base_repository.dart';
-import '../models/league.dart';
-import '../services/local_storage_service.dart';
-import '../services/firestore_service.dart';
+import '../models/gamification/league.dart';
 import '../../shared/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -14,12 +12,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - 티어별 리그 매칭
 class LeagueRepository extends BaseRepository<League> {
   LeagueRepository({
-    required LocalStorageService localStorageService,
-    required FirestoreService firestoreService,
-  }) : super(
-          localStorageService: localStorageService,
-          firestoreService: firestoreService,
-        );
+    required super.localStorageService,
+    required super.firestoreService,
+  });
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -127,6 +122,7 @@ class LeagueRepository extends BaseRepository<League> {
 
       final leagueData = leagueDoc.data();
       final league = League(
+        id: leagueDoc.id,
         tier: LeagueTier.values.firstWhere(
           (t) => t.toString() == leagueData['tier'],
           orElse: () => LeagueTier.bronze,
@@ -267,6 +263,7 @@ class LeagueRepository extends BaseRepository<League> {
 
         final leagueData = leagueDoc.data();
         return League(
+          id: leagueDoc.id,
           tier: LeagueTier.values.firstWhere(
             (t) => t.toString() == leagueData['tier'],
             orElse: () => LeagueTier.bronze,

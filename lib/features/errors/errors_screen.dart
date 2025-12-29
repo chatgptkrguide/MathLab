@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/user_provider.dart';
-import '../../data/providers/error_note_provider.dart';
-import '../../data/providers/problem_provider.dart';
+import '../../data/providers/user/user_provider.dart';
+import '../../data/providers/learning/error_note_provider.dart';
+import '../../data/providers/learning/problem_provider.dart';
 import '../problem/problem_screen.dart';
-import '../error_notes/widgets/widgets.dart';
+import 'widgets/widgets.dart';
+import 'dialogs/dialogs.dart';
 
 /// 오답 노트 화면
 /// 실제 ErrorNoteProvider 데이터 기반으로 구현
@@ -102,7 +102,15 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                       children: [
                         _buildHeader(),
                         ErrorStatsGrid(errorStats: errorStats),
-                        _buildActionButtons(filteredNotes),
+                        FadeInWidget(
+                          duration: const Duration(milliseconds: 600),
+                          delay: const Duration(milliseconds: 100),
+                          child: ErrorActionButtons(
+                            filteredNotes: filteredNotes,
+                            onReviewSelected: () => _reviewSelectedProblems(filteredNotes),
+                            onCreateCustomSet: () => _createCustomReviewSet(userId),
+                          ),
+                        ),
                         ErrorFilterTabs(
                           controller: _tabController,
                           filterTabs: _filterTabs,
@@ -110,7 +118,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                         ),
                         _buildErrorNotesList(userErrorNotes, filteredNotes),
                         if (filteredNotes.isEmpty)
-                          _buildTips(),
+                          const LearningTipsCard(),
                       ],
                     ),
                   ),
@@ -152,104 +160,6 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-
-  /// 액션 버튼들 (반응형 2열)
-  Widget _buildActionButtons(List<ErrorNote> filteredNotes) {
-    final user = ref.watch(userProvider);
-    final userId = user?.id ?? 'user001';
-    final selectedErrorCount = filteredNotes.length;
-
-    return FadeInWidget(
-      duration: const Duration(milliseconds: 600),
-      delay: const Duration(milliseconds: 100),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isSmallScreen = constraints.maxWidth < 500;
-
-            if (isSmallScreen) {
-              return Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: selectedErrorCount > 0
-                          ? () => _reviewSelectedProblems(filteredNotes)
-                          : null,
-                      icon: const Icon(Icons.refresh, size: AppDimensions.iconS),
-                      label: Text('선택 문제 복습 ($selectedErrorCount)'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppDimensions.paddingM,
-                        ),
-                        minimumSize: const Size(double.infinity, 48),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.spacingS),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: filteredNotes.isNotEmpty
-                          ? () => _createCustomReviewSet(userId)
-                          : null,
-                      icon: const Icon(Icons.library_books,
-                          size: AppDimensions.iconS),
-                      label: const Text('맞춤 복습 세트'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppDimensions.paddingM,
-                        ),
-                        minimumSize: const Size(double.infinity, 48),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }
-
-            return Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: selectedErrorCount > 0
-                        ? () => _reviewSelectedProblems(filteredNotes)
-                        : null,
-                    icon: const Icon(Icons.refresh, size: AppDimensions.iconS),
-                    label: Text('선택 문제 복습 ($selectedErrorCount)'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppDimensions.paddingM,
-                      ),
-                      minimumSize: const Size(0, 48),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.spacingS),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: filteredNotes.isNotEmpty
-                        ? () => _createCustomReviewSet(userId)
-                        : null,
-                    icon: const Icon(Icons.library_books,
-                        size: AppDimensions.iconS),
-                    label: const Text('맞춤 복습 세트'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppDimensions.paddingM,
-                      ),
-                      minimumSize: const Size(0, 48),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
 
 
   /// 오답 노트 목록
@@ -301,108 +211,14 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
   }
 
 
-  /// 학습 팁
-  Widget _buildTips() {
-    return Container(
-      margin: const EdgeInsets.all(AppDimensions.paddingL),
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
-      decoration: BoxDecoration(
-        color: AppColors.warningOrange.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: AppColors.warningOrange.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                color: AppColors.warningOrange,
-                size: AppDimensions.iconM,
-              ),
-              const SizedBox(width: AppDimensions.spacingS),
-              Flexible(
-                child: Text(
-                  '오답 노트 활용 팁',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.warningOrange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacingS),
-          Text(
-            '• 틀린 문제는 자동으로 오답 노트에 저장됩니다',
-            style: AppTextStyles.bodySmall,
-          ),
-          Text(
-            '• 같은 유형의 문제를 선택해서 집중 복습하세요',
-            style: AppTextStyles.bodySmall,
-          ),
-          Text(
-            '• 맞춤 복습 세트를 만들어 체계적으로 학습하세요',
-            style: AppTextStyles.bodySmall,
-          ),
-        ],
-      ),
-    );
-  }
-
   // 이벤트 핸들러들
 
   void _reviewSelectedProblems(List<ErrorNote> selectedNotes) {
-    final selectedCount = selectedNotes.length;
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        title: Row(
-          children: [
-            Text('🔄', style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              '선택 문제 복습',
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          '$selectedCount개의 문제를 복습하시겠습니까?',
-          style: AppTextStyles.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '취소',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _startReviewSession(selectedNotes);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mathButtonBlue,
-            ),
-            child: const Text('복습 시작'),
-          ),
-        ],
+      builder: (context) => ReviewConfirmationDialog(
+        selectedCount: selectedNotes.length,
+        onConfirm: () => _startReviewSession(selectedNotes),
       ),
     );
   }
@@ -446,61 +262,9 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
   void _createCustomReviewSet(String userId) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        title: Row(
-          children: [
-            const Icon(Icons.menu_book, color: AppColors.primary, size: 24),
-            const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              '맞춤 복습 세트',
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          '어떤 기준으로 복습 세트를 만드시겠습니까?',
-          style: AppTextStyles.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '취소',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _createReviewSetByCategory(userId);
-            },
-            child: Text(
-              '카테고리별',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.mathButtonBlue,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _createReviewSetByDifficulty(userId);
-            },
-            child: Text(
-              '난이도별',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.mathButtonBlue,
-              ),
-            ),
-          ),
-        ],
+      builder: (context) => CustomReviewSetDialog(
+        onCreateByCategory: () => _createReviewSetByCategory(userId),
+        onCreateByDifficulty: () => _createReviewSetByDifficulty(userId),
       ),
     );
   }
@@ -549,155 +313,10 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
   void _navigateToProblemReview(ErrorNote errorNote) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        title: Row(
-          children: [
-            Text('📝', style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: AppDimensions.spacingS),
-            Expanded(
-              child: Text(
-                '오답 노트 상세',
-                style: AppTextStyles.headlineSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('문제', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: AppDimensions.spacingXS),
-              Text(errorNote.question, style: AppTextStyles.bodyMedium),
-              const SizedBox(height: AppDimensions.spacingM),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('내 답', style: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: AppDimensions.spacingXS),
-                        Text(
-                          errorNote.userAnswer,
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.errorRed),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.spacingM),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('정답', style: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: AppDimensions.spacingXS),
-                        Text(
-                          errorNote.correctAnswer,
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.successGreen),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppDimensions.spacingM),
-
-              Text('해설', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: AppDimensions.spacingXS),
-              Text(errorNote.explanation, style: AppTextStyles.bodyMedium),
-              const SizedBox(height: AppDimensions.spacingM),
-
-              Wrap(
-                spacing: AppDimensions.spacingM,
-                runSpacing: AppDimensions.spacingS,
-                children: [
-                  _buildInfoChip('카테고리', errorNote.category, AppColors.mathBlue),
-                  _buildInfoChip('난이도', errorNote.difficultyText, AppColors.mathOrange),
-                  _buildInfoChip('복습', '${errorNote.reviewCount}회', AppColors.mathTeal),
-                  _buildInfoChip('상태', errorNote.statusText, _getStatusColor(errorNote.status)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '닫기',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _startReviewSession([errorNote]);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mathButtonBlue,
-            ),
-            child: const Text('이 문제 복습하기'),
-          ),
-        ],
+      builder: (context) => ErrorNoteDetailDialog(
+        errorNote: errorNote,
+        onReview: () => _startReviewSession([errorNote]),
       ),
     );
-  }
-
-  Widget _buildInfoChip(String label, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingM,
-        vertical: AppDimensions.paddingS,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '$label: ',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-          Text(
-            value,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getStatusColor(ErrorStatus status) {
-    switch (status) {
-      case ErrorStatus.newError:
-        return AppColors.errorRed;
-      case ErrorStatus.reviewing:
-        return AppColors.warningOrange;
-      case ErrorStatus.improving:
-        return AppColors.mathBlue;
-      case ErrorStatus.mastered:
-        return AppColors.successGreen;
-    }
   }
 }

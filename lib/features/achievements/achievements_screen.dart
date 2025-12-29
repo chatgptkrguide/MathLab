@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/achievement_provider.dart';
-import '../../data/models/achievement.dart';
+import '../../data/providers/gamification/achievement_provider.dart';
+import '../../data/models/gamification/achievement.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 
@@ -83,7 +83,7 @@ class AchievementsScreen extends ConsumerWidget {
                                     gradient: const LinearGradient(
                                       colors: [
                                         AppColors.successGreen,
-                                        AppColors.duolingoGreenDark,
+                                        AppColors.mathGreenDark,
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(12),

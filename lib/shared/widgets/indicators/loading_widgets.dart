@@ -87,14 +87,14 @@ class _DuolingoLoadingIndicatorState extends State<DuolingoLoadingIndicator>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        widget.color ?? AppColors.duolingoBlue,
-                        (widget.color ?? AppColors.duolingoBlue).withValues(alpha: 0.6),
+                        widget.color ?? AppColors.mathBlue,
+                        (widget.color ?? AppColors.mathBlue).withValues(alpha: 0.6),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(widget.size / 2),
                     boxShadow: [
                       BoxShadow(
-                        color: (widget.color ?? AppColors.duolingoBlue).withValues(alpha: 0.3),
+                        color: (widget.color ?? AppColors.mathBlue).withValues(alpha: 0.3),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
@@ -288,7 +288,7 @@ class SkeletonProgressCard extends StatelessWidget {
 }
 
 /// 범용 스켈레톤 로딩 위젯 (호환성 함수)
-Widget SkeletonLoading({
+Widget skeletonLoading({
   double? width,
   double height = 20,
   double borderRadius = 4,

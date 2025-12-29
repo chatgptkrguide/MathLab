@@ -21,7 +21,7 @@ class HomeStartButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0000FF).withOpacity(0.3),
+            color: const Color(0xFF0000FF).withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

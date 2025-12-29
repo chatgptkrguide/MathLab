@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
-import '../models/premium_tier.dart';
+import '../models/subscription/premium_tier.dart';
 import 'subscription_service.dart';
+import '../../shared/utils/logger.dart';
 
 /// 인앱 구매 서비스
 ///
@@ -49,7 +50,7 @@ class InAppPurchaseService {
     // 인앱 구매 사용 가능 여부 확인
     final available = await _inAppPurchase.isAvailable();
     if (!available) {
-      print('[IAP] 인앱 구매를 사용할 수 없습니다');
+      Logger.warning('인앱 구매를 사용할 수 없습니다', tag: 'IAP');
       return false;
     }
 
@@ -72,7 +73,7 @@ class InAppPurchaseService {
     // 미완료 거래 처리
     await _restorePendingPurchases();
 
-    print('[IAP] 초기화 완료');
+    Logger.info('초기화 완료', tag: 'IAP');
     return true;
   }
 
@@ -99,27 +100,28 @@ class InAppPurchaseService {
       final response = await _inAppPurchase.queryProductDetails(productIds);
 
       if (response.error != null) {
-        print('[IAP] 상품 조회 오류: ${response.error}');
+        Logger.error('상품 조회 오류: ${response.error}', tag: 'IAP');
         return false;
       }
 
       if (response.productDetails.isEmpty) {
-        print('[IAP] 등록된 상품이 없습니다');
+        Logger.warning('등록된 상품이 없습니다', tag: 'IAP');
         return false;
       }
 
       _products = response.productDetails;
-      print('[IAP] ${_products.length}개 상품 로드 완료');
+      Logger.info('${_products.length}개 상품 로드 완료', tag: 'IAP');
 
       // 상품 정보 출력
       for (final product in _products) {
-        print(
-            '[IAP] ${product.id}: ${product.price} (${product.currencyCode})');
+        Logger.debug(
+            '${product.id}: ${product.price} (${product.currencyCode})',
+            tag: 'IAP');
       }
 
       return true;
     } catch (e) {
-      print('[IAP] 상품 로드 오류: $e');
+      Logger.error('상품 로드 오류', error: e, tag: 'IAP');
       return false;
     }
   }
@@ -208,12 +210,12 @@ class InAppPurchaseService {
   Future<void> _onPurchaseUpdated(
       List<PurchaseDetails> purchaseDetailsList) async {
     for (final purchaseDetails in purchaseDetailsList) {
-      print('[IAP] 구매 상태: ${purchaseDetails.status}');
+      Logger.debug('구매 상태: ${purchaseDetails.status}', tag: 'IAP');
 
       switch (purchaseDetails.status) {
         case PurchaseStatus.pending:
           // 구매 대기 중 (사용자가 결제 프로세스 진행 중)
-          print('[IAP] 결제 대기 중...');
+          Logger.debug('결제 대기 중...', tag: 'IAP');
           break;
 
         case PurchaseStatus.purchased:
@@ -242,13 +244,13 @@ class InAppPurchaseService {
 
   /// 구매 성공 처리
   Future<void> _handlePurchaseSuccess(PurchaseDetails purchaseDetails) async {
-    print('[IAP] 구매 성공: ${purchaseDetails.productID}');
+    Logger.info('구매 성공: ${purchaseDetails.productID}', tag: 'IAP');
 
     try {
       // 영수증 검증 (서버 사이드 검증 권장)
       final isValid = await _verifyPurchase(purchaseDetails);
       if (!isValid) {
-        print('[IAP] 영수증 검증 실패');
+        Logger.error('영수증 검증 실패', tag: 'IAP');
         _purchaseInProgress = false;
         _onPurchaseComplete?.call(false, '영수증 검증 실패');
         return;
@@ -257,7 +259,7 @@ class InAppPurchaseService {
       // 구독 등급 결정
       final tier = _getTierFromProductId(purchaseDetails.productID);
       if (tier == null) {
-        print('[IAP] 알 수 없는 상품: ${purchaseDetails.productID}');
+        Logger.error('알 수 없는 상품: ${purchaseDetails.productID}', tag: 'IAP');
         _purchaseInProgress = false;
         _onPurchaseComplete?.call(false, '알 수 없는 상품');
         return;
@@ -275,12 +277,12 @@ class InAppPurchaseService {
         platform: Platform.isIOS ? 'ios' : 'android',
       );
 
-      print('[IAP] Firestore 구독 생성 완료');
+      Logger.info('Firestore 구독 생성 완료', tag: 'IAP');
 
       _purchaseInProgress = false;
       _onPurchaseComplete?.call(true, null);
     } catch (e) {
-      print('[IAP] 구매 처리 오류: $e');
+      Logger.error('구매 처리 오류', error: e, tag: 'IAP');
       _purchaseInProgress = false;
       _onPurchaseComplete?.call(false, '구매 처리 오류: $e');
     }
@@ -288,7 +290,7 @@ class InAppPurchaseService {
 
   /// 구매 오류 처리
   void _handlePurchaseError(PurchaseDetails purchaseDetails) {
-    print('[IAP] 구매 오류: ${purchaseDetails.error}');
+    Logger.error('구매 오류: ${purchaseDetails.error}', tag: 'IAP');
 
     _purchaseInProgress = false;
     _onPurchaseComplete?.call(
@@ -299,7 +301,7 @@ class InAppPurchaseService {
 
   /// 구매 취소 처리
   void _handlePurchaseCanceled() {
-    print('[IAP] 사용자가 구매 취소');
+    Logger.info('사용자가 구매 취소', tag: 'IAP');
 
     _purchaseInProgress = false;
     _onPurchaseComplete?.call(false, '구매가 취소되었습니다');
@@ -315,16 +317,16 @@ class InAppPurchaseService {
   /// iOS에서는 필수 기능입니다.
   Future<bool> restorePurchases(String userId) async {
     try {
-      print('[IAP] 구매 복원 시작...');
+      Logger.info('구매 복원 시작...', tag: 'IAP');
 
       await _inAppPurchase.restorePurchases();
 
       // 복원된 구매는 _onPurchaseUpdated에서 처리됨
-      print('[IAP] 구매 복원 요청 완료');
+      Logger.info('구매 복원 요청 완료', tag: 'IAP');
 
       return true;
     } catch (e) {
-      print('[IAP] 구매 복원 오류: $e');
+      Logger.error('구매 복원 오류', error: e, tag: 'IAP');
       return false;
     }
   }
@@ -338,9 +340,9 @@ class InAppPurchaseService {
       // iOS: 완료되지 않은 거래
       // Android: 소비되지 않은 구매
       await _inAppPurchase.restorePurchases();
-      print('[IAP] 미완료 거래 처리 완료');
+      Logger.info('미완료 거래 처리 완료', tag: 'IAP');
     } catch (e) {
-      print('[IAP] 미완료 거래 처리 오류: $e');
+      Logger.error('미완료 거래 처리 오류', error: e, tag: 'IAP');
     }
   }
 

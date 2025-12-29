@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/chat_provider.dart';
+import '../../data/providers/communication/chat_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
 import 'chat_detail_screen.dart';
@@ -157,7 +157,7 @@ class ChatRoomsScreen extends ConsumerWidget {
     }
 
     return CircleAvatar(
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       child: Icon(icon, color: color),
     );
   }
@@ -171,14 +171,14 @@ class ChatRoomsScreen extends ConsumerWidget {
           Icon(
             Icons.chat_bubble_outline,
             size: 64,
-            color: AppColors.textSecondary.withOpacity(0.5),
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             '채팅방이 없습니다',
             style: TextStyle(
               fontSize: 16,
-              color: AppColors.textSecondary.withOpacity(0.7),
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 8),
@@ -186,7 +186,7 @@ class ChatRoomsScreen extends ConsumerWidget {
             '새 대화를 시작해보세요!',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary.withOpacity(0.5),
+              color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
           ),
         ],

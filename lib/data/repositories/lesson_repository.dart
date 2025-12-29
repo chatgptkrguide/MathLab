@@ -1,7 +1,5 @@
 import 'base_repository.dart';
-import '../models/lesson.dart';
-import '../services/local_storage_service.dart';
-import '../services/firestore_service.dart';
+import '../models/learning/lesson.dart';
 import '../../shared/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -14,12 +12,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - 레슨 잠금/해제 관리
 class LessonRepository extends BaseRepository<List<Lesson>> {
   LessonRepository({
-    required LocalStorageService localStorageService,
-    required FirestoreService firestoreService,
-  }) : super(
-          localStorageService: localStorageService,
-          firestoreService: firestoreService,
-        );
+    required super.localStorageService,
+    required super.firestoreService,
+  });
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 

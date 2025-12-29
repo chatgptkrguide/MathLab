@@ -7,9 +7,9 @@ import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/widgets/animations/fade_in_widget.dart';
 import '../../shared/utils/level_badge_mapper.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/leaderboard_provider.dart';
-import '../../data/providers/friend_provider.dart';
-import '../../data/providers/all_users_provider.dart';
+import '../../data/providers/gamification/leaderboard_provider.dart';
+import '../../data/providers/user/friend_provider.dart';
+import '../../data/providers/user/all_users_provider.dart';
 import '../league/league_screen.dart';
 
 /// 리더보드 화면
@@ -192,7 +192,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     bottom: -6,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.duolingoGreenDark, // Darker green (successGreen 20% darker)
+                        color: AppColors.mathGreenDark, // Darker green (successGreen 20% darker)
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
@@ -204,7 +204,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       color: AppColors.successGreen, // GoMath green
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: AppColors.duolingoGreenDark, // Darker green
+                        color: AppColors.mathGreenDark, // Darker green
                         width: 3,
                       ),
                     ),
@@ -218,7 +218,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                             border: Border.all(
-                              color: AppColors.duolingoGreenDark, // Darker green
+                              color: AppColors.mathGreenDark, // Darker green
                               width: 3,
                             ),
                           ),
@@ -337,7 +337,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? AppColors.highlightGreen // Light green highlight (successGreen 80% lighter)
+            ? AppColors.successGreen.withValues(alpha: 0.2) // Light green highlight
             : AppColors.surface,
         border: Border.all(
           color: entry.isCurrentUser

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/study_timer_provider.dart';
+import '../../data/providers/learning/study_timer_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
 
@@ -48,7 +48,7 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
     final minutes = (seconds % 3600) ~/ 60;
 
     if (hours > 0) {
-      return '$hours시간 ${minutes}분';
+      return '$hours시간 $minutes분';
     }
     return '$minutes분';
   }
@@ -144,7 +144,7 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -170,12 +170,12 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
+          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -249,7 +249,7 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -413,7 +413,7 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -500,7 +500,7 @@ class _StudyStatsScreenState extends ConsumerState<StudyStatsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

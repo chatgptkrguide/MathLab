@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/problem.dart';
-import '../../../data/providers/hint_provider_optimized.dart';
-import '../../../data/providers/user_provider.dart';
+import '../../../data/models/learning/problem.dart';
+import '../../../data/providers/learning/hint_provider_optimized.dart';
+import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/constants.dart';
 import '../../../shared/utils/haptic_feedback.dart';
 import '../../../shared/widgets/animations/fade_in_widget.dart';

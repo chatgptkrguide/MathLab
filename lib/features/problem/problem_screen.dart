@@ -7,15 +7,16 @@ import '../../shared/constants/game_constants.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/models/models.dart';
-import '../../data/providers/user_provider.dart';
-import '../../data/providers/problem_provider.dart';
-import '../../data/providers/lesson_provider.dart';
-import '../../data/providers/error_note_provider.dart';
-import '../../data/providers/wrong_answer_provider.dart';
-import '../../data/providers/achievement_provider.dart';
-import '../../data/providers/hint_provider_optimized.dart';
-import '../../data/providers/study_history_provider.dart';
+import '../../data/providers/user/user_provider.dart';
+import '../../data/providers/learning/problem_provider.dart';
+import '../../data/providers/learning/lesson_provider.dart';
+import '../../data/providers/learning/error_note_provider.dart';
+import '../../data/providers/learning/wrong_answer_provider.dart';
+import '../../data/providers/gamification/achievement_provider.dart';
+import '../../data/providers/learning/hint_provider_optimized.dart';
+import '../../data/providers/learning/study_history_provider.dart';
 import '../../data/services/sound_service.dart';
+import '../../data/services/analytics_service.dart';
 import 'widgets/problem_result_dialog.dart';
 import 'widgets/xp_gain_animation.dart';
 import 'widgets/hint_section.dart';
@@ -25,6 +26,8 @@ import 'widgets/problem_options.dart';
 import 'widgets/problem_answer_input.dart';
 import 'widgets/problem_explanation.dart';
 import 'widgets/problem_controls.dart';
+import 'widgets/exit_confirmation_dialog.dart';
+import 'widgets/heart_depleted_dialog.dart';
 
 /// 문제 풀이 화면
 /// 실제 Problem 데이터 기반, 경험치/뱃지 시스템 통합
@@ -329,130 +332,21 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     }
   }
 
-  /// 답 제출
+  /// 답 제출 (객관식)
   void _submitAnswer() async {
     if (_selectedAnswerIndex == null) return;
 
-    final user = ref.read(userProvider);
-    final userId = user?.id ?? 'user001';
-
     _isCorrect = _currentProblem.isCorrectAnswer(_selectedAnswerIndex!);
 
-    setState(() {
-      _isAnswerSubmitted = true;
-    });
+    // 사용자 답안 텍스트
+    final userAnswerText = _currentProblem.choices.isNotEmpty &&
+                           _selectedAnswerIndex! < _currentProblem.choices.length
+        ? _currentProblem.choices[_selectedAnswerIndex!]
+        : '선택 없음';
 
-    // 실제 시간 측정
-    _stopwatch.stop();
-    final timeSpent = _stopwatch.elapsed.inSeconds;
-
-    // 결과 저장
-    final result = ProblemResult(
-      problemId: _currentProblem.id,
-      userId: userId,
+    await _processAnswerSubmission(
       selectedAnswerIndex: _selectedAnswerIndex,
-      isCorrect: _isCorrect,
-      solvedAt: DateTime.now(),
-      timeSpentSeconds: timeSpent,
-      xpEarned: _isCorrect ? _currentProblem.xpReward : 0,
-    );
-
-    _results.add(result);
-    await ref.read(problemResultsProvider.notifier).addResult(result);
-
-    if (_isCorrect) {
-      // 정답: 연속 스트릭 증가
-      _currentStreak++;
-      if (_currentStreak > _maxStreak) {
-        _maxStreak = _currentStreak;
-      }
-
-      // 스트릭 보너스 XP 계산
-      int bonusXP = 0;
-      if (_currentStreak >= 10) {
-        bonusXP = 20; // 10연속 정답
-      } else if (_currentStreak >= 5) {
-        bonusXP = 10; // 5연속 정답
-      } else if (_currentStreak >= 3) {
-        bonusXP = 5; // 3연속 정답
-      }
-
-      _totalCorrect++;
-      _totalXPEarned += _currentProblem.xpReward + bonusXP;
-
-      // 정답 햅틱 피드백 및 사운드
-      await AppHapticFeedback.success();
-      await SoundEffects.playCorrect();
-
-      // 사용자 XP 업데이트 (보너스 포함)
-      await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
-
-      // XP 획득 사운드
-      await SoundEffects.playXPGain();
-
-      // 매일 학습 스트릭 업데이트 (최초 정답 시에만)
-      if (_totalCorrect == 1) {
-        await ref.read(userProvider.notifier).incrementStreakOnStudy();
-
-        // 학습 이력에 오늘 날짜 추가
-        await ref.read(studyHistoryProvider.notifier).markTodayAsCompleted();
-      }
-
-      // XP 획득 애니메이션 표시 (보너스 포함)
-      if (mounted) {
-        _showXPGainAnimation(_currentProblem.xpReward + bonusXP);
-      }
-
-      // 스트릭 애니메이션 표시
-      if (bonusXP > 0) {
-        setState(() {
-          _showStreakAnimation = true;
-        });
-
-        // 2초 후 애니메이션 종료
-        Future.delayed(const Duration(milliseconds: 2000), () {
-          if (mounted) {
-            setState(() {
-              _showStreakAnimation = false;
-            });
-          }
-        });
-      }
-
-      // 뱃지 언락 체크
-      _checkAchievements();
-    } else {
-      // 오답: 스트릭 초기화
-      _currentStreak = 0;
-
-      // 오답 햅틱 피드백 및 사운드
-      await AppHapticFeedback.error();
-      await SoundEffects.playWrong();
-
-      // 오답: 오답 노트에 저장 (기존 error_note와 새로운 wrong_answer 모두 저장)
-      final userAnswer = _currentProblem.choices.isNotEmpty &&
-                         _selectedAnswerIndex != null &&
-                         _selectedAnswerIndex! < _currentProblem.choices.length
-          ? _currentProblem.choices[_selectedAnswerIndex!]
-          : '선택 없음';
-
-      await ref.read(errorNoteProvider.notifier).addErrorNote(
-            userId: userId,
-            problem: _currentProblem,
-            userAnswer: userAnswer,
-          );
-
-      // 새로운 오답 노트 시스템에도 저장
-      await ref.read(wrongAnswerProvider.notifier).addWrongAnswer(
-            problem: _currentProblem,
-            selectedAnswerIndex: _selectedAnswerIndex!,
-          );
-    }
-
-    // 레슨 진행률 업데이트
-    await ref.read(lessonProvider.notifier).onProblemSolved(
-      _currentProblem.id,
-      _isCorrect,
+      userAnswerText: userAnswerText,
     );
   }
 
@@ -460,41 +354,58 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   void _submitShortAnswer() async {
     if (_answerController.text.isEmpty) return;
 
-    final user = ref.read(userProvider);
-    final userId = user?.id ?? 'user001';
-
-    // 답안 정규화 (공백 제거, 소문자 변환 등)
+    // 답안 정규화 (공백 제거)
     final userAnswer = _answerController.text.trim();
 
-    // 정답 가져오기 (answer 필드가 String인 경우)
+    // 정답 가져오기
     String correctAnswer = '';
     if (_currentProblem.answer is String) {
       correctAnswer = (_currentProblem.answer as String).trim();
     }
 
-    // 정답 체크 (대소문자 구분 없음, 공백 무시)
+    // 정답 체크
     if (_currentProblem.type == ProblemType.calculation) {
-      // 계산 문제: 숫자 비교
       _isCorrect = _compareNumbers(userAnswer, correctAnswer);
     } else {
-      // 주관식: 문자열 비교 (대소문자 무시)
       _isCorrect = userAnswer.toLowerCase() == correctAnswer.toLowerCase();
+    }
+
+    await _processAnswerSubmission(
+      selectedAnswerIndex: null,
+      userAnswerText: userAnswer,
+    );
+  }
+
+  /// 답안 제출 공통 처리 로직
+  Future<void> _processAnswerSubmission({
+    required int? selectedAnswerIndex,
+    required String userAnswerText,
+  }) async {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      // 사용자가 로그인하지 않은 경우 경고
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그인이 필요합니다.')),
+        );
+      }
+      return;
     }
 
     setState(() {
       _isAnswerSubmitted = true;
     });
 
-    // 실제 시간 측정
+    // 시간 측정
     _stopwatch.stop();
     final timeSpent = _stopwatch.elapsed.inSeconds;
 
     // 결과 저장
     final result = ProblemResult(
       problemId: _currentProblem.id,
-      userId: userId,
-      selectedAnswerIndex: null, // 주관식은 인덱스 없음
-      textAnswer: userAnswer, // 사용자가 입력한 답
+      userId: user.id,
+      selectedAnswerIndex: selectedAnswerIndex,
+      textAnswer: selectedAnswerIndex == null ? userAnswerText : null,
       isCorrect: _isCorrect,
       solvedAt: DateTime.now(),
       timeSpentSeconds: timeSpent,
@@ -505,86 +416,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     await ref.read(problemResultsProvider.notifier).addResult(result);
 
     if (_isCorrect) {
-      // 정답: 연속 스트릭 증가
-      _currentStreak++;
-      if (_currentStreak > _maxStreak) {
-        _maxStreak = _currentStreak;
-      }
-
-      // 스트릭 보너스 XP 계산
-      int bonusXP = 0;
-      if (_currentStreak >= 10) {
-        bonusXP = 20; // 10연속 정답
-      } else if (_currentStreak >= 5) {
-        bonusXP = 10; // 5연속 정답
-      } else if (_currentStreak >= 3) {
-        bonusXP = 5; // 3연속 정답
-      }
-
-      _totalCorrect++;
-      _totalXPEarned += _currentProblem.xpReward + bonusXP;
-
-      // 정답 햅틱 피드백 및 사운드
-      await AppHapticFeedback.success();
-      await SoundEffects.playCorrect();
-
-      // 사용자 XP 업데이트 (보너스 포함)
-      await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
-
-      // XP 획득 사운드
-      await SoundEffects.playXPGain();
-
-      // 매일 학습 스트릭 업데이트 (최초 정답 시에만)
-      if (_totalCorrect == 1) {
-        await ref.read(userProvider.notifier).incrementStreakOnStudy();
-
-        // 학습 이력에 오늘 날짜 추가
-        await ref.read(studyHistoryProvider.notifier).markTodayAsCompleted();
-      }
-
-      // XP 획득 애니메이션 표시 (보너스 포함)
-      if (mounted) {
-        _showXPGainAnimation(_currentProblem.xpReward + bonusXP);
-      }
-
-      // 스트릭 애니메이션 표시
-      if (bonusXP > 0) {
-        setState(() {
-          _showStreakAnimation = true;
-        });
-
-        // 2초 후 애니메이션 종료
-        Future.delayed(const Duration(milliseconds: 2000), () {
-          if (mounted) {
-            setState(() {
-              _showStreakAnimation = false;
-            });
-          }
-        });
-      }
-
-      // 뱃지 언락 체크
-      _checkAchievements();
+      await _handleCorrectAnswer();
     } else {
-      // 오답: 스트릭 초기화
-      _currentStreak = 0;
-
-      // 오답 햅틱 피드백 및 사운드
-      await AppHapticFeedback.error();
-      await SoundEffects.playWrong();
-
-      // 오답: 오답 노트에 저장 (기존 error_note와 새로운 wrong_answer 모두 저장)
-      await ref.read(errorNoteProvider.notifier).addErrorNote(
-            userId: userId,
-            problem: _currentProblem,
-            userAnswer: userAnswer,
-          );
-
-      // 새로운 오답 노트 시스템에도 저장 (주관식은 selectedAnswerIndex 없음)
-      await ref.read(wrongAnswerProvider.notifier).addWrongAnswer(
-            problem: _currentProblem,
-            selectedAnswerIndex: null, // 주관식은 인덱스 없음
-          );
+      await _handleWrongAnswer(user.id, userAnswerText, selectedAnswerIndex);
     }
 
     // 레슨 진행률 업데이트
@@ -594,12 +428,129 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     );
   }
 
+  /// 정답 처리
+  Future<void> _handleCorrectAnswer() async {
+    // 스트릭 증가
+    _currentStreak++;
+    if (_currentStreak > _maxStreak) {
+      _maxStreak = _currentStreak;
+    }
+
+    // 스트릭 보너스 XP 계산
+    final bonusXP = _calculateStreakBonus();
+
+    _totalCorrect++;
+    _totalXPEarned += _currentProblem.xpReward + bonusXP;
+
+    // Analytics: 문제 정답 기록
+    await AnalyticsService().logProblemCorrect(
+      problemId: _currentProblem.id,
+      problemType: _currentProblem.type.toString(),
+      attemptCount: _currentStreak,
+    );
+
+    // 햅틱 및 사운드 피드백
+    await AppHapticFeedback.success();
+    await SoundEffects.playCorrect();
+
+    // XP 업데이트
+    await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
+    await SoundEffects.playXPGain();
+
+    // 최초 정답 시 스트릭 업데이트
+    if (_totalCorrect == 1) {
+      await ref.read(userProvider.notifier).incrementStreakOnStudy();
+      await ref.read(studyHistoryProvider.notifier).markTodayAsCompleted();
+    }
+
+    // 애니메이션 표시
+    if (mounted) {
+      _showXPGainAnimation(_currentProblem.xpReward + bonusXP);
+    }
+
+    if (bonusXP > 0) {
+      _showStreakAnimationWithDelay();
+    }
+
+    // 뱃지 언락 체크
+    _checkAchievements();
+  }
+
+  /// 오답 처리
+  Future<void> _handleWrongAnswer(
+    String userId,
+    String userAnswerText,
+    int? selectedAnswerIndex,
+  ) async {
+    // 스트릭 초기화
+    _currentStreak = 0;
+
+    // Analytics: 문제 오답 기록
+    await AnalyticsService().logProblemIncorrect(
+      problemId: _currentProblem.id,
+      problemType: _currentProblem.type.toString(),
+      attemptCount: 1, // 오답이므로 시도 횟수는 1
+    );
+
+    // 하트 감소
+    await ref.read(userProvider.notifier).decreaseHeart();
+
+    // 하트가 0이 되면 게임 오버 처리
+    final user = ref.read(userProvider);
+    if (user != null && user.hearts <= 0) {
+      if (mounted) {
+        await _showHeartDepletedDialog();
+      }
+      return; // 더 이상 진행하지 않음
+    }
+
+    // 햅틱 및 사운드 피드백
+    await AppHapticFeedback.error();
+    await SoundEffects.playWrong();
+
+    // 오답 노트에 저장
+    await ref.read(errorNoteProvider.notifier).addErrorNote(
+          userId: userId,
+          problem: _currentProblem,
+          userAnswer: userAnswerText,
+        );
+
+    if (selectedAnswerIndex != null) {
+      await ref.read(wrongAnswerProvider.notifier).addWrongAnswer(
+            problem: _currentProblem,
+            selectedAnswerIndex: selectedAnswerIndex,
+          );
+    }
+  }
+
+  /// 스트릭 보너스 XP 계산
+  int _calculateStreakBonus() {
+    if (_currentStreak >= 10) return 20;
+    if (_currentStreak >= 5) return 10;
+    if (_currentStreak >= 3) return 5;
+    return 0;
+  }
+
+  /// 스트릭 애니메이션 표시
+  void _showStreakAnimationWithDelay() {
+    setState(() {
+      _showStreakAnimation = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      if (mounted) {
+        setState(() {
+          _showStreakAnimation = false;
+        });
+      }
+    });
+  }
+
   /// 숫자 비교 (오차 범위 허용)
   bool _compareNumbers(String userAnswer, String correctAnswer) {
     try {
       final userNum = double.parse(userAnswer);
       final correctNum = double.parse(correctAnswer);
-      // 0.01 오차 범위 허용
       return (userNum - correctNum).abs() < 0.01;
     } catch (e) {
       return false;
@@ -764,54 +715,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   void _showExitDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        title: Row(
-          children: [
-            const Icon(Icons.warning, color: AppColors.warningOrange, size: 24),
-            const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              '학습 중단',
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          '정말 나가시겠습니까?\n\n현재까지의 진행 상황은 저장되지 않습니다.',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              '계속하기',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.mathButtonBlue,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // 다이얼로그 닫기
-              Navigator.of(context).pop(); // ProblemScreen 닫기
-            },
-            child: Text(
-              '나가기',
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.errorRed,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
+      builder: (context) => const ExitConfirmationDialog(),
     );
   }
 
@@ -875,6 +779,15 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
           size: 28,
         ),
       ),
+    );
+  }
+
+  /// 하트 소진 다이얼로그 표시
+  Future<void> _showHeartDepletedDialog() async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const HeartDepletedDialog(),
     );
   }
 

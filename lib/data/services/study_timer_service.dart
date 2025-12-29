@@ -65,7 +65,7 @@ class StudyTimerService {
       await _clearCurrentSession();
 
       Logger.info(
-        '학습 세션 종료: ${completedSession.activityType.label} (${duration}초)',
+        '학습 세션 종료: ${completedSession.activityType.label} ($duration초)',
         tag: 'StudyTimer',
       );
 

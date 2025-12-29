@@ -1,4 +1,4 @@
-import '../models/wrong_answer.dart';
+import '../models/learning/wrong_answer.dart';
 import '../services/local_storage_service.dart';
 import '../services/firestore_service.dart';
 import '../../shared/utils/logger.dart';

@@ -295,7 +295,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
                 ? AppColors.mathTeal
                 : isPast
                     ? AppColors.mathTeal.withValues(alpha: 0.3)
-                    : AppColors.progressBackground,
+                    : AppColors.disabled,
             border: isToday
                 ? Border.all(color: AppColors.mathTeal, width: 2)
                 : null,

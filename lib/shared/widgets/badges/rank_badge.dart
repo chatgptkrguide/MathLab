@@ -40,7 +40,7 @@ class RankBadge extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.arrow_drop_down,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       size: size * 0.3,
                     ),
                     Text(
@@ -127,7 +127,7 @@ class _HexagonBadgePainter extends CustomPainter {
     // 레벨 표시선 그리기 (레전드가 아닌 경우)
     if (!isLegend && level > 0) {
       final linePaint = Paint()
-        ..color = Colors.white.withOpacity(0.3)
+        ..color = Colors.white.withValues(alpha: 0.3)
         ..strokeWidth = 1.5
         ..style = PaintingStyle.stroke;
 
@@ -144,7 +144,7 @@ class _HexagonBadgePainter extends CustomPainter {
     // 레전드 날개 그리기
     if (isLegend) {
       final wingPaint = Paint()
-        ..color = Colors.white.withOpacity(0.3)
+        ..color = Colors.white.withValues(alpha: 0.3)
         ..style = PaintingStyle.fill;
 
       // 왼쪽 날개

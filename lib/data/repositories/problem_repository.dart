@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import '../models/problem.dart';
-import '../models/school_level.dart';
+import '../models/learning/problem.dart';
+import '../models/learning/school_level.dart';
 import '../../shared/utils/logger.dart';
 
 /// 문제 데이터 저장소

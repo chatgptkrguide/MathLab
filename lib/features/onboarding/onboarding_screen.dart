@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/services/local_storage_service.dart';
+import '../../data/services/analytics_service.dart';
 import '../../shared/utils/logger.dart';
 import 'widgets/onboarding_page.dart';
 
@@ -249,6 +250,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _skipOnboarding() async {
     await AppHapticFeedback.lightImpact();
 
+    if (!mounted) return;
+
     // 확인 다이얼로그
     final shouldSkip = await showDialog<bool>(
       context: context,
@@ -311,6 +314,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         'completed': true,
         'completedAt': DateTime.now().toIso8601String(),
       });
+
+      // Analytics: 온보딩 완료 기록
+      await AnalyticsService().logEvent(
+        name: 'onboarding_complete',
+        parameters: {
+          'completed_at': DateTime.now().toIso8601String(),
+        },
+      );
 
       Logger.info('Onboarding completed');
 

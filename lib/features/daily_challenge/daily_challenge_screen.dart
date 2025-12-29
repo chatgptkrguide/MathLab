@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/daily_challenge.dart';
-import '../../data/providers/daily_challenge_provider.dart';
+import '../../data/models/gamification/daily_challenge.dart';
+import '../../data/providers/gamification/daily_challenge_provider.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 
@@ -59,9 +59,8 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen>
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () async {
             await AppHapticFeedback.lightImpact();
-            if (mounted) {
-              Navigator.of(context).pop();
-            }
+            if (!context.mounted) return;
+            Navigator.of(context).pop();
           },
         ),
       ),

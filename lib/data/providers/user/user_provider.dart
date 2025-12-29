@@ -1,0 +1,505 @@
+import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/models.dart';
+import '../../services/mock_data_service.dart';
+import '../../services/notification_service.dart';
+import '../../repositories/user_repository.dart';
+import '../../../shared/constants/game_constants.dart';
+import '../base/base_notifier.dart';
+import '../gamification/league_provider.dart';
+import '../infrastructure/firebase_providers.dart';
+
+/// 사용자 정보 상태 관리 (Firestore 연동 버전)
+///
+/// **개선사항:**
+/// - BaseNotifier 상속으로 중복 로깅 제거
+/// - executeWithErrorHandling로 try-catch 자동화
+/// - Firestore XP 동기화 (League와 연동)
+class UserNotifier extends BaseNotifier<User?> {
+  final UserRepository _userRepository;
+  final Ref _ref;
+
+  UserNotifier(this._userRepository, this._ref) : super(null, 'UserProvider') {
+    _loadUser();
+  }
+
+  final MockDataService _dataService = MockDataService();
+
+  /// 앱 시작 시 사용자 정보 로드
+  Future<void> _loadUser() async {
+    await executeWithErrorHandling(
+      () async {
+        final storageKey = _getStorageKey();
+        logInfo('사용자 정보 로드 시작 (키: $storageKey)');
+
+        final user = await _userRepository.get(storageKey);
+
+        if (user != null) {
+          state = user;
+          logInfo('사용자 정보 로드 성공: ${user.name} (키: $storageKey)');
+          await checkAndUpdateStreak();
+          await _updateHeartsBasedOnTime();
+        } else {
+          state = _dataService.getSampleUser();
+          await _saveUser();
+          logInfo('새 사용자 생성: ${state?.name} (키: $storageKey)');
+        }
+      },
+      errorMessage: '사용자 정보 로드 실패',
+      fallback: () {
+        state = _dataService.getSampleUser();
+      },
+    );
+  }
+
+  /// 경과 시간 기반 하트 재생 (30분마다 1개)
+  Future<void> _updateHeartsBasedOnTime() async {
+    if (state == null || state!.hearts >= GameConstants.maxHearts) return;
+
+    final now = DateTime.now();
+    final lastHeartUpdate = state!.lastHeartUpdateTime ?? now;
+    final minutesPassed = now.difference(lastHeartUpdate).inMinutes;
+    final heartsToRegenerate = minutesPassed ~/ GameConstants.heartRecoveryMinutes;
+
+    if (heartsToRegenerate > 0) {
+      final newHearts = (state!.hearts + heartsToRegenerate).clamp(0, GameConstants.maxHearts);
+      final actualRegenerated = newHearts - state!.hearts;
+
+      if (actualRegenerated > 0) {
+        state = state!.copyWith(
+          hearts: newHearts,
+          lastHeartUpdateTime: now,
+        );
+        await _saveUser();
+        logInfo('하트 자동 재생: +$actualRegenerated (현재: $newHearts/${GameConstants.maxHearts})');
+      }
+    }
+  }
+
+  /// 하트 전체 구매 (광고 시청 또는 IAP)
+  Future<void> purchaseFullHearts() async {
+    if (state == null) return;
+
+    state = state!.copyWith(hearts: GameConstants.maxHearts);
+    await _saveUser();
+    logInfo('하트 전체 구매 완료: ${GameConstants.maxHearts}개');
+  }
+
+  /// 스토리지 키 생성 헬퍼 메서드
+  String _getStorageKey([String? accountId]) {
+    final targetId = accountId ?? state?.id;
+
+    if (targetId == null || targetId.isEmpty || targetId == 'default') {
+      return GameConstants.userStorageKey;
+    }
+
+    return 'user_$targetId';
+  }
+
+  /// 특정 계정의 사용자 정보 로드
+  Future<void> loadUserByAccount(String accountId) async {
+    await executeWithErrorHandling(
+      () async {
+        final storageKey = _getStorageKey(accountId);
+        final user = await _userRepository.get(storageKey);
+
+        if (user != null) {
+          state = user;
+          logInfo('계정 로드 성공: $accountId (키: $storageKey)');
+        } else {
+          state = _dataService.getSampleUser().copyWith(id: accountId);
+          await _saveUser();
+          logInfo('새 계정 생성: $accountId (키: $storageKey)');
+        }
+      },
+      errorMessage: '계정 로드 실패: $accountId',
+    );
+  }
+
+  /// 현재 계정 변경 시 호출
+  Future<void> switchToAccount(String accountId) async {
+    await loadUserByAccount(accountId);
+  }
+
+  /// 사용자 정보 저장
+  Future<void> _saveUser() async {
+    if (state == null) return;
+
+    await executeWithErrorHandling(
+      () async {
+        final storageKey = _getStorageKey();
+        await _userRepository.save(storageKey, state!);
+        logInfo('사용자 정보 저장 완료 (키: $storageKey)');
+      },
+      errorMessage: '사용자 정보 저장 실패',
+    );
+  }
+
+  /// 학년 업데이트
+  Future<void> updateGrade(String newGrade) async {
+    if (state == null) return;
+
+    state = state!.copyWith(currentGrade: newGrade);
+    await _saveUser();
+    logInfo('학년 변경: $newGrade');
+  }
+
+  /// XP 추가 (Firestore 및 League 동기화)
+  Future<void> addXP(int xp) async {
+    if (state == null) return;
+
+    _checkAndResetDailyXP();
+
+    final currentXP = state!.xp + xp;
+    final currentLevel = state!.level;
+    final currentDailyXP = state!.dailyXP + (xp > 0 ? xp : 0);
+
+    final newLevel = (currentXP ~/ GameConstants.xpPerLevel) + 1;
+    final leveledUp = newLevel > currentLevel;
+
+    // 로컬 state 즉시 업데이트
+    state = state!.copyWith(
+      xp: currentXP,
+      level: newLevel,
+      dailyXP: currentDailyXP,
+    );
+
+    await _saveUser();
+    logInfo('XP 추가: +$xp XP (총 $currentXP XP, 오늘 $currentDailyXP XP, 레벨 $newLevel)');
+
+    // Firestore 동기화 (백그라운드)
+    _syncXPToFirestore(xp).catchError((error, stackTrace) {
+      logError('Firestore XP 동기화 실패', error: error, stackTrace: stackTrace);
+    });
+
+    // League 동기화 (백그라운드)
+    _syncXPToLeague(xp).catchError((error, stackTrace) {
+      logError('League XP 동기화 실패', error: error, stackTrace: stackTrace);
+    });
+
+    if (leveledUp) {
+      await _onLevelUp(newLevel);
+    }
+  }
+
+  /// Firestore XP 동기화
+  Future<void> _syncXPToFirestore(int xpGained) async {
+    if (state == null) return;
+
+    await executeWithErrorHandling(
+      () async {
+        await _userRepository.updateXP(state!.id, xpGained);
+        logInfo('Firestore XP 동기화 완료: +$xpGained');
+      },
+      errorMessage: 'Firestore XP 동기화 실패',
+    );
+  }
+
+  /// League XP 동기화
+  Future<void> _syncXPToLeague(int xpGained) async {
+    await executeWithErrorHandling(
+      () async {
+        final leagueNotifier = _ref.read(leagueProvider.notifier);
+        await leagueNotifier.updateUserXP(xpGained);
+        logInfo('League XP 동기화 완료: +$xpGained');
+      },
+      errorMessage: 'League XP 동기화 실패',
+    );
+  }
+
+  /// 레벨업 처리
+  Future<void> _onLevelUp(int newLevel) async {
+    logInfo('🎉 레벨 업! 새 레벨: $newLevel');
+
+    try {
+      // await AppHapticFeedback.levelUp();
+    } catch (e) {
+      logWarning('햅틱 피드백 실패');
+    }
+
+    state = state!.copyWith(hearts: GameConstants.maxHearts);
+    await _saveUser();
+  }
+
+  /// 앱 시작 시 스트릭 확인 및 업데이트
+  Future<void> checkAndUpdateStreak() async {
+    if (state == null) return;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastStudyDate = state!.lastStudyDate;
+
+    if (lastStudyDate == null) {
+      logInfo('첫 사용자, 스트릭 대기 중');
+      return;
+    }
+
+    final lastStudyDateOnly = DateTime(
+      lastStudyDate.year,
+      lastStudyDate.month,
+      lastStudyDate.day,
+    );
+
+    if (_isSameDay(lastStudyDateOnly, today)) {
+      logInfo('오늘 이미 학습 완료');
+      return;
+    }
+
+    if (!_isConsecutiveDay(lastStudyDateOnly, today)) {
+      final oldStreak = state!.streakDays;
+      if (oldStreak > 0) {
+        logWarning('🔥 스트릭 끊김! 이전: $oldStreak일 → 0일로 리셋');
+        state = state!.copyWith(streakDays: 0, lastStudyDate: null);
+        await _saveUser();
+      }
+    }
+  }
+
+  /// 학습 완료 시 스트릭 증가
+  Future<void> incrementStreakOnStudy() async {
+    if (state == null) return;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastStudyDate = state!.lastStudyDate;
+
+    int newStreakDays = state!.streakDays;
+
+    if (lastStudyDate == null) {
+      newStreakDays = 1;
+      logInfo('🔥 첫 학습 시작! 스트릭: 1일');
+    } else {
+      final lastStudyDateOnly = DateTime(
+        lastStudyDate.year,
+        lastStudyDate.month,
+        lastStudyDate.day,
+      );
+
+      if (_isSameDay(lastStudyDateOnly, today)) {
+        logInfo('오늘 이미 학습 완료, 스트릭 유지');
+        return;
+      } else if (_isConsecutiveDay(lastStudyDateOnly, today)) {
+        newStreakDays = state!.streakDays + 1;
+        logInfo('🔥 스트릭 증가! 현재: $newStreakDays일');
+      } else {
+        final oldStreak = state!.streakDays;
+        newStreakDays = 1;
+        logWarning('🔥 스트릭 끊김! 이전: $oldStreak일 → 새로 시작: 1일');
+      }
+    }
+
+    state = state!.copyWith(
+      streakDays: newStreakDays,
+      lastStudyDate: now,
+    );
+
+    await _saveUser();
+
+    try {
+      await NotificationService().scheduleStreakReminder(
+        currentStreak: newStreakDays,
+      );
+      logInfo('스트릭 알림 스케줄링 완료: $newStreakDays일');
+    } catch (e) {
+      logError('스트릭 알림 스케줄링 실패', error: e);
+    }
+  }
+
+  /// 스트릭 리셋 (관리자용 또는 테스트용)
+  Future<void> resetStreak() async {
+    if (state == null) return;
+
+    logWarning('스트릭 강제 리셋');
+    state = state!.copyWith(
+      streakDays: 0,
+      lastStudyDate: null,
+    );
+    await _saveUser();
+  }
+
+  /// 연속된 날짜인지 확인 (어제 → 오늘)
+  bool _isConsecutiveDay(DateTime lastDate, DateTime currentDate) {
+    final yesterday = currentDate.subtract(const Duration(days: 1));
+    return _isSameDay(lastDate, yesterday);
+  }
+
+  /// 같은 날짜인지 확인 (년-월-일만 비교)
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+           date1.month == date2.month &&
+           date1.day == date2.day;
+  }
+
+  /// 스트릭 업데이트 (매일 학습 시 호출) - DEPRECATED: incrementStreakOnStudy 사용
+  @Deprecated('Use incrementStreakOnStudy instead')
+  Future<void> updateStreak() async {
+    await incrementStreakOnStudy();
+  }
+
+  /// 사용자 정보 전체 업데이트
+  Future<void> updateUser(User updatedUser) async {
+    state = updatedUser;
+    await _saveUser();
+    logInfo('사용자 정보 업데이트 완료: ${updatedUser.name}');
+  }
+
+  /// 사용자 이름 변경
+  Future<void> updateUserName(String newName) async {
+    if (state == null) return;
+
+    state = state!.copyWith(name: newName);
+    await _saveUser();
+  }
+
+  /// 현재 학년 변경
+  Future<void> updateCurrentGrade(String grade) async {
+    if (state == null) return;
+
+    state = state!.copyWith(currentGrade: grade);
+    await _saveUser();
+  }
+
+  /// 게스트 사용자 생성
+  Future<void> createGuestUser() async {
+    logInfo('게스트 사용자 생성 시작');
+
+    final guestId = 'guest_${DateTime.now().millisecondsSinceEpoch}';
+
+    state = _dataService.getSampleUser().copyWith(
+      id: guestId,
+      name: '게스트',
+    );
+
+    await _saveUser();
+    logInfo('게스트 사용자 생성 완료: $guestId');
+  }
+
+  /// 사용자 초기화 (테스트용)
+  Future<void> resetUser() async {
+    logWarning('사용자 데이터 초기화 시작');
+
+    state = _dataService.getSampleUser();
+    await _saveUser();
+
+    logInfo('사용자 데이터 초기화 완료');
+  }
+
+  /// 일일 XP 목표 달성 여부
+  bool get hasReachedDailyGoal {
+    if (state == null) return false;
+    final todayXP = _getTodayXP();
+    return todayXP >= GameConstants.dailyGoalXP;
+  }
+
+  /// 오늘 획득한 XP
+  int _getTodayXP() {
+    if (state == null) return 0;
+    _checkAndResetDailyXP();
+    return state!.dailyXP;
+  }
+
+  /// 일일 XP 리셋 필요 여부 확인 및 실행
+  void _checkAndResetDailyXP() {
+    if (state == null) return;
+
+    final now = DateTime.now();
+    final lastReset = state!.lastXPResetDate;
+
+    final isSameDay = now.year == lastReset.year &&
+                      now.month == lastReset.month &&
+                      now.day == lastReset.day;
+
+    if (!isSameDay) {
+      state = state!.copyWith(
+        dailyXP: 0,
+        lastXPResetDate: now,
+      );
+      _saveUser();
+      logInfo('일일 XP 리셋 완료');
+    }
+  }
+
+  /// 다음 레벨까지 필요한 XP
+  int get xpToNextLevel {
+    if (state == null) return 0;
+    return state!.xpToNextLevel;
+  }
+
+  /// 현재 레벨 진행률
+  double get levelProgress {
+    if (state == null) return 0.0;
+    return state!.levelProgress;
+  }
+
+  /// 하트 감소 (오답 시)
+  Future<void> decreaseHeart() async {
+    if (state == null || state!.hearts <= 0) return;
+
+    state = state!.copyWith(hearts: state!.hearts - 1);
+    await _saveUser();
+  }
+
+  /// 하트 추가
+  Future<void> addHearts(int amount) async {
+    if (state == null) return;
+
+    final newHearts = (state!.hearts + amount).clamp(0, GameConstants.maxHearts);
+    state = state!.copyWith(hearts: newHearts);
+    await _saveUser();
+
+    logInfo('하트 추가: +$amount (현재: $newHearts개)');
+  }
+
+  /// 하트 복구 (시간 경과 또는 구매)
+  Future<void> restoreHearts() async {
+    if (state == null) return;
+
+    state = state!.copyWith(hearts: GameConstants.maxHearts);
+    await _saveUser();
+
+    logInfo('하트 복구 완료: ${GameConstants.maxHearts}개');
+  }
+
+  /// 레벨 설정 (레벨 테스트 결과 반영)
+  Future<void> setLevel(int level) async {
+    if (state == null) return;
+
+    final clampedLevel = level.clamp(1, 100);
+    state = state!.copyWith(level: clampedLevel);
+    await _saveUser();
+
+    logInfo('레벨 설정 완료: Level $clampedLevel');
+  }
+}
+
+/// 사용자 정보 프로바이더
+final userProvider = StateNotifierProvider<UserNotifier, User?>((ref) {
+  final userRepository = ref.watch(userRepositoryProvider);
+  return UserNotifier(userRepository, ref);
+});
+
+/// 사용자 정보를 감시하는 편의 프로바이더들
+final userXPProvider = Provider<int>((ref) {
+  final user = ref.watch(userProvider);
+  return user?.xp ?? 0;
+});
+
+final userLevelProvider = Provider<int>((ref) {
+  final user = ref.watch(userProvider);
+  return user?.level ?? 1;
+});
+
+final userStreakProvider = Provider<int>((ref) {
+  final user = ref.watch(userProvider);
+  return user?.streakDays ?? 0;
+});
+
+final userNameProvider = Provider<String>((ref) {
+  final user = ref.watch(userProvider);
+  return user?.name ?? '학습자';
+});
+
+final userGradeProvider = Provider<String>((ref) {
+  final user = ref.watch(userProvider);
+  return user?.currentGrade ?? '중1';
+});

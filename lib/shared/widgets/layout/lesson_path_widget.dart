@@ -219,11 +219,11 @@ class LessonPathWidget extends StatelessWidget {
 
   /// 3D 그림자용 더 어두운 색상 (GoMath)
   Color _getDarkerColor(LessonNode lesson) {
-    if (lesson.isCompleted) return AppColors.duolingoGreenDark; // 어두운 그린
+    if (lesson.isCompleted) return AppColors.mathGreenDark; // 어두운 그린
     if (lesson.isCurrent) return AppColors.mathBlueDark; // 어두운 블루
 
     final darkColors = [
-      AppColors.duolingoGreenDark, // 어두운 그린 (successGreen 20% darker)
+      AppColors.mathGreenDark, // 어두운 그린 (successGreen 20% darker)
       AppColors.mathBlueDark, // 어두운 블루 (mathBlue 20% darker)
       AppColors.mathOrangeDark, // 어두운 오렌지 (mathOrange 20% darker)
       AppColors.mathPurpleDark, // 어두운 퍼플 (mathPurple 20% darker)

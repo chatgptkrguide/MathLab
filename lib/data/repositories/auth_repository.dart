@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firebase_auth_service.dart';
-import '../models/user.dart';
+import '../models/user/user.dart';
 import '../../shared/utils/logger.dart';
 
 /// 인증 Repository
