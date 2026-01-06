@@ -62,16 +62,34 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
   Future<void> _handleGuestStart() async {
     if (_isLoading) return;
 
-    // 프로필 설정 화면으로 이동
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => const OnboardingProfileSetupScreen(),
-      ),
-    );
+    try {
+      // 1. 프로필 설정 화면으로 이동하여 정보 입력
+      final profileResult = await Navigator.of(context).push<TempProfileData>(
+        MaterialPageRoute(
+          builder: (context) => const OnboardingProfileSetupScreen(),
+        ),
+      );
 
-    // 프로필 설정 완료 후 게스트로 시작
-    if (result == true && mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      if (profileResult == null || !mounted) return;
+
+      setState(() => _isLoading = true);
+
+      // 2. 게스트 계정 생성
+      final success = await ref.read(authProvider.notifier).signInAsGuest();
+
+      if (!mounted) return;
+
+      if (success) {
+        // 3. 프로필 정보를 게스트 계정에 적용
+        await ref.read(authProvider.notifier).applyTempProfileToAccount(profileResult);
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        _showError('게스트 로그인에 실패했습니다');
+      }
+    } catch (e) {
+      if (mounted) _showError('게스트 시작 실패: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

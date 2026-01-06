@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/utils/storage_helper.dart';
+import 'local_storage_service.dart';
 
 /// 임시 프로필 정보 저장 서비스
 ///
@@ -8,27 +9,23 @@ import '../../shared/utils/storage_helper.dart';
 class TempProfileStorage {
   static const String _tempProfileKey = 'temp_profile_data';
 
-  final StorageHelper _storage = StorageHelper();
+  final LocalStorageService _storage = LocalStorageService();
 
   /// 임시 프로필 정보 저장
   Future<void> saveTempProfile(TempProfileData data) async {
-    await _storage.setString(_tempProfileKey, data.toJson().toString());
+    await _storage.saveObject<TempProfileData>(
+      key: _tempProfileKey,
+      data: data,
+      toJson: (profile) => profile.toJson(),
+    );
   }
 
   /// 임시 프로필 정보 불러오기
   Future<TempProfileData?> loadTempProfile() async {
-    final jsonString = await _storage.getString(_tempProfileKey);
-    if (jsonString == null || jsonString.isEmpty) {
-      return null;
-    }
-
-    try {
-      // JSON 문자열을 Map으로 파싱
-      final json = _parseJsonString(jsonString);
-      return TempProfileData.fromJson(json);
-    } catch (e) {
-      return null;
-    }
+    return await _storage.loadObject<TempProfileData>(
+      key: _tempProfileKey,
+      fromJson: TempProfileData.fromJson,
+    );
   }
 
   /// 임시 프로필 정보 삭제
@@ -39,28 +36,6 @@ class TempProfileStorage {
   /// 임시 프로필이 존재하는지 확인
   Future<bool> hasTempProfile() async {
     return await _storage.containsKey(_tempProfileKey);
-  }
-
-  /// JSON 문자열을 Map으로 파싱하는 헬퍼 함수
-  Map<String, dynamic> _parseJsonString(String jsonString) {
-    // 간단한 JSON 파싱 (더 복잡한 경우 dart:convert 사용)
-    final map = <String, dynamic>{};
-
-    // {key: value, ...} 형태에서 각 항목 추출
-    final cleaned = jsonString.replaceAll(RegExp(r'[{}]'), '').trim();
-    if (cleaned.isEmpty) return map;
-
-    final pairs = cleaned.split(',');
-    for (final pair in pairs) {
-      final parts = pair.split(':');
-      if (parts.length == 2) {
-        final key = parts[0].trim().replaceAll('"', '').replaceAll("'", '');
-        final value = parts[1].trim().replaceAll('"', '').replaceAll("'", '');
-        map[key] = value;
-      }
-    }
-
-    return map;
   }
 }
 

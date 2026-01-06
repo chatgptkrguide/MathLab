@@ -400,14 +400,14 @@ class AuthNotifier extends BaseNotifier<AuthState> {
 
     // 로그인 성공 후 임시 프로필 정보가 있으면 연동
     if (success && tempProfile != null && state.currentAccount != null) {
-      await _applyTempProfileToAccount(tempProfile);
+      await applyTempProfileToAccount(tempProfile);
     }
 
     return success;
   }
 
   /// 임시 프로필 정보를 실제 계정에 연동
-  Future<void> _applyTempProfileToAccount(TempProfileData tempProfile) async {
+  Future<void> applyTempProfileToAccount(TempProfileData tempProfile) async {
     await executeWithErrorHandling(
       () async {
         if (state.currentAccount == null) {
