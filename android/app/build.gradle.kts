@@ -85,3 +85,27 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
+
+// Task to clean up duplicate resource files (like "values 2.xml")
+tasks.register("cleanDuplicateResources") {
+    doFirst {
+        val projectBuildDir = file("${project.rootDir.parent}/build")
+        if (projectBuildDir.exists()) {
+            projectBuildDir.walkTopDown().forEach { file ->
+                if (file.name.matches(Regex(".*\\s+\\d+\\.(xml|png|jpg|jpeg)"))) {
+                    println("Deleting duplicate resource: ${file.absolutePath}")
+                    file.delete()
+                }
+            }
+        }
+    }
+}
+
+// Run cleanup before all build tasks
+tasks.matching {
+    it.name.contains("merge") ||
+    it.name.contains("process") ||
+    it.name.contains("compile")
+}.configureEach {
+    dependsOn("cleanDuplicateResources")
+}

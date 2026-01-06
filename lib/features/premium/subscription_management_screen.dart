@@ -157,7 +157,7 @@ class _SubscriptionManagementScreenState
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -170,7 +170,7 @@ class _SubscriptionManagementScreenState
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -200,20 +200,20 @@ class _SubscriptionManagementScreenState
               Text(
                 subscription.tier.displayName,
                 style: AppTextStyles.titleMedium.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Colors.white.withOpacity(0.9),
                 ),
               ),
               if (subscription.tier != PremiumTier.lifetime) ...[
                 Text(
                   ' • ',
                   style: AppTextStyles.titleMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withOpacity(0.7),
                   ),
                 ),
                 Text(
                   subscription.remainingTimeText,
                   style: AppTextStyles.titleMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: Colors.white.withOpacity(0.9),
                   ),
                 ),
               ],
@@ -226,7 +226,7 @@ class _SubscriptionManagementScreenState
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -267,7 +267,7 @@ class _SubscriptionManagementScreenState
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -405,7 +405,7 @@ class _SubscriptionManagementScreenState
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -472,7 +472,7 @@ class _SubscriptionManagementScreenState
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          border: Border.all(color: color.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -480,7 +480,7 @@ class _SubscriptionManagementScreenState
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

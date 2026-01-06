@@ -28,7 +28,7 @@ class RecentTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.mathBlue.withValues(alpha: 0.1),
+                color: AppColors.mathBlue.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: const Text(

@@ -171,10 +171,10 @@ class ProblemControls extends StatelessWidget {
   Color _getDarkerButtonColor() {
     if (isAnswerSubmitted) {
       return isCorrect
-          ? AppColors.successGreen.withValues(alpha: 0.8)
+          ? AppColors.successGreen.withOpacity(0.8)
           : AppColors.mathButtonBlueDark;
     }
-    return AppColors.successGreen.withValues(alpha: 0.8);
+    return AppColors.successGreen.withOpacity(0.8);
   }
 
   String _getButtonText() {

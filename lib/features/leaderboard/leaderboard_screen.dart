@@ -128,7 +128,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.25),
+        color: AppColors.surface.withOpacity(0.25),
         borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
@@ -138,7 +138,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.surface.withValues(alpha: 0.3),
+              color: AppColors.surface.withOpacity(0.3),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -337,7 +337,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? AppColors.successGreen.withValues(alpha: 0.2) // Light green highlight
+            ? AppColors.successGreen.withOpacity(0.2) // Light green highlight
             : AppColors.surface,
         border: Border.all(
           color: entry.isCurrentUser
@@ -349,8 +349,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         boxShadow: [
           BoxShadow(
             color: entry.isCurrentUser
-                ? AppColors.successGreen.withValues(alpha: 0.15)
-                : AppColors.borderLight.withValues(alpha: 0.1),
+                ? AppColors.successGreen.withOpacity(0.15)
+                : AppColors.borderLight.withOpacity(0.1),
             blurRadius: entry.isCurrentUser ? 8 : 4,
             offset: Offset(0, entry.isCurrentUser ? 3 : 2),
           ),
@@ -620,7 +620,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.textSecondary.withValues(alpha: 0.1),
+          color: AppColors.textSecondary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -637,7 +637,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     // 친구 추가 버튼
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(

@@ -41,12 +41,12 @@ class ProfileHeaderContent extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.mathButtonBlue.withValues(alpha: 0.4),
+                    color: AppColors.mathButtonBlue.withOpacity(0.4),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -91,7 +91,7 @@ class ProfileHeaderContent extends StatelessWidget {
                 vertical: 4,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surface.withValues(alpha: 0.25),
+                color: AppColors.surface.withOpacity(0.25),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Text(
@@ -119,7 +119,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   Container(
                     width: 1,
                     height: 28, // 32 → 28
-                    color: AppColors.surface.withValues(alpha: 0.25),
+                    color: AppColors.surface.withOpacity(0.25),
                   ),
                   ProfileStatBadge(
                     value: '${user?.xp ?? 0}',
@@ -129,7 +129,7 @@ class ProfileHeaderContent extends StatelessWidget {
                   Container(
                     width: 1,
                     height: 28,
-                    color: AppColors.surface.withValues(alpha: 0.25),
+                    color: AppColors.surface.withOpacity(0.25),
                   ),
                   ProfileStatBadge(
                     value: '${user?.streakDays ?? 0}',

@@ -143,7 +143,7 @@ class EmptyState extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: (iconColor ?? AppColors.textSecondary).withValues(alpha: 0.1),
+                  color: (iconColor ?? AppColors.textSecondary).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -217,7 +217,7 @@ class InlineEmptyState extends StatelessWidget {
           Icon(
             icon,
             size: 40,
-            color: iconColor ?? AppColors.textSecondary.withValues(alpha: 0.5),
+            color: iconColor ?? AppColors.textSecondary.withOpacity(0.5),
           ),
           const SizedBox(height: AppDimensions.spacingM),
           Text(

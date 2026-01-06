@@ -139,7 +139,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -179,7 +179,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -197,7 +197,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요...',
                 hintStyle: TextStyle(
-                  color: AppColors.textSecondary.withValues(alpha: 0.5),
+                  color: AppColors.textSecondary.withOpacity(0.5),
                 ),
                 filled: true,
                 fillColor: AppColors.background,
@@ -259,7 +259,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
             Icon(
               icon,
               size: 64,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
+              color: AppColors.textSecondary.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -267,7 +267,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
-                color: AppColors.textSecondary.withValues(alpha: 0.7),
+                color: AppColors.textSecondary.withOpacity(0.7),
                 height: 1.5,
               ),
             ),

@@ -29,7 +29,7 @@ class LevelUpDialog extends StatefulWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: AppColors.cardShadow.withValues(alpha: 0.87),
+      barrierColor: AppColors.cardShadow.withOpacity(0.87),
       transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, animation, secondaryAnimation) {
         return LevelUpDialog(
@@ -195,7 +195,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.cardShadow.withValues(alpha: 0.3),
+                    color: AppColors.cardShadow.withOpacity(0.3),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
@@ -248,7 +248,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.mathYellow.withValues(alpha: 0.4),
+                                color: AppColors.mathYellow.withOpacity(0.4),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -292,7 +292,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                       vertical: AppDimensions.paddingM,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.mathTeal.withValues(alpha: 0.1),
+                      color: AppColors.mathTeal.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Row(
@@ -375,7 +375,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                               borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
+                                  color: AppColors.mathButtonBlue.withOpacity(0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),

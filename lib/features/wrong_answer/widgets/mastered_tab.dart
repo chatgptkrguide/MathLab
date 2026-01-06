@@ -28,7 +28,7 @@ class MasteredTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.successGreen.withValues(alpha: 0.1),
+                color: AppColors.successGreen.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'local_storage_service.dart';
 import 'firestore_service.dart';
+import 'conflict_resolution_service.dart';
 import '../models/sync/sync_status.dart';
 import '../models/sync/sync_task.dart';
 import '../models/user/user.dart';
@@ -30,6 +31,7 @@ class SyncManager {
   final LocalStorageService _localStorage = LocalStorageService();
   final FirestoreService _firestore = FirestoreService();
   final Connectivity _connectivity = Connectivity();
+  final ConflictResolutionService _conflictResolver = ConflictResolutionService();
 
   // Repository 인스턴스 (initialize에서 주입받음)
   // late final로 선언하여 초기화 보장 및 null 체크 제거
@@ -581,10 +583,17 @@ class SyncManager {
       if (remoteUser != null) {
         final localUser = await _userRepository.getFromLocal(accountId);
 
-        // 충돌 해결 (Local-First: 로컬 우선, Remote가 더 최신이면 덮어쓰기)
+        // 충돌 해결 - ConflictResolutionService 사용
         if (localUser != null) {
-          final merged = _userRepository.mergeData(localUser, remoteUser);
-          await _userRepository.saveToLocal(accountId, merged);
+          final resolvedData = _conflictResolver.resolveConflict(
+            'user',
+            accountId,
+            localUser.toJson(),
+            remoteUser.toJson(),
+          );
+          final resolvedUser = User.fromJson(resolvedData);
+          await _userRepository.saveToLocal(accountId, resolvedUser);
+          Logger.debug('사용자 프로필 충돌 해결 및 병합 완료', tag: 'SyncManager');
         } else {
           await _userRepository.saveToLocal(accountId, remoteUser);
         }
@@ -648,25 +657,45 @@ class SyncManager {
     }
   }
 
-  /// 오답 목록 병합 (중복 제거)
+  /// 오답 목록 병합 (ConflictResolutionService 사용)
   List<WrongAnswer> _mergeWrongAnswers(List<WrongAnswer> local, List<WrongAnswer> remote) {
     final Map<String, WrongAnswer> merged = {};
 
-    // 로컬 데이터 추가
+    // 로컬 데이터를 맵으로 변환
+    final localMap = <String, WrongAnswer>{};
     for (final answer in local) {
-      merged[answer.id] = answer;
+      localMap[answer.id] = answer;
     }
 
-    // 원격 데이터 추가 (중복 시 최신 것 사용)
+    // 원격 데이터를 맵으로 변환
+    final remoteMap = <String, WrongAnswer>{};
     for (final answer in remote) {
-      final existing = merged[answer.id];
-      if (existing == null) {
-        merged[answer.id] = answer;
-      } else {
-        // 복습 횟수가 많은 것 우선
-        if (answer.reviewCount > existing.reviewCount) {
-          merged[answer.id] = answer;
-        }
+      remoteMap[answer.id] = answer;
+    }
+
+    // 모든 고유 ID 수집
+    final allIds = {...localMap.keys, ...remoteMap.keys};
+
+    // 각 오답에 대해 충돌 해결
+    for (final id in allIds) {
+      final localAnswer = localMap[id];
+      final remoteAnswer = remoteMap[id];
+
+      if (localAnswer != null && remoteAnswer != null) {
+        // 충돌 해결이 필요한 경우
+        final resolvedData = _conflictResolver.resolveConflict(
+          'wrongAnswer',
+          id,
+          localAnswer.toJson(),
+          remoteAnswer.toJson(),
+        );
+        merged[id] = WrongAnswer.fromJson(resolvedData);
+      } else if (localAnswer != null) {
+        // 로컬에만 있는 경우
+        merged[id] = localAnswer;
+      } else if (remoteAnswer != null) {
+        // 원격에만 있는 경우
+        merged[id] = remoteAnswer;
       }
     }
 

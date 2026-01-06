@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/user/user_account.dart';
 import '../../services/social_auth_service.dart';
+import '../../services/temp_profile_storage.dart';
 import '../../../shared/constants/game_constants.dart';
 import '../base/base_notifier.dart';
 
@@ -28,16 +29,30 @@ class AuthNotifier extends BaseNotifier<AuthState> {
 
   /// 소셜 로그인 초기화
   Future<void> _initializeSocialAuth() async {
-    await executeWithErrorHandling(
-      () async {
+    try {
+      // Google 초기화 시도 (실패해도 계속 진행)
+      try {
         await _socialAuth.initializeGoogle();
+        logInfo('Google 로그인 초기화 완료');
+      } catch (e) {
+        logWarning('Google 로그인 초기화 실패 (계속 진행): $e');
+      }
+
+      // Kakao 초기화 시도 (실패해도 계속 진행)
+      try {
         await _socialAuth.initializeKakao(
           nativeAppKey: 'YOUR_KAKAO_NATIVE_APP_KEY',
         );
-        logInfo('소셜 로그인 초기화 완료');
-      },
-      errorMessage: '소셜 로그인 초기화 실패',
-    );
+        logInfo('Kakao 로그인 초기화 완료');
+      } catch (e) {
+        logWarning('Kakao 로그인 초기화 실패 (계속 진행): $e');
+      }
+
+      logInfo('소셜 로그인 초기화 시도 완료');
+    } catch (e) {
+      logError('소셜 로그인 초기화 중 예상치 못한 오류', error: e);
+      // 초기화 실패해도 앱은 계속 동작
+    }
   }
 
   /// 기존 로그인 확인
@@ -376,11 +391,67 @@ class AuthNotifier extends BaseNotifier<AuthState> {
     return false;
   }
 
-  /// Google 로그인
-  Future<bool> signInWithGoogle() => _handleSocialLogin(
-        _socialAuth.signInWithGoogle,
-        'Google',
-      );
+  /// Google 로그인 (프로필 정보 연동 포함)
+  Future<bool> signInWithGoogle({TempProfileData? tempProfile}) async {
+    final success = await _handleSocialLogin(
+      _socialAuth.signInWithGoogle,
+      'Google',
+    );
+
+    // 로그인 성공 후 임시 프로필 정보가 있으면 연동
+    if (success && tempProfile != null && state.currentAccount != null) {
+      await _applyTempProfileToAccount(tempProfile);
+    }
+
+    return success;
+  }
+
+  /// 임시 프로필 정보를 실제 계정에 연동
+  Future<void> _applyTempProfileToAccount(TempProfileData tempProfile) async {
+    await executeWithErrorHandling(
+      () async {
+        if (state.currentAccount == null) {
+          throw Exception('현재 로그인된 계정이 없습니다');
+        }
+
+        logInfo('임시 프로필 정보를 계정에 연동: ${state.currentAccount!.email}');
+
+        // UserAccount preferences 업데이트
+        final updatedPreferences = {
+          ...state.currentAccount!.preferences,
+          'name': tempProfile.name,
+          'birthDate': tempProfile.birthDate?.toIso8601String(),
+          'gender': tempProfile.gender,
+          'grade': tempProfile.currentGrade,
+          'schoolName': tempProfile.schoolName,
+          'bio': tempProfile.bio,
+          'isProfileComplete': 'true',
+        };
+
+        final updatedAccount = state.currentAccount!.copyWith(
+          displayName: tempProfile.name,
+          preferences: updatedPreferences,
+        );
+
+        // 계정 정보 저장
+        final existingAccounts = await _loadAccounts();
+        final updatedAccounts = existingAccounts.map((acc) {
+          return acc.id == updatedAccount.id ? updatedAccount : acc;
+        }).toList();
+
+        await _saveAccounts(updatedAccounts);
+
+        // 상태 업데이트
+        state = state.copyWith(
+          currentAccount: updatedAccount,
+          availableAccounts: updatedAccounts,
+        );
+
+        logInfo('프로필 정보 연동 완료: ${tempProfile.name} (학년: ${tempProfile.currentGrade})');
+      },
+      errorMessage: '프로필 정보 연동 실패',
+    );
+  }
 
   /// Kakao 로그인
   Future<bool> signInWithKakao() => _handleSocialLogin(
@@ -393,6 +464,75 @@ class AuthNotifier extends BaseNotifier<AuthState> {
         _socialAuth.signInWithApple,
         'Apple',
       );
+
+  /// 이메일/비밀번호 로그인
+  Future<bool> signInWithEmailPassword({
+    required String email,
+    required String displayName,
+    required String uid,
+  }) async {
+    return await executeWithErrorHandling(
+      () async {
+        state = state.copyWith(isLoading: true);
+
+        final existingAccounts = await _loadAccounts();
+
+        // 기존 계정 확인
+        UserAccount? existingAccount;
+        try {
+          existingAccount = existingAccounts.firstWhere(
+            (acc) => acc.email == email,
+          );
+        } catch (_) {
+          // 계정이 없으면 null
+        }
+
+        final UserAccount account;
+        if (existingAccount != null) {
+          // 기존 계정 업데이트
+          account = existingAccount.copyWith(
+            lastLoginAt: DateTime.now(),
+          );
+        } else {
+          // 새 계정 생성
+          account = UserAccount(
+            id: uid,
+            email: email,
+            displayName: displayName,
+            createdAt: DateTime.now(),
+            lastLoginAt: DateTime.now(),
+            accountType: AccountType.student,
+            preferences: {'grade': '미설정'},
+          );
+        }
+
+        // 계정 저장
+        final updatedAccounts = existingAccount != null
+            ? existingAccounts.map((acc) {
+                return acc.id == account.id ? account : acc;
+              }).toList()
+            : [...existingAccounts, account];
+
+        await _saveAccounts(updatedAccounts);
+        await _setCurrentAccount(account.id);
+
+        state = AuthState(
+          isAuthenticated: true,
+          currentAccount: account,
+          availableAccounts: updatedAccounts,
+          isLoading: false,
+        );
+
+        logInfo('이메일 로그인 성공: $email');
+        return true;
+      },
+      errorMessage: '이메일 로그인 실패',
+      fallback: () {
+        state = state.copyWith(isLoading: false);
+        return false;
+      },
+    ) ?? false;
+  }
 
   /// 로그아웃
   Future<void> signOut() async {

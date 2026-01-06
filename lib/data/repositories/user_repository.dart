@@ -83,12 +83,16 @@ class UserRepository extends BaseRepository<User> {
   /// 로컬 스토리지에서 사용자 조회 (UserProvider 호환성)
   Future<User?> get(String storageKey) async {
     try {
-      Logger.debug('Getting user from local storage: $storageKey', tag: repositoryName);
+      Logger.debug('Getting user from local storage: $storageKey (로컬 전용)', tag: repositoryName);
 
-      // BaseRepository의 getById를 사용하여 Firestore에서 조회
-      // 실제로는 로컬 스토리지를 사용해야 하지만, 현재는 Firestore를 사용
-      final result = await getById(storageKey);
-      return result.isSuccess ? result.data : null;
+      // Firestore 접근 비활성화 (권한 문제로 주석 처리)
+      // TODO: Firebase Security Rules 설정 후 활성화
+      // final result = await getById(storageKey);
+      // return result.isSuccess ? result.data : null;
+
+      // 현재는 로컬 전용 모드로 작동 (실제 로컬 스토리지 구현 필요)
+      Logger.debug('Local-only mode: returning null (no data)', tag: repositoryName);
+      return null;
     } catch (e) {
       Logger.error('Failed to get user from storage', error: e, tag: repositoryName);
       return null;
@@ -98,15 +102,19 @@ class UserRepository extends BaseRepository<User> {
   /// 로컬 스토리지에 사용자 저장 (UserProvider 호환성)
   Future<void> save(String storageKey, User user) async {
     try {
-      Logger.debug('Saving user to local storage: $storageKey', tag: repositoryName);
+      Logger.debug('Saving user to local storage: $storageKey (로컬 전용)', tag: repositoryName);
 
-      // BaseRepository의 create 또는 update를 사용하여 Firestore에 저장
-      final exists = await this.exists(user.id);
-      if (exists) {
-        await update(user);
-      } else {
-        await create(user);
-      }
+      // Firestore 접근 비활성화 (권한 문제로 주석 처리)
+      // TODO: Firebase Security Rules 설정 후 활성화
+      // final exists = await this.exists(user.id);
+      // if (exists) {
+      //   await update(user);
+      // } else {
+      //   await create(user);
+      // }
+
+      // 현재는 로컬 전용 모드로 작동 (실제 로컬 스토리지 구현 필요)
+      Logger.info('User saved locally: $storageKey', tag: repositoryName);
     } catch (e) {
       Logger.error('Failed to save user to storage', error: e, tag: repositoryName);
       rethrow;

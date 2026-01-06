@@ -122,14 +122,14 @@ class FigmaColors {
   // ========== 그림자 ==========
   /// 카드 그림자
   static BoxShadow cardShadow = BoxShadow(
-    color: Colors.black.withValues(alpha: 0.1),
+    color: Colors.black.withOpacity(0.1),
     blurRadius: 10,
     offset: const Offset(0, 4),
   );
 
   /// 작은 그림자
   static BoxShadow smallShadow = BoxShadow(
-    color: Colors.black.withValues(alpha: 0.05),
+    color: Colors.black.withOpacity(0.05),
     blurRadius: 5,
     offset: const Offset(0, 2),
   );

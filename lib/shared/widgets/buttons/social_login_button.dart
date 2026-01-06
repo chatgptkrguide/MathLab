@@ -55,7 +55,7 @@ class SocialLoginButton extends StatelessWidget {
                 color: enabled ? _getBackgroundColor() : AppColors.borderLight, // GoMath disabled gray
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: enabled ? _getShadowColor() : AppColors.borderLight.withValues(alpha: 0.8), // Darker border
+                  color: enabled ? _getShadowColor() : AppColors.borderLight.withOpacity(0.8), // Darker border
                   width: 3,
                 ),
               ),
@@ -168,7 +168,7 @@ class SocialLoginButton extends StatelessWidget {
   Color _getShadowColor() {
     switch (provider) {
       case SocialLoginProvider.google:
-        return AppColors.borderLight.withValues(alpha: 0.8); // GoMath gray shadow
+        return AppColors.borderLight.withOpacity(0.8); // GoMath gray shadow
       case SocialLoginProvider.kakao:
         return AppColors.kakaoYellowDark; // Kakao darker yellow (brand color)
       case SocialLoginProvider.apple:

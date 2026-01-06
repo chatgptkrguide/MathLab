@@ -106,7 +106,7 @@ class ErrorDisplay extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.errorRed.withValues(alpha: 0.1),
+                color: AppColors.errorRed.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -223,10 +223,10 @@ class InlineErrorDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.errorRed.withValues(alpha: 0.1),
+        color: AppColors.errorRed.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(
-          color: AppColors.errorRed.withValues(alpha: 0.3),
+          color: AppColors.errorRed.withOpacity(0.3),
           width: 1,
         ),
       ),

@@ -185,7 +185,7 @@ class _UnifiedButtonState extends State<UnifiedButton>
               border: Border.all(
                 color: enabled
                     ? _effectiveShadowColor
-                    : AppColors.borderLight.withValues(alpha: 0.8),
+                    : AppColors.borderLight.withOpacity(0.8),
                 width: 3,
               ),
             ),
@@ -212,6 +212,7 @@ class _UnifiedButtonState extends State<UnifiedButton>
 
     // 애니메이션 적용 여부
     if (widget.enableAnimation) {
+      final contentToAnimate = buttonContent;
       buttonContent = Semantics(
         button: true,
         enabled: enabled,
@@ -221,14 +222,9 @@ class _UnifiedButtonState extends State<UnifiedButton>
           onTapDown: enabled ? (_) => _onTapDown() : null,
           onTapUp: enabled ? (_) => _onTapUp() : null,
           onTapCancel: enabled ? _onTapCancel : null,
-          child: AnimatedBuilder(
-            animation: _scaleAnimation,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: buttonContent,
-              );
-            },
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: contentToAnimate,
           ),
         ),
       );

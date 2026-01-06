@@ -16,7 +16,7 @@ class PremiumHeroSection extends StatelessWidget {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -44,7 +44,7 @@ class PremiumHeroSection extends StatelessWidget {
           Text(
             '무제한 학습과 모든 프리미엄 기능을\n지금 바로 사용해보세요!',
             style: AppTextStyles.bodyLarge.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: Colors.white.withOpacity(0.9),
             ),
             textAlign: TextAlign.center,
           ),

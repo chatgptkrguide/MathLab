@@ -50,8 +50,8 @@ class LessonCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: isCurrent && !isLocked
-                  ? const Color(0xFFFFD700).withValues(alpha: 0.5)
-                  : Colors.black.withValues(alpha: 0.1),
+                  ? const Color(0xFFFFD700).withOpacity(0.5)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: isCurrent && !isLocked ? 20 : 10,
               offset: const Offset(0, 4),
             ),
@@ -72,7 +72,7 @@ class LessonCard extends StatelessWidget {
                       size: 60,
                       color: isLocked
                           ? Colors.grey.shade400
-                          : Colors.white.withValues(alpha: 0.7),
+                          : Colors.white.withOpacity(0.7),
                     );
                   },
                 ),
@@ -83,7 +83,7 @@ class LessonCard extends StatelessWidget {
             if (isLocked)
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: Colors.white.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Center(
@@ -107,7 +107,7 @@ class LessonCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -133,7 +133,7 @@ class LessonCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),

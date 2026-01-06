@@ -24,7 +24,7 @@ class ProfileStatBadge extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.2),
+              color: AppColors.surface.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(

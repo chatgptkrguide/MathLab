@@ -89,7 +89,7 @@ class AchievementsScreen extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.successGreen.withValues(alpha: 0.3),
+                                        color: AppColors.successGreen.withOpacity(0.3),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),

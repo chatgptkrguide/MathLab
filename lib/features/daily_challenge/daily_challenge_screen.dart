@@ -75,7 +75,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen>
                 color: AppColors.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.cardShadow.withValues(alpha: 0.05),
+                    color: AppColors.cardShadow.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -140,7 +140,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen>
                             width: 24,
                             height: 24,
                             decoration: BoxDecoration(
-                              color: AppColors.surface.withValues(alpha: 0.2),
+                              color: AppColors.surface.withOpacity(0.2),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -234,7 +234,7 @@ class _ChallengeCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppDimensions.paddingL),
             decoration: BoxDecoration(
               color: challenge.isCompleted
-                  ? AppColors.success.withValues(alpha: 0.1)
+                  ? AppColors.success.withOpacity(0.1)
                   : AppColors.surface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
@@ -246,13 +246,13 @@ class _ChallengeCard extends StatelessWidget {
               boxShadow: [
                 if (challenge.isCompleted)
                   BoxShadow(
-                    color: AppColors.success.withValues(alpha: 0.2),
+                    color: AppColors.success.withOpacity(0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   )
                 else
                   BoxShadow(
-                    color: AppColors.borderLight.withValues(alpha: 0.15),
+                    color: AppColors.borderLight.withOpacity(0.15),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
@@ -271,7 +271,7 @@ class _ChallengeCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: challenge.isCompleted
                             ? AppColors.success
-                            : AppColors.primary.withValues(alpha: 0.1),
+                            : AppColors.primary.withOpacity(0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: challenge.isCompleted
@@ -328,11 +328,11 @@ class _ChallengeCard extends StatelessWidget {
                         vertical: AppDimensions.paddingS,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.primary.withOpacity(0.1),
                         borderRadius:
                             BorderRadius.circular(AppDimensions.radiusM),
                         border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.3),
+                          color: AppColors.primary.withOpacity(0.3),
                         ),
                       ),
                       child: Row(
@@ -400,7 +400,7 @@ class _ChallengeCard extends StatelessWidget {
                                   value: progress,
                                   minHeight: 12,
                                   backgroundColor:
-                                      AppColors.disabled.withValues(alpha: 0.2),
+                                      AppColors.disabled.withOpacity(0.2),
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     challenge.isCompleted
                                         ? AppColors.success

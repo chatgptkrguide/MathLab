@@ -130,10 +130,10 @@ class AppColors {
   static const List<Color> headerBlueGradient = mathBlueGradient;
 
   /// 헤더 버튼 배경 (반투명 흰색)
-  static Color get headerButtonBackground => surface.withValues(alpha: 0.2);
+  static Color get headerButtonBackground => surface.withOpacity(0.2);
 
   /// 헤더 버튼 테두리 (반투명 흰색)
-  static Color get headerButtonBorder => surface.withValues(alpha: 0.3);
+  static Color get headerButtonBorder => surface.withOpacity(0.3);
 
   /// 헤더 텍스트 색상 (흰색)
   static const Color headerText = surface;
@@ -247,6 +247,6 @@ class AppColors {
   @Deprecated('Use disabled instead')
   static const Color progressBackground = Color(0xFFE5E5E5);
 
-  @Deprecated('Use successGreen.withValues(alpha: 0.2) instead')
+  @Deprecated('Use successGreen.withOpacity(0.2) instead')
   static const Color highlightGreen = Color(0xFFD4F4DD);
 }

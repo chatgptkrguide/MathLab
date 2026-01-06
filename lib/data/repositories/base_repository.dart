@@ -1,5 +1,6 @@
 import '../services/local_storage_service.dart';
 import '../services/firestore_service.dart';
+import '../services/network_error_handler.dart';
 import '../../shared/utils/logger.dart';
 
 /// Repository 기본 클래스
@@ -67,12 +68,22 @@ abstract class BaseRepository<T> {
       // 1. 로컬에 먼저 저장
       await saveToLocal(accountId, data);
 
-      // 2. Firebase에 비동기 업로드
+      // 2. Firebase에 비동기 업로드 (재시도 로직 포함)
       try {
-        await saveToFirebase(accountId, data);
+        await NetworkErrorHandler.executeWithRetry(
+          () => saveToFirebase(accountId, data),
+          maxRetries: 2,
+          onRetry: (attempt, error) {
+            Logger.info(
+              'Firebase 저장 재시도 중 (시도 $attempt)',
+              tag: runtimeType.toString(),
+            );
+          },
+        );
       } catch (e) {
+        final networkError = NetworkErrorHandler.analyzeError(e);
         Logger.warning(
-          'Firebase 저장 실패 (오프라인 큐에 추가)',
+          'Firebase 저장 실패: ${networkError.message} (오프라인 큐에 추가)',
           tag: runtimeType.toString(),
         );
         // TODO: 오프라인 큐에 추가
@@ -96,7 +107,10 @@ abstract class BaseRepository<T> {
       await deleteFromLocal(accountId);
 
       try {
-        await deleteFromFirebase(accountId);
+        await NetworkErrorHandler.executeWithRetry(
+          () => deleteFromFirebase(accountId),
+          maxRetries: 2,
+        );
       } catch (e) {
         Logger.warning(
           'Firebase 삭제 실패',
@@ -121,7 +135,17 @@ abstract class BaseRepository<T> {
   /// Firebase에서 데이터 동기화 (백그라운드)
   Future<void> _syncFromFirebase(String accountId) async {
     try {
-      final remote = await getFromFirebase(accountId);
+      // 네트워크 연결 확인
+      if (!await NetworkErrorHandler.isConnected()) {
+        Logger.debug('오프라인 상태 - 동기화 건너뜀', tag: runtimeType.toString());
+        return;
+      }
+
+      final remote = await NetworkErrorHandler.executeWithRetry(
+        () => getFromFirebase(accountId),
+        maxRetries: 1, // 백그라운드 동기화는 재시도 최소화
+      );
+
       if (remote != null) {
         final local = await getFromLocal(accountId);
 
@@ -132,8 +156,9 @@ abstract class BaseRepository<T> {
         }
       }
     } catch (e) {
+      final networkError = NetworkErrorHandler.analyzeError(e);
       Logger.debug(
-        'Firebase 동기화 실패 (무시됨)',
+        'Firebase 동기화 실패: ${networkError.localizedMessage} (무시됨)',
         tag: runtimeType.toString(),
       );
     }

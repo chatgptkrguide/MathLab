@@ -28,7 +28,7 @@ class DailyRewardDialog extends StatefulWidget {
       context: context,
       barrierDismissible: false,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: AppColors.cardShadow.withValues(alpha: 0.87),
+      barrierColor: AppColors.cardShadow.withOpacity(0.87),
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) {
         return DailyRewardDialog(
@@ -104,7 +104,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
             borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
             boxShadow: [
               BoxShadow(
-                color: AppColors.cardShadow.withValues(alpha: 0.3),
+                color: AppColors.cardShadow.withOpacity(0.3),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -170,7 +170,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.mathYellow.withValues(alpha: 0.4),
+                            color: AppColors.mathYellow.withOpacity(0.4),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -218,7 +218,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
                     borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.mathButtonBlue.withValues(alpha: 0.3),
+                        color: AppColors.mathButtonBlue.withOpacity(0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -294,7 +294,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
             color: isToday
                 ? AppColors.mathTeal
                 : isPast
-                    ? AppColors.mathTeal.withValues(alpha: 0.3)
+                    ? AppColors.mathTeal.withOpacity(0.3)
                     : AppColors.disabled,
             border: isToday
                 ? Border.all(color: AppColors.mathTeal, width: 2)

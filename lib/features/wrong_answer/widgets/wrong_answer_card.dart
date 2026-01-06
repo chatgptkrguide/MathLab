@@ -60,7 +60,7 @@ class WrongAnswerCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: borderColor.withValues(alpha: 0.1),
+            color: borderColor.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -71,8 +71,8 @@ class WrongAnswerCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          splashColor: borderColor.withValues(alpha: 0.1),
-          highlightColor: borderColor.withValues(alpha: 0.05),
+          splashColor: borderColor.withOpacity(0.1),
+          highlightColor: borderColor.withOpacity(0.05),
           child: Padding(
             padding: const EdgeInsets.all(AppDimensions.paddingM),
             child: Column(
@@ -87,10 +87,10 @@ class WrongAnswerCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.mathBlue.withValues(alpha: 0.1),
+                        color: AppColors.mathBlue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: AppColors.mathBlue.withValues(alpha: 0.3),
+                          color: AppColors.mathBlue.withOpacity(0.3),
                           width: 1.5,
                         ),
                       ),
@@ -112,7 +112,7 @@ class WrongAnswerCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.disabled.withValues(alpha: 0.2),
+                        color: AppColors.disabled.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

@@ -67,7 +67,7 @@ class _LessonCardState extends State<LessonCard>
                   end: Alignment.bottomRight,
                   colors: _getGradientColors(),
                 ),
-          color: isLocked ? AppColors.disabled.withValues(alpha: 0.1) : null,
+          color: isLocked ? AppColors.disabled.withOpacity(0.1) : null,
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: Border.all(
             color: isLocked
@@ -79,7 +79,7 @@ class _LessonCardState extends State<LessonCard>
               ? null
               : [
                   BoxShadow(
-                    color: _getPrimaryColor().withValues(alpha: 0.3),
+                    color: _getPrimaryColor().withOpacity(0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -141,7 +141,7 @@ class _LessonCardState extends State<LessonCard>
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.successGreen
-                                  .withValues(alpha: 0.6 * _pulseController.value),
+                                  .withOpacity(0.6 * _pulseController.value),
                               blurRadius: 8 + (4 * _pulseController.value),
                               spreadRadius: 1 + (2 * _pulseController.value),
                             ),
@@ -171,8 +171,8 @@ class _LessonCardState extends State<LessonCard>
       height: 56,
       decoration: BoxDecoration(
         color: isLocked
-            ? AppColors.disabled.withValues(alpha: 0.2)
-            : AppColors.surface.withValues(alpha: 0.3),
+            ? AppColors.disabled.withOpacity(0.2)
+            : AppColors.surface.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Center(
@@ -197,7 +197,7 @@ class _LessonCardState extends State<LessonCard>
               style: AppTextStyles.bodySmall.copyWith(
                 color: isLocked
                     ? AppColors.disabled
-                    : AppColors.surface.withValues(alpha: 0.9),
+                    : AppColors.surface.withOpacity(0.9),
               ),
             ),
             Text(
@@ -217,8 +217,8 @@ class _LessonCardState extends State<LessonCard>
           child: LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),
             backgroundColor: isLocked
-                ? AppColors.disabled.withValues(alpha: 0.2)
-                : AppColors.surface.withValues(alpha: 0.3),
+                ? AppColors.disabled.withOpacity(0.2)
+                : AppColors.surface.withOpacity(0.3),
             valueColor: AlwaysStoppedAnimation(
               isLocked ? AppColors.disabled : AppColors.surface,
             ),

@@ -28,7 +28,7 @@ class UserProfileCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Colors.white,
-            const Color(0xFFE3F2FD).withValues(alpha: 0.5),
+            const Color(0xFFE3F2FD).withOpacity(0.5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -36,7 +36,7 @@ class UserProfileCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -64,7 +64,7 @@ class UserProfileCard extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.mathBlue.withValues(alpha: 0.3),
+                      color: AppColors.mathBlue.withOpacity(0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -191,12 +191,12 @@ class UserProfileCard extends StatelessWidget {
                 height: 50,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [tierColor, tierColor.withValues(alpha: 0.7)],
+                    colors: [tierColor, tierColor.withOpacity(0.7)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: tierColor.withValues(alpha: 0.3),
+                      color: tierColor.withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),

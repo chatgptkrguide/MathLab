@@ -42,7 +42,7 @@ class HomeLanguageCards extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
+                        color: Colors.black.withOpacity(0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -100,7 +100,7 @@ class HomeLanguageCards extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
+                        color: Colors.black.withOpacity(0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -361,7 +361,7 @@ class HomeLanguageCards extends ConsumerWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withValues(alpha: 0.1),
+                  color: const Color(0xFF4A90E2).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

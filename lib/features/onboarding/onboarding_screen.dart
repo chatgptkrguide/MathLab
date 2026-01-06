@@ -154,7 +154,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   child: Text(
                     '건너뛰기',
                     style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.surface.withValues(alpha: 0.8),
+                      color: AppColors.surface.withOpacity(0.8),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -226,7 +226,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       decoration: BoxDecoration(
         color: isActive
             ? AppColors.surface
-            : AppColors.surface.withValues(alpha: 0.3),
+            : AppColors.surface.withOpacity(0.3),
         borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
     );

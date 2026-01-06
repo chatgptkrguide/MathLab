@@ -152,7 +152,7 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
             : AppColors.mathRed; // GoMath red
       } else if (widget.isCorrectAnswer) {
         // 정답 표시 (연한 초록색)
-        return AppColors.successGreen.withValues(alpha: 0.2); // Light green
+        return AppColors.successGreen.withOpacity(0.2); // Light green
       } else {
         return AppColors.surface;
       }
@@ -299,10 +299,10 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: _textColor.withValues(alpha: 0.15),
+                      color: _textColor.withOpacity(0.15),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _textColor.withValues(alpha: 0.3),
+                        color: _textColor.withOpacity(0.3),
                         width: 2,
                       ),
                     ),

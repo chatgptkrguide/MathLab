@@ -107,7 +107,7 @@ class _XPAnimationWidgetState extends State<XPAnimationWidget>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.mathTeal.withValues(alpha: 0.4),
+                      color: AppColors.mathTeal.withOpacity(0.4),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -282,7 +282,7 @@ class _ComboAnimationWidgetState extends State<ComboAnimationWidget>
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                          color: AppColors.cardShadow.withValues(alpha: 0.3),
+                          color: AppColors.cardShadow.withOpacity(0.3),
                           offset: const Offset(0, 2),
                           blurRadius: 4,
                         ),

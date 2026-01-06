@@ -47,21 +47,21 @@ class MessageListItem extends StatelessWidget {
             decoration: BoxDecoration(
               color: message.isRead
                   ? AppColors.surface
-                  : AppColors.mathBlue.withValues(alpha: 0.05),
+                  : AppColors.mathBlue.withOpacity(0.05),
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
                 color: message.isImportant
                     ? AppColors.error
                     : message.isRead
-                        ? AppColors.borderLight.withValues(alpha: 0.3)
-                        : AppColors.mathBlue.withValues(alpha: 0.3),
+                        ? AppColors.borderLight.withOpacity(0.3)
+                        : AppColors.mathBlue.withOpacity(0.3),
                 width: message.isImportant ? 2 : 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: message.isRead
-                      ? Colors.black.withValues(alpha: 0.03)
-                      : AppColors.mathBlue.withValues(alpha: 0.1),
+                      ? Colors.black.withOpacity(0.03)
+                      : AppColors.mathBlue.withOpacity(0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -80,13 +80,13 @@ class MessageListItem extends StatelessWidget {
                       end: Alignment.bottomRight,
                       colors: [
                         _getIconColor(),
-                        _getIconColor().withValues(alpha: 0.7),
+                        _getIconColor().withOpacity(0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: _getIconColor().withValues(alpha: 0.3),
+                        color: _getIconColor().withOpacity(0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -191,10 +191,10 @@ class MessageListItem extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: _getIconColor().withValues(alpha: 0.1),
+                              color: _getIconColor().withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: _getIconColor().withValues(alpha: 0.3),
+                                color: _getIconColor().withOpacity(0.3),
                               ),
                             ),
                             child: Text(

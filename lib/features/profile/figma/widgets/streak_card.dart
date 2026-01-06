@@ -22,7 +22,7 @@ class StreakCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             const Color(0xFFE3F2FD),
-            const Color(0xFFBBDEFB).withValues(alpha: 0.5),
+            const Color(0xFFBBDEFB).withOpacity(0.5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -30,7 +30,7 @@ class StreakCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.mathBlue.withValues(alpha: 0.2),
+            color: AppColors.mathBlue.withOpacity(0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -47,7 +47,7 @@ class StreakCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -102,7 +102,7 @@ class StreakCard extends StatelessWidget {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

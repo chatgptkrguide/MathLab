@@ -12,13 +12,8 @@ class SocialAuthService {
   factory SocialAuthService() => _instance;
   SocialAuthService._internal();
 
-  /// Google Sign-In 인스턴스
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [
-      'email',
-      'profile',
-    ],
-  );
+  /// Google Sign-In 인스턴스 (lazy initialization)
+  GoogleSignIn? _googleSignIn;
 
   /// Google 로그인 초기화 여부
   bool _isGoogleInitialized = false;
@@ -31,7 +26,13 @@ class SocialAuthService {
     if (_isGoogleInitialized) return;
 
     try {
-      // Google Sign-In은 자동으로 초기화됨
+      // Google Sign-In을 lazy 초기화
+      _googleSignIn = GoogleSignIn(
+        scopes: [
+          'email',
+          'profile',
+        ],
+      );
       _isGoogleInitialized = true;
       Logger.info('Google 로그인 초기화 완료', tag: 'SocialAuth');
     } catch (e, stackTrace) {
@@ -41,6 +42,8 @@ class SocialAuthService {
         stackTrace: stackTrace,
         tag: 'SocialAuth',
       );
+      // 초기화 실패 시에도 계속 진행
+      _isGoogleInitialized = false;
     }
   }
 
@@ -74,10 +77,17 @@ class SocialAuthService {
   /// Google 로그인
   Future<SocialAuthResult?> signInWithGoogle() async {
     try {
+      if (_googleSignIn == null || !_isGoogleInitialized) {
+        await initializeGoogle();
+        if (_googleSignIn == null) {
+          throw Exception('Google 로그인을 초기화할 수 없습니다');
+        }
+      }
+
       Logger.info('Google 로그인 시작', tag: 'SocialAuth');
 
       // Google 계정 선택 화면 표시 (타임아웃: 60초)
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn().timeout(
+      final GoogleSignInAccount? googleUser = await _googleSignIn!.signIn().timeout(
         const Duration(seconds: 60),
         onTimeout: () {
           Logger.warning('Google 로그인 타임아웃', tag: 'SocialAuth');
@@ -151,8 +161,10 @@ class SocialAuthService {
   /// Google 로그아웃
   Future<void> signOutGoogle() async {
     try {
-      await _googleSignIn.signOut();
-      Logger.info('Google 로그아웃 완료', tag: 'SocialAuth');
+      if (_googleSignIn != null) {
+        await _googleSignIn!.signOut();
+        Logger.info('Google 로그아웃 완료', tag: 'SocialAuth');
+      }
     } catch (e, stackTrace) {
       Logger.error(
         'Google 로그아웃 실패',
@@ -166,8 +178,10 @@ class SocialAuthService {
   /// Google 계정 연결 해제
   Future<void> disconnectGoogle() async {
     try {
-      await _googleSignIn.disconnect();
-      Logger.info('Google 계정 연결 해제 완료', tag: 'SocialAuth');
+      if (_googleSignIn != null) {
+        await _googleSignIn!.disconnect();
+        Logger.info('Google 계정 연결 해제 완료', tag: 'SocialAuth');
+      }
     } catch (e, stackTrace) {
       Logger.error(
         'Google 계정 연결 해제 실패',
@@ -180,7 +194,8 @@ class SocialAuthService {
 
   /// 현재 Google 로그인 상태 확인
   Future<bool> isGoogleSignedIn() async {
-    return await _googleSignIn.isSignedIn();
+    if (_googleSignIn == null) return false;
+    return await _googleSignIn!.isSignedIn();
   }
 
   // ==================== Kakao 로그인 ====================

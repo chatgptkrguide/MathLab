@@ -131,7 +131,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
         FadeTransition(
           opacity: _fadeAnimation,
           child: Container(
-            color: AppColors.cardShadow.withValues(alpha: 0.7),
+            color: AppColors.cardShadow.withOpacity(0.7),
           ),
         ),
         // 결과 다이얼로그
@@ -152,7 +152,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                 borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.cardShadow.withValues(alpha: 0.2),
+                    color: AppColors.cardShadow.withOpacity(0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -190,12 +190,12 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                       gradient: LinearGradient(
                         colors: [
                           _gradeColor,
-                          _gradeColor.withValues(alpha: 0.7),
+                          _gradeColor.withOpacity(0.7),
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: _gradeColor.withValues(alpha: 0.4),
+                          color: _gradeColor.withOpacity(0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -303,7 +303,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                                     boxShadow: [
                                       BoxShadow(
                                         color: AppColors.mathButtonBlue
-                                            .withValues(alpha: 0.3),
+                                            .withOpacity(0.3),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
                                       ),
@@ -431,7 +431,7 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppColors.mathButtonBlue
-                                          .withValues(alpha: 0.3),
+                                          .withOpacity(0.3),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
@@ -529,8 +529,8 @@ class _ProblemResultDialogState extends State<ProblemResultDialog>
             height: 28,
             decoration: BoxDecoration(
               color: result.isCorrect
-                  ? AppColors.successGreen.withValues(alpha: 0.1)
-                  : AppColors.errorRed.withValues(alpha: 0.1),
+                  ? AppColors.successGreen.withOpacity(0.1)
+                  : AppColors.errorRed.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Center(

@@ -54,7 +54,7 @@ class TierLevelScreen extends ConsumerWidget {
                 Icon(
                   Icons.emoji_events_outlined,
                   size: 64,
-                  color: AppColors.textSecondary.withValues(alpha: 0.5),
+                  color: AppColors.textSecondary.withOpacity(0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -137,7 +137,7 @@ class TierLevelScreen extends ConsumerWidget {
         gradient: LinearGradient(
           colors: [
             _getTierColor(league.currentTier),
-            _getTierColor(league.currentTier).withValues(alpha: 0.7),
+            _getTierColor(league.currentTier).withOpacity(0.7),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -145,7 +145,7 @@ class TierLevelScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _getTierColor(league.currentTier).withValues(alpha: 0.3),
+            color: _getTierColor(league.currentTier).withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -182,7 +182,7 @@ class TierLevelScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -206,10 +206,10 @@ class TierLevelScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
+        color: AppColors.error.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.error.withValues(alpha: 0.3),
+          color: AppColors.error.withOpacity(0.3),
           width: 2,
         ),
       ),
@@ -270,10 +270,10 @@ class TierLevelScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
+        color: AppColors.warning.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.warning.withValues(alpha: 0.3),
+          color: AppColors.warning.withOpacity(0.3),
           width: 2,
         ),
       ),

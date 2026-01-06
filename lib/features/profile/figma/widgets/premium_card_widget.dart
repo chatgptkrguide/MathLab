@@ -21,10 +21,10 @@ class PremiumCardWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isPremiumActive
-              ? AppColors.premiumGradient.map((c) => c.withValues(alpha: 0.2)).toList()
+              ? AppColors.premiumGradient.map((c) => c.withOpacity(0.2)).toList()
               : [
                   const Color(0xFFE3F2FD),
-                  const Color(0xFFBBDEFB).withValues(alpha: 0.5),
+                  const Color(0xFFBBDEFB).withOpacity(0.5),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -33,8 +33,8 @@ class PremiumCardWidget extends ConsumerWidget {
         boxShadow: [
           BoxShadow(
             color: isPremiumActive
-                ? AppColors.premiumGold.withValues(alpha: 0.2)
-                : AppColors.mathBlue.withValues(alpha: 0.2),
+                ? AppColors.premiumGold.withOpacity(0.2)
+                : AppColors.mathBlue.withOpacity(0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

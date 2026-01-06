@@ -33,13 +33,13 @@ class PracticeOptionButton extends StatelessWidget {
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: AppColors.successGreen.withValues(alpha: 0.3),
+                color: AppColors.successGreen.withOpacity(0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               )
             else
               BoxShadow(
-                color: AppColors.borderLight.withValues(alpha: 0.1),
+                color: AppColors.borderLight.withOpacity(0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -51,7 +51,7 @@ class PracticeOptionButton extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.surface : AppColors.successGreen.withValues(alpha: 0.1),
+                color: isSelected ? AppColors.surface : AppColors.successGreen.withOpacity(0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected ? AppColors.surface : AppColors.successGreen,

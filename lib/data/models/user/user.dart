@@ -22,6 +22,14 @@ class User implements BaseModel {
   final DateTime? lastHeartUpdateTime; // 마지막 하트 업데이트 시간 (재생 계산용)
   final DateTime? updatedAt; // 마지막 업데이트 시간
 
+  // ====== 추가 프로필 정보 ======
+  final DateTime? birthDate; // 생년월일
+  final String? gender; // 성별 (male, female, other, prefer_not_to_say)
+  final String? phoneNumber; // 전화번호
+  final String? bio; // 자기소개
+  final String? schoolName; // 학교명
+  final bool isProfileComplete; // 프로필 완성 여부
+
   // ====== 프리미엄 관련 필드 ======
   final bool isPremium; // 프리미엄 사용자 여부
   final PremiumTier premiumTier; // 프리미엄 등급 (free/monthly/yearly/lifetime)
@@ -44,6 +52,12 @@ class User implements BaseModel {
     this.lastStudyDate, // 마지막 학습 날짜 (nullable)
     this.lastHeartUpdateTime, // 마지막 하트 업데이트 시간 (nullable)
     this.updatedAt, // 마지막 업데이트 시간 (nullable)
+    this.birthDate, // 생년월일 (nullable)
+    this.gender, // 성별 (nullable)
+    this.phoneNumber, // 전화번호 (nullable)
+    this.bio, // 자기소개 (nullable)
+    this.schoolName, // 학교명 (nullable)
+    this.isProfileComplete = false, // 기본값: 미완성
     this.isPremium = false, // 기본값: 무료 사용자
     this.premiumTier = PremiumTier.free, // 기본값: 무료 등급
     this.premiumExpiryDate, // 기본값: null (무료 사용자는 만료일 없음)
@@ -77,6 +91,14 @@ class User implements BaseModel {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
+      birthDate: json['birthDate'] != null
+          ? DateTime.parse(json['birthDate'] as String)
+          : null,
+      gender: json['gender'] as String?,
+      phoneNumber: json['phoneNumber'] as String?,
+      bio: json['bio'] as String?,
+      schoolName: json['schoolName'] as String?,
+      isProfileComplete: json['isProfileComplete'] as bool? ?? false,
       isPremium: json['isPremium'] as bool? ?? false,
       premiumTier: json['premiumTier'] != null
           ? PremiumTier.fromString(json['premiumTier'] as String)
@@ -109,6 +131,12 @@ class User implements BaseModel {
       lastStudyDate: (data['lastStudyDate'] as Timestamp?)?.toDate(),
       lastHeartUpdateTime: (data['lastHeartUpdateTime'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      birthDate: (data['birthDate'] as Timestamp?)?.toDate(),
+      gender: data['gender'] as String?,
+      phoneNumber: data['phoneNumber'] as String?,
+      bio: data['bio'] as String?,
+      schoolName: data['schoolName'] as String?,
+      isProfileComplete: data['isProfileComplete'] as bool? ?? false,
       isPremium: data['isPremium'] as bool? ?? false,
       premiumTier: data['premiumTier'] != null
           ? PremiumTier.fromString(data['premiumTier'] as String)
@@ -137,6 +165,12 @@ class User implements BaseModel {
       'lastStudyDate': lastStudyDate?.toIso8601String(),
       'lastHeartUpdateTime': lastHeartUpdateTime?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'birthDate': birthDate?.toIso8601String(),
+      'gender': gender,
+      'phoneNumber': phoneNumber,
+      'bio': bio,
+      'schoolName': schoolName,
+      'isProfileComplete': isProfileComplete,
       'isPremium': isPremium,
       'premiumTier': premiumTier.value,
       'premiumExpiryDate': premiumExpiryDate?.toIso8601String(),
@@ -163,6 +197,12 @@ class User implements BaseModel {
       'lastStudyDate': lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
       'lastXPResetDate': Timestamp.fromDate(lastXPResetDate),
       'lastHeartUpdateTime': lastHeartUpdateTime != null ? Timestamp.fromDate(lastHeartUpdateTime!) : null,
+      'birthDate': birthDate != null ? Timestamp.fromDate(birthDate!) : null,
+      'gender': gender,
+      'phoneNumber': phoneNumber,
+      'bio': bio,
+      'schoolName': schoolName,
+      'isProfileComplete': isProfileComplete,
       'isPremium': isPremium,
       'premiumTier': premiumTier.value,
       'premiumExpiryDate': premiumExpiryDate != null ? Timestamp.fromDate(premiumExpiryDate!) : null,
@@ -192,6 +232,12 @@ class User implements BaseModel {
     DateTime? lastStudyDate,
     DateTime? lastHeartUpdateTime,
     DateTime? updatedAt,
+    DateTime? birthDate,
+    String? gender,
+    String? phoneNumber,
+    String? bio,
+    String? schoolName,
+    bool? isProfileComplete,
     bool? isPremium,
     PremiumTier? premiumTier,
     DateTime? premiumExpiryDate,
@@ -213,6 +259,12 @@ class User implements BaseModel {
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
       lastHeartUpdateTime: lastHeartUpdateTime ?? this.lastHeartUpdateTime,
       updatedAt: updatedAt ?? this.updatedAt,
+      birthDate: birthDate ?? this.birthDate,
+      gender: gender ?? this.gender,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      bio: bio ?? this.bio,
+      schoolName: schoolName ?? this.schoolName,
+      isProfileComplete: isProfileComplete ?? this.isProfileComplete,
       isPremium: isPremium ?? this.isPremium,
       premiumTier: premiumTier ?? this.premiumTier,
       premiumExpiryDate: premiumExpiryDate ?? this.premiumExpiryDate,
@@ -300,6 +352,34 @@ class User implements BaseModel {
 
   /// photoUrl getter (avatarUrl의 alias)
   String? get photoUrl => avatarUrl.isEmpty ? null : avatarUrl;
+
+  /// 나이 계산 (생년월일 기준)
+  int? get age {
+    if (birthDate == null) return null;
+    final now = DateTime.now();
+    int age = now.year - birthDate!.year;
+    if (now.month < birthDate!.month ||
+        (now.month == birthDate!.month && now.day < birthDate!.day)) {
+      age--;
+    }
+    return age;
+  }
+
+  /// 성별 표시 텍스트
+  String get genderText {
+    switch (gender) {
+      case 'male':
+        return '남성';
+      case 'female':
+        return '여성';
+      case 'other':
+        return '기타';
+      case 'prefer_not_to_say':
+        return '비공개';
+      default:
+        return '미설정';
+    }
+  }
 
   @override
   String toString() {

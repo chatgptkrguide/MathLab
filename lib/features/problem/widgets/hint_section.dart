@@ -89,7 +89,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.mathOrange.withValues(alpha: 0.15),
+                        color: AppColors.mathOrange.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -130,15 +130,15 @@ class _HintSectionState extends ConsumerState<HintSection>
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.mathOrange.withValues(alpha: 0.1),
-                          AppColors.mathOrange.withValues(alpha: 0.05),
+                          AppColors.mathOrange.withOpacity(0.1),
+                          AppColors.mathOrange.withOpacity(0.05),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.mathOrange.withValues(alpha: 0.3),
+                        color: AppColors.mathOrange.withOpacity(0.3),
                         width: 1.5,
                       ),
                     ),
@@ -356,11 +356,11 @@ class _HintItemState extends State<_HintItem>
       decoration: BoxDecoration(
         color: widget.isUnlocked
             ? AppColors.surface
-            : AppColors.disabled.withValues(alpha: 0.1),
+            : AppColors.disabled.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(
           color: widget.isUnlocked
-              ? AppColors.mathPurple.withValues(alpha: 0.3)
+              ? AppColors.mathPurple.withOpacity(0.3)
               : AppColors.borderLight,
           width: widget.isUnlocked ? 2 : 1,
         ),
@@ -437,7 +437,7 @@ class _HintItemState extends State<_HintItem>
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: AppColors.disabled.withValues(alpha: 0.3),
+            color: AppColors.disabled.withOpacity(0.3),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -509,7 +509,7 @@ class _HintItemState extends State<_HintItem>
                   border: Border.all(
                     color: widget.canUnlock
                         ? AppColors.mathOrangeDark
-                        : AppColors.disabled.withValues(alpha: 0.8),
+                        : AppColors.disabled.withOpacity(0.8),
                     width: 2,
                   ),
                 ),

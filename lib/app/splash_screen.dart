@@ -114,18 +114,18 @@ class _SplashScreenState extends State<SplashScreen>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              AppColors.surface.withValues(alpha: 0.3),
-                              AppColors.surface.withValues(alpha: 0.1),
+                              AppColors.surface.withOpacity(0.3),
+                              AppColors.surface.withOpacity(0.1),
                             ],
                           ),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppColors.surface.withValues(alpha: 0.5),
+                            color: AppColors.surface.withOpacity(0.5),
                             width: 3,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.surface.withValues(alpha: 0.2),
+                              color: AppColors.surface.withOpacity(0.2),
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
@@ -145,7 +145,7 @@ class _SplashScreenState extends State<SplashScreen>
                               color: AppColors.surface,
                               shadows: [
                                 Shadow(
-                                  color: AppColors.mathButtonBlue.withValues(alpha: 0.5),
+                                  color: AppColors.mathButtonBlue.withOpacity(0.5),
                                   blurRadius: 15,
                                 ),
                               ],
@@ -157,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen>
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.surface.withValues(alpha: 0.9),
+                              color: AppColors.surface.withOpacity(0.9),
                               fontStyle: FontStyle.italic,
                               letterSpacing: 2,
                             ),
@@ -175,7 +175,7 @@ class _SplashScreenState extends State<SplashScreen>
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.surface.withValues(alpha: 0.7),
+                              color: AppColors.surface.withOpacity(0.7),
                             ),
                           ),
                         ),
@@ -190,7 +190,7 @@ class _SplashScreenState extends State<SplashScreen>
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.surface.withValues(alpha: 0.7),
+                              color: AppColors.surface.withOpacity(0.7),
                             ),
                           ),
                         ),
@@ -203,7 +203,7 @@ class _SplashScreenState extends State<SplashScreen>
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.surface.withValues(alpha: 0.6),
+                            color: AppColors.surface.withOpacity(0.6),
                           ),
                         ),
                       ),
@@ -222,7 +222,7 @@ class _SplashScreenState extends State<SplashScreen>
                       fontSize: 52,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withValues(alpha: 0.25),
+                          color: Colors.black.withOpacity(0.25),
                           offset: const Offset(0, 3),
                           blurRadius: 8,
                         ),
@@ -236,7 +236,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Text(
                     '매일 5분, 수학이 쉬워진다',
                     style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.surface.withValues(alpha: 0.9),
+                      color: AppColors.surface.withOpacity(0.9),
                       fontWeight: FontWeight.w600,
                       fontSize: 18,
                     ),

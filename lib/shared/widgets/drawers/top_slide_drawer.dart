@@ -18,7 +18,7 @@ class TopSlideDrawer extends StatelessWidget {
       alignment: Alignment.topCenter,
       child: Material(
         elevation: 16,
-        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shadowColor: Colors.black.withOpacity(0.3),
         child: Container(
           width: MediaQuery.of(context).size.width,
           constraints: BoxConstraints(
@@ -32,7 +32,7 @@ class TopSlideDrawer extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -50,7 +50,7 @@ class TopSlideDrawer extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
+      barrierColor: Colors.black.withOpacity(0.5),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return TopSlideDrawer(child: child);

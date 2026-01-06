@@ -81,8 +81,8 @@ class FriendProfileScreen extends ConsumerWidget {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [
-                AppColors.accentCyan.withValues(alpha: 0.3),
-                AppColors.accentCyan.withValues(alpha: 0.1),
+                AppColors.accentCyan.withOpacity(0.3),
+                AppColors.accentCyan.withOpacity(0.1),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -124,7 +124,7 @@ class FriendProfileScreen extends ConsumerWidget {
             vertical: AppDimensions.paddingS,
           ),
           decoration: BoxDecoration(
-            color: AppColors.successGreen.withValues(alpha: 0.1),
+            color: AppColors.successGreen.withOpacity(0.1),
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             border: Border.all(
               color: AppColors.successGreen,
@@ -163,13 +163,13 @@ class FriendProfileScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.mathGold.withValues(alpha: 0.1),
-            AppColors.mathYellow.withValues(alpha: 0.05),
+            AppColors.mathGold.withOpacity(0.1),
+            AppColors.mathYellow.withOpacity(0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         border: Border.all(
-          color: AppColors.mathGold.withValues(alpha: 0.3),
+          color: AppColors.mathGold.withOpacity(0.3),
           width: 1.5,
         ),
       ),
@@ -316,7 +316,7 @@ class FriendProfileScreen extends ConsumerWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: color.withValues(alpha: 0.3),
+          color: color.withOpacity(0.3),
           width: 1.5,
         ),
       ),
@@ -420,12 +420,12 @@ class FriendProfileScreen extends ConsumerWidget {
               gradient: LinearGradient(
                 colors: [
                   color,
-                  color.withValues(alpha: 0.6),
+                  color.withOpacity(0.6),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.3),
+                  color: color.withOpacity(0.3),
                   blurRadius: 8,
                   spreadRadius: 2,
                 ),
@@ -527,7 +527,7 @@ class FriendProfileScreen extends ConsumerWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

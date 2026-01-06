@@ -64,12 +64,12 @@ class CourseEnrollmentScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
+          colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -83,7 +83,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -149,7 +149,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
                 Icon(
                   Icons.school_outlined,
                   size: 64,
-                  color: AppColors.textSecondary.withValues(alpha: 0.5),
+                  color: AppColors.textSecondary.withOpacity(0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -164,7 +164,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
                   '새 과정을 추가해보세요',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    color: AppColors.textSecondary.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -215,7 +215,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -237,7 +237,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -374,7 +374,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

@@ -391,22 +391,50 @@ class MockDataService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
+      // 문제 유형별로 정답 계산
+      final int correctAnswer;
+      final String question;
+
+      if (i % 3 == 0) {
+        // 덧셈 문제
+        final a = 5 + i;
+        final b = 3 + i;
+        correctAnswer = a + b;
+        question = '$a + $b = ?';
+      } else if (i % 3 == 1) {
+        // 뺄셈 문제
+        final a = 15 + i;
+        final b = 7 + i;
+        correctAnswer = a - b;
+        question = '$a - $b = ?';
+      } else {
+        // 곱셈 문제
+        final a = 3 + (i % 4);
+        final b = 2 + (i % 3);
+        correctAnswer = a * b;
+        question = '$a × $b = ?';
+      }
+
+      // 정답을 포함한 선택지 생성 (정답, 오답 3개)
+      final options = [
+        '$correctAnswer',  // 정답
+        '${correctAnswer + 1}',  // 오답 1
+        '${correctAnswer - 1}',  // 오답 2
+        '${correctAnswer + 2}',  // 오답 3
+      ];
+
       problems.add(Problem.legacy(
         id: 'basic_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
-        question: i % 3 == 0
-            ? '${5 + i} + ${3 + i} = ?'
-            : i % 3 == 1
-                ? '${15 + i} - ${7 + i} = ?'
-                : '${3 + (i % 4)} × ${2 + (i % 3)} = ?',
+        question: question,
         category: '기초산술',
         difficulty: 1 + (i % 3),
         tags: ['사칙연산'],
         xpReward: 10, // 연습 모드 XP 보상
-        options: _generateOptions(i),
+        options: options,
         correctAnswerIndex: 0,
-        correctAnswer: _calculateAnswer(i),
+        correctAnswer: '$correctAnswer',
         explanation: '사칙연산의 기본 규칙을 적용합니다.',
         hints: ['차근차근 계산해보세요'],
       ));
@@ -421,23 +449,31 @@ class MockDataService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     for (int i = 0; i < count; i++) {
+      // 정답 먼저 계산
+      final a = 3 + i;
+      final b = 10 + i;
+      final correctAnswer = b - a;  // x + a = b → x = b - a
+
+      // 정답을 포함한 선택지 생성
+      final options = [
+        '$correctAnswer',  // 정답
+        '${correctAnswer + 1}',  // 오답 1
+        '${correctAnswer - 1}',  // 오답 2
+        '${correctAnswer + 2}',  // 오답 3
+      ];
+
       problems.add(Problem.legacy(
         id: 'algebra_${timestamp}_$i',
         lessonId: 'practice',
         type: ProblemType.multipleChoice,
-        question: 'x + ${3 + i} = ${10 + i}일 때, x = ?',
+        question: 'x + $a = $b일 때, x = ?',
         category: '대수',
         difficulty: 2 + (i % 3),
         tags: ['일차방정식'],
         xpReward: 10,
-        options: [
-          '${7 + (i % 5)}',
-          '${6 + (i % 5)}',
-          '${8 + (i % 5)}',
-          '${9 + (i % 5)}',
-        ],
+        options: options,
         correctAnswerIndex: 0,
-        correctAnswer: '${7 + (i % 5)}',
+        correctAnswer: '$correctAnswer',
         explanation: '양변에서 상수항을 빼서 x의 값을 구합니다.',
         hints: ['등식의 성질을 이용하세요', '양변에서 같은 수를 빼세요'],
       ));

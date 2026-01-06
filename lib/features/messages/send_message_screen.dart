@@ -132,10 +132,10 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.mathBlue.withValues(alpha: 0.1),
+        color: AppColors.mathBlue.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.mathBlue.withValues(alpha: 0.3),
+          color: AppColors.mathBlue.withOpacity(0.3),
           width: 1,
         ),
       ),

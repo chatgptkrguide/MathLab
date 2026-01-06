@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../data/providers/auth/auth_provider.dart';
+import '../../data/services/temp_profile_storage.dart';
+import '../profile/onboarding_profile_setup_screen.dart';
+import 'email_login_screen.dart';
 
 /// 피그마 "00 홈1" 디자인 기반 로그인 화면
 /// 다크 퍼플 배경 + Chatbot 캐릭터 + 로그인 버튼들
@@ -58,33 +61,49 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
 
   Future<void> _handleGuestStart() async {
     if (_isLoading) return;
-    setState(() => _isLoading = true);
 
-    try {
-      final success = await ref.read(authProvider.notifier).signInAsGuest();
-      if (!mounted) return;
+    // 프로필 설정 화면으로 이동
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => const OnboardingProfileSetupScreen(),
+      ),
+    );
 
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      } else {
-        _showError('게스트 로그인에 실패했습니다');
-      }
-    } catch (e) {
-      if (mounted) _showError('로그인 실패: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    // 프로필 설정 완료 후 게스트로 시작
+    if (result == true && mounted) {
+      Navigator.of(context).pushReplacementNamed('/home');
     }
   }
 
   Future<void> _handleGoogleLogin() async {
     if (_isLoading) return;
-    setState(() => _isLoading = true);
 
     try {
-      final success = await ref.read(authProvider.notifier).signInWithGoogle();
+      // 1. 프로필 설정 화면으로 이동하여 정보 입력
+      final profileResult = await Navigator.of(context).push<TempProfileData>(
+        MaterialPageRoute(
+          builder: (context) => const OnboardingProfileSetupScreen(),
+        ),
+      );
+
+      if (profileResult == null || !mounted) return;
+
+      // 2. 프로필 정보를 임시 저장
+      final tempStorage = ref.read(tempProfileStorageProvider);
+      await tempStorage.saveTempProfile(profileResult);
+
+      setState(() => _isLoading = true);
+
+      // 3. 구글 로그인 실행 (프로필 정보 함께 전달)
+      final success = await ref.read(authProvider.notifier).signInWithGoogle(
+        tempProfile: profileResult,
+      );
+
       if (!mounted) return;
 
       if (success) {
+        // 4. 임시 프로필 정보 삭제
+        await tempStorage.clearTempProfile();
         Navigator.of(context).pushReplacementNamed('/home');
       } else {
         _showError('Google 로그인에 실패했습니다');
@@ -113,6 +132,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
       if (mounted) _showError('Kakao 로그인 실패: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleEmailLogin() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => const EmailLoginScreen(),
+      ),
+    );
+
+    if (result == true && mounted) {
+      Navigator.of(context).pushReplacementNamed('/home');
     }
   }
 
@@ -230,7 +261,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withValues(alpha: 0.2),
+                                    color: Colors.white.withOpacity(0.2),
                                   ),
                                 ),
                                 Padding(
@@ -238,7 +269,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                                   child: Text(
                                     '또는',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.6),
+                                      color: Colors.white.withOpacity(0.6),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -247,7 +278,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withValues(alpha: 0.2),
+                                    color: Colors.white.withOpacity(0.2),
                                   ),
                                 ),
                               ],
@@ -273,6 +304,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                               backgroundColor: AppColors.kakaoYellow,
                               textColor: AppColors.kakaoBrown,
                               onPressed: _handleKakaoLogin,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // Email 로그인
+                            _buildSocialButton(
+                              text: '이메일로 계속하기',
+                              icon: Icons.email,
+                              backgroundColor: const Color(0xFF2D2A4A),
+                              textColor: Colors.white,
+                              onPressed: _handleEmailLogin,
                             ),
                           ],
                         ),
@@ -334,7 +376,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity( 0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -382,7 +424,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: Colors.black.withOpacity( 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),

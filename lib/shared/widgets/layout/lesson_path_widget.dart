@@ -117,7 +117,7 @@ class LessonPathWidget extends StatelessWidget {
                     if (lesson.isLocked)
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.3),
+                          color: Colors.black.withOpacity(0.3),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(

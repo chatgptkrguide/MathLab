@@ -29,7 +29,7 @@ class UserProfileBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.textSecondary.withValues(alpha: 0.3),
+              color: AppColors.textSecondary.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -39,7 +39,7 @@ class UserProfileBottomSheet extends StatelessWidget {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -173,7 +173,7 @@ class _UserStatRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
+            color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 20),

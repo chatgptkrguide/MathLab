@@ -45,6 +45,9 @@ dependencies:
   flutter_secure_storage: ^9.0.0  # 보안 저장소 (iOS Keychain, Android KeyStore)
   encrypt: ^5.0.3  # AES 암호화
   crypto: ^3.0.3  # 해시 함수
+  hive: ^2.2.3  # NoSQL 로컬 데이터베이스
+  hive_flutter: ^1.1.0  # Hive Flutter 통합
+  sqflite: ^2.3.0  # SQLite 데이터베이스
 
   # HTTP 클라이언트
   dio: ^5.4.0
@@ -54,6 +57,8 @@ dependencies:
 
   # 애니메이션
   confetti: ^0.7.0
+  lottie: ^2.7.0  # Lottie 애니메이션
+  rive: ^0.12.4  # Rive 애니메이션
 
   # 성능 최적화
   cached_network_image: ^3.3.1  # 이미지 캐싱
@@ -63,7 +68,8 @@ dependencies:
   connectivity_plus: ^6.0.3  # 네트워크 상태 확인
 
   # 수학 렌더링 (LaTeX/TeX 지원)
-  # flutter_tex: ^4.0.9  # 주석 처리: 대신 LaTeX → Unicode 변환기 사용 (math_text.dart)
+  flutter_math_fork: ^0.7.2  # 수학 수식 렌더링
+  flutter_tex: ^4.0.9  # LaTeX/TeX 지원
 
   # Firebase
   firebase_core: ^3.10.0
@@ -77,6 +83,9 @@ dependencies:
   # 로컬 알림
   flutter_local_notifications: ^18.0.1
   timezone: ^0.9.4  # 알림 스케줄링용
+
+  # 백그라운드 작업
+  # workmanager: ^0.5.2  # 백그라운드 태스크 실행 - 일시적으로 비활성화 (호환성 문제)
 
   # 사운드 효과
   audioplayers: ^6.1.0
@@ -103,8 +112,9 @@ dependencies:
   # 이미지 선택
   image_picker: ^1.0.7
 
-  # 차트
+  # 차트 및 그래프
   fl_chart: ^0.69.2
+  syncfusion_flutter_charts: ^31.1.19  # 고급 차트 라이브러리
 
   # 인앱 구매 (Premium Subscription)
   in_app_purchase: ^3.1.13

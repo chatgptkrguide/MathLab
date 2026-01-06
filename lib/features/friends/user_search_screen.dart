@@ -159,7 +159,7 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
               });
             },
             backgroundColor: AppColors.surface,
-            selectedColor: AppColors.primary.withValues(alpha: 0.2),
+            selectedColor: AppColors.primary.withOpacity(0.2),
             checkmarkColor: AppColors.primary,
           ),
           const SizedBox(width: 8),
@@ -182,7 +182,7 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                     }
                   : null,
               backgroundColor: _selectedGrade != null
-                  ? AppColors.primary.withValues(alpha: 0.2)
+                  ? AppColors.primary.withOpacity(0.2)
                   : AppColors.surface,
             ),
             itemBuilder: (context) {
@@ -223,7 +223,7 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                     }
                   : null,
               backgroundColor: _minLevel != null || _maxLevel != null
-                  ? AppColors.primary.withValues(alpha: 0.2)
+                  ? AppColors.primary.withOpacity(0.2)
                   : AppColors.surface,
             ),
           ),
@@ -335,7 +335,7 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
             Icon(
               Icons.person_search,
               size: 64,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
+              color: AppColors.textSecondary.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -350,7 +350,7 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
               '다른 검색어나 필터를 시도해보세요',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary.withValues(alpha: 0.7),
+                color: AppColors.textSecondary.withOpacity(0.7),
               ),
             ),
           ],

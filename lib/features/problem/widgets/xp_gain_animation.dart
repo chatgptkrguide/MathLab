@@ -132,7 +132,7 @@ class _XPGainAnimationState extends State<XPGainAnimation>
             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             boxShadow: [
               BoxShadow(
-                color: AppColors.mathTeal.withValues(alpha: 0.4),
+                color: AppColors.mathTeal.withOpacity(0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -145,7 +145,7 @@ class _XPGainAnimationState extends State<XPGainAnimation>
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingS),
                 decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.3),
+                  color: AppColors.surface.withOpacity(0.3),
                   shape: BoxShape.circle,
                 ),
                 child: const Text(
@@ -169,7 +169,7 @@ class _XPGainAnimationState extends State<XPGainAnimation>
                   Text(
                     '경험치 획득!',
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.surface.withValues(alpha: 0.9),
+                      color: AppColors.surface.withOpacity(0.9),
                     ),
                   ),
                 ],

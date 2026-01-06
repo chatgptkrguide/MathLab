@@ -1,0 +1,126 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../shared/utils/storage_helper.dart';
+
+/// 임시 프로필 정보 저장 서비스
+///
+/// 로그인 전에 입력받은 프로필 정보를 임시로 저장하고,
+/// 로그인 후 실제 계정에 연동하는 기능을 제공합니다.
+class TempProfileStorage {
+  static const String _tempProfileKey = 'temp_profile_data';
+
+  final StorageHelper _storage = StorageHelper();
+
+  /// 임시 프로필 정보 저장
+  Future<void> saveTempProfile(TempProfileData data) async {
+    await _storage.setString(_tempProfileKey, data.toJson().toString());
+  }
+
+  /// 임시 프로필 정보 불러오기
+  Future<TempProfileData?> loadTempProfile() async {
+    final jsonString = await _storage.getString(_tempProfileKey);
+    if (jsonString == null || jsonString.isEmpty) {
+      return null;
+    }
+
+    try {
+      // JSON 문자열을 Map으로 파싱
+      final json = _parseJsonString(jsonString);
+      return TempProfileData.fromJson(json);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// 임시 프로필 정보 삭제
+  Future<void> clearTempProfile() async {
+    await _storage.remove(_tempProfileKey);
+  }
+
+  /// 임시 프로필이 존재하는지 확인
+  Future<bool> hasTempProfile() async {
+    return await _storage.containsKey(_tempProfileKey);
+  }
+
+  /// JSON 문자열을 Map으로 파싱하는 헬퍼 함수
+  Map<String, dynamic> _parseJsonString(String jsonString) {
+    // 간단한 JSON 파싱 (더 복잡한 경우 dart:convert 사용)
+    final map = <String, dynamic>{};
+
+    // {key: value, ...} 형태에서 각 항목 추출
+    final cleaned = jsonString.replaceAll(RegExp(r'[{}]'), '').trim();
+    if (cleaned.isEmpty) return map;
+
+    final pairs = cleaned.split(',');
+    for (final pair in pairs) {
+      final parts = pair.split(':');
+      if (parts.length == 2) {
+        final key = parts[0].trim().replaceAll('"', '').replaceAll("'", '');
+        final value = parts[1].trim().replaceAll('"', '').replaceAll("'", '');
+        map[key] = value;
+      }
+    }
+
+    return map;
+  }
+}
+
+/// 임시 프로필 데이터 모델
+class TempProfileData {
+  final String name;
+  final DateTime? birthDate;
+  final String? gender;
+  final String currentGrade;
+  final String? schoolName;
+  final String? bio;
+
+  const TempProfileData({
+    required this.name,
+    this.birthDate,
+    this.gender,
+    required this.currentGrade,
+    this.schoolName,
+    this.bio,
+  });
+
+  /// JSON으로 변환
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'birthDate': birthDate?.toIso8601String(),
+      'gender': gender,
+      'currentGrade': currentGrade,
+      'schoolName': schoolName,
+      'bio': bio,
+    };
+  }
+
+  /// JSON에서 생성
+  factory TempProfileData.fromJson(Map<String, dynamic> json) {
+    return TempProfileData(
+      name: json['name'] as String? ?? '',
+      birthDate: json['birthDate'] != null && json['birthDate'] != 'null'
+          ? DateTime.tryParse(json['birthDate'] as String)
+          : null,
+      gender: json['gender'] as String?,
+      currentGrade: json['currentGrade'] as String? ?? '중1',
+      schoolName: json['schoolName'] as String?,
+      bio: json['bio'] as String?,
+    );
+  }
+
+  /// 비어있는지 확인
+  bool get isEmpty => name.isEmpty;
+
+  /// 유효한 데이터인지 확인
+  bool get isValid => name.length >= 2;
+
+  @override
+  String toString() {
+    return 'TempProfileData{name: $name, birthDate: $birthDate, gender: $gender, grade: $currentGrade}';
+  }
+}
+
+/// Provider
+final tempProfileStorageProvider = Provider<TempProfileStorage>((ref) {
+  return TempProfileStorage();
+});

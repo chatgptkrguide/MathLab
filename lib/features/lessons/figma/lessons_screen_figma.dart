@@ -78,7 +78,7 @@ class LessonsScreenFigma extends ConsumerWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.headerText.withValues(alpha: 0.2),
+                              color: AppColors.headerText.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(

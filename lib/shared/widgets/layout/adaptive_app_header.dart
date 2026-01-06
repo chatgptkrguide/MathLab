@@ -85,7 +85,7 @@ class AdaptiveAppHeader extends ConsumerWidget {
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: (backgroundColor ?? AppColors.mathBlue).withValues(alpha: 0.3),
+                  color: (backgroundColor ?? AppColors.mathBlue).withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -166,7 +166,7 @@ class AdaptiveAppHeader extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.15),
+        color: AppColors.surface.withOpacity(0.15),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(

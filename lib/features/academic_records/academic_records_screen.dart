@@ -66,12 +66,12 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
+          colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -179,7 +179,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
-                : AppColors.textSecondary.withValues(alpha: 0.3),
+                : AppColors.textSecondary.withOpacity(0.3),
           ),
         ),
         child: Text(
@@ -206,7 +206,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
                 Icon(
                   Icons.assessment_outlined,
                   size: 64,
-                  color: AppColors.textSecondary.withValues(alpha: 0.5),
+                  color: AppColors.textSecondary.withOpacity(0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -221,7 +221,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
                   '+ 버튼을 눌러 성적을 추가해보세요',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    color: AppColors.textSecondary.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -268,7 +268,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -317,7 +317,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -396,7 +396,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 24),
@@ -505,7 +505,7 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.1),
+                            color: AppColors.success.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

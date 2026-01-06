@@ -26,6 +26,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
 
+  <!-- Google Sign-In Client ID -->
+  <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID_HERE">
+
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -35,10 +38,26 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>MathLab - 게이미피케이션 수학 학습 앱</title>
+  <title>GoMath</title>
   <link rel="manifest" href="manifest.json">
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = '{{flutter_service_worker_version}}';
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.load({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        }
+      });
+    });
+  </script>
 </body>
 </html>

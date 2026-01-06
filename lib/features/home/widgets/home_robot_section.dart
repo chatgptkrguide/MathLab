@@ -65,7 +65,7 @@ class HomeRobotSection extends StatelessWidget {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
               ),
               child: Center(
                 child: Image.asset(

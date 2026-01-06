@@ -177,7 +177,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.mathBlue.withValues(alpha: 0.3),
+            color: AppColors.mathBlue.withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -205,7 +205,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
               Container(
                 width: 1,
                 height: 60,
-                color: AppColors.headerText.withValues(alpha: 0.3),
+                color: AppColors.headerText.withOpacity(0.3),
               ),
               Expanded(
                 child: _buildSummaryItem(
@@ -217,7 +217,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
             ],
           ),
           const SizedBox(height: AppDimensions.spacingM),
-          Divider(color: AppColors.headerText.withValues(alpha: 0.3)),
+          Divider(color: AppColors.headerText.withOpacity(0.3)),
           const SizedBox(height: AppDimensions.spacingM),
           Row(
             children: [
@@ -231,7 +231,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
               Container(
                 width: 1,
                 height: 60,
-                color: AppColors.headerText.withValues(alpha: 0.3),
+                color: AppColors.headerText.withOpacity(0.3),
               ),
               Expanded(
                 child: _buildSummaryItem(
@@ -268,7 +268,7 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
         Text(
           label,
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.headerText.withValues(alpha: 0.8),
+            color: AppColors.headerText.withOpacity(0.8),
           ),
         ),
       ],

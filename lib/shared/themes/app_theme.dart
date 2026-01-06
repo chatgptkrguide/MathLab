@@ -94,7 +94,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.mathBlue,
-          backgroundColor: AppColors.surface.withValues(alpha: 0.1),
+          backgroundColor: AppColors.surface.withOpacity(0.1),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.paddingL,
             vertical: AppDimensions.paddingM,

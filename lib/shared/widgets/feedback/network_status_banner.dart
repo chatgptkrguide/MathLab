@@ -99,7 +99,7 @@ class NetworkStatusIndicator extends ConsumerWidget {
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: AppColors.warningOrange.withValues(alpha: 0.2),
+              color: AppColors.warningOrange.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: AppColors.warningOrange,

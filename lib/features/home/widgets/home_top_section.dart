@@ -46,7 +46,7 @@ class HomeTopSection extends StatelessWidget {
                   isGuest ? '게스트로 학습 중' : '$userName의 수학 학습',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withOpacity(0.8),
                   ),
                 ),
               ],

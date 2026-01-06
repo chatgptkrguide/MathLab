@@ -36,7 +36,7 @@ class StatCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.cardShadow.withValues(alpha: 0.08),
+              color: AppColors.cardShadow.withOpacity(0.08),
               blurRadius: AppDimensions.cardElevation * 3,
               offset: const Offset(0, AppDimensions.cardElevation),
             ),
