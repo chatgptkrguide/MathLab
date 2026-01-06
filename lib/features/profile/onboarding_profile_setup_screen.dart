@@ -66,12 +66,14 @@ class _OnboardingProfileSetupScreenState
   void _nextPage() {
     Logger.info('_nextPage called: current=$_currentPage, total=$_totalPages', tag: 'OnboardingProfileSetup');
     if (_currentPage < _totalPages - 1) {
+      // Haptic feedback for smooth transition
+      HapticFeedback.lightImpact();
       setState(() => _currentPage++);
       Logger.info('Moving to page $_currentPage', tag: 'OnboardingProfileSetup');
       _pageController.animateToPage(
         _currentPage,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
       );
     } else {
       Logger.info('Already at last page', tag: 'OnboardingProfileSetup');
@@ -80,11 +82,13 @@ class _OnboardingProfileSetupScreenState
 
   void _previousPage() {
     if (_currentPage > 0) {
+      // Haptic feedback for going back
+      HapticFeedback.lightImpact();
       setState(() => _currentPage--);
       _pageController.animateToPage(
         _currentPage,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
       );
     }
   }
@@ -172,6 +176,8 @@ class _OnboardingProfileSetupScreenState
   }
 
   Future<void> _saveProfile() async {
+    // Success haptic feedback
+    HapticFeedback.mediumImpact();
     setState(() => _isLoading = true);
 
     try {
@@ -191,11 +197,18 @@ class _OnboardingProfileSetupScreenState
 
       Logger.info('프로필 입력 완료: ${tempProfileData.name}', tag: 'OnboardingProfileSetupScreen');
 
+      // Short delay for better UX (show loading state)
+      await Future.delayed(const Duration(milliseconds: 500));
+
       if (mounted) {
+        // Success haptic feedback before closing
+        HapticFeedback.heavyImpact();
         // TempProfileData를 반환하고 화면 닫기
         Navigator.of(context).pop(tempProfileData);
       }
     } catch (e) {
+      // Error haptic feedback
+      HapticFeedback.vibrate();
       Logger.error('프로필 저장 실패', error: e, tag: 'OnboardingProfileSetupScreen');
 
       if (mounted) {

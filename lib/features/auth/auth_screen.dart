@@ -82,12 +82,31 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
       if (success) {
         // 3. 프로필 정보를 게스트 계정에 적용
         await ref.read(authProvider.notifier).applyTempProfileToAccount(profileResult);
+
+        // Success feedback
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Text('${profileResult.name}님, 환영합니다! 🎉'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF58CC02),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+
         Navigator.of(context).pushReplacementNamed('/home');
       } else {
-        _showError('게스트 로그인에 실패했습니다');
+        _showError('게스트 계정 생성에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (e) {
-      if (mounted) _showError('게스트 시작 실패: $e');
+      if (mounted) _showError('예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -122,12 +141,31 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
       if (success) {
         // 4. 임시 프로필 정보 삭제
         await tempStorage.clearTempProfile();
+
+        // Success feedback
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Text('${profileResult.name}님, 환영합니다! 🎉'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF58CC02),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+
         Navigator.of(context).pushReplacementNamed('/home');
       } else {
-        _showError('Google 로그인에 실패했습니다');
+        _showError('Google 로그인에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (e) {
-      if (mounted) _showError('Google 로그인 실패: $e');
+      if (mounted) _showError('Google 로그인 중 문제가 발생했습니다. 네트워크를 확인해주세요.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
