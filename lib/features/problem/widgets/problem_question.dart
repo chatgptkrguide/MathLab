@@ -51,8 +51,8 @@ class ProblemQuestion extends StatelessWidget {
   Widget _buildCategoryBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 10,
+        horizontal: 18,
+        vertical: 14,
       ),
       decoration: BoxDecoration(
         color: AppColors.mathBlue, // GoMath 파란색
@@ -139,7 +139,7 @@ class ProblemQuestion extends StatelessWidget {
           fontWeight: FontWeight.bold,
           height: 1.4,
         ),
-        fontSize: 20,
+        fontSize: 24,
       ),
     );
   }

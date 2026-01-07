@@ -87,12 +87,31 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   @override
   void initState() {
     super.initState();
+
+    // 문제 리스트가 비어있으면 초기화 중단
+    if (widget.problems.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('문제 데이터를 불러올 수 없습니다.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      });
+      return;
+    }
+
     _setupAnimations();
     _stopwatch.start(); // 타이머 시작
 
     // 첫 문제의 힌트 시스템 초기화
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(hintProviderOptimized.notifier).startProblem(_currentProblem.id);
+      if (widget.problems.isNotEmpty) {
+        ref.read(hintProviderOptimized.notifier).startProblem(_currentProblem.id);
+      }
     });
   }
 
@@ -143,8 +162,17 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     super.dispose();
   }
 
-  Problem get _currentProblem => widget.problems[_currentProblemIndex];
-  double get _progress => (_currentProblemIndex + 1) / widget.problems.length;
+  Problem get _currentProblem {
+    if (widget.problems.isEmpty || _currentProblemIndex >= widget.problems.length) {
+      throw StateError('No problems available or index out of range');
+    }
+    return widget.problems[_currentProblemIndex];
+  }
+
+  double get _progress {
+    if (widget.problems.isEmpty) return 0.0;
+    return (_currentProblemIndex + 1) / widget.problems.length;
+  }
 
   @override
   Widget build(BuildContext context) {

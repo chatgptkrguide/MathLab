@@ -138,15 +138,10 @@ class CustomBottomNavigation extends StatelessWidget {
 
     // 일반 네비게이션 아이템 (플렉서블 디자인으로 오버플로우 방지)
     return Expanded(
-      child: Semantics(
-        button: true,
-        selected: isSelected,
-        label: '$label${isSelected ? ' 선택됨' : ''}',
+      child: GestureDetector(
         onTap: () => onTap(index),
-        child: GestureDetector(
-          onTap: () => onTap(index),
-          behavior: HitTestBehavior.opaque,
-          child: Container(
+        behavior: HitTestBehavior.opaque,
+        child: Container(
             constraints: const BoxConstraints(minHeight: 40, minWidth: 40),
             padding: const EdgeInsets.symmetric(
               horizontal: 1.0,
@@ -174,7 +169,7 @@ class CustomBottomNavigation extends StatelessWidget {
                     color: isSelected
                         ? AppColors.mathButtonBlue
                         : AppColors.textSecondary.withOpacity(0.6),
-                    size: isSelected ? 24 : 22,
+                    size: isSelected ? 26 : 24, // 24→26, 22→24 (UX 개선: 더 잘 보이도록)
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -187,7 +182,7 @@ class CustomBottomNavigation extends StatelessWidget {
                           : AppColors.textSecondary.withOpacity(0.7),
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.w500,
-                      fontSize: isSelected ? 10 : 9,
+                      fontSize: isSelected ? 11 : 10, // 10→11, 9→10 (UX 개선: 가독성 향상)
                       height: 1.0,
                     ),
                     overflow: TextOverflow.ellipsis,

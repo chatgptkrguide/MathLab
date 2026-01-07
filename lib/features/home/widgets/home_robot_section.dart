@@ -44,52 +44,64 @@ class HomeRobotSection extends StatelessWidget {
           ),
         );
       },
-      child: SizedBox(
-        width: 300,
-        height: 300,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Figma 원형 진행률 링
-            const CircularProgressRing(
-              progress: 0.8,
-              centerText: '80%',
-              subtitle: '완료',
-              size: 280,
-              strokeWidth: 16,
-            ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // 화면 크기에 따라 동적으로 크기 조절
+          final screenWidth = MediaQuery.of(context).size.width;
+          final maxWidth = screenWidth * 0.8; // 화면의 80%
+          final containerSize = maxWidth > 300 ? 300.0 : maxWidth;
+          final ringSize = containerSize * 0.93; // 280/300
+          final characterContainerSize = containerSize * 0.67; // 200/300
+          final characterSize = containerSize * 0.6; // 180/300
 
-            // 로봇 캐릭터 (중앙에 오버레이)
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.2),
-              ),
-              child: Center(
-                child: Image.asset(
-                  'assets/icons/robot_character.png',
-                  width: 180,
-                  height: 180,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/icons/character_design.png',
-                      width: 180,
-                      height: 180,
+          return SizedBox(
+            width: containerSize,
+            height: containerSize,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Figma 원형 진행률 링
+                CircularProgressRing(
+                  progress: 0.8,
+                  centerText: '80%',
+                  subtitle: '완료',
+                  size: ringSize,
+                  strokeWidth: 16,
+                ),
+
+                // 로봇 캐릭터 (중앙에 오버레이)
+                Container(
+                  width: characterContainerSize,
+                  height: characterContainerSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.2),
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/icons/robot_character.png',
+                      width: characterSize,
+                      height: characterSize,
                       errorBuilder: (context, error, stackTrace) {
-                        return const Text(
-                          '🤖',
-                          style: TextStyle(fontSize: 100),
+                        return Image.asset(
+                          'assets/icons/character_design.png',
+                          width: characterSize,
+                          height: characterSize,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Text(
+                              '🤖',
+                              style: TextStyle(fontSize: containerSize * 0.33),
+                            );
+                          },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

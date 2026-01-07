@@ -1,0 +1,318 @@
+Launching lib/main.dart on SM S921N in debug mode...
+Running Gradle task 'assembleDebug'...                          
+⚠️  Warning: key.properties not found. Using debug signing.
+⚠️  For production release, create key.properties file.
+Running Gradle task 'assembleDebug'...                             23.5s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          29.8s
+I/flutter (17593): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(61)] Using the Impeller rendering backend (Vulkan).
+I/flutter (17593): [INFO] [Main] Firebase initialized successfully
+I/flutter (17593): [INFO] [Main] Timezone initialized
+I/flutter (17593): [INFO] [EncryptionService] 암호화 서비스 초기화 완료
+I/flutter (17593): [INFO] [SocialAuth] Google 로그인 초기화 완료
+I/flutter (17593): [INFO] [UserProvider] 사용자 정보 로드 시작 (키: user)
+I/flutter (17593): [DEBUG] [UserRepository] Getting user from local storage: user (로컬 전용)
+I/flutter (17593): [DEBUG] [UserRepository] Local-only mode: returning null (no data)
+Syncing files to device SM S921N...                             
+I/flutter (17593): [INFO] [AuthProvider] Google 로그인 초기화 완료
+I/flutter (17593): [INFO] [SocialAuth] Kakao 로그인 초기화 완료
+I/flutter (17593): [DEBUG] [UserRepository] Saving user to local storage: user_user001 (로컬 전용)
+I/flutter (17593): [INFO] [UserRepository] User saved locally: user_user001
+I/flutter (17593): [INFO] [AuthProvider] Kakao 로그인 초기화 완료
+I/flutter (17593): [INFO] [AuthProvider] 소셜 로그인 초기화 시도 완료
+I/flutter (17593): [INFO] [UserProvider] 사용자 정보 저장 완료 (키: user_user001)
+I/flutter (17593): [INFO] [UserProvider] 새 사용자 생성: 학습자 (키: user)
+I/Choreographer(17593): Skipped 35 frames!  The application may be doing too much work on its main thread.
+I/BLASTBufferQueue(17593): [a21a8f8 SurfaceView[com.gomath.mathlab/com.gomath.mathlab.MainActivity]@0#1](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/flutter (17593): [DEBUG] [Storage] Loaded 1 items for key: userAccounts
+I/flutter (17593): [DEBUG] [AuthProvider] 계정 1개 로드 완료
+I/flutter (17593): [INFO] [AuthProvider] 기존 계정 로그인: 테스터
+I/flutter (17593): [DEBUG] [AuthProvider] 마이그레이션 이미 완료됨
+D/SurfaceView(17593): 169978104 setAlpha: alpha=1.0
+I/SurfaceView(17593): 169978104 Changes: creating=false format=false size=false visible=false alpha=true hint=false left=false top=false z=false attached=true lifecycleStrategy=false
+I/SurfaceView(17593): 169978104 Cur surface: Surface(name=null mNativeObject=-5476376672306563808)/@0xa2fdbd0
+D/SurfaceComposerClient(17593): setCornerRadius ## a21a8f8 SurfaceView[com.gomath.mathlab/com.gomath.mathlab.MainActivity]@0#44638 cornerRadius=0.000000
+I/SV[169978104 MainActivity](17593): updateSurface: mVisible = true mSurface.isValid() = true
+I/SV[169978104 MainActivity](17593): updateSurface: mSurfaceCreated = true surfaceChanged = false visibleChanged = false
+I/SurfaceView(17593): 169978104 surfaceRedrawNeeded
+I/SurfaceView(17593): 169978104 finishedDrawing
+V/SurfaceView(17593): Layout: x=0 y=0 w=1080 h=2340, frame=Rect(0, 0 - 1080, 2340)
+I/flutter (17593): [INFO] [AuthWrapper] 프로필 미완성, 프로필 설정 화면으로 이동
+I/flutter (17593): [DEBUG] [UserRepository] Getting user from local storage: user_user_1767771525052_752 (로컬 전용)
+I/flutter (17593): [DEBUG] [UserRepository] Local-only mode: returning null (no data)
+I/flutter (17593): [INFO] [UserProvider] UserAccount 프로필 정보 적용: 테스터 (프로필 완성: true, 학년: 중1)
+I/flutter (17593): [DEBUG] [UserRepository] Saving user to local storage: user_user_1767771525052_752 (로컬 전용)
+I/flutter (17593): [INFO] [UserRepository] User saved locally: user_user_1767771525052_752
+I/flutter (17593): [INFO] [UserProvider] 사용자 정보 저장 완료 (키: user_user_1767771525052_752)
+I/flutter (17593): [INFO] [UserProvider] 새 계정 생성 (로컬): user_1767771525052_752 (키: user_user_1767771525052_752)
+I/flutter (17593): [INFO] [AuthWrapper] 사용자 정보 로드 완료: user_1767771525052_752
+I/flutter (17593): [INFO] [AuthWrapper] 로컬 전용 모드로 실행 중 (Firebase 동기화 비활성화)
+I/BLASTBufferQueue_Java(17593): update, w= 1080 h= 2340 mName = VRI[MainActivity]@a994779 mNativeObject= 0xb400006eaefa1f50 sc.mNativeObject= 0xb400006e4eeced50 format= -3 caller= android.view.ViewRootImpl.updateBlastSurfaceIfNeeded:3574 android.view.ViewRootImpl.relayoutWindow:11685 android.view.ViewRootImpl.performTraversals:4804 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 
+I/VRI[MainActivity]@a994779(17593): Relayout returned: old=(0,0,1080,2340) new=(0,0,1080,2340) relayoutAsync=false req=(1080,2340)0 dur=2 res=0x1 s={true 0xb400006e7eee6eb0} ch=false seqId=0
+I/VRI[MainActivity]@a994779(17593): updateBoundsLayer: t=android.view.SurfaceControl$Transaction@e4a4753 sc=Surface(name=Bounds for - com.gomath.mathlab/com.gomath.mathlab.MainActivity@0)/@0x48dd890 frame=1
+D/VRI[MainActivity]@a994779(17593): reportNextDraw android.view.ViewRootImpl.performTraversals:5443 android.view.ViewRootImpl.doTraversal:3924 android.view.ViewRootImpl$TraversalRunnable.run:12903 android.view.Choreographer$CallbackRecord.run:1901 android.view.Choreographer$CallbackRecord.run:1910 
+D/VRI[MainActivity]@a994779(17593): Setup new sync=wmsSync-VRI[MainActivity]@a994779#2
+I/VRI[MainActivity]@a994779(17593): Creating new active sync group VRI[MainActivity]@a994779#3
+D/VRI[MainActivity]@a994779(17593): Draw frame after cancel
+D/VRI[MainActivity]@a994779(17593): registerCallbacksForSync syncBuffer=false
+D/SurfaceView(17593): 169978104 updateSurfacePosition RenderWorker, frameNr = 1, position = [0, 0, 1080, 2340] surfaceSize = 1080x2340
+I/SV[169978104 MainActivity](17593): uSP: rtp = Rect(0, 0 - 1080, 2340) rtsw = 1080 rtsh = 2340
+I/SV[169978104 MainActivity](17593): onSSPAndSRT: pl = 0 pt = 0 sx = 1.0 sy = 1.0
+I/SV[169978104 MainActivity](17593): aOrMT: VRI[MainActivity]@a994779 t = android.view.SurfaceControl$Transaction@59fedbc fN = 1 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 android.graphics.RenderNode$CompositePositionUpdateListener.positionChanged:401 
+I/VRI[MainActivity]@a994779(17593): mWNT: t=0xb400006f7eefdf90 mBlastBufferQueue=0xb400006eaefa1f50 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.SurfaceView.applyOrMergeTransaction:1863 android.view.SurfaceView.-$$Nest$mapplyOrMergeTransaction:0 android.view.SurfaceView$SurfaceViewPositionUpdateListener.positionChanged:1932 
+D/VRI[MainActivity]@a994779(17593): Received frameDrawingCallback syncResult=0 frameNum=1.
+I/VRI[MainActivity]@a994779(17593): mWNT: t=0xb400006f7ef0b510 mBlastBufferQueue=0xb400006eaefa1f50 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$12.onFrameDraw:15441 android.view.ThreadedRenderer$1.onFrameDraw:718 <bottom of call stack> 
+I/VRI[MainActivity]@a994779(17593): Setting up sync and frameCommitCallback
+I/BLASTBufferQueue(17593): [VRI[MainActivity]@a994779#0](f:0,a:0,s:0) onFrameAvailable the first frame is available
+I/VRI[MainActivity]@a994779(17593): Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true
+D/HWUI    (17593): CFMS:: SetUp Pid : 17593    Tid : 17631
+D/VRI[MainActivity]@a994779(17593): reportDrawFinished seqId=0
+I/flutter (17593): [INFO] [LeagueProvider] LeagueNotifier 초기화 (Firestore 연동)
+I/flutter (17593): [INFO] [LeagueProvider] 리그 데이터 로드 시작 (Firestore 연동)
+I/flutter (17593): [DEBUG] [Storage] No data found for key: wrong_answers_user_1767771525052_752
+I/flutter (17593): [DEBUG] [WrongAnswerRepository] 로컬에 오답 목록 없음: user_1767771525052_752
+I/flutter (17593): [INFO] [FirestoreService] Firestore에서 오답 목록 조회: user_1767771525052_752
+I/flutter (17593): [INFO] [MessageProvider] 초기 메시지 생성 완료
+I/flutter (17593): [DEBUG] [Storage] No data found for key: league_user_1767771525052_752
+I/flutter (17593): [DEBUG] [LeagueRepository] 로컬에 리그 데이터 없음: league_user_1767771525052_752
+I/flutter (17593): [INFO] [NotificationService] User granted permission: AuthorizationStatus.authorized
+I/flutter (17593): [INFO] [MessageProvider] 리스트 데이터 저장 완료: messages_user_1767771525052_752 (2개 항목)
+I/flutter (17593): [DEBUG] [MessageProvider] 메시지 저장 완료
+Syncing files to device SM S921N...                                325ms
+
+Flutter run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on SM S921N is available at: http://127.0.0.1:60296/MYnP19Gyk0E=/
+The Flutter DevTools debugger and profiler on SM S921N is available at: http://127.0.0.1:9100?uri=http://127.0.0.1:60296/MYnP19Gyk0E=/
+I/InputMethodManager_LC(17593): showSoftInput(View,I)
+I/ImeTracker(17593): com.gomath.mathlab:15d73964: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false
+I/InputMethodManager_LC(17593): ssi(): flags=0 view=com.gomath.mathlab reason=SHOW_SOFT_INPUT
+I/InputMethodManager_LC(17593): ssi() view is not EditText
+I/ImeTracker(17593): com.gomath.mathlab:15d73964: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager(17593): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{65085c0 VFE...... .F....ID 0,0-1080,2340 #1} is not served.
+W/InputMethodManager_LC(17593): ssi(): Ignoring showSoftInput() servedView=null mDisplayId=0 view=io.flutter.embedding.android.FlutterView{65085c0 VFE...... .F....ID 0,0-1080,2340 #1},focus=true,windowFocus=false,window=android.view.ViewRootImpl$W@a994779,displayId=0,temporaryDetach=false,hasImeFocus=false
+I/InputMethodManager_LC(17593): showSoftInput(View,I)
+I/ImeTracker(17593): com.gomath.mathlab:6c7f703d: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false
+I/InputMethodManager_LC(17593): ssi(): flags=0 view=com.gomath.mathlab reason=SHOW_SOFT_INPUT
+I/InputMethodManager_LC(17593): ssi() view is not EditText
+I/ImeTracker(17593): com.gomath.mathlab:6c7f703d: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager(17593): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{65085c0 VFE...... .F....ID 0,0-1080,2340 #1} is not served.
+W/InputMethodManager_LC(17593): ssi(): Ignoring showSoftInput() servedView=null mDisplayId=0 view=io.flutter.embedding.android.FlutterView{65085c0 VFE...... .F....ID 0,0-1080,2340 #1},focus=true,windowFocus=false,window=android.view.ViewRootImpl$W@a994779,displayId=0,temporaryDetach=false,hasImeFocus=false
+I/ImeTracker(17593): com.gomath.mathlab:e35a62eb: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT fromUser false
+I/InputMethodManager_LC(17593): hsifw() - flag : 0
+I/ImeTracker(17593): com.gomath.mathlab:e35a62eb: onFailed at PHASE_CLIENT_VIEW_SERVED
+I/InputMethodManager(17593): hsifw() ignored windowToken=android.view.ViewRootImpl$W@a994779 servedView=null mDisplayId=0
+D/VRI[MainActivity]@a994779(17593): mThreadedRenderer.initializeIfNeeded()#2 mSurface={isValid=true 0xb400006e7eee6eb0}
+D/InputMethodManagerUtils(17593): startInputInner - Id : 0
+I/InputMethodManager(17593): startInputInner - IInputMethodManagerGlobalInvoker.startInputOrWindowGainedFocus
+I/InputMethodManager(17593): handleMessage: setImeVisibility visible=false
+D/InsetsController(17593): hide(ime(), fromIme=false)
+I/ImeTracker(17593): com.gomath.mathlab:dce41ca6: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/InputTransport(17593): Input channel constructed: 'ClientS', fd=218
+I/flutter (17593): [INFO] [NotificationService] FCM Token: e7UMbrriSYKzWAFEEMhBgB:APA91bEfDQmL4Li7LVA8HNWF0KPeEcqyys-bKQ06qDO8rsvkcGEHGApMFXLaJ8aI9J0UOBqLggGuZS-hdgefMpbexJHDRZY1FpORerWi2oqHhuYm7FNSIdg
+I/flutter (17593): [INFO] [NotificationService] Local notifications initialized
+I/flutter (17593): [INFO] [NotificationService] NotificationService initialized
+I/flutter (17593): [INFO] [Main] NotificationService initialized successfully
+W/DynamiteModule(17593): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
+D/ConnectivityManager(17593): StackLog: [android.net.ConnectivityManager.sendRequestForNetwork(ConnectivityManager.java:4736)] [android.net.ConnectivityManager.registerDefaultNetworkCallbackForUid(ConnectivityManager.java:5461)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5428)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5402)] [com.google.firebase.firestore.remote.AndroidConnectivityMonitor.configureNetworkMonitoring(AndroidConnectivityMonitor.java:87)] [com.google.firebase.firestore.remote.AndroidConnectivityMonitor.<init>(AndroidConnectivityMonitor.java:64)] [com.google.firebase.firestore.remote.RemoteComponenetProvider.createConnectivityMonitor(RemoteComponenetProvider.java:94)] [com.google.firebase.firestore.remote.RemoteComponenetProvider.initialize(RemoteComponenetProvider.java:41)] [com.google.firebase.firestore.core.ComponentProvider.initialize(ComponentProvider.java:158)] [com.google.firebase.firestore.core.FirestoreClient.initialize(FirestoreClient.java:284)] [com.google.firebase.firestore.core.FirestoreClient.lambda$new$0$com-google-firebase-firestore-core-FirestoreClient(FirestoreClient.java:109)] [com.google.firebase.firestore.core.FirestoreClient$$ExternalSyntheticLambda10.run(D8$$SyntheticClass:0)] [com.google.firebase.firestore.util.AsyncQueue.lambda$enqueue$2(AsyncQueue.java:445)] [com.google.firebase.firestore.util.AsyncQueue$$ExternalSyntheticLambda4.call(D8$$SyntheticClass:0)] [com.google.firebase.firestore.util.AsyncQueue$SynchronizedShutdownAwareExecutor.lambda$executeAndReportResult$1(AsyncQueue.java:330)] [com.google.firebase.firestore.util.AsyncQueue$SynchronizedShutdownAwareExecutor$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)] [java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)] [java.util.concurrent.FutureTask.run(FutureTask.java:317)] [java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:348)] [java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)] [java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)] [com.google.firebase.firestore.util.AsyncQueue$SynchronizedShutdownAwareExecutor$DelayedStartFactory.run(AsyncQueue.java:235)] [java.lang.Thread.run(Thread.java:1119)]
+I/DynamiteModule(17593): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
+W/ProviderInstaller(17593): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
+D/ApplicationLoaders(17593): Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+D/ApplicationLoaders(17593): Returning zygote-cached class loader: /system/framework/com.android.media.remotedisplay.jar
+D/ApplicationLoaders(17593): Returning zygote-cached class loader: /system/framework/com.android.location.provider.jar
+I/flutter (17593): [INFO] [SoundService] SoundService initialized
+D/nativeloader(17593): Configuring clns-11 for other apk /system/system_ext/framework/org.carconnectivity.android.digitalkey.rangingintent.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/lib/arm64:/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(17593): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libface_recognition.arcsoft.so:libpic_best.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libdigital_tele_scope.arcsoft.so:libdigital_tele_scope_rawsr.arcsoft.so:libsf_tetra_enhance.arcsoft.so:libmf_bayer_enhance.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libmultisourceseparator.audio.samsung.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libaifrcInterface.camera.samsung.so:libBestPhoto.camera.samsung.so:libC2paDps.camera.samsung.so:libVide
+D/nativeloader(17593): Configuring clns-12 for other apk /system/system_ext/framework/org.carconnectivity.android.digitalkey.secureelement.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/lib/arm64:/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(17593): Extending system_exposed_libraries: libhumantracking.arcsoft.so:libface_recognition.arcsoft.so:libpic_best.arcsoft.so:libPortraitDistortionCorrection.arcsoft.so:libPortraitDistortionCorrectionCali.arcsoft.so:libface_landmark.arcsoft.so:libFacialStickerEngine.arcsoft.so:libfrtracking_engine.arcsoft.so:libFaceRecognition.arcsoft.so:libveengine.arcsoft.so:lib_pet_detection.arcsoft.so:libae_bracket_hdr.arcsoft.so:libdigital_tele_scope.arcsoft.so:libdigital_tele_scope_rawsr.arcsoft.so:libsf_tetra_enhance.arcsoft.so:libmf_bayer_enhance.arcsoft.so:libhybrid_high_dynamic_range.arcsoft.so:libimage_enhancement.arcsoft.so:libFacialAttributeDetection.arcsoft.so:libobjectcapture_jni.arcsoft.so:libobjectcapture.arcsoft.so:libmultisourceseparator.audio.samsung.so:libaudiomirroring_jni.audiomirroring.samsung.so:libBeauty_v4.camera.samsung.so:libexifa.camera.samsung.so:libjpega.camera.samsung.so:libOpenCv.camera.samsung.so:libaifrcInterface.camera.samsung.so:libBestPhoto.camera.samsung.so:libC2paDps.camera.samsung.so:libVide
+D/ApplicationLoaders(17593): Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+D/ApplicationLoaders(17593): Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+I/flutter (17593): [INFO] [Main] SoundService initialized successfully
+W/.gomath.mathlab(17593): Loading /data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/oat/arm64/base.odex non-executable as it requires an image which we failed to load
+D/nativeloader(17593): Configuring clns-13 for other apk /data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/lib/arm64:/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+E/GoogleApiManager(17593): Failed to get service from broker. 
+E/GoogleApiManager(17593): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(17593): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3354)
+E/GoogleApiManager(17593): 	at android.os.Parcel.createException(Parcel.java:3338)
+E/GoogleApiManager(17593): 	at android.os.Parcel.readException(Parcel.java:3321)
+E/GoogleApiManager(17593): 	at android.os.Parcel.readException(Parcel.java:3263)
+E/GoogleApiManager(17593): 	at bddz.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):36)
+E/GoogleApiManager(17593): 	at bdca.z(:com.google.android.gms@254932035@25.49.32 (260400-843446962):143)
+E/GoogleApiManager(17593): 	at bcid.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):42)
+E/GoogleApiManager(17593): 	at android.os.Handler.handleCallback(Handler.java:995)
+E/GoogleApiManager(17593): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+E/GoogleApiManager(17593): 	at cqne.mv(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+E/GoogleApiManager(17593): 	at cqne.dispatchMessage(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+E/GoogleApiManager(17593): 	at android.os.Looper.loopOnce(Looper.java:273)
+E/GoogleApiManager(17593): 	at android.os.Looper.loop(Looper.java:363)
+E/GoogleApiManager(17593): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/GoogleApiManager(17593): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(17593): Failed to register com.google.android.gms.providerinstaller#com.gomath.mathlab
+W/FlagRegistrar(17593): fvxl: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(17593): 	at fvxn.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):13)
+W/FlagRegistrar(17593): 	at gtqr.d(:com.google.android.gms@254932035@25.49.32 (260400-843446962):3)
+W/FlagRegistrar(17593): 	at gtqt.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):130)
+W/FlagRegistrar(17593): 	at gtta.execute(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(17593): 	at gtrb.f(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(17593): 	at gtrb.m(:com.google.android.gms@254932035@25.49.32 (260400-843446962):99)
+W/FlagRegistrar(17593): 	at gtrb.r(:com.google.android.gms@254932035@25.49.32 (260400-843446962):17)
+W/FlagRegistrar(17593): 	at fopg.hz(:com.google.android.gms@254932035@25.49.32 (260400-843446962):35)
+W/FlagRegistrar(17593): 	at fcbp.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):12)
+W/FlagRegistrar(17593): 	at gtta.execute(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(17593): 	at fcbq.b(:com.google.android.gms@254932035@25.49.32 (260400-843446962):18)
+W/FlagRegistrar(17593): 	at fccf.b(:com.google.android.gms@254932035@25.49.32 (260400-843446962):34)
+W/FlagRegistrar(17593): 	at fcch.d(:com.google.android.gms@254932035@25.49.32 (260400-843446962):25)
+W/FlagRegistrar(17593): 	at bcfm.c(:com.google.android.gms@254932035@25.49.32 (260400-843446962):9)
+W/FlagRegistrar(17593): 	at bcib.q(:com.google.android.gms@254932035@25.49.32 (260400-843446962):48)
+W/FlagRegistrar(17593): 	at bcib.d(:com.google.android.gms@254932035@25.49.32 (260400-843446962):10)
+W/FlagRegistrar(17593): 	at bcib.g(:com.google.android.gms@254932035@25.49.32 (260400-843446962):191)
+W/FlagRegistrar(17593): 	at bcib.onConnectionFailed(:com.google.android.gms@254932035@25.49.32 (260400-843446962):2)
+W/FlagRegistrar(17593): 	at bcid.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):70)
+W/FlagRegistrar(17593): 	at android.os.Handler.handleCallback(Handler.java:995)
+W/FlagRegistrar(17593): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+W/FlagRegistrar(17593): 	at cqne.mv(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(17593): 	at cqne.dispatchMessage(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+W/FlagRegistrar(17593): 	at android.os.Looper.loopOnce(Looper.java:273)
+W/FlagRegistrar(17593): 	at android.os.Looper.loop(Looper.java:363)
+W/FlagRegistrar(17593): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/FlagRegistrar(17593): Caused by: bcdt: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(17593): 	at bdbm.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):15)
+W/FlagRegistrar(17593): 	at bcfp.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+W/FlagRegistrar(17593): 	at bcfm.c(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+W/FlagRegistrar(17593): 	... 12 more
+D/nativeloader(17593): Load /data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/base.apk!/lib/arm64-v8a/libconscrypt_gmscore_jni.so using class loader ns clns-13 (caller=/data/app/~~QPRRMtb9jc4-PIC0B5Ccwg==/com.google.android.gms-G-IwvrX0YFTntqau9vmZeQ==/base.apk): ok
+V/NativeCrypto(17593): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 329 native methods...
+I/.gomath.mathlab(17593): hiddenapi: Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app) using reflection: allowed
+I/ProviderInstaller(17593): Installed default security provider GmsCore_OpenSSL
+D/ConnectivityManager(17593): StackLog: [android.net.ConnectivityManager.sendRequestForNetwork(ConnectivityManager.java:4736)] [android.net.ConnectivityManager.registerDefaultNetworkCallbackForUid(ConnectivityManager.java:5461)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5428)] [android.net.ConnectivityManager.registerDefaultNetworkCallback(ConnectivityManager.java:5402)] [io.grpc.android.AndroidChannelBuilder$AndroidChannel.configureNetworkMonitoring(AndroidChannelBuilder.java:217)] [io.grpc.android.AndroidChannelBuilder$AndroidChannel.<init>(AndroidChannelBuilder.java:198)] [io.grpc.android.AndroidChannelBuilder.build(AndroidChannelBuilder.java:169)] [com.google.firebase.firestore.remote.GrpcCallProvider.initChannel(GrpcCallProvider.java:116)] [com.google.firebase.firestore.remote.GrpcCallProvider.lambda$initChannelTask$6$com-google-firebase-firestore-remote-GrpcCallProvider(GrpcCallProvider.java:242)] [com.google.firebase.firestore.remote.GrpcCallProvider$$ExternalSyntheticLambda4.call(D8$$SyntheticClass:0)] [com.google.android.gms.tasks.zzz.run(com.google.android.gms:play-services-tasks@@18.1.0:1)] [com.google.firebase.firestore.util.ThrottledForwardingExecutor.lambda$execute$0$com-google-firebase-firestore-util-ThrottledForwardingExecutor(ThrottledForwardingExecutor.java:54)] [com.google.firebase.firestore.util.ThrottledForwardingExecutor$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)] [java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)] [java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)] [java.lang.Thread.run(Thread.java:1119)]
+I/.gomath.mathlab(17593): hiddenapi: Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app) using reflection: allowed
+I/.gomath.mathlab(17593): hiddenapi: Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app) using reflection: allowed
+W/Firestore(17593): (25.1.4) [Firestore]: Listen for Query(target=Query(users/user_1767771525052_752/wrongAnswers order by -timestamp, -__name__);limitType=LIMIT_TO_FIRST) failed: Status{code=PERMISSION_DENIED, description=Missing or insufficient permissions., cause=null}
+W/Firestore(17593): (25.1.4) [Firestore]: Listen for Query(target=Query(leagues where weekStartDate==time(1767538800,0) and weekEndDate==time(1768143600,0) order by __name__);limitType=LIMIT_TO_FIRST) failed: Status{code=PERMISSION_DENIED, description=Missing or insufficient permissions., cause=null}
+I/flutter (17593): [ERROR] [FirestoreService] 오답 목록 조회 실패
+I/flutter (17593): [ERROR] Error: [cloud_firestore/permission-denied] The caller does not have permission to execute the specified operation.
+I/flutter (17593): [ERROR] StackTrace: #0      FirebaseFirestoreHostApi.queryGet (package:cloud_firestore_platform_interface/src/pigeon/messages.pigeon.dart:1153:7)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #1      MethodChannelQuery.get (package:cloud_firestore_platform_interface/src/method_channel/method_channel_query.dart:118:11)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #2      _JsonQuery.get (package:cloud_firestore/src/query.dart:426:9)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #3      FirestoreService.getWrongAnswers (package:mathlab/data/services/firestore_service.dart:454:24)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #4      WrongAnswerRepository.getFromFirebase (package:mathlab/data/repositories/wrong_answer_repository.dart:98:32)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #5      WrongAnswerRepository.get (package:mathlab/data/repositories/wrong_answer_repository.dart:153:22)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #6      WrongAnswerProvider._loadWrongAnswers (package:mathlab/data/providers/learning/wrong_answer_provider.dart:127:28)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #7      WrongAnswerProvider._initialize (package:mathlab/data/providers/learning/wrong_answer_provider.dart:113:5)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): 
+I/flutter (17593): [ERROR] [WrongAnswerRepository] Firebase 오답 목록 조회 실패
+I/flutter (17593): [ERROR] Error: Exception: 오답 목록 조회 실패: [cloud_firestore/permission-denied] The caller does not have permission to execute the specified operation.
+I/flutter (17593): [ERROR] StackTrace: #0      FirestoreService.getWrongAnswers (package:mathlab/data/services/firestore_service.dart:474:7)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #1      WrongAnswerRepository.getFromFirebase (package:mathlab/data/repositories/wrong_answer_repository.dart:98:32)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #2      WrongAnswerRepository.get (package:mathlab/data/repositories/wrong_answer_repository.dart:153:22)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #3      WrongAnswerProvider._loadWrongAnswers (package:mathlab/data/providers/learning/wrong_answer_provider.dart:127:28)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #4      WrongAnswerProvider._initialize (package:mathlab/data/providers/learning/wrong_answer_provider.dart:113:5)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): 
+I/flutter (17593): [INFO] [WrongAnswerProvider] Loaded 0 wrong answers for account
+I/flutter (17593): [ERROR] [LeagueRepository] Firebase 리그 데이터 조회 실패
+I/flutter (17593): [ERROR] Error: [cloud_firestore/permission-denied] The caller does not have permission to execute the specified operation.
+I/flutter (17593): [ERROR] StackTrace: #0      FirebaseFirestoreHostApi.queryGet (package:cloud_firestore_platform_interface/src/pigeon/messages.pigeon.dart:1153:7)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #1      MethodChannelQuery.get (package:cloud_firestore_platform_interface/src/method_channel/method_channel_query.dart:118:11)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #2      _JsonQuery.get (package:cloud_firestore/src/query.dart:426:9)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #3      LeagueRepository.getFromFirebase (package:mathlab/data/repositories/league_repository.dart:82:30)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #4      LeagueNotifier._loadCurrentLeague.<anonymous closure> (package:mathlab/data/providers/gamification/league_provider.dart:98:30)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #5      BaseNotifier.executeWithErrorHandling (package:mathlab/data/providers/base/base_notifier.dart:102:14)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #6      LeagueNotifier._loadCurrentLeague (package:mathlab/data/providers/gamification/league_provider.dart:82:5)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): #7      LeagueNotifier._initialize (package:mathlab/data/providers/gamification/league_provider.dart:58:5)
+I/flutter (17593): <asynchronous suspension>
+I/flutter (17593): 
+I/flutter (17593): [INFO] [LeagueProvider] 리그 데이터 없음, 새 리그 생성 필요
+I/flutter (17593): [INFO] [LeagueProvider] 리그 로드 완료
+W/Firestore(17593): (25.1.4) [Firestore]: Listen for Query(target=Query(leagues where weekStartDate==time(1767538800,0) and weekEndDate==time(1768143600,0) order by __name__);limitType=LIMIT_TO_FIRST) failed: Status{code=PERMISSION_DENIED, description=Missing or insufficient permissions., cause=null}
+E/flutter (17593): [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: [cloud_firestore/permission-denied] The caller does not have permission to execute the specified operation.
+E/flutter (17593): #0      EventChannelExtension.receiveGuardedBroadcastStream (package:_flutterfire_internals/src/exception.dart:67:43)
+E/flutter (17593): #1      MethodChannelQuery.snapshots.<anonymous closure> (package:cloud_firestore_platform_interface/src/method_channel/method_channel_query.dart:183:18)
+E/flutter (17593): <asynchronous suspension>
+E/flutter (17593): 
+I/VRI[MainActivity]@a994779(17593): call setFrameRateCategory for touch hint category=high hint, reason=touch, vri=VRI[MainActivity]@a994779
+
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 11 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///Users/yeojoonsoo02/Desktop/Work_Project/Gomath/MathLab/lib/features/profile/figma/profile_detail_screen.dart:943:17
+
+To inspect this widget in Flutter DevTools, visit:
+http://127.0.0.1:9100/#/inspector?uri=http%3A%2F%2F127.0.0.1%3A60296%2FMYnP19Gyk0E%3D%2F&inspectorRef=inspector-0
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#9dd0a relayoutBoundary=up24 OVERFLOWING:
+  creator: Row ← Column ← Expanded ← Row ← Padding ← DecoratedBox ← Padding ← Container ← Column ←
+    _SingleChildViewport ← IgnorePointer-[GlobalKey#d2acb] ← Semantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=null; fit=null (can use size)
+  constraints: BoxConstraints(0.0<=w<=160.0, 0.0<=h<=Infinity)
+  size: Size(160.0, 27.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+D/ProfileInstaller(17593): Installing profile for com.gomath.mathlab
+E/GoogleApiManager(17593): Failed to get service from broker. 
+E/GoogleApiManager(17593): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(17593): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3354)
+E/GoogleApiManager(17593): 	at android.os.Parcel.createException(Parcel.java:3338)
+E/GoogleApiManager(17593): 	at android.os.Parcel.readException(Parcel.java:3321)
+E/GoogleApiManager(17593): 	at android.os.Parcel.readException(Parcel.java:3263)
+E/GoogleApiManager(17593): 	at bddz.a(:com.google.android.gms@254932035@25.49.32 (260400-843446962):36)
+E/GoogleApiManager(17593): 	at bdca.z(:com.google.android.gms@254932035@25.49.32 (260400-843446962):143)
+E/GoogleApiManager(17593): 	at bcid.run(:com.google.android.gms@254932035@25.49.32 (260400-843446962):42)
+E/GoogleApiManager(17593): 	at android.os.Handler.handleCallback(Handler.java:995)
+E/GoogleApiManager(17593): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+E/GoogleApiManager(17593): 	at cqne.mv(:com.google.android.gms@254932035@25.49.32 (260400-843446962):1)
+E/GoogleApiManager(17593): 	at cqne.dispatchMessage(:com.google.android.gms@254932035@25.49.32 (260400-843446962):5)
+E/GoogleApiManager(17593): 	at android.os.Looper.loopOnce(Looper.java:273)
+E/GoogleApiManager(17593): 	at android.os.Looper.loop(Looper.java:363)
+E/GoogleApiManager(17593): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+W/GoogleApiManager(17593): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+I/VRI[MainActivity]@a994779(17593): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@a994779
+I/TRuntime.CctTransportBackend(17593): Making request to: https://firebaselogging-pa.googleapis.com/v1/firelog/legacy/batchlog
+I/TRuntime.CctTransportBackend(17593): Status Code: 200
+W/Firestore(17593): (25.1.4) [WatchStream]: (be25e63) Stream closed with status: Status{code=CANCELLED, description=Disconnecting idle stream. Timed out waiting for new targets., cause=null}.
+Lost connection to device.

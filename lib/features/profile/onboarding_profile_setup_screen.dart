@@ -106,15 +106,10 @@ class _OnboardingProfileSetupScreenState
   }
 
   bool _canProceed() {
-    Logger.info(
-        '_canProceed called: page=$_currentPage, nameText="${_nameController.text}", length=${_nameController.text.length}',
-        tag: 'OnboardingProfileSetup');
+    // 로깅 제거: build 메서드에서 여러 번 호출되므로 로그가 무한 반복될 수 있음
     switch (_currentPage) {
       case 0: // 이름
-        final canProceed = _nameController.text.trim().length >= 2;
-        Logger.info('Page 0 check: canProceed=$canProceed',
-            tag: 'OnboardingProfileSetup');
-        return canProceed;
+        return _nameController.text.trim().length >= 2;
       case 1: // 생년월일
         return _selectedBirthDate != null;
       case 2: // 성별

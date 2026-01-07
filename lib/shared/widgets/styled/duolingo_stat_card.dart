@@ -27,7 +27,7 @@ class DuolingoStatCard extends StatelessWidget {
     required this.label,
     required this.value,
     this.onTap,
-    this.iconSize = 22,
+    this.iconSize = 26, // 22 → 26 (UX 개선: 더 잘 보이도록)
   });
 
   @override
@@ -65,8 +65,8 @@ class DuolingoStatCard extends StatelessWidget {
   /// 아이콘 빌더
   Widget _buildIcon() {
     return Container(
-      width: 36,
-      height: 36,
+      width: 40, // 36 → 40 (UX 개선)
+      height: 40, // 36 → 40 (UX 개선)
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [

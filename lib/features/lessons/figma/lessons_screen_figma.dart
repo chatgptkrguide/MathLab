@@ -224,6 +224,19 @@ class LessonsScreenFigma extends ConsumerWidget {
     final problems =
         ref.read(problemProvider.notifier).getProblemsByLesson(lessonId);
 
+    // 문제가 없는 경우 경고 표시
+    if (problems.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('아직 준비된 문제가 없습니다.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
     // 문제 풀이 화면으로 이동
     if (context.mounted) {
       Navigator.push(

@@ -58,20 +58,16 @@ final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
 
 /// Lesson Repository Provider
 final lessonRepositoryProvider = Provider<LessonRepository>((ref) {
-  final firestoreService = ref.watch(firestoreServiceProvider);
   final localStorageService = ref.watch(localStorageServiceProvider);
   return LessonRepository(
-    firestoreService: firestoreService,
     localStorageService: localStorageService,
   );
 });
 
 /// League Repository Provider
 final leagueRepositoryProvider = Provider<LeagueRepository>((ref) {
-  final firestoreService = ref.watch(firestoreServiceProvider);
   final localStorageService = ref.watch(localStorageServiceProvider);
   return LeagueRepository(
-    firestoreService: firestoreService,
     localStorageService: localStorageService,
   );
 });

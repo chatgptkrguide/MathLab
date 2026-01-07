@@ -79,7 +79,7 @@ class HomeScreenFigma extends ConsumerWidget {
                     // 데일리 챌린지 배너
                     const HomeDailyChallenge(),
 
-                    const SizedBox(height: 80), // 네비게이션 바 공간 축소
+                    const SizedBox(height: 100), // 네비게이션 바 공간 (UX 개선: 80 → 100)
                   ],
                 ),
               ),

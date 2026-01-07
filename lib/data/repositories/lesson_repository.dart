@@ -1,5 +1,5 @@
-import 'base/base_repository.dart';
 import '../models/learning/lesson.dart';
+import '../services/local_storage_service.dart';
 import '../../shared/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,17 +10,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - 로컬 + Firebase 동기화
 /// - 학년별/카테고리별 레슨 조회
 /// - 레슨 잠금/해제 관리
-class LessonRepository extends BaseRepository<List<Lesson>> {
+class LessonRepository {
   LessonRepository({
-    required super.localStorageService,
-    required super.firestoreService,
+    required this.localStorageService,
   });
+
+  final LocalStorageService localStorageService;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // ==================== 로컬 스토리지 ====================
 
-  @override
   Future<List<Lesson>?> getFromLocal(String storageKey) async {
     try {
       final json = await localStorageService.loadMap(storageKey);
@@ -46,7 +46,6 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
     }
   }
 
-  @override
   Future<void> saveToLocal(String storageKey, List<Lesson> data) async {
     try {
       await localStorageService.saveMap(storageKey, {
@@ -65,7 +64,6 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
     }
   }
 
-  @override
   Future<void> deleteFromLocal(String storageKey) async {
     try {
       await localStorageService.remove(storageKey);
@@ -82,7 +80,6 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
 
   // ==================== Firebase ====================
 
-  @override
   Future<List<Lesson>?> getFromFirebase(String userId) async {
     try {
       final querySnapshot =
@@ -111,7 +108,6 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
     }
   }
 
-  @override
   Future<void> saveToFirebase(String userId, List<Lesson> data) async {
     try {
       final batch = _firestore.batch();
@@ -135,7 +131,6 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
     }
   }
 
-  @override
   Future<void> deleteFromFirebase(String userId) async {
     try {
       final querySnapshot = await _firestore.collection('lessons').get();
@@ -159,7 +154,6 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
 
   // ==================== 충돌 해결 ====================
 
-  @override
   Future<List<Lesson>?> mergeData(
       List<Lesson> local, List<Lesson> remote) async {
     // 레슨 데이터는 주로 읽기 전용이므로 Firebase를 우선

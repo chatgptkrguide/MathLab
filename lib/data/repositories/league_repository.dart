@@ -1,5 +1,5 @@
-import 'base/base_repository.dart';
 import '../models/gamification/league.dart';
+import '../services/local_storage_service.dart';
 import '../../shared/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,17 +10,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - 로컬 + Firebase 동기화
 /// - 실시간 순위 업데이트
 /// - 티어별 리그 매칭
-class LeagueRepository extends BaseRepository<League> {
+class LeagueRepository {
   LeagueRepository({
-    required super.localStorageService,
-    required super.firestoreService,
+    required this.localStorageService,
   });
 
+  final LocalStorageService localStorageService;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // ==================== 로컬 스토리지 ====================
 
-  @override
   Future<League?> getFromLocal(String storageKey) async {
     try {
       final json = await localStorageService.loadMap(storageKey);
@@ -42,7 +41,6 @@ class LeagueRepository extends BaseRepository<League> {
     }
   }
 
-  @override
   Future<void> saveToLocal(String storageKey, League data) async {
     try {
       await localStorageService.saveMap(storageKey, data.toJson());
@@ -58,7 +56,6 @@ class LeagueRepository extends BaseRepository<League> {
     }
   }
 
-  @override
   Future<void> deleteFromLocal(String storageKey) async {
     try {
       await localStorageService.remove(storageKey);
@@ -75,7 +72,6 @@ class LeagueRepository extends BaseRepository<League> {
 
   // ==================== Firebase ====================
 
-  @override
   Future<League?> getFromFirebase([String? userId]) async {
     try {
       // 현재 주차의 리그 조회
@@ -143,7 +139,6 @@ class LeagueRepository extends BaseRepository<League> {
     }
   }
 
-  @override
   Future<void> saveToFirebase(String userId, League data) async {
     try {
       final leagueId = _generateLeagueId(data.weekStartDate, data.tier);
@@ -185,7 +180,6 @@ class LeagueRepository extends BaseRepository<League> {
     }
   }
 
-  @override
   Future<void> deleteFromFirebase(String userId) async {
     try {
       // 사용자가 참여한 모든 리그에서 참가자 정보 삭제
@@ -213,7 +207,6 @@ class LeagueRepository extends BaseRepository<League> {
 
   // ==================== 충돌 해결 ====================
 
-  @override
   Future<League?> mergeData(League local, League remote) async {
     // 리그 데이터는 Firebase를 우선 (서버 데이터가 항상 최신)
     Logger.debug('리그 데이터 충돌 해결: remote 우선', tag: 'LeagueRepository');

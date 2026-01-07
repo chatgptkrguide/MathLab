@@ -68,27 +68,47 @@ class Problem {
   }
 
   factory Problem.fromJson(Map<String, dynamic> json) {
+    // Legacy JSON format support: use category as title if title is missing
+    final title = json['title'] as String? ?? json['category'] as String;
+
+    // Handle old JSON format with 'options' instead of 'choices'
+    final choices = (json['choices'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        (json['options'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        [];
+
+    // Handle old JSON format with 'correctAnswerIndex' or 'correctAnswer'
+    final answer = json['answer'] ??
+                   json['correctAnswerIndex'] ??
+                   json['correctAnswer'];
+
+    // Build metadata from legacy fields
+    final metadata = json['metadata'] as Map<String, dynamic>? ?? {};
+    if (json['lessonId'] != null) metadata['lessonId'] = json['lessonId'];
+    if (json['tags'] != null) metadata['tags'] = json['tags'];
+    if (json['xpReward'] != null) metadata['xpReward'] = json['xpReward'];
+
     return Problem(
       id: json['id'] as String,
-      title: json['title'] as String,
+      title: title,
       question: json['question'] as String,
       type: ProblemType.values.firstWhere(
         (e) => e.toString() == 'ProblemType.${json['type']}',
       ),
       category: json['category'] as String,
       difficulty: json['difficulty'] as int,
-      choices: (json['choices'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
-      answer: json['answer'],
+      choices: choices,
+      answer: answer,
       hints:
           (json['hints'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               [],
       explanation: json['explanation'] as String?,
       imageUrl: json['imageUrl'] as String?,
       answerImageUrl: json['answerImageUrl'] as String?,
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      metadata: metadata.isNotEmpty ? metadata : null,
     );
   }
 

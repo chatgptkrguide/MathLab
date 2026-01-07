@@ -170,7 +170,7 @@ class FigmaSizes {
 
   // ========== 진행률 바 크기 ==========
   /// 일일 목표 진행률 바 높이
-  static const double progressBarHeightGoal = 9.0;
+  static const double progressBarHeightGoal = 12.0; // 9.0 → 12.0 (UX 개선: 더 잘 보이도록)
 
   /// 일반 진행률 바 높이
   static const double progressBarHeightNormal = 12.0;

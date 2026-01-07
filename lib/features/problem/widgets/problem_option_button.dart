@@ -222,14 +222,14 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
       return Icon(
         widget.isCorrectAnswer ? Icons.check_circle : Icons.cancel,
         color: AppColors.surface,
-        size: 24,
+        size: 28,
       );
     } else if (widget.isCorrectAnswer) {
       // 정답 표시
       return const Icon(
         Icons.check_circle,
         color: AppColors.surface,
-        size: 24,
+        size: 28,
       );
     }
     return null;

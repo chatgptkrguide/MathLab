@@ -81,12 +81,10 @@ class SyncManager {
       _lessonRepository = lessonRepository ??
           LessonRepository(
             localStorageService: _localStorage,
-            firestoreService: _firestore,
           );
       _leagueRepository = leagueRepository ??
           LeagueRepository(
             localStorageService: _localStorage,
-            firestoreService: _firestore,
           );
 
       // 오프라인 큐 로드

@@ -4,6 +4,7 @@ import '../features/auth/auth_screen.dart';
 import '../features/profile/onboarding_profile_setup_screen.dart';
 import '../data/providers/auth/auth_provider.dart';
 import '../data/providers/user/user_provider.dart';
+import '../data/providers/learning/problem_provider.dart';
 // import '../data/providers/infrastructure/sync_manager_provider.dart'; // 주석 처리: 현재 미사용 (Firebase 권한 문제로 임시 비활성화)
 // import '../data/providers/communication/fcm_provider.dart'; // 주석 처리: 현재 미사용 (Firebase 권한 문제로 임시 비활성화)
 import '../shared/utils/logger.dart';
@@ -45,7 +46,11 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       await ref.read(userProvider.notifier).loadUserByAccount(currentAccountId);
       Logger.info('사용자 정보 로드 완료: $currentAccountId', tag: 'AuthWrapper');
 
-      // 2. SyncManager 초기화 확인 및 실시간 동기화 시작 (임시 비활성화 - Firebase 권한 문제)
+      // 2. ProblemProvider 초기화 (문제 데이터 로드)
+      ref.read(problemProvider);
+      Logger.info('문제 데이터 로드 시작', tag: 'AuthWrapper');
+
+      // 3. SyncManager 초기화 확인 및 실시간 동기화 시작 (임시 비활성화 - Firebase 권한 문제)
       // TODO: Firebase Security Rules 설정 후 활성화
       // final syncManagerInitialized = await ref.read(syncManagerInitializedProvider.future);
       // if (syncManagerInitialized) {
