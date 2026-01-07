@@ -4,10 +4,11 @@ import '../base/base_notifier.dart';
 
 import './assignment_provider.dart';
 
-
 /// 과제 제출 상태 관리
-class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmission>> {
-  AssignmentSubmissionNotifier(this.ref) : super([], 'AssignmentSubmissionNotifier') {
+class AssignmentSubmissionNotifier
+    extends BaseNotifier<List<AssignmentSubmission>> {
+  AssignmentSubmissionNotifier(this.ref)
+      : super([], 'AssignmentSubmissionNotifier') {
     _loadSubmissions();
   }
 
@@ -106,7 +107,8 @@ class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmissio
   /// 제출 취소 (학생 - 마감 전에만 가능)
   Future<void> cancelSubmission(String submissionId) async {
     state = state.map((submission) {
-      if (submission.id == submissionId && submission.status == SubmissionStatus.submitted) {
+      if (submission.id == submissionId &&
+          submission.status == SubmissionStatus.submitted) {
         final updated = submission.copyWith(
           status: SubmissionStatus.notSubmitted,
           submittedAt: null,
@@ -126,19 +128,23 @@ class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmissio
 
   /// 특정 과제의 모든 제출 조회
   List<AssignmentSubmission> getSubmissionsByAssignment(String assignmentId) {
-    return state.where((submission) => submission.assignmentId == assignmentId).toList();
+    return state
+        .where((submission) => submission.assignmentId == assignmentId)
+        .toList();
   }
 
   /// 특정 학생의 모든 제출 조회
   List<AssignmentSubmission> getSubmissionsByStudent(String studentId) {
-    return state.where((submission) => submission.studentId == studentId).toList();
+    return state
+        .where((submission) => submission.studentId == studentId)
+        .toList();
   }
 
   /// 미제출 학생 조회
   List<AssignmentSubmission> getNotSubmittedStudents(String assignmentId) {
     return state.where((submission) {
       return submission.assignmentId == assignmentId &&
-             submission.status == SubmissionStatus.notSubmitted;
+          submission.status == SubmissionStatus.notSubmitted;
     }).toList();
   }
 
@@ -146,15 +152,18 @@ class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmissio
   List<AssignmentSubmission> getUnconfirmedSubmissions(String assignmentId) {
     return state.where((submission) {
       return submission.assignmentId == assignmentId &&
-             submission.status == SubmissionStatus.submitted;
+          submission.status == SubmissionStatus.submitted;
     }).toList();
   }
 
   /// 특정 학생의 특정 과제 제출 조회
-  AssignmentSubmission? getStudentSubmission(String assignmentId, String studentId) {
+  AssignmentSubmission? getStudentSubmission(
+      String assignmentId, String studentId) {
     try {
       return state.firstWhere(
-        (submission) => submission.assignmentId == assignmentId && submission.studentId == studentId,
+        (submission) =>
+            submission.assignmentId == assignmentId &&
+            submission.studentId == studentId,
       );
     } catch (e) {
       return null;
@@ -168,7 +177,9 @@ class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmissio
     }).length;
 
     // AssignmentProvider의 제출 수 업데이트
-    ref.read(assignmentProvider.notifier).updateSubmissionCount(assignmentId, submittedCount);
+    ref
+        .read(assignmentProvider.notifier)
+        .updateSubmissionCount(assignmentId, submittedCount);
   }
 
   /// 과제별 제출 통계
@@ -176,20 +187,24 @@ class AssignmentSubmissionNotifier extends BaseNotifier<List<AssignmentSubmissio
     final submissions = getSubmissionsByAssignment(assignmentId);
     final submitted = submissions.where((s) => s.isSubmitted).length;
     final confirmed = submissions.where((s) => s.isConfirmed).length;
-    final notSubmitted = submissions.where((s) => s.status == SubmissionStatus.notSubmitted).length;
+    final notSubmitted = submissions
+        .where((s) => s.status == SubmissionStatus.notSubmitted)
+        .length;
 
     return {
       'total': submissions.length,
       'submitted': submitted,
       'confirmed': confirmed,
       'notSubmitted': notSubmitted,
-      'submissionRate': submissions.isEmpty ? 0.0 : (submitted / submissions.length) * 100,
+      'submissionRate':
+          submissions.isEmpty ? 0.0 : (submitted / submissions.length) * 100,
       'confirmationRate': submitted == 0 ? 0.0 : (confirmed / submitted) * 100,
     };
   }
 }
 
 /// Provider 선언
-final assignmentSubmissionProvider = StateNotifierProvider<AssignmentSubmissionNotifier, List<AssignmentSubmission>>((ref) {
+final assignmentSubmissionProvider = StateNotifierProvider<
+    AssignmentSubmissionNotifier, List<AssignmentSubmission>>((ref) {
   return AssignmentSubmissionNotifier(ref);
 });

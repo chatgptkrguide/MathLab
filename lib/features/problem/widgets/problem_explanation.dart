@@ -48,14 +48,18 @@ class ProblemExplanation extends StatelessWidget {
               children: [
                 Icon(
                   isCorrect ? Icons.check_circle : Icons.lightbulb,
-                  color: isCorrect ? AppColors.successGreen : AppColors.warningOrange,
+                  color: isCorrect
+                      ? AppColors.successGreen
+                      : AppColors.warningOrange,
                   size: 24,
                 ),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   isCorrect ? '정답입니다!' : '다시 한번 확인해보세요',
                   style: AppTextStyles.titleLarge.copyWith(
-                    color: isCorrect ? AppColors.successGreen : AppColors.warningOrange,
+                    color: isCorrect
+                        ? AppColors.successGreen
+                        : AppColors.warningOrange,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

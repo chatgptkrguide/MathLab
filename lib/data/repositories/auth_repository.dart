@@ -24,7 +24,8 @@ class AuthRepository {
   firebase_auth.User? get currentUser => _authService.currentUser;
 
   /// 로그인 상태 스트림
-  Stream<firebase_auth.User?> get authStateChanges => _authService.authStateChanges;
+  Stream<firebase_auth.User?> get authStateChanges =>
+      _authService.authStateChanges;
 
   /// 로그인 여부
   bool get isSignedIn => _authService.isSignedIn;
@@ -166,7 +167,8 @@ class AuthRepository {
   /// 익명 로그인 (게스트)
   Future<User?> signInAnonymously() async {
     try {
-      final userCredential = await firebase_auth.FirebaseAuth.instance.signInAnonymously();
+      final userCredential =
+          await firebase_auth.FirebaseAuth.instance.signInAnonymously();
 
       if (userCredential.user == null) {
         return null;

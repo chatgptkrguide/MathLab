@@ -89,7 +89,8 @@ class AchievementsScreen extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.successGreen.withOpacity(0.3),
+                                        color: AppColors.successGreen
+                                            .withOpacity(0.3),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
@@ -126,7 +127,8 @@ class AchievementsScreen extends ConsumerWidget {
                 (context, index) {
                   final achievement = state.achievements[index];
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
+                    padding:
+                        const EdgeInsets.only(bottom: AppDimensions.paddingM),
                     child: _AchievementCard(achievement: achievement),
                   );
                 },

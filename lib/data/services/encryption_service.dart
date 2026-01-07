@@ -40,7 +40,8 @@ class EncryptionService {
       final ivString = deviceId.padRight(16, '0').substring(0, 16);
       final iv = encrypt_pkg.IV.fromUtf8(ivString);
 
-      _encrypter = encrypt_pkg.Encrypter(encrypt_pkg.AES(key, mode: encrypt_pkg.AESMode.cbc));
+      _encrypter = encrypt_pkg.Encrypter(
+          encrypt_pkg.AES(key, mode: encrypt_pkg.AESMode.cbc));
       _iv = iv;
 
       Logger.info('암호화 서비스 초기화 완료', tag: 'EncryptionService');
@@ -64,7 +65,9 @@ class EncryptionService {
       final encrypted = _encrypter.encrypt(plainText, iv: _iv);
       final encryptedText = encrypted.base64;
 
-      Logger.debug('데이터 암호화 완료: ${plainText.length}자 → ${encryptedText.length}자', tag: 'EncryptionService');
+      Logger.debug(
+          '데이터 암호화 완료: ${plainText.length}자 → ${encryptedText.length}자',
+          tag: 'EncryptionService');
       return encryptedText;
     } catch (e, stackTrace) {
       Logger.error(
@@ -86,7 +89,9 @@ class EncryptionService {
       final encrypted = encrypt_pkg.Encrypted.fromBase64(encryptedText);
       final decrypted = _encrypter.decrypt(encrypted, iv: _iv);
 
-      Logger.debug('데이터 복호화 완료: ${encryptedText.length}자 → ${decrypted.length}자', tag: 'EncryptionService');
+      Logger.debug(
+          '데이터 복호화 완료: ${encryptedText.length}자 → ${decrypted.length}자',
+          tag: 'EncryptionService');
       return decrypted;
     } catch (e, stackTrace) {
       Logger.error(

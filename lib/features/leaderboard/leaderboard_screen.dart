@@ -192,7 +192,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     bottom: -6,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.mathGreenDark, // Darker green (successGreen 20% darker)
+                        color: AppColors
+                            .mathGreenDark, // Darker green (successGreen 20% darker)
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
@@ -216,7 +217,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                           height: 56,
                           decoration: BoxDecoration(
                             color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                            borderRadius:
+                                BorderRadius.circular(AppDimensions.radiusXL),
                             border: Border.all(
                               color: AppColors.mathGreenDark, // Darker green
                               width: 3,
@@ -602,12 +604,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
     // 이미 친구인지 확인
     final isFriend = friends.any(
-      (f) => f.userId == entry.userId && f.status == FriendRequestStatus.accepted,
+      (f) =>
+          f.userId == entry.userId && f.status == FriendRequestStatus.accepted,
     );
 
     // 대기 중인 요청이 있는지 확인
     final hasPendingRequest = friends.any(
-      (f) => f.userId == entry.userId && f.status == FriendRequestStatus.pending,
+      (f) =>
+          f.userId == entry.userId && f.status == FriendRequestStatus.pending,
     );
 
     if (isFriend) {
@@ -681,11 +685,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       );
 
       await ref.read(friendsProvider.notifier).sendFriendRequest(
-        userId: targetUser.id,
-        name: targetUser.name,
-        level: targetUser.level,
-        xp: targetUser.xp,
-      );
+            userId: targetUser.id,
+            name: targetUser.name,
+            level: targetUser.level,
+            xp: targetUser.xp,
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

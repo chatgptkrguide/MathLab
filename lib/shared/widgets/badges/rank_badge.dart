@@ -167,8 +167,10 @@ class _HexagonBadgePainter extends CustomPainter {
     }
   }
 
-  double cos(double angle) => angle == 0 ? 1 : (angle == 3.14159 ? -1 : angle.cos);
-  double sin(double angle) => angle == 0 ? 0 : (angle == 3.14159 ? 0 : angle.sin);
+  double cos(double angle) =>
+      angle == 0 ? 1 : (angle == 3.14159 ? -1 : angle.cos);
+  double sin(double angle) =>
+      angle == 0 ? 0 : (angle == 3.14159 ? 0 : angle.sin);
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;

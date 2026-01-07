@@ -52,7 +52,8 @@ class PracticeProvider extends BaseNotifier<PracticeState> {
   static const String _storageKey = 'practice_state';
   static const String _statsKey = 'practice_stats';
 
-  PracticeProvider(this._ref) : super(const PracticeState(), 'PracticeProvider') {
+  PracticeProvider(this._ref)
+      : super(const PracticeState(), 'PracticeProvider') {
     _loadState();
     _loadStats();
   }
@@ -150,21 +151,23 @@ class PracticeProvider extends BaseNotifier<PracticeState> {
     }
 
     // 오답 노트에서 문제 재구성
-    final problems = errorNotes.map((note) => Problem(
-      id: note.problemId,
-      title: note.category,
-      question: note.question,
-      type: ProblemType.multipleChoice, // 기본 타입
-      explanation: note.explanation,
-      category: note.category,
-      difficulty: note.difficulty,
-      answer: note.correctAnswer,
-      metadata: {
-        'lessonId': note.lessonId,
-        'tags': note.tags,
-        'xpReward': note.difficulty * 5, // 난이도 기반 XP
-      },
-    )).toList();
+    final problems = errorNotes
+        .map((note) => Problem(
+              id: note.problemId,
+              title: note.category,
+              question: note.question,
+              type: ProblemType.multipleChoice, // 기본 타입
+              explanation: note.explanation,
+              category: note.category,
+              difficulty: note.difficulty,
+              answer: note.correctAnswer,
+              metadata: {
+                'lessonId': note.lessonId,
+                'tags': note.tags,
+                'xpReward': note.difficulty * 5, // 난이도 기반 XP
+              },
+            ))
+        .toList();
 
     final session = PracticeSession(
       id: 'practice_error_${DateTime.now().millisecondsSinceEpoch}',
@@ -210,8 +213,8 @@ class PracticeProvider extends BaseNotifier<PracticeState> {
 
     // Null-safety 처리: correctAnswer가 null이면 오답 처리
     final isCorrect = problem.correctAnswer != null &&
-                      answer.trim().toLowerCase() ==
-                      problem.correctAnswer!.trim().toLowerCase();
+        answer.trim().toLowerCase() ==
+            problem.correctAnswer!.trim().toLowerCase();
 
     // 정답 시 경험치 부여
     if (isCorrect && problem.xpReward > 0) {
@@ -222,16 +225,14 @@ class PracticeProvider extends BaseNotifier<PracticeState> {
     // 통계 업데이트
     final newSession = session.copyWith(
       currentProblemIndex: session.currentProblemIndex + 1,
-      correctCount: isCorrect
-          ? session.correctCount + 1
-          : session.correctCount,
-      incorrectCount: !isCorrect
-          ? session.incorrectCount + 1
-          : session.incorrectCount,
+      correctCount: isCorrect ? session.correctCount + 1 : session.correctCount,
+      incorrectCount:
+          !isCorrect ? session.incorrectCount + 1 : session.incorrectCount,
     );
 
     // 세션 완료 확인
-    final isLastProblem = newSession.currentProblemIndex >= session.problems.length;
+    final isLastProblem =
+        newSession.currentProblemIndex >= session.problems.length;
     final completedSession = isLastProblem
         ? newSession.copyWith(
             isCompleted: true,
@@ -268,7 +269,8 @@ class PracticeProvider extends BaseNotifier<PracticeState> {
     );
 
     // 세션 완료 확인
-    final isLastProblem = newSession.currentProblemIndex >= session.problems.length;
+    final isLastProblem =
+        newSession.currentProblemIndex >= session.problems.length;
     final completedSession = isLastProblem
         ? newSession.copyWith(
             isCompleted: true,

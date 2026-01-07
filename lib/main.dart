@@ -46,7 +46,8 @@ void main() async {
       await NotificationService().initialize();
       Logger.info('NotificationService initialized successfully', tag: 'Main');
     } catch (e) {
-      Logger.error('Failed to initialize NotificationService', error: e, tag: 'Main');
+      Logger.error('Failed to initialize NotificationService',
+          error: e, tag: 'Main');
     }
 
     try {

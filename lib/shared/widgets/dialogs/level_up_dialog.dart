@@ -188,7 +188,8 @@ class _LevelUpDialogState extends State<LevelUpDialog>
           child: Material(
             type: MaterialType.transparency,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXXXL),
+              margin: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingXXXL),
               padding: const EdgeInsets.all(AppDimensions.paddingXXL),
               decoration: BoxDecoration(
                 color: AppColors.surface,
@@ -293,7 +294,8 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.mathTeal.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -320,7 +322,8 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                     padding: const EdgeInsets.all(AppDimensions.paddingM),
                     decoration: BoxDecoration(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Column(
                       children: [
@@ -372,10 +375,12 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                               gradient: const LinearGradient(
                                 colors: AppColors.mathButtonGradient,
                               ),
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                              borderRadius:
+                                  BorderRadius.circular(AppDimensions.radiusXL),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.mathButtonBlue.withOpacity(0.3),
+                                  color:
+                                      AppColors.mathButtonBlue.withOpacity(0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),

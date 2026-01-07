@@ -40,8 +40,11 @@ class WrongAnswerState {
       totalCount: totalCount ?? this.totalCount,
       masteredCount: masteredCount ?? this.masteredCount,
       needsReviewCount: needsReviewCount ?? this.needsReviewCount,
-      selectedCategory: clearCategory ? null : (selectedCategory ?? this.selectedCategory),
-      selectedDifficulty: clearDifficulty ? null : (selectedDifficulty ?? this.selectedDifficulty),
+      selectedCategory:
+          clearCategory ? null : (selectedCategory ?? this.selectedCategory),
+      selectedDifficulty: clearDifficulty
+          ? null
+          : (selectedDifficulty ?? this.selectedDifficulty),
     );
   }
 
@@ -57,12 +60,16 @@ class WrongAnswerState {
 
     // 카테고리 필터
     if (selectedCategory != null) {
-      filtered = filtered.where((wa) => wa.problem.category == selectedCategory).toList();
+      filtered = filtered
+          .where((wa) => wa.problem.category == selectedCategory)
+          .toList();
     }
 
     // 난이도 필터
     if (selectedDifficulty != null) {
-      filtered = filtered.where((wa) => wa.problem.difficulty == selectedDifficulty).toList();
+      filtered = filtered
+          .where((wa) => wa.problem.difficulty == selectedDifficulty)
+          .toList();
     }
 
     return filtered;
@@ -140,7 +147,8 @@ class WrongAnswerProvider extends BaseNotifier<WrongAnswerState> {
       // 로컬에만 저장 (복습 상태 등 로컬 변경사항)
       await _wrongAnswerRepository.saveToLocal(accountId, state.wrongAnswers);
 
-      logDebug('Saved ${state.wrongAnswers.length} wrong answers to local storage');
+      logDebug(
+          'Saved ${state.wrongAnswers.length} wrong answers to local storage');
     } catch (e) {
       logError('Failed to save wrong answers', error: e);
     }
@@ -236,15 +244,18 @@ class WrongAnswerProvider extends BaseNotifier<WrongAnswerState> {
     if (isMastered) {
       logInfo('🎉 Mastered wrong answer: ${wrongAnswer.problem.id}');
     } else if (isCorrect) {
-      logInfo('✅ Reviewed correctly: ${wrongAnswer.problem.id} ($newReviewCount/3)');
+      logInfo(
+          '✅ Reviewed correctly: ${wrongAnswer.problem.id} ($newReviewCount/3)');
     } else {
-      logInfo('❌ Reviewed incorrectly: ${wrongAnswer.problem.id} - reset count');
+      logInfo(
+          '❌ Reviewed incorrectly: ${wrongAnswer.problem.id} - reset count');
     }
   }
 
   /// 오답 삭제
   Future<void> deleteWrongAnswer(String wrongAnswerId) async {
-    final updatedList = state.wrongAnswers.where((wa) => wa.id != wrongAnswerId).toList();
+    final updatedList =
+        state.wrongAnswers.where((wa) => wa.id != wrongAnswerId).toList();
 
     _updateState(updatedList);
     await _saveWrongAnswers();
@@ -278,10 +289,7 @@ class WrongAnswerProvider extends BaseNotifier<WrongAnswerState> {
 
   /// 사용 가능한 카테고리 목록
   List<String> get availableCategories {
-    return state.wrongAnswers
-        .map((wa) => wa.problem.category)
-        .toSet()
-        .toList()
+    return state.wrongAnswers.map((wa) => wa.problem.category).toSet().toList()
       ..sort();
   }
 
@@ -296,9 +304,7 @@ class WrongAnswerProvider extends BaseNotifier<WrongAnswerState> {
 
   /// 복습 필요 목록 (필터 적용)
   List<WrongAnswer> get reviewList {
-    return state.filteredWrongAnswers
-        .where((wa) => wa.needsReview)
-        .toList()
+    return state.filteredWrongAnswers.where((wa) => wa.needsReview).toList()
       ..sort((a, b) {
         // 긴급도 높은 순, 같으면 오래된 순
         final urgencyCompare = b.urgency.compareTo(a.urgency);
@@ -315,17 +321,13 @@ class WrongAnswerProvider extends BaseNotifier<WrongAnswerState> {
 
   /// 완료 목록 (필터 적용)
   List<WrongAnswer> get masteredList {
-    return state.filteredWrongAnswers
-        .where((wa) => wa.isMastered)
-        .toList()
+    return state.filteredWrongAnswers.where((wa) => wa.isMastered).toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
   /// 미완료 목록
   List<WrongAnswer> get unfinishedList {
-    return state.wrongAnswers
-        .where((wa) => !wa.isMastered)
-        .toList()
+    return state.wrongAnswers.where((wa) => !wa.isMastered).toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
   }
 

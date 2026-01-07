@@ -47,11 +47,12 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
 
         if (userCredential != null && mounted) {
           // AuthProvider를 통해 계정 정보 업데이트
-          final success = await ref.read(authProvider.notifier).signInWithEmailPassword(
-            email: _emailController.text.trim(),
-            displayName: userCredential.user?.displayName ?? '사용자',
-            uid: userCredential.user?.uid ?? '',
-          );
+          final success =
+              await ref.read(authProvider.notifier).signInWithEmailPassword(
+                    email: _emailController.text.trim(),
+                    displayName: userCredential.user?.displayName ?? '사용자',
+                    uid: userCredential.user?.uid ?? '',
+                  );
 
           if (success && mounted) {
             Navigator.of(context).pop(true);
@@ -66,15 +67,17 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
 
         if (userCredential != null) {
           // 사용자 이름 업데이트
-          await userCredential.user?.updateDisplayName(_nameController.text.trim());
+          await userCredential.user
+              ?.updateDisplayName(_nameController.text.trim());
 
           if (mounted) {
             // 회원가입 후 자동 로그인
-            final success = await ref.read(authProvider.notifier).signInWithEmailPassword(
-              email: _emailController.text.trim(),
-              displayName: _nameController.text.trim(),
-              uid: userCredential.user?.uid ?? '',
-            );
+            final success =
+                await ref.read(authProvider.notifier).signInWithEmailPassword(
+                      email: _emailController.text.trim(),
+                      displayName: _nameController.text.trim(),
+                      uid: userCredential.user?.uid ?? '',
+                    );
 
             if (success && mounted) {
               Navigator.of(context).pop(true);
@@ -145,17 +148,20 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: '이름',
-                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                      labelStyle:
+                          TextStyle(color: Colors.white.withOpacity(0.7)),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.1),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon: const Icon(Icons.person, color: Colors.white70),
+                      prefixIcon:
+                          const Icon(Icons.person, color: Colors.white70),
                     ),
                     validator: (value) {
-                      if (!_isLogin && (value == null || value.trim().isEmpty)) {
+                      if (!_isLogin &&
+                          (value == null || value.trim().isEmpty)) {
                         return '이름을 입력하세요';
                       }
                       return null;
@@ -210,7 +216,9 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     prefixIcon: const Icon(Icons.lock, color: Colors.white70),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: Colors.white70,
                       ),
                       onPressed: () {
@@ -272,9 +280,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     });
                   },
                   child: Text(
-                    _isLogin
-                      ? '계정이 없으신가요? 회원가입'
-                      : '이미 계정이 있으신가요? 로그인',
+                    _isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 14,
@@ -301,7 +307,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               hintText: '이메일을 입력하세요',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                              hintStyle: TextStyle(
+                                  color: Colors.white.withOpacity(0.5)),
                             ),
                           ),
                           actions: [

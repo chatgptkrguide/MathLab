@@ -102,7 +102,8 @@ class ProblemAnswerInput extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  borderSide: const BorderSide(color: AppColors.mathPurple, width: 2),
+                  borderSide:
+                      const BorderSide(color: AppColors.mathPurple, width: 2),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -118,7 +119,9 @@ class ProblemAnswerInput extends StatelessWidget {
             ),
 
             // 오답 시 정답 표시
-            if (isAnswerSubmitted && !isCorrect && correctAnswerText != null) ...[
+            if (isAnswerSubmitted &&
+                !isCorrect &&
+                correctAnswerText != null) ...[
               const SizedBox(height: AppDimensions.spacingS),
               Text(
                 '정답: $correctAnswerText',

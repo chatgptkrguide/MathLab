@@ -294,7 +294,9 @@ class ChatRoomsScreen extends ConsumerWidget {
                   updatedAt: now,
                 );
 
-                await ref.read(chatRoomsProvider.notifier).createChatRoom(newRoom);
+                await ref
+                    .read(chatRoomsProvider.notifier)
+                    .createChatRoom(newRoom);
 
                 if (context.mounted) {
                   Navigator.pop(context);

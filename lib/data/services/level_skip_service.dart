@@ -38,7 +38,8 @@ class LevelSkipService {
   }) async {
     try {
       // 1. 레슨의 모든 문제 로드
-      final allProblems = await _problemRepository.loadProblemsByLesson(lessonId);
+      final allProblems =
+          await _problemRepository.loadProblemsByLesson(lessonId);
 
       if (allProblems.isEmpty) {
         throw Exception('레슨에 문제가 없습니다: $lessonId');
@@ -148,7 +149,8 @@ class LevelSkipService {
       // 테스트 완료 확인
       final isCompleted = newIndex >= test.totalProblems;
       final newStatus = isCompleted
-          ? _evaluateTest(newCorrectAnswers, test.totalProblems, test.requiredAccuracy)
+          ? _evaluateTest(
+              newCorrectAnswers, test.totalProblems, test.requiredAccuracy)
           : SkipTestStatus.inProgress;
 
       final updatedTest = test.copyWith(
@@ -185,7 +187,7 @@ class LevelSkipService {
       return problem.answer == answer;
     } else if (problem.answer is String && answer is String) {
       return problem.answer.toString().toLowerCase().trim() ==
-             answer.toString().toLowerCase().trim();
+          answer.toString().toLowerCase().trim();
     } else {
       return problem.answer.toString() == answer.toString();
     }
@@ -267,7 +269,8 @@ class LevelSkipService {
   }
 
   /// 레슨의 스킵 테스트 결과 조회
-  Future<SkipTestResult?> getResultByLesson(String userId, String lessonId) async {
+  Future<SkipTestResult?> getResultByLesson(
+      String userId, String lessonId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final json = prefs.getString('${_resultKey}_${userId}_$lessonId');
@@ -393,13 +396,14 @@ class LevelSkipService {
       for (final key in keys) {
         if (key.contains(userId) &&
             (key.startsWith(_testKey) ||
-             key.startsWith(_resultKey) ||
-             key.startsWith(_testHistoryKey))) {
+                key.startsWith(_resultKey) ||
+                key.startsWith(_testHistoryKey))) {
           await prefs.remove(key);
         }
       }
 
-      Logger.info('Cleared skip test data for user: $userId', tag: 'LevelSkipService');
+      Logger.info('Cleared skip test data for user: $userId',
+          tag: 'LevelSkipService');
     } catch (e) {
       Logger.error('Failed to clear user data', error: e);
     }

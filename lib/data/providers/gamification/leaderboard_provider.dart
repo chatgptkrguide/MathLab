@@ -46,7 +46,8 @@ class LeaderboardState {
 class LeaderboardNotifier extends BaseNotifier<LeaderboardState> {
   final Ref ref;
 
-  LeaderboardNotifier(this.ref) : super(const LeaderboardState(), 'LeaderboardNotifier') {
+  LeaderboardNotifier(this.ref)
+      : super(const LeaderboardState(), 'LeaderboardNotifier') {
     _initializeLeaderboard();
   }
 

@@ -87,7 +87,8 @@ class SocialAuthService {
       Logger.info('Google 로그인 시작', tag: 'SocialAuth');
 
       // Google 계정 선택 화면 표시 (타임아웃: 60초)
-      final GoogleSignInAccount? googleUser = await _googleSignIn!.signIn().timeout(
+      final GoogleSignInAccount? googleUser =
+          await _googleSignIn!.signIn().timeout(
         const Duration(seconds: 60),
         onTimeout: () {
           Logger.warning('Google 로그인 타임아웃', tag: 'SocialAuth');
@@ -101,7 +102,8 @@ class SocialAuthService {
       }
 
       // 인증 정보 가져오기 (타임아웃: 30초)
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication.timeout(
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication.timeout(
         const Duration(seconds: 30),
         onTimeout: () {
           Logger.warning('Google 인증 정보 가져오기 타임아웃', tag: 'SocialAuth');
@@ -310,7 +312,9 @@ class SocialAuthService {
       // Apple은 첫 로그인 시에만 이메일과 이름을 제공함
       String displayName = 'Apple 사용자';
       if (credential.givenName != null || credential.familyName != null) {
-        displayName = '${credential.familyName ?? ''} ${credential.givenName ?? ''}'.trim();
+        displayName =
+            '${credential.familyName ?? ''} ${credential.givenName ?? ''}'
+                .trim();
       }
 
       return SocialAuthResult(

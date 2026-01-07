@@ -78,46 +78,96 @@ class _HomeStartButtonState extends State<HomeStartButton>
           width: double.infinity,
           height: 56,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: _isPressed
-                  ? [const Color(0xFF0000CC), const Color(0xFF000099)]
-                  : [const Color(0xFF0000FF), const Color(0xFF0000CC)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
+              // 하단 어두운 그림자 (3D 효과 - 듀오링고 스타일)
               BoxShadow(
-                color: const Color(0xFF0000FF).withOpacity(_isPressed ? 0.5 : 0.3),
-                blurRadius: _isPressed ? 16 : 12,
-                offset: Offset(0, _isPressed ? 4 : 6),
+                color: const Color(0xFF46A302),
+                offset: Offset(0, _isPressed ? 2 : 4),
+                blurRadius: 0,
+                spreadRadius: 0,
+              ),
+              // 주변 부드러운 그림자
+              BoxShadow(
+                color:
+                    const Color(0xFF58CC02).withOpacity(_isPressed ? 0.3 : 0.4),
+                blurRadius: _isPressed ? 8 : 12,
+                offset: Offset(0, _isPressed ? 3 : 6),
               ),
             ],
           ),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          child: Container(
+            decoration: BoxDecoration(
+              // 듀오링고 그린 그라디언트
+              gradient: LinearGradient(
+                colors: _isPressed
+                    ? [const Color(0xFF46A302), const Color(0xFF3A8502)]
+                    : [const Color(0xFF58CC02), const Color(0xFF46A302)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFF70D820),
+                width: 2,
+              ),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: _isPressed ? 26 : 28,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '학습 시작하기',
-                  style: TextStyle(
-                    fontSize: _isPressed ? 17 : 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 0.5,
+                // 상단 하이라이트 (3D 효과)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 8,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(_isPressed ? 0.1 : 0.3),
+                          Colors.white.withOpacity(0.0),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(14),
+                        topRight: Radius.circular(14),
+                      ),
+                    ),
                   ),
                 ),
+                // 버튼 내용
+                _buildButtonContent(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildButtonContent() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.play_arrow,
+          color: Colors.white,
+          size: _isPressed ? 26 : 28,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '학습 시작하기',
+          style: TextStyle(
+            fontSize: _isPressed ? 19 : 20,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
     );
   }
 }

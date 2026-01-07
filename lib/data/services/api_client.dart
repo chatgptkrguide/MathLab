@@ -66,7 +66,8 @@ class ApiClient {
         }
       }
 
-      Logger.debug('API Request: ${options.method} ${options.path}', tag: 'ApiClient');
+      Logger.debug('API Request: ${options.method} ${options.path}',
+          tag: 'ApiClient');
     } catch (error) {
       Logger.error('Error adding auth token', tag: 'ApiClient', error: error);
     }
@@ -84,7 +85,8 @@ class ApiClient {
   }
 
   /// 에러 인터셉터
-  Future<void> _onError(DioException error, ErrorInterceptorHandler handler) async {
+  Future<void> _onError(
+      DioException error, ErrorInterceptorHandler handler) async {
     Logger.error(
       'API Error: ${error.response?.statusCode} ${error.requestOptions.path}',
       tag: 'ApiClient',
@@ -93,7 +95,8 @@ class ApiClient {
 
     // 401 Unauthorized - 토큰 만료 or 무효
     if (error.response?.statusCode == 401) {
-      Logger.warning('Unauthorized - attempting token refresh', tag: 'ApiClient');
+      Logger.warning('Unauthorized - attempting token refresh',
+          tag: 'ApiClient');
 
       try {
         // 토큰 갱신 중이 아니면 갱신 시작
@@ -121,7 +124,8 @@ class ApiClient {
             final response = await _dio.fetch(options);
             return handler.resolve(response);
           } else {
-            Logger.error('No user logged in - cannot refresh token', tag: 'ApiClient');
+            Logger.error('No user logged in - cannot refresh token',
+                tag: 'ApiClient');
             _isRefreshing = false;
             return handler.reject(error);
           }
@@ -162,7 +166,8 @@ class ApiClient {
       });
       Logger.info('FCM token registered successfully', tag: 'ApiClient');
     } catch (error) {
-      Logger.error('Failed to register FCM token', tag: 'ApiClient', error: error);
+      Logger.error('Failed to register FCM token',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -176,7 +181,8 @@ class ApiClient {
       );
       Logger.info('FCM token deleted successfully', tag: 'ApiClient');
     } catch (error) {
-      Logger.error('Failed to delete FCM token', tag: 'ApiClient', error: error);
+      Logger.error('Failed to delete FCM token',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -193,7 +199,8 @@ class ApiClient {
       });
       Logger.info('Subscribed to topic: $topic', tag: 'ApiClient');
     } catch (error) {
-      Logger.error('Failed to subscribe to topic', tag: 'ApiClient', error: error);
+      Logger.error('Failed to subscribe to topic',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -210,7 +217,8 @@ class ApiClient {
       });
       Logger.info('Unsubscribed from topic: $topic', tag: 'ApiClient');
     } catch (error) {
-      Logger.error('Failed to unsubscribe from topic', tag: 'ApiClient', error: error);
+      Logger.error('Failed to unsubscribe from topic',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -284,7 +292,8 @@ class ApiClient {
 
       Logger.info('Password reset email sent', tag: 'ApiClient');
     } catch (error) {
-      Logger.error('Password reset request failed', tag: 'ApiClient', error: error);
+      Logger.error('Password reset request failed',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -311,7 +320,8 @@ class ApiClient {
       final response = await _dio.get('/users/$userId');
       return response.data as Map<String, dynamic>;
     } catch (error) {
-      Logger.error('Failed to get user profile', tag: 'ApiClient', error: error);
+      Logger.error('Failed to get user profile',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -326,7 +336,8 @@ class ApiClient {
       Logger.info('User profile updated', tag: 'ApiClient');
       return response.data as Map<String, dynamic>;
     } catch (error) {
-      Logger.error('Failed to update user profile', tag: 'ApiClient', error: error);
+      Logger.error('Failed to update user profile',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -344,7 +355,8 @@ class ApiClient {
       Logger.info('iOS receipt verification: $isValid', tag: 'ApiClient');
       return isValid;
     } catch (error) {
-      Logger.error('iOS receipt verification failed', tag: 'ApiClient', error: error);
+      Logger.error('iOS receipt verification failed',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -366,7 +378,8 @@ class ApiClient {
       Logger.info('Android receipt verification: $isValid', tag: 'ApiClient');
       return isValid;
     } catch (error) {
-      Logger.error('Android receipt verification failed', tag: 'ApiClient', error: error);
+      Logger.error('Android receipt verification failed',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -377,7 +390,8 @@ class ApiClient {
       final response = await _dio.get('/payment/subscription/$userId');
       return response.data as Map<String, dynamic>;
     } catch (error) {
-      Logger.error('Failed to get subscription status', tag: 'ApiClient', error: error);
+      Logger.error('Failed to get subscription status',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -388,7 +402,8 @@ class ApiClient {
       await _dio.post('/payment/subscription/$userId/cancel');
       Logger.info('Subscription cancelled', tag: 'ApiClient');
     } catch (error) {
-      Logger.error('Failed to cancel subscription', tag: 'ApiClient', error: error);
+      Logger.error('Failed to cancel subscription',
+          tag: 'ApiClient', error: error);
       rethrow;
     }
   }
@@ -409,7 +424,8 @@ class RetryInterceptor extends Interceptor {
   });
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+      DioException err, ErrorInterceptorHandler handler) async {
     final extra = err.requestOptions.extra;
     final retryCount = extra['retryCount'] ?? 0;
 

@@ -60,7 +60,8 @@ class _AcademicRecordsScreenState extends ConsumerState<AcademicRecordsScreen> {
   }
 
   /// 통계 요약 카드
-  Widget _buildStatisticsSummary(AsyncValue<AcademicStatistics> statisticsAsync) {
+  Widget _buildStatisticsSummary(
+      AsyncValue<AcademicStatistics> statisticsAsync) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),

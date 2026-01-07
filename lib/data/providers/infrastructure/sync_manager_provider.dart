@@ -48,7 +48,8 @@ final isOnlineProvider = Provider<bool>((ref) {
 });
 
 /// 실시간 사용자 프로필 스트림 Provider
-final realtimeUserProfileProvider = StreamProvider.family<User?, String>((ref, userId) {
+final realtimeUserProfileProvider =
+    StreamProvider.family<User?, String>((ref, userId) {
   final syncManager = ref.watch(syncManagerProvider);
   return syncManager.watchUserProfile(userId);
 });
@@ -60,7 +61,8 @@ final realtimeLessonsProvider = StreamProvider<List<Lesson>>((ref) {
 });
 
 /// 실시간 리그 스트림 Provider
-final realtimeLeagueProvider = StreamProvider.family<League?, String>((ref, userId) {
+final realtimeLeagueProvider =
+    StreamProvider.family<League?, String>((ref, userId) {
   final syncManager = ref.watch(syncManagerProvider);
   return syncManager.watchLeague(userId);
 });

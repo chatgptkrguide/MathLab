@@ -52,7 +52,8 @@ class LessonPathWidget extends StatelessWidget {
   }
 
   /// 레슨 노드 빌드 (듀오링고 스타일)
-  Widget _buildLessonNode(LessonNode lesson, bool isLeft, bool isCenter, bool isRight) {
+  Widget _buildLessonNode(
+      LessonNode lesson, bool isLeft, bool isCenter, bool isRight) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingS),
       child: Align(
@@ -138,7 +139,8 @@ class LessonPathWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppColors.mathYellow, // GoMath 골드
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.surface, width: 2),
+                            border:
+                                Border.all(color: AppColors.surface, width: 2),
                           ),
                           child: const Icon(
                             Icons.stars_rounded,
@@ -149,7 +151,9 @@ class LessonPathWidget extends StatelessWidget {
                       ),
 
                     // 별 표시 (현재 레슨)
-                    if (lesson.isCurrent && !lesson.isLocked && !lesson.isCompleted)
+                    if (lesson.isCurrent &&
+                        !lesson.isLocked &&
+                        !lesson.isCompleted)
                       Positioned(
                         top: -8,
                         child: Container(
@@ -157,7 +161,8 @@ class LessonPathWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppColors.mathYellow, // GoMath 골드
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.surface, width: 2),
+                            border:
+                                Border.all(color: AppColors.surface, width: 2),
                           ),
                           child: const Icon(
                             Icons.star_rounded,
@@ -284,7 +289,8 @@ class DuolingoPathPainter extends CustomPainter {
     }
   }
 
-  void _drawDottedLine(Canvas canvas, double x1, double y1, double x2, double y2, Paint paint) {
+  void _drawDottedLine(
+      Canvas canvas, double x1, double y1, double x2, double y2, Paint paint) {
     const dashLength = 8.0;
     const gapLength = 6.0;
 
@@ -307,7 +313,8 @@ class DuolingoPathPainter extends CustomPainter {
     }
   }
 
-  void _drawDottedCurve(Canvas canvas, double x1, double y1, double x2, double y2, Paint paint) {
+  void _drawDottedCurve(
+      Canvas canvas, double x1, double y1, double x2, double y2, Paint paint) {
     const dashLength = 8.0;
     const gapLength = 6.0;
 
@@ -318,9 +325,11 @@ class DuolingoPathPainter extends CustomPainter {
     // 왼쪽에서 오른쪽으로 갈 때와 오른쪽에서 왼쪽으로 갈 때 다른 곡선
     final isMovingRight = x2 > x1;
 
-    final controlX1 = isMovingRight ? x1 + (x2 - x1) * 0.3 : x1 - (x1 - x2) * 0.3;
+    final controlX1 =
+        isMovingRight ? x1 + (x2 - x1) * 0.3 : x1 - (x1 - x2) * 0.3;
     final controlY1 = y2 * 0.25;
-    final controlX2 = isMovingRight ? x1 + (x2 - x1) * 0.7 : x1 - (x1 - x2) * 0.7;
+    final controlX2 =
+        isMovingRight ? x1 + (x2 - x1) * 0.7 : x1 - (x1 - x2) * 0.7;
     final controlY2 = y2 * 0.75;
 
     path.cubicTo(controlX1, controlY1, controlX2, controlY2, x2, y2);
@@ -331,7 +340,8 @@ class DuolingoPathPainter extends CustomPainter {
     while (distance < metrics.length) {
       final start = metrics.getTangentForOffset(distance);
       distance += dashLength;
-      final end = metrics.getTangentForOffset(distance.clamp(0, metrics.length));
+      final end =
+          metrics.getTangentForOffset(distance.clamp(0, metrics.length));
 
       if (start != null && end != null) {
         canvas.drawLine(start.position, end.position, paint);

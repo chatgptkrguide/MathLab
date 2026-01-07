@@ -66,7 +66,8 @@ class FileUploadService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = path.extension(imagePath);
       final fileName = 'photo_$timestamp$extension';
-      final storagePath = 'users/$studentId/assignments/$assignmentId/$fileName';
+      final storagePath =
+          'users/$studentId/assignments/$assignmentId/$fileName';
 
       // Firebase Storage에 업로드
       final ref = _storage.ref().child(storagePath);
@@ -80,7 +81,6 @@ class FileUploadService {
 
       Logger.info('과제 사진 업로드 성공: $downloadUrl', tag: 'FileUploadService');
       return UploadResult.success(downloadUrl);
-
     } catch (e, stackTrace) {
       Logger.error(
         '과제 사진 업로드 실패',
@@ -145,7 +145,8 @@ class FileUploadService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = path.extension(imagePath);
       final fileName = 'omr_$timestamp$extension';
-      final storagePath = 'users/$studentId/weekly_tests/$weeklyTestId/$fileName';
+      final storagePath =
+          'users/$studentId/weekly_tests/$weeklyTestId/$fileName';
 
       // Firebase Storage에 업로드
       final ref = _storage.ref().child(storagePath);
@@ -159,7 +160,6 @@ class FileUploadService {
 
       Logger.info('OMR 사진 업로드 성공: $downloadUrl', tag: 'FileUploadService');
       return UploadResult.success(downloadUrl);
-
     } catch (e, stackTrace) {
       Logger.error(
         'OMR 사진 업로드 실패',
@@ -188,7 +188,6 @@ class FileUploadService {
 
       Logger.info('파일 삭제 성공: $fileUrl', tag: 'FileUploadService');
       return true;
-
     } catch (e, stackTrace) {
       Logger.error(
         '파일 삭제 실패',
@@ -247,7 +246,6 @@ class FileUploadService {
 
       Logger.info('프로필 이미지 업로드 성공: $downloadUrl', tag: 'FileUploadService');
       return UploadResult.success(downloadUrl);
-
     } catch (e, stackTrace) {
       Logger.error(
         '프로필 이미지 업로드 실패',
@@ -288,7 +286,6 @@ class FileUploadService {
       // 현재는 원본 경로를 그대로 반환 (개발 단계)
       Logger.info('이미지 압축: $imagePath', tag: 'FileUploadService');
       return imagePath;
-
     } catch (e, stackTrace) {
       Logger.error(
         '이미지 압축 실패',
@@ -324,7 +321,6 @@ class FileUploadService {
       final mockUrl = '$destination/file_$timestamp.jpg';
 
       return UploadResult.success(mockUrl);
-
     } catch (e, stackTrace) {
       Logger.error(
         '진행률 추적 업로드 실패',

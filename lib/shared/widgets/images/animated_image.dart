@@ -440,8 +440,8 @@ class _ImageGalleryState extends State<ImageGallery> {
             itemCount: widget.imageUrls.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: AppDimensions.paddingS),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingS),
                 child: AnimatedImage(
                   imageUrl: widget.imageUrls[index],
                   height: widget.height,

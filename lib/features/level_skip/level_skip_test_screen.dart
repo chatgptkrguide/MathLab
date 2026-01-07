@@ -44,8 +44,7 @@ class _LevelSkipTestScreenState extends ConsumerState<LevelSkipTestScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        LevelSkipResultScreen(test: test),
+                    builder: (context) => LevelSkipResultScreen(test: test),
                   ),
                 );
               });
@@ -277,7 +276,8 @@ class _LevelSkipTestScreenState extends ConsumerState<LevelSkipTestScreen> {
     });
 
     try {
-      final notifier = ref.read(skipTestNotifierProvider(widget.testId).notifier);
+      final notifier =
+          ref.read(skipTestNotifierProvider(widget.testId).notifier);
       await notifier.submitAnswer(_selectedAnswerIndex!);
 
       // 다음 문제로 이동 준비
@@ -340,7 +340,8 @@ class _LevelSkipTestScreenState extends ConsumerState<LevelSkipTestScreen> {
           const SizedBox(height: 16),
           Text(
             message,
-            style: const TextStyle(fontSize: 16, color: AppColors.textSecondary),
+            style:
+                const TextStyle(fontSize: 16, color: AppColors.textSecondary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -408,9 +409,7 @@ class LevelSkipResultScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
 
                     Text(
-                      isPassed
-                          ? '레벨 스킵 테스트를 통과했습니다!'
-                          : '조금 더 연습이 필요합니다',
+                      isPassed ? '레벨 스킵 테스트를 통과했습니다!' : '조금 더 연습이 필요합니다',
                       style: const TextStyle(
                         fontSize: 18,
                         color: AppColors.textSecondary,
@@ -510,7 +509,8 @@ class LevelSkipResultScreen extends ConsumerWidget {
         children: [
           _buildStatRow('정답률', '${test.finalAccuracy}%'),
           const Divider(height: 32),
-          _buildStatRow('맞춘 문제', '${test.correctAnswers} / ${test.totalProblems}'),
+          _buildStatRow(
+              '맞춘 문제', '${test.correctAnswers} / ${test.totalProblems}'),
           const Divider(height: 32),
           _buildStatRow('통과 기준', '${test.requiredAccuracy}%'),
           if (test.durationInSeconds != null) ...[

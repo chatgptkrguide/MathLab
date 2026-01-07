@@ -29,8 +29,10 @@ class MockDataService {
   /// JSON 파일에서 레슨 데이터 로드
   Future<List<Lesson>> loadLessons() async {
     try {
-      Logger.info('[MockDataService] lessons.json 로드 시작', tag: 'MockDataService');
-      final jsonString = await rootBundle.loadString('assets/data/lessons.json');
+      Logger.info('[MockDataService] lessons.json 로드 시작',
+          tag: 'MockDataService');
+      final jsonString =
+          await rootBundle.loadString('assets/data/lessons.json');
       final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
       final lessonsList = jsonData['lessons'] as List<dynamic>;
 
@@ -38,7 +40,9 @@ class MockDataService {
           .map((json) => Lesson.fromJson(json as Map<String, dynamic>))
           .toList();
 
-      Logger.info('[MockDataService] lessons.json에서 ${lessons.length}개 레슨 로드 완료', tag: 'MockDataService');
+      Logger.info(
+          '[MockDataService] lessons.json에서 ${lessons.length}개 레슨 로드 완료',
+          tag: 'MockDataService');
       return lessons;
     } catch (e, stackTrace) {
       Logger.error(
@@ -273,7 +277,8 @@ class MockDataService {
     var totalErrors = errorNotes.length;
     var unreviewed = errorNotes.where((note) => note.reviewCount == 0).length;
     var reviewedOnce = errorNotes.where((note) => note.reviewCount == 1).length;
-    var reviewedTwice = errorNotes.where((note) => note.reviewCount >= 2).length;
+    var reviewedTwice =
+        errorNotes.where((note) => note.reviewCount >= 2).length;
 
     return {
       'total': totalErrors,
@@ -313,7 +318,8 @@ class MockDataService {
           '-3^(-2) = -1/9',
         ],
         answer: 2,
-        explanation: '(-3)^(-2) = 1/(-3)^2 = 1/9가 맞지만, 보기에서는 1/9로 표시되어 있어 정답입니다. '
+        explanation:
+            '(-3)^(-2) = 1/(-3)^2 = 1/9가 맞지만, 보기에서는 1/9로 표시되어 있어 정답입니다. '
             '실제로 (-3)^2 = 9이므로 (-3)^(-2) = 1/9입니다.',
         hints: [
           '음수의 거듭제곱을 먼저 계산하세요',
@@ -344,7 +350,8 @@ class MockDataService {
         ],
         correctAnswerIndex: 0,
         correctAnswer: '2a²∛2',
-        explanation: '³√(16a^6) = ³√(8·2·a^6) = ³√8 · ³√2 · ³√(a^6) = 2 · ³√2 · a² = 2a²∛2',
+        explanation:
+            '³√(16a^6) = ³√(8·2·a^6) = ³√8 · ³√2 · ³√(a^6) = 2 · ³√2 · a² = 2a²∛2',
         hints: [
           '16을 8과 2의 곱으로 나누어 보세요',
           'a^6 = (a²)³ 임을 이용하세요',
@@ -417,10 +424,10 @@ class MockDataService {
 
       // 정답을 포함한 선택지 생성 (정답, 오답 3개)
       final options = [
-        '$correctAnswer',  // 정답
-        '${correctAnswer + 1}',  // 오답 1
-        '${correctAnswer - 1}',  // 오답 2
-        '${correctAnswer + 2}',  // 오답 3
+        '$correctAnswer', // 정답
+        '${correctAnswer + 1}', // 오답 1
+        '${correctAnswer - 1}', // 오답 2
+        '${correctAnswer + 2}', // 오답 3
       ];
 
       problems.add(Problem.legacy(
@@ -452,14 +459,14 @@ class MockDataService {
       // 정답 먼저 계산
       final a = 3 + i;
       final b = 10 + i;
-      final correctAnswer = b - a;  // x + a = b → x = b - a
+      final correctAnswer = b - a; // x + a = b → x = b - a
 
       // 정답을 포함한 선택지 생성
       final options = [
-        '$correctAnswer',  // 정답
-        '${correctAnswer + 1}',  // 오답 1
-        '${correctAnswer - 1}',  // 오답 2
-        '${correctAnswer + 2}',  // 오답 3
+        '$correctAnswer', // 정답
+        '${correctAnswer + 1}', // 오답 1
+        '${correctAnswer - 1}', // 오답 2
+        '${correctAnswer + 2}', // 오답 3
       ];
 
       problems.add(Problem.legacy(

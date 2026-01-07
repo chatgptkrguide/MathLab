@@ -107,7 +107,8 @@ class OnboardingPage extends StatelessWidget {
                       padding: const EdgeInsets.all(AppDimensions.paddingL),
                       decoration: BoxDecoration(
                         color: AppColors.surface.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusL),
                         border: Border.all(
                           color: AppColors.surface.withOpacity(0.3),
                           width: 2,

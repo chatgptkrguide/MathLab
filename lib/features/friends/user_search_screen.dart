@@ -135,7 +135,8 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
@@ -171,9 +172,8 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                 _selectedGrade ?? '학년',
                 style: TextStyle(fontSize: 13),
               ),
-              deleteIcon: _selectedGrade != null
-                  ? Icon(Icons.close, size: 18)
-                  : null,
+              deleteIcon:
+                  _selectedGrade != null ? Icon(Icons.close, size: 18) : null,
               onDeleted: _selectedGrade != null
                   ? () {
                       setState(() {
@@ -271,13 +271,19 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
         .toSet();
 
     // 현재 사용자와 친구 제외
-    final levelRecommendations = recommendedByLevel.where((user) {
-      return user.id != currentUser.id && !friendUserIds.contains(user.id);
-    }).take(5).toList();
+    final levelRecommendations = recommendedByLevel
+        .where((user) {
+          return user.id != currentUser.id && !friendUserIds.contains(user.id);
+        })
+        .take(5)
+        .toList();
 
-    final gradeRecommendations = recommendedByGrade.where((user) {
-      return user.id != currentUser.id && !friendUserIds.contains(user.id);
-    }).take(5).toList();
+    final gradeRecommendations = recommendedByGrade
+        .where((user) {
+          return user.id != currentUser.id && !friendUserIds.contains(user.id);
+        })
+        .take(5)
+        .toList();
 
     return Expanded(
       child: ListView(
@@ -372,7 +378,6 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
     );
   }
 
-
   /// 레벨 범위 선택 다이얼로그
   void _showLevelRangeDialog() {
     int tempMinLevel = _minLevel ?? 1;
@@ -395,7 +400,8 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                         labelText: '최소 레벨',
                         border: OutlineInputBorder(),
                       ),
-                      controller: TextEditingController(text: tempMinLevel.toString()),
+                      controller:
+                          TextEditingController(text: tempMinLevel.toString()),
                       onChanged: (value) {
                         final parsed = int.tryParse(value);
                         if (parsed != null && parsed >= 1) {
@@ -412,7 +418,8 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                         labelText: '최대 레벨',
                         border: OutlineInputBorder(),
                       ),
-                      controller: TextEditingController(text: tempMaxLevel.toString()),
+                      controller:
+                          TextEditingController(text: tempMaxLevel.toString()),
                       onChanged: (value) {
                         final parsed = int.tryParse(value);
                         if (parsed != null && parsed >= tempMinLevel) {
@@ -477,5 +484,4 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
       ),
     );
   }
-
 }

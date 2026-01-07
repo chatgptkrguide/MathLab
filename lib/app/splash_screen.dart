@@ -145,7 +145,8 @@ class _SplashScreenState extends State<SplashScreen>
                               color: AppColors.surface,
                               shadows: [
                                 Shadow(
-                                  color: AppColors.mathButtonBlue.withOpacity(0.5),
+                                  color:
+                                      AppColors.mathButtonBlue.withOpacity(0.5),
                                   blurRadius: 15,
                                 ),
                               ],
@@ -249,7 +250,8 @@ class _SplashScreenState extends State<SplashScreen>
                     width: 40,
                     height: 40,
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.surface),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.surface),
                       strokeWidth: 3,
                     ),
                   ),

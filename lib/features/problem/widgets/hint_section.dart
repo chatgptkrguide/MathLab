@@ -188,14 +188,16 @@ class _HintSectionState extends ConsumerState<HintSection>
                           (index) {
                             // hintState를 통해 unlock 여부 확인
                             final hintKey = '${widget.problem.id}_$index';
-                            final isUnlocked = hintState.unlockedHints.contains(hintKey);
+                            final isUnlocked =
+                                hintState.unlockedHints.contains(hintKey);
 
                             return _HintItem(
                               problem: widget.problem,
                               hintIndex: index,
                               hintText: widget.problem.hints[index],
                               isUnlocked: isUnlocked,
-                              canUnlock: userXP >= HintProviderOptimized.hintCost,
+                              canUnlock:
+                                  userXP >= HintProviderOptimized.hintCost,
                               onUnlock: () => _unlockHint(context, index),
                             );
                           },
@@ -516,11 +518,13 @@ class _HintItemState extends State<_HintItem>
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: widget.canUnlock ? () async {
-                      await _buttonController.forward();
-                      await _buttonController.reverse();
-                      widget.onUnlock();
-                    } : null,
+                    onTap: widget.canUnlock
+                        ? () async {
+                            await _buttonController.forward();
+                            await _buttonController.reverse();
+                            widget.onUnlock();
+                          }
+                        : null,
                     borderRadius: BorderRadius.circular(10),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

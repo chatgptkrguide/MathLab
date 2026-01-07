@@ -138,7 +138,8 @@ class UserProfileCard extends StatelessWidget {
                         backgroundColor: Colors.white,
                         foregroundColor: const Color(0xFF1A1A1A),
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(

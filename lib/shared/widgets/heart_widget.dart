@@ -33,7 +33,8 @@ class HeartWidget extends ConsumerWidget {
           final isFilled = index < heartConfig.currentHearts;
 
           return Padding(
-            padding: EdgeInsets.only(right: index < heartConfig.maxHearts - 1 ? 4 : 0),
+            padding: EdgeInsets.only(
+                right: index < heartConfig.maxHearts - 1 ? 4 : 0),
             child: _buildHeart(isFilled),
           );
         }),
@@ -150,7 +151,8 @@ class HeartInfoDialog extends ConsumerWidget {
                     LinearProgressIndicator(
                       value: heartConfig.recoveryProgress,
                       backgroundColor: Colors.grey.shade300,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.mathBlue),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.mathBlue),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ],
@@ -168,7 +170,8 @@ class HeartInfoDialog extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusL),
                       ),
                     ),
                     child: const Text('닫기'),
@@ -185,7 +188,8 @@ class HeartInfoDialog extends ConsumerWidget {
                       backgroundColor: AppColors.mathRed,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusL),
                       ),
                     ),
                     child: const Text(

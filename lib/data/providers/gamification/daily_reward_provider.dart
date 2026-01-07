@@ -112,43 +112,48 @@ class DailyRewardProvider extends BaseNotifier<DailyRewardState> {
   /// 데일리 리워드 클레임
   Future<bool> claimDailyReward() async {
     return await executeWithErrorHandling(
-      () async {
-        if (!state.canClaimToday) {
-          logWarning('Cannot claim reward: already claimed today');
-          return false;
-        }
+          () async {
+            if (!state.canClaimToday) {
+              logWarning('Cannot claim reward: already claimed today');
+              return false;
+            }
 
-        final currentReward = state.rewards[state.currentDay - 1];
+            final currentReward = state.rewards[state.currentDay - 1];
 
-        // 보상 지급 (타입에 따라 처리)
-        if (currentReward.type == RewardType.xp) {
-          await _ref.read(userProvider.notifier).addXP(currentReward.amount);
-        } else if (currentReward.type == RewardType.hearts) {
-          await _ref.read(userProvider.notifier).addHearts(currentReward.amount);
-        }
+            // 보상 지급 (타입에 따라 처리)
+            if (currentReward.type == RewardType.xp) {
+              await _ref
+                  .read(userProvider.notifier)
+                  .addXP(currentReward.amount);
+            } else if (currentReward.type == RewardType.hearts) {
+              await _ref
+                  .read(userProvider.notifier)
+                  .addHearts(currentReward.amount);
+            }
 
-        // 다음 날로 이동 (7일 주기)
-        final nextDay = state.currentDay >= 7 ? 1 : state.currentDay + 1;
+            // 다음 날로 이동 (7일 주기)
+            final nextDay = state.currentDay >= 7 ? 1 : state.currentDay + 1;
 
-        await updateAndSave(
-          state.copyWith(
-            lastClaimDate: DateTime.now(),
-            currentDay: nextDay,
-            canClaimToday: false,
-          ),
-          saveKey: _storageKey,
-          toJson: (s) => s.toJson(),
-        );
+            await updateAndSave(
+              state.copyWith(
+                lastClaimDate: DateTime.now(),
+                currentDay: nextDay,
+                canClaimToday: false,
+              ),
+              saveKey: _storageKey,
+              toJson: (s) => s.toJson(),
+            );
 
-        logInfo(
-          'Daily reward claimed: day ${currentReward.day}, type: ${currentReward.type.name}, amount: ${currentReward.amount}',
-        );
+            logInfo(
+              'Daily reward claimed: day ${currentReward.day}, type: ${currentReward.type.name}, amount: ${currentReward.amount}',
+            );
 
-        return true;
-      },
-      errorMessage: 'Failed to claim daily reward',
-      fallback: () => false,
-    ) ?? false;
+            return true;
+          },
+          errorMessage: 'Failed to claim daily reward',
+          fallback: () => false,
+        ) ??
+        false;
   }
 
   /// 상태 새로고침 (날짜 변경 체크)

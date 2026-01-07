@@ -164,7 +164,8 @@ class LocalStorageService {
         return fromJson(jsonData);
       }).toList();
 
-      Logger.debug('Loaded ${objects.length} items for key: $key', tag: 'Storage');
+      Logger.debug('Loaded ${objects.length} items for key: $key',
+          tag: 'Storage');
       return objects;
     } catch (e, stackTrace) {
       Logger.error(
@@ -193,7 +194,8 @@ class LocalStorageService {
       final success = await preferences.setStringList(key, jsonStringList);
 
       if (success) {
-        Logger.debug('Saved ${data.length} items for key: $key', tag: 'Storage');
+        Logger.debug('Saved ${data.length} items for key: $key',
+            tag: 'Storage');
       } else {
         Logger.warning('Failed to save list for key: $key', tag: 'Storage');
       }
@@ -421,9 +423,11 @@ class LocalStorageService {
       final success = await preferences.setString(key, encryptedText);
 
       if (success) {
-        Logger.debug('Saved encrypted object for key: $key', tag: 'SecureStorage');
+        Logger.debug('Saved encrypted object for key: $key',
+            tag: 'SecureStorage');
       } else {
-        Logger.warning('Failed to save encrypted object for key: $key', tag: 'SecureStorage');
+        Logger.warning('Failed to save encrypted object for key: $key',
+            tag: 'SecureStorage');
       }
 
       return success;
@@ -453,14 +457,16 @@ class LocalStorageService {
       final encryptedText = preferences.getString(key);
 
       if (encryptedText == null) {
-        Logger.debug('No encrypted data found for key: $key', tag: 'SecureStorage');
+        Logger.debug('No encrypted data found for key: $key',
+            tag: 'SecureStorage');
         return null;
       }
 
       final jsonData = _encryption.decryptJson(encryptedText);
       final object = fromJson(jsonData);
 
-      Logger.debug('Loaded encrypted object for key: $key', tag: 'SecureStorage');
+      Logger.debug('Loaded encrypted object for key: $key',
+          tag: 'SecureStorage');
       return object;
     } catch (e, stackTrace) {
       Logger.error(
@@ -484,7 +490,8 @@ class LocalStorageService {
       final success = await preferences.setString(key, encryptedText);
 
       if (success) {
-        Logger.debug('Saved encrypted string for key: $key', tag: 'SecureStorage');
+        Logger.debug('Saved encrypted string for key: $key',
+            tag: 'SecureStorage');
       }
 
       return success;
@@ -509,12 +516,14 @@ class LocalStorageService {
       final encryptedText = preferences.getString(key);
 
       if (encryptedText == null) {
-        Logger.debug('No encrypted string found for key: $key', tag: 'SecureStorage');
+        Logger.debug('No encrypted string found for key: $key',
+            tag: 'SecureStorage');
         return null;
       }
 
       final decrypted = _encryption.decrypt(encryptedText);
-      Logger.debug('Loaded encrypted string for key: $key', tag: 'SecureStorage');
+      Logger.debug('Loaded encrypted string for key: $key',
+          tag: 'SecureStorage');
       return decrypted;
     } catch (e, stackTrace) {
       Logger.error(
@@ -545,7 +554,8 @@ class LocalStorageService {
       // 이미 암호화된 데이터인지 확인 (복호화 시도)
       try {
         _encryption.decrypt(plainText);
-        Logger.debug('Data already encrypted for key: $key', tag: 'SecureStorage');
+        Logger.debug('Data already encrypted for key: $key',
+            tag: 'SecureStorage');
         return true;
       } catch (_) {
         // 복호화 실패 = 평문 데이터
@@ -556,9 +566,11 @@ class LocalStorageService {
       final success = await preferences.setString(key, encryptedText);
 
       if (success) {
-        Logger.info('Migrated data to encrypted format for key: $key', tag: 'SecureStorage');
+        Logger.info('Migrated data to encrypted format for key: $key',
+            tag: 'SecureStorage');
       } else {
-        Logger.warning('Failed to migrate data for key: $key', tag: 'SecureStorage');
+        Logger.warning('Failed to migrate data for key: $key',
+            tag: 'SecureStorage');
       }
 
       return success;

@@ -3,11 +3,11 @@ import '../../shared/utils/logger.dart';
 
 /// 충돌 해결 전략 열거형
 enum ResolutionStrategy {
-  lastWriteWins,  // 최신 타임스탬프 기준 덮어쓰기
-  merge,          // 필드별 병합
-  clientWins,     // 클라이언트 우선
-  serverWins,     // 서버 우선
-  custom,         // 커스텀 로직
+  lastWriteWins, // 최신 타임스탬프 기준 덮어쓰기
+  merge, // 필드별 병합
+  clientWins, // 클라이언트 우선
+  serverWins, // 서버 우선
+  custom, // 커스텀 로직
 }
 
 /// 충돌 해결 메타데이터
@@ -86,7 +86,9 @@ class ConflictResolutionService {
       final localXP = local['totalXP'] as int;
       final serverXP = server['totalXP'] as int;
       target['totalXP'] = localXP > serverXP ? localXP : serverXP;
-      Logger.debug('XP 병합: local=$localXP, server=$serverXP, merged=${target['totalXP']}', tag: _tag);
+      Logger.debug(
+          'XP 병합: local=$localXP, server=$serverXP, merged=${target['totalXP']}',
+          tag: _tag);
     }
 
     // 레벨은 더 큰 값 유지
@@ -100,7 +102,8 @@ class ConflictResolutionService {
     if (local['streak'] != null && server['streak'] != null) {
       final localStreak = local['streak'] as int;
       final serverStreak = server['streak'] as int;
-      target['streak'] = localStreak > serverStreak ? localStreak : serverStreak;
+      target['streak'] =
+          localStreak > serverStreak ? localStreak : serverStreak;
     }
 
     // 일일 XP는 날짜 확인 후 병합
@@ -118,12 +121,14 @@ class ConflictResolutionService {
     final localResetDate = (local['lastXPResetDate'] as Timestamp?)?.toDate();
     final serverResetDate = (server['lastXPResetDate'] as Timestamp?)?.toDate();
 
-    if (localDailyXP != null && serverDailyXP != null &&
-        localResetDate != null && serverResetDate != null) {
-
+    if (localDailyXP != null &&
+        serverDailyXP != null &&
+        localResetDate != null &&
+        serverResetDate != null) {
       // 같은 날짜면 더 큰 값 유지
       if (_isSameDay(localResetDate, serverResetDate)) {
-        target['dailyXP'] = localDailyXP > serverDailyXP ? localDailyXP : serverDailyXP;
+        target['dailyXP'] =
+            localDailyXP > serverDailyXP ? localDailyXP : serverDailyXP;
         target['lastXPResetDate'] = Timestamp.fromDate(localResetDate);
         Logger.debug(
           '일일 XP 병합 (같은 날): local=$localDailyXP, server=$serverDailyXP, merged=${target['dailyXP']}',
@@ -196,22 +201,26 @@ class ConflictResolutionService {
     // 복습 횟수는 더 큰 값 유지
     final localReviewCount = conflict.localData['reviewCount'] as int? ?? 0;
     final serverReviewCount = conflict.serverData['reviewCount'] as int? ?? 0;
-    merged['reviewCount'] = localReviewCount > serverReviewCount ? localReviewCount : serverReviewCount;
+    merged['reviewCount'] = localReviewCount > serverReviewCount
+        ? localReviewCount
+        : serverReviewCount;
 
     // 마지막 복습 시간은 더 최신 시간 유지
-    final localLastReview = (conflict.localData['lastReviewedAt'] as Timestamp?)?.toDate();
-    final serverLastReview = (conflict.serverData['lastReviewedAt'] as Timestamp?)?.toDate();
+    final localLastReview =
+        (conflict.localData['lastReviewedAt'] as Timestamp?)?.toDate();
+    final serverLastReview =
+        (conflict.serverData['lastReviewedAt'] as Timestamp?)?.toDate();
 
     if (localLastReview != null && serverLastReview != null) {
       merged['lastReviewedAt'] = Timestamp.fromDate(
-        localLastReview.isAfter(serverLastReview) ? localLastReview : serverLastReview
-      );
+          localLastReview.isAfter(serverLastReview)
+              ? localLastReview
+              : serverLastReview);
     }
 
     // 마스터 여부는 OR 연산 (한 번이라도 마스터하면 마스터)
-    merged['isMastered'] =
-      (conflict.localData['isMastered'] ?? false) ||
-      (conflict.serverData['isMastered'] ?? false);
+    merged['isMastered'] = (conflict.localData['isMastered'] ?? false) ||
+        (conflict.serverData['isMastered'] ?? false);
 
     merged['updatedAt'] = FieldValue.serverTimestamp();
 
@@ -323,8 +332,8 @@ class ConflictResolutionService {
     final utc1 = date1.toUtc();
     final utc2 = date2.toUtc();
     return utc1.year == utc2.year &&
-           utc1.month == utc2.month &&
-           utc1.day == utc2.day;
+        utc1.month == utc2.month &&
+        utc1.day == utc2.day;
   }
 
   /// 충돌 통계 기록

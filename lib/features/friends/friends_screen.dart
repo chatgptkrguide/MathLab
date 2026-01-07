@@ -43,9 +43,11 @@ class FriendsScreen extends ConsumerWidget {
                         children: [
                           // 대기 중인 친구 요청
                           if (pendingRequests.isNotEmpty) ...[
-                            _buildSectionHeader('친구 요청', pendingRequests.length),
+                            _buildSectionHeader(
+                                '친구 요청', pendingRequests.length),
                             ...pendingRequests.map((friend) {
-                              return _buildPendingRequestItem(context, ref, friend);
+                              return _buildPendingRequestItem(
+                                  context, ref, friend);
                             }),
                             const SizedBox(height: 16),
                           ],
@@ -148,7 +150,8 @@ class FriendsScreen extends ConsumerWidget {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.workspace_premium, size: 14, color: AppColors.mathGold),
+                    Icon(Icons.workspace_premium,
+                        size: 14, color: AppColors.mathGold),
                     const SizedBox(width: 4),
                     Text(
                       'Lv.${friend.level}',
@@ -320,7 +323,9 @@ class FriendsScreen extends ConsumerWidget {
                   updatedAt: now,
                 );
 
-                await ref.read(chatRoomsProvider.notifier).createChatRoom(newRoom);
+                await ref
+                    .read(chatRoomsProvider.notifier)
+                    .createChatRoom(newRoom);
 
                 if (context.mounted) {
                   Navigator.push(
@@ -376,10 +381,13 @@ class FriendsScreen extends ConsumerWidget {
                 );
 
                 if (shouldDelete == true) {
-                  await ref.read(friendsProvider.notifier).removeFriend(friend.id);
+                  await ref
+                      .read(friendsProvider.notifier)
+                      .removeFriend(friend.id);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${friend.name}님을 친구 목록에서 삭제했습니다')),
+                      SnackBar(
+                          content: Text('${friend.name}님을 친구 목록에서 삭제했습니다')),
                     );
                   }
                 }

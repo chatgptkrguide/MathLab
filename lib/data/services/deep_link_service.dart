@@ -3,15 +3,15 @@ import '../../shared/utils/logger.dart';
 
 /// FCM 알림 타입
 enum NotificationType {
-  leagueUpdate,       // 리그 업데이트
-  friendRequest,      // 친구 요청
-  achievement,        // 업적 달성
-  streakReminder,     // 연속 학습 리마인더
-  lessonComplete,     // 레슨 완료
+  leagueUpdate, // 리그 업데이트
+  friendRequest, // 친구 요청
+  achievement, // 업적 달성
+  streakReminder, // 연속 학습 리마인더
+  lessonComplete, // 레슨 완료
   weeklyTestAvailable, // 주간 테스트 가능
-  premiumOffer,       // 프리미엄 제안
-  customMessage,      // 커스텀 메시지
-  unknown,            // 알 수 없는 타입
+  premiumOffer, // 프리미엄 제안
+  customMessage, // 커스텀 메시지
+  unknown, // 알 수 없는 타입
 }
 
 /// FCM 딥링크 서비스
@@ -32,41 +32,41 @@ class DeepLinkService {
 
       // 알림 타입 파싱
       final type = parseNotificationType(data['type']);
-      
+
       // 타입별 네비게이션
       switch (type) {
         case NotificationType.leagueUpdate:
           await _navigateToLeague(context, data);
           break;
-        
+
         case NotificationType.friendRequest:
           await _navigateToFriends(context, data);
           break;
-        
+
         case NotificationType.achievement:
           await _navigateToAchievements(context, data);
           break;
-        
+
         case NotificationType.streakReminder:
           await _navigateToHome(context);
           break;
-        
+
         case NotificationType.lessonComplete:
           await _navigateToLesson(context, data);
           break;
-        
+
         case NotificationType.weeklyTestAvailable:
           await _navigateToWeeklyTest(context, data);
           break;
-        
+
         case NotificationType.premiumOffer:
           await _navigateToPremium(context, data);
           break;
-        
+
         case NotificationType.customMessage:
           await _navigateToMessages(context, data);
           break;
-        
+
         case NotificationType.unknown:
           Logger.warning('알 수 없는 알림 타입: ${data['type']}', tag: 'DeepLink');
           await _navigateToHome(context);
@@ -89,9 +89,9 @@ class DeepLinkService {
   @visibleForTesting
   NotificationType parseNotificationType(dynamic typeValue) {
     if (typeValue == null) return NotificationType.unknown;
-    
+
     final typeString = typeValue.toString().toLowerCase();
-    
+
     switch (typeString) {
       case 'league_update':
         return NotificationType.leagueUpdate;
@@ -233,7 +233,7 @@ class DeepLinkService {
     if (!context.mounted) return;
 
     Navigator.of(context).popUntil((route) => route.isFirst);
-    
+
     // 특정 채팅방 ID가 있으면 해당 채팅방으로 이동
     final chatRoomId = data['chatRoomId'];
     if (chatRoomId != null) {
@@ -249,11 +249,11 @@ class DeepLinkService {
   ) async {
     try {
       Logger.info('Deep Link URL 처리: $url', tag: 'DeepLink');
-      
+
       final uri = Uri.parse(url);
       final path = uri.path;
       final queryParams = uri.queryParameters;
-      
+
       // URL 패턴별 처리
       if (path.startsWith('/league')) {
         await _navigateToLeague(context, queryParams);

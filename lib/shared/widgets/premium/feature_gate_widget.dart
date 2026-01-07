@@ -58,9 +58,7 @@ class FeatureGateWidget extends ConsumerWidget {
   /// 잠금 상태 뷰
   Widget _buildLockedView(BuildContext context) {
     return GestureDetector(
-      onTap: navigateOnTap
-          ? () => _handleUpgradeNavigation(context)
-          : null,
+      onTap: navigateOnTap ? () => _handleUpgradeNavigation(context) : null,
       child: Stack(
         children: [
           // 원본 콘텐츠 (블러 처리 또는 그레이스케일)
@@ -145,7 +143,8 @@ class FeatureGateWidget extends ConsumerWidget {
 
               // 잠금 메시지
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(12),
@@ -358,9 +357,7 @@ class FeatureGateListTile extends ConsumerWidget {
               ),
             )
           : null,
-      onTap: isPremiumActive
-          ? onTap
-          : () => _handleUpgradeNavigation(context),
+      onTap: isPremiumActive ? onTap : () => _handleUpgradeNavigation(context),
     );
   }
 

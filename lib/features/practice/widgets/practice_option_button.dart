@@ -51,10 +51,13 @@ class PracticeOptionButton extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.surface : AppColors.successGreen.withOpacity(0.1),
+                color: isSelected
+                    ? AppColors.surface
+                    : AppColors.successGreen.withOpacity(0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.surface : AppColors.successGreen,
+                  color:
+                      isSelected ? AppColors.surface : AppColors.successGreen,
                   width: 2,
                 ),
               ),
@@ -62,7 +65,9 @@ class PracticeOptionButton extends StatelessWidget {
                 child: Text(
                   String.fromCharCode(65 + index), // A, B, C, D
                   style: TextStyle(
-                    color: isSelected ? AppColors.successGreen : AppColors.textPrimary,
+                    color: isSelected
+                        ? AppColors.successGreen
+                        : AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

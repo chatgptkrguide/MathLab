@@ -44,7 +44,8 @@ class AcademicRecordService {
       List<AcademicRecord> records = [];
       if (recordsJson != null) {
         final List<dynamic> recordsList = jsonDecode(recordsJson);
-        records = recordsList.map((json) => AcademicRecord.fromJson(json)).toList();
+        records =
+            recordsList.map((json) => AcademicRecord.fromJson(json)).toList();
       }
 
       records.add(record);
@@ -73,7 +74,8 @@ class AcademicRecordService {
       }
 
       final List<dynamic> recordsList = jsonDecode(recordsJson);
-      final records = recordsList.map((json) => AcademicRecord.fromJson(json)).toList();
+      final records =
+          recordsList.map((json) => AcademicRecord.fromJson(json)).toList();
 
       final index = records.indexWhere((r) => r.id == updatedRecord.id);
       if (index == -1) {
@@ -83,7 +85,8 @@ class AcademicRecordService {
       records[index] = updatedRecord;
       await _saveAllRecords(records);
 
-      Logger.info('학업 성적 수정 완료: ${updatedRecord.id}', tag: 'AcademicRecordService');
+      Logger.info('학업 성적 수정 완료: ${updatedRecord.id}',
+          tag: 'AcademicRecordService');
     } catch (e, stackTrace) {
       Logger.error(
         '학업 성적 수정 실패',
@@ -104,7 +107,8 @@ class AcademicRecordService {
       if (recordsJson == null) return;
 
       final List<dynamic> recordsList = jsonDecode(recordsJson);
-      final records = recordsList.map((json) => AcademicRecord.fromJson(json)).toList();
+      final records =
+          recordsList.map((json) => AcademicRecord.fromJson(json)).toList();
 
       records.removeWhere((r) => r.id == recordId);
       await _saveAllRecords(records);
@@ -160,12 +164,13 @@ class AcademicRecordService {
           .map((r) => r.averageScore!)
           .toList();
 
-      final averageScore = scores.isEmpty
-          ? 0.0
-          : scores.reduce((a, b) => a + b) / scores.length;
+      final averageScore =
+          scores.isEmpty ? 0.0 : scores.reduce((a, b) => a + b) / scores.length;
 
-      final highestScore = scores.isEmpty ? 0.0 : scores.reduce((a, b) => a > b ? a : b);
-      final lowestScore = scores.isEmpty ? 0.0 : scores.reduce((a, b) => a < b ? a : b);
+      final highestScore =
+          scores.isEmpty ? 0.0 : scores.reduce((a, b) => a > b ? a : b);
+      final lowestScore =
+          scores.isEmpty ? 0.0 : scores.reduce((a, b) => a < b ? a : b);
 
       // 유형별 평균 계산
       final Map<AcademicRecordType, double> averageByType = {};
@@ -238,7 +243,8 @@ class AcademicRecordService {
   }
 
   /// 특정 과목의 성적 추세 조회
-  Future<SubjectTrend?> getSubjectTrend(String userId, String subjectName) async {
+  Future<SubjectTrend?> getSubjectTrend(
+      String userId, String subjectName) async {
     try {
       final allRecords = await getAllRecords(userId);
       final scores = <double>[];

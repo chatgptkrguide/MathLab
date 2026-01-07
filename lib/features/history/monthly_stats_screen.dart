@@ -54,9 +54,11 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
     final studyHistory = ref.watch(studyHistoryProvider);
 
     // 현재 월의 학습 기록 필터링
-    final monthlyHistory = studyHistory.where((date) =>
-      date.year == _currentMonth.year && date.month == _currentMonth.month
-    ).toList();
+    final monthlyHistory = studyHistory
+        .where((date) =>
+            date.year == _currentMonth.year &&
+            date.month == _currentMonth.month)
+        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -110,9 +112,23 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
 
   /// 월 선택기
   Widget _buildMonthSelector() {
-    final months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    final months = [
+      '1월',
+      '2월',
+      '3월',
+      '4월',
+      '5월',
+      '6월',
+      '7월',
+      '8월',
+      '9월',
+      '10월',
+      '11월',
+      '12월'
+    ];
     final now = DateTime.now();
-    final isCurrentMonth = _currentMonth.year == now.year && _currentMonth.month == now.month;
+    final isCurrentMonth =
+        _currentMonth.year == now.year && _currentMonth.month == now.month;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -150,7 +166,8 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
           IconButton(
             icon: Icon(
               Icons.chevron_right,
-              color: isCurrentMonth ? AppColors.borderLight : AppColors.mathBlue,
+              color:
+                  isCurrentMonth ? AppColors.borderLight : AppColors.mathBlue,
             ),
             onPressed: isCurrentMonth ? null : _nextMonth,
             padding: EdgeInsets.zero,
@@ -329,7 +346,9 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
       studyTimes[date.day] = 20 + (date.day % 30); // 임시: 20-50분 사이
     }
 
-    final maxTime = studyTimes.values.isEmpty ? 60 : studyTimes.values.reduce((a, b) => a > b ? a : b);
+    final maxTime = studyTimes.values.isEmpty
+        ? 60
+        : studyTimes.values.reduce((a, b) => a > b ? a : b);
 
     return BarChart(
       BarChartData(
@@ -492,7 +511,9 @@ class _MonthlyStatsScreenState extends ConsumerState<MonthlyStatsScreen> {
     }
 
     final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final maxCount = weekdayCount.values.isEmpty ? 1 : weekdayCount.values.reduce((a, b) => a > b ? a : b);
+    final maxCount = weekdayCount.values.isEmpty
+        ? 1
+        : weekdayCount.values.reduce((a, b) => a > b ? a : b);
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),

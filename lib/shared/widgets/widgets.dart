@@ -20,9 +20,12 @@ export 'buttons/unified_button.dart';
 // Cards
 export 'cards/achievement_card.dart';
 export 'cards/daily_goal_card.dart';
-export 'cards/duolingo_card.dart';
+// export 'cards/duolingo_card.dart'; // 삭제됨: styled/duolingo_card.dart로 통합
 export 'cards/lesson_card.dart';
 export 'cards/stat_card.dart';
+
+// Styled widgets
+export 'styled/duolingo_card.dart'; // Duolingo 스타일 카드 (통합 버전)
 
 // Drawers
 export 'drawers/learning_calendar_drawer.dart';

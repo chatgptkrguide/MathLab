@@ -27,10 +27,12 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
         );
 
         state = HeartConfig.fromJson(heartData);
-        Logger.info('하트 상태 로드 완료: ${state.currentHearts}/${state.maxHearts}', tag: 'Heart');
+        Logger.info('하트 상태 로드 완료: ${state.currentHearts}/${state.maxHearts}',
+            tag: 'Heart');
       }
     } catch (e, stackTrace) {
-      Logger.error('하트 상태 로드 실패', error: e, stackTrace: stackTrace, tag: 'Heart');
+      Logger.error('하트 상태 로드 실패',
+          error: e, stackTrace: stackTrace, tag: 'Heart');
     }
   }
 
@@ -43,7 +45,8 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
 
       Logger.info('하트 상태 저장 완료', tag: 'Heart');
     } catch (e, stackTrace) {
-      Logger.error('하트 상태 저장 실패', error: e, stackTrace: stackTrace, tag: 'Heart');
+      Logger.error('하트 상태 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'Heart');
     }
   }
 
@@ -70,23 +73,27 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
     final minutesSinceLastLost = timeSinceLastLost.inMinutes;
 
     // 복구할 하트 개수 계산
-    final heartsToRecover = (minutesSinceLastLost / state.heartRecoveryMinutes).floor();
+    final heartsToRecover =
+        (minutesSinceLastLost / state.heartRecoveryMinutes).floor();
 
     if (heartsToRecover > 0) {
-      final newHearts = (state.currentHearts + heartsToRecover).clamp(0, state.maxHearts);
+      final newHearts =
+          (state.currentHearts + heartsToRecover).clamp(0, state.maxHearts);
       final isFullyRecovered = newHearts >= state.maxHearts;
 
       state = state.copyWith(
         currentHearts: newHearts,
         lastHeartLostAt: isFullyRecovered
             ? null
-            : state.lastHeartLostAt!.add(Duration(minutes: heartsToRecover * state.heartRecoveryMinutes)),
+            : state.lastHeartLostAt!.add(Duration(
+                minutes: heartsToRecover * state.heartRecoveryMinutes)),
         clearLastHeartLostAt: isFullyRecovered,
       );
 
       _saveHeartState();
 
-      Logger.info('하트 복구: ${state.currentHearts}/${state.maxHearts}', tag: 'Heart');
+      Logger.info('하트 복구: ${state.currentHearts}/${state.maxHearts}',
+          tag: 'Heart');
     }
 
     // 다음 하트 복구까지 남은 시간 계산
@@ -124,7 +131,8 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
       _startRecoveryTimer();
     }
 
-    Logger.info('하트 감소: ${state.currentHearts}/${state.maxHearts}', tag: 'Heart');
+    Logger.info('하트 감소: ${state.currentHearts}/${state.maxHearts}',
+        tag: 'Heart');
     return true;
   }
 
@@ -139,7 +147,8 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
 
     await _saveHeartState();
 
-    Logger.info('하트 획득: ${state.currentHearts}/${state.maxHearts}', tag: 'Heart');
+    Logger.info('하트 획득: ${state.currentHearts}/${state.maxHearts}',
+        tag: 'Heart');
   }
 
   /// 하트 전체 복구 (프리미엄 기능 등)
@@ -151,7 +160,8 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
 
     await _saveHeartState();
 
-    Logger.info('하트 전체 복구: ${state.currentHearts}/${state.maxHearts}', tag: 'Heart');
+    Logger.info('하트 전체 복구: ${state.currentHearts}/${state.maxHearts}',
+        tag: 'Heart');
   }
 
   /// 하트 초기화 (디버그/테스트용)

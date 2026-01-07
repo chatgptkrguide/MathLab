@@ -8,15 +8,15 @@ import '../../shared/utils/logger.dart';
 
 // 에러 타입 분류
 enum NetworkErrorType {
-  noConnection,      // 인터넷 연결 없음
-  timeout,          // 요청 시간 초과
-  serverError,      // 서버 오류 (5xx)
-  clientError,      // 클라이언트 오류 (4xx)
-  unauthorized,     // 인증 실패
-  rateLimited,      // Rate limit 초과
-  parseError,       // 데이터 파싱 오류
-  cancelled,        // 요청 취소됨
-  unknown,          // 알 수 없는 오류
+  noConnection, // 인터넷 연결 없음
+  timeout, // 요청 시간 초과
+  serverError, // 서버 오류 (5xx)
+  clientError, // 클라이언트 오류 (4xx)
+  unauthorized, // 인증 실패
+  rateLimited, // Rate limit 초과
+  parseError, // 데이터 파싱 오류
+  cancelled, // 요청 취소됨
+  unknown, // 알 수 없는 오류
 }
 
 /// 네트워크 에러 정보
@@ -344,7 +344,8 @@ class NetworkErrorHandler {
 
         // 다음 재시도를 위한 지연 시간 증가 (지수 백오프)
         currentDelay = Duration(
-          milliseconds: (currentDelay.inMilliseconds * backoffMultiplier).round(),
+          milliseconds:
+              (currentDelay.inMilliseconds * backoffMultiplier).round(),
         );
         if (currentDelay > maxRetryDelay) {
           currentDelay = maxRetryDelay;

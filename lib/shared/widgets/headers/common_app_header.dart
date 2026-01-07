@@ -167,17 +167,18 @@ class CommonAppHeaderWithMenu extends StatelessWidget {
           color: AppColors.headerText,
           size: 28,
         ),
-        onPressed: onMenuPressed ?? () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('메뉴 기능 준비 중입니다'),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          );
-        },
+        onPressed: onMenuPressed ??
+            () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('메뉴 기능 준비 중입니다'),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            },
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(),
       ),

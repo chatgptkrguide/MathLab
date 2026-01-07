@@ -247,7 +247,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppColors.mathBlue),
+              leading:
+                  const Icon(Icons.photo_library, color: AppColors.mathBlue),
               title: const Text('갤러리에서 선택'),
               onTap: () {
                 Navigator.pop(context);

@@ -322,7 +322,8 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                 title: '연간',
                 price: PremiumTier.yearly.formattedPrice,
                 period: '/년',
-                description: '${PremiumTier.yearly.formattedMonthlyEquivalent}/월 (${PremiumTier.yearly.discountPercentage.toStringAsFixed(0)}% 절약)',
+                description:
+                    '${PremiumTier.yearly.formattedMonthlyEquivalent}/월 (${PremiumTier.yearly.discountPercentage.toStringAsFixed(0)}% 절약)',
                 isRecommended: true,
               ),
 
@@ -331,7 +332,8 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                 top: -10,
                 right: 16,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.mathOrange,
                     borderRadius: BorderRadius.circular(12),
@@ -408,7 +410,9 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.premiumGold : AppColors.borderLight,
+                  color: isSelected
+                      ? AppColors.premiumGold
+                      : AppColors.borderLight,
                   width: 2,
                 ),
                 color: isSelected ? AppColors.premiumGold : Colors.transparent,
@@ -457,7 +461,9 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                       price,
                       style: AppTextStyles.headlineSmall.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? AppColors.premiumGold : AppColors.textPrimary,
+                        color: isSelected
+                            ? AppColors.premiumGold
+                            : AppColors.textPrimary,
                       ),
                     ),
                     if (period.isNotEmpty)

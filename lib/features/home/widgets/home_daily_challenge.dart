@@ -90,7 +90,8 @@ class _HomeDailyChallengeState extends State<HomeDailyChallenge>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFF9800).withOpacity(_isPressed ? 0.4 : 0.3),
+                color:
+                    const Color(0xFFFF9800).withOpacity(_isPressed ? 0.4 : 0.3),
                 blurRadius: _isPressed ? 12 : 8,
                 offset: Offset(0, _isPressed ? 2 : 4),
               ),
@@ -121,7 +122,8 @@ class _HomeDailyChallengeState extends State<HomeDailyChallenge>
                     ),
                     const SizedBox(height: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.25),
                         borderRadius: BorderRadius.circular(20),

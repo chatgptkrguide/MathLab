@@ -11,7 +11,6 @@ class LearningCalendarDrawer extends StatefulWidget {
 }
 
 class _LearningCalendarDrawerState extends State<LearningCalendarDrawer> {
-
   final int _challengeDoneDays = 6;
   final int _remainingDays = 10;
 
@@ -147,11 +146,11 @@ class _LearningCalendarDrawerState extends State<LearningCalendarDrawer> {
     // December 2022 캘린더 데이터
     final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final List<int?> days = [
-      null, null, null, 1, 2, 3, 4,  // 첫 주
-      5, 6, 7, 8, 9, 10, 11,         // 둘째 주
-      12, 13, 14, 15, 16, 17, 18,    // 셋째 주 (13-18 학습함)
-      19, 20, 21, 22, 23, 24, 25,    // 넷째 주
-      26, 27, 28, 29, 30, 31, null,  // 다섯째 주
+      null, null, null, 1, 2, 3, 4, // 첫 주
+      5, 6, 7, 8, 9, 10, 11, // 둘째 주
+      12, 13, 14, 15, 16, 17, 18, // 셋째 주 (13-18 학습함)
+      19, 20, 21, 22, 23, 24, 25, // 넷째 주
+      26, 27, 28, 29, 30, 31, null, // 다섯째 주
     ];
 
     return Column(
@@ -159,18 +158,20 @@ class _LearningCalendarDrawerState extends State<LearningCalendarDrawer> {
         // 요일 헤더
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: weekDays.map((day) => SizedBox(
-            width: 40,
-            child: Center(
-              child: Text(
-                day,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          )).toList(),
+          children: weekDays
+              .map((day) => SizedBox(
+                    width: 40,
+                    child: Center(
+                      child: Text(
+                        day,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ))
+              .toList(),
         ),
         const SizedBox(height: 12),
 
@@ -196,7 +197,7 @@ class _LearningCalendarDrawerState extends State<LearningCalendarDrawer> {
             return Container(
               decoration: BoxDecoration(
                 color: isStudied
-                    ? const Color(0xFF6BA4D8)  // 피그마의 파란색
+                    ? const Color(0xFF6BA4D8) // 피그마의 파란색
                     : Colors.transparent,
                 shape: BoxShape.circle,
               ),

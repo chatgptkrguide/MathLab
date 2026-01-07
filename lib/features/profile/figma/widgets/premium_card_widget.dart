@@ -21,7 +21,9 @@ class PremiumCardWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isPremiumActive
-              ? AppColors.premiumGradient.map((c) => c.withOpacity(0.2)).toList()
+              ? AppColors.premiumGradient
+                  .map((c) => c.withOpacity(0.2))
+                  .toList()
               : [
                   const Color(0xFFE3F2FD),
                   const Color(0xFFBBDEFB).withOpacity(0.5),
@@ -53,7 +55,9 @@ class PremiumCardWidget extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isPremiumActive ? AppColors.premiumGold : const Color(0xFF1A1A1A),
+                        color: isPremiumActive
+                            ? AppColors.premiumGold
+                            : const Color(0xFF1A1A1A),
                       ),
                     ),
                     if (isPremiumActive) ...[
@@ -68,7 +72,9 @@ class PremiumCardWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  isPremiumActive ? premiumStatusText : 'Get benefit from our premium',
+                  isPremiumActive
+                      ? premiumStatusText
+                      : 'Get benefit from our premium',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey.shade700,
@@ -86,7 +92,8 @@ class PremiumCardWidget extends ConsumerWidget {
                   // Premium user: Navigate to subscription management
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const SubscriptionManagementScreen(),
+                      builder: (context) =>
+                          const SubscriptionManagementScreen(),
                     ),
                   );
                 } else {
@@ -99,9 +106,12 @@ class PremiumCardWidget extends ConsumerWidget {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: isPremiumActive ? AppColors.premiumGold : AppColors.mathBlue,
+                backgroundColor: isPremiumActive
+                    ? AppColors.premiumGold
+                    : AppColors.mathBlue,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

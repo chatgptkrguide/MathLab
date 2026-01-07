@@ -59,9 +59,7 @@ class ProfileHeaderContent extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  (user?.name.isNotEmpty == true)
-                      ? user!.name[0]
-                      : '학',
+                  (user?.name.isNotEmpty == true) ? user!.name[0] : '학',
                   style: const TextStyle(
                     fontSize: 40, // 28 → 40 (더 크게)
                     fontWeight: FontWeight.bold,
@@ -106,8 +104,8 @@ class ProfileHeaderContent extends StatelessWidget {
             const SizedBox(height: 10), // 14 → 10
             // 통계 (Level, XP, Streak)
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingL),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

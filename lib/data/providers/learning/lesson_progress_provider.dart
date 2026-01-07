@@ -69,9 +69,8 @@ class LessonProgressNotifier extends BaseNotifier<Map<String, int>> {
       }
 
       // Map을 간단한 문자열 형태로 변환 (grade:index,grade:index,...)
-      final progressString = state.entries
-          .map((e) => '${e.key}:${e.value}')
-          .join(',');
+      final progressString =
+          state.entries.map((e) => '${e.key}:${e.value}').join(',');
       await storage.setString(key, progressString);
     } catch (e, stackTrace) {
       logError(

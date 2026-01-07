@@ -22,6 +22,7 @@ class NavigationNotifier extends StateNotifier<int> {
 }
 
 /// 네비게이션 탭 인덱스 프로바이더
-final navigationProvider = StateNotifierProvider<NavigationNotifier, int>((ref) {
+final navigationProvider =
+    StateNotifierProvider<NavigationNotifier, int>((ref) {
   return NavigationNotifier();
 });

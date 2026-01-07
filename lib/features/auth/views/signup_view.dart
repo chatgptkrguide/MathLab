@@ -47,7 +47,8 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
       // 현재 게스트 계정 확인
       final currentAuthState = ref.read(authProvider);
       final isGuest = currentAuthState.isGuest;
-      final guestAccountId = isGuest ? currentAuthState.currentAccount?.id : null;
+      final guestAccountId =
+          isGuest ? currentAuthState.currentAccount?.id : null;
 
       // 회원가입 진행
       final success = await ref.read(authProvider.notifier).signUp(
@@ -252,7 +253,8 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                         onTap: _isLoading
                             ? null
                             : () {
-                                setState(() => _agreedToTerms = !_agreedToTerms);
+                                setState(
+                                    () => _agreedToTerms = !_agreedToTerms);
                               },
                         child: Text.rich(
                           TextSpan(
@@ -335,7 +337,8 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                       onPressed: _isLoading
                           ? null
                           : () {
-                              Navigator.pushReplacementNamed(context, '/auth/login');
+                              Navigator.pushReplacementNamed(
+                                  context, '/auth/login');
                             },
                       child: const Text(
                         '로그인',

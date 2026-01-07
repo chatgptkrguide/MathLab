@@ -48,7 +48,8 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
 
     await AppHapticFeedback.success();
 
-    final success = await ref.read(dailyRewardProvider.notifier).claimDailyReward();
+    final success =
+        await ref.read(dailyRewardProvider.notifier).claimDailyReward();
 
     if (success && mounted) {
       _confettiController.forward();
@@ -260,11 +261,12 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                   final reward = state.rewards[index];
                   final isCurrentDay = reward.day == state.currentDay;
                   final isClaimed = reward.day < state.currentDay ||
-                                    (reward.day == state.currentDay && !state.canClaimToday);
+                      (reward.day == state.currentDay && !state.canClaimToday);
                   final isLocked = reward.day > state.currentDay;
 
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
+                    padding:
+                        const EdgeInsets.only(bottom: AppDimensions.paddingM),
                     child: _DayRewardCard(
                       reward: reward,
                       isCurrentDay: isCurrentDay,
@@ -350,7 +352,9 @@ class _DayRewardCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(AppDimensions.paddingL),
             decoration: BoxDecoration(
-              color: isCurrentDay ? AppColors.primary.withOpacity(0.1) : AppColors.surface,
+              color: isCurrentDay
+                  ? AppColors.primary.withOpacity(0.1)
+                  : AppColors.surface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
                 color: isCurrentDay
@@ -375,128 +379,131 @@ class _DayRewardCard extends StatelessWidget {
                   ),
               ],
             ),
-      child: Row(
-        children: [
-          // Day 번호
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: isClaimed
-                  ? AppColors.success
-                  : isLocked
-                      ? AppColors.disabled
-                      : AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: isClaimed
-                  ? const Icon(
-                      Icons.check,
-                      color: AppColors.surface,
-                      size: 24,
-                    )
-                  : Text(
-                      '${reward.day}',
-                      style: const TextStyle(
-                        color: AppColors.surface,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-            ),
-          ),
-
-          const SizedBox(width: AppDimensions.spacingM),
-
-          // 보상 정보
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  '${reward.day}일차',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isClaimed || isLocked
-                        ? AppColors.textSecondary
-                        : AppColors.textPrimary,
+                // Day 번호
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: isClaimed
+                        ? AppColors.success
+                        : isLocked
+                            ? AppColors.disabled
+                            : AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: isClaimed
+                        ? const Icon(
+                            Icons.check,
+                            color: AppColors.surface,
+                            size: 24,
+                          )
+                        : Text(
+                            '${reward.day}',
+                            style: const TextStyle(
+                              color: AppColors.surface,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spacingXS),
-                Row(
-                  children: [
-                    Text(reward.emoji, style: const TextStyle(fontSize: 16)),
-                    const SizedBox(width: 4),
-                    Text(
-                      reward.displayName,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
+
+                const SizedBox(width: AppDimensions.spacingM),
+
+                // 보상 정보
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${reward.day}일차',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isClaimed || isLocked
+                              ? AppColors.textSecondary
+                              : AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppDimensions.spacingXS),
+                      Row(
+                        children: [
+                          Text(reward.emoji,
+                              style: const TextStyle(fontSize: 16)),
+                          const SizedBox(width: 4),
+                          Text(
+                            reward.displayName,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (reward.day == 7) ...[
+                        const SizedBox(height: AppDimensions.spacingXS),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppDimensions.paddingS,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: AppColors.goldGradient,
+                            ),
+                            borderRadius:
+                                BorderRadius.circular(AppDimensions.radiusS),
+                          ),
+                          child: const Text(
+                            '보너스',
+                            style: TextStyle(
+                              color: AppColors.surface,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-                if (reward.day == 7) ...[
-                  const SizedBox(height: AppDimensions.spacingXS),
+
+                // 상태 아이콘
+                if (isCurrentDay && !isClaimed)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingS,
-                      vertical: 2,
+                      horizontal: AppDimensions.paddingM,
+                      vertical: AppDimensions.paddingS,
                     ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: AppColors.goldGradient,
-                      ),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                      color: AppColors.primary,
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: const Text(
-                      '보너스',
+                      '오늘',
                       style: TextStyle(
                         color: AppColors.surface,
-                        fontSize: 12,
                         fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
+                  )
+                else if (isClaimed)
+                  const Icon(
+                    Icons.check_circle,
+                    color: AppColors.success,
+                    size: 32,
+                  )
+                else if (isLocked)
+                  const Icon(
+                    Icons.lock_outline,
+                    color: AppColors.disabled,
+                    size: 32,
                   ),
-                ],
               ],
             ),
-          ),
-
-          // 상태 아이콘
-          if (isCurrentDay && !isClaimed)
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.paddingM,
-                vertical: AppDimensions.paddingS,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-              ),
-              child: const Text(
-                '오늘',
-                style: TextStyle(
-                  color: AppColors.surface,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            )
-          else if (isClaimed)
-            const Icon(
-              Icons.check_circle,
-              color: AppColors.success,
-              size: 32,
-            )
-          else if (isLocked)
-            const Icon(
-              Icons.lock_outline,
-              color: AppColors.disabled,
-              size: 32,
-            ),
-        ],
-      ),
           ),
         );
       },

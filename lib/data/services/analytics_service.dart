@@ -33,7 +33,8 @@ class AnalyticsService {
 
       Logger.info('Analytics 및 Crashlytics 초기화 완료', tag: 'Analytics');
     } catch (e, stackTrace) {
-      Logger.error('Analytics 초기화 실패', error: e, stackTrace: stackTrace, tag: 'Analytics');
+      Logger.error('Analytics 초기화 실패',
+          error: e, stackTrace: stackTrace, tag: 'Analytics');
     }
   }
 
@@ -284,7 +285,8 @@ class AnalyticsService {
         reason: reason,
         fatal: fatal,
       );
-      Logger.error('크래시 기록', error: exception, stackTrace: stack, tag: 'Crashlytics');
+      Logger.error('크래시 기록',
+          error: exception, stackTrace: stack, tag: 'Crashlytics');
     } catch (e) {
       Logger.error('크래시 기록 실패', error: e, tag: 'Crashlytics');
     }
@@ -294,7 +296,10 @@ class AnalyticsService {
   Future<void> recordFlutterError(FlutterErrorDetails details) async {
     try {
       await _crashlytics.recordFlutterError(details);
-      Logger.error('Flutter 에러 기록', error: details.exception, stackTrace: details.stack, tag: 'Crashlytics');
+      Logger.error('Flutter 에러 기록',
+          error: details.exception,
+          stackTrace: details.stack,
+          tag: 'Crashlytics');
     } catch (e) {
       Logger.error('Flutter 에러 기록 실패', error: e, tag: 'Crashlytics');
     }

@@ -62,7 +62,8 @@ class GradeTabBar extends StatelessWidget {
                     color: isSelected
                         ? AppColors.mathBlue
                         : AppColors.textSecondary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ),

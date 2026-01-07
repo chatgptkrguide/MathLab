@@ -34,7 +34,8 @@ class CourseEnrollmentScreen extends ConsumerWidget {
 
             // 활성 과정 목록
             Expanded(
-              child: _buildEnrollmentsList(context, ref, activeEnrollmentsAsync),
+              child:
+                  _buildEnrollmentsList(context, ref, activeEnrollmentsAsync),
             ),
           ],
         ),
@@ -108,9 +109,7 @@ class CourseEnrollmentScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      slots > 0
-                          ? '$slots개 과정 더 추가 가능'
-                          : '최대 수강 과정 수에 도달했습니다',
+                      slots > 0 ? '$slots개 과정 더 추가 가능' : '최대 수강 과정 수에 도달했습니다',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
@@ -444,7 +443,6 @@ class CourseEnrollmentScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-
             if (enrollment.status == EnrollmentStatus.active) ...[
               ListTile(
                 leading: Icon(Icons.pause, color: AppColors.warning),
@@ -467,7 +465,6 @@ class CourseEnrollmentScreen extends ConsumerWidget {
                 },
               ),
             ],
-
             if (enrollment.status == EnrollmentStatus.paused) ...[
               ListTile(
                 leading: Icon(Icons.play_arrow, color: AppColors.success),

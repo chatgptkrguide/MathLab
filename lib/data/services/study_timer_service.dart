@@ -168,9 +168,7 @@ class StudyTimerService {
       }
 
       final List<dynamic> jsonList = json.decode(historyJson);
-      return jsonList
-          .map((json) => StudySession.fromJson(json))
-          .toList();
+      return jsonList.map((json) => StudySession.fromJson(json)).toList();
     } catch (e, stackTrace) {
       Logger.error(
         '세션 기록 로드 실패',

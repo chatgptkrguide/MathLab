@@ -19,9 +19,8 @@ class HomeFriendsActivity extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final friends = ref.watch(friendsProvider);
-    final acceptedFriends = friends
-        .where((f) => f.status == FriendRequestStatus.accepted)
-        .toList();
+    final acceptedFriends =
+        friends.where((f) => f.status == FriendRequestStatus.accepted).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +44,8 @@ class HomeFriendsActivity extends ConsumerWidget {
                   const SizedBox(width: 8),
                   if (acceptedFriends.isNotEmpty)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -173,7 +173,8 @@ class HomeFriendsActivity extends ConsumerWidget {
               },
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: const Row(
                   children: [
                     Icon(Icons.person_add, color: Colors.white, size: 20),
@@ -279,7 +280,8 @@ class HomeFriendsActivity extends ConsumerWidget {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.workspace_premium, size: 12, color: AppColors.mathGold),
+                    Icon(Icons.workspace_premium,
+                        size: 12, color: AppColors.mathGold),
                     const SizedBox(width: 3),
                     Text(
                       'Lv.${friend.level}',

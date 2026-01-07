@@ -71,7 +71,8 @@ class AdaptiveAppHeader extends ConsumerWidget {
     final user = ref.watch(userProvider);
 
     return Container(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: backgroundColor,
         gradient: gradientColors != null
@@ -85,7 +86,8 @@ class AdaptiveAppHeader extends ConsumerWidget {
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: (backgroundColor ?? AppColors.mathBlue).withOpacity(0.3),
+                  color:
+                      (backgroundColor ?? AppColors.mathBlue).withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),

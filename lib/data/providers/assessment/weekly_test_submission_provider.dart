@@ -4,8 +4,10 @@ import './weekly_test_provider.dart';
 import '../base/base_notifier.dart';
 
 /// 주간테스트 제출 상태 관리 (BaseNotifier 최적화 버전)
-class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmission>> {
-  WeeklyTestSubmissionNotifier(this.ref) : super([], 'WeeklyTestSubmissionProvider') {
+class WeeklyTestSubmissionNotifier
+    extends BaseNotifier<List<WeeklyTestSubmission>> {
+  WeeklyTestSubmissionNotifier(this.ref)
+      : super([], 'WeeklyTestSubmissionProvider') {
     _loadSubmissions();
   }
 
@@ -55,7 +57,8 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
   Future<void> createSubmission(WeeklyTestSubmission submission) async {
     state = [...state, submission];
     await _saveSubmissions();
-    logInfo('주간테스트 제출 생성: ${submission.studentName} - ${submission.weeklyTestId}');
+    logInfo(
+        '주간테스트 제출 생성: ${submission.studentName} - ${submission.weeklyTestId}');
   }
 
   /// OMR 제출 (학생)
@@ -129,12 +132,16 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
 
   /// 특정 주간테스트의 모든 제출 조회
   List<WeeklyTestSubmission> getSubmissionsByTest(String weeklyTestId) {
-    return state.where((submission) => submission.weeklyTestId == weeklyTestId).toList();
+    return state
+        .where((submission) => submission.weeklyTestId == weeklyTestId)
+        .toList();
   }
 
   /// 특정 학생의 모든 제출 조회
   List<WeeklyTestSubmission> getSubmissionsByStudent(String studentId) {
-    return state.where((submission) => submission.studentId == studentId).toList();
+    return state
+        .where((submission) => submission.studentId == studentId)
+        .toList();
   }
 
   /// 미제출 학생 조회
@@ -148,16 +155,19 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
   List<WeeklyTestSubmission> getUngradedSubmissions(String weeklyTestId) {
     return state.where((submission) {
       return submission.weeklyTestId == weeklyTestId &&
-             submission.isSubmitted &&
-             !submission.isGraded;
+          submission.isSubmitted &&
+          !submission.isGraded;
     }).toList();
   }
 
   /// 특정 학생의 특정 주간테스트 제출 조회
-  WeeklyTestSubmission? getStudentSubmission(String weeklyTestId, String studentId) {
+  WeeklyTestSubmission? getStudentSubmission(
+      String weeklyTestId, String studentId) {
     try {
       return state.firstWhere(
-        (submission) => submission.weeklyTestId == weeklyTestId && submission.studentId == studentId,
+        (submission) =>
+            submission.weeklyTestId == weeklyTestId &&
+            submission.studentId == studentId,
       );
     } catch (e) {
       return null;
@@ -171,7 +181,9 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
     }).length;
 
     // WeeklyTestProvider의 제출 수 업데이트
-    ref.read(weeklyTestProvider.notifier).updateSubmissionCount(weeklyTestId, submittedCount);
+    ref
+        .read(weeklyTestProvider.notifier)
+        .updateSubmissionCount(weeklyTestId, submittedCount);
   }
 
   /// 주간테스트별 제출 통계
@@ -185,19 +197,23 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
     final gradedSubmissions = submissions.where((s) => s.isGraded).toList();
     final averageScore = gradedSubmissions.isEmpty
         ? 0.0
-        : gradedSubmissions.fold<int>(0, (sum, s) => sum + (s.score ?? 0)) / gradedSubmissions.length;
+        : gradedSubmissions.fold<int>(0, (sum, s) => sum + (s.score ?? 0)) /
+            gradedSubmissions.length;
 
     // 최고/최저 점수
     final scores = gradedSubmissions.map((s) => s.score ?? 0).toList();
-    final highestScore = scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
-    final lowestScore = scores.isEmpty ? 0 : scores.reduce((a, b) => a < b ? a : b);
+    final highestScore =
+        scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
+    final lowestScore =
+        scores.isEmpty ? 0 : scores.reduce((a, b) => a < b ? a : b);
 
     return {
       'total': submissions.length,
       'submitted': submitted,
       'graded': graded,
       'notSubmitted': notSubmitted,
-      'submissionRate': submissions.isEmpty ? 0.0 : (submitted / submissions.length) * 100,
+      'submissionRate':
+          submissions.isEmpty ? 0.0 : (submitted / submissions.length) * 100,
       'gradingRate': submitted == 0 ? 0.0 : (graded / submitted) * 100,
       'averageScore': averageScore,
       'highestScore': highestScore,
@@ -207,18 +223,19 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
 
   /// 학생 성적 조회 (시간순 정렬)
   List<WeeklyTestSubmission> getStudentGrades(String studentId) {
-    final submissions = getSubmissionsByStudent(studentId)
-        .where((s) => s.isGraded)
-        .toList();
+    final submissions =
+        getSubmissionsByStudent(studentId).where((s) => s.isGraded).toList();
 
     // 제출일 기준 최신순 정렬
-    submissions.sort((a, b) => (b.submittedAt ?? DateTime(2000)).compareTo(a.submittedAt ?? DateTime(2000)));
+    submissions.sort((a, b) => (b.submittedAt ?? DateTime(2000))
+        .compareTo(a.submittedAt ?? DateTime(2000)));
 
     return submissions;
   }
 
   /// 성적 추이 분석 (최근 N회)
-  Map<String, dynamic> analyzeGradeTrend(String studentId, {int recentCount = 5}) {
+  Map<String, dynamic> analyzeGradeTrend(String studentId,
+      {int recentCount = 5}) {
     final grades = getStudentGrades(studentId).take(recentCount).toList();
 
     if (grades.isEmpty) {
@@ -239,7 +256,8 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
 
     if (scores.length >= 2) {
       final recent = scores.first; // 최신
-      final oldAverage = scores.skip(1).reduce((a, b) => a + b) / (scores.length - 1);
+      final oldAverage =
+          scores.skip(1).reduce((a, b) => a + b) / (scores.length - 1);
       improvement = recent - oldAverage;
 
       if (improvement > 5.0) {
@@ -259,6 +277,7 @@ class WeeklyTestSubmissionNotifier extends BaseNotifier<List<WeeklyTestSubmissio
 }
 
 /// Provider 선언
-final weeklyTestSubmissionProvider = StateNotifierProvider<WeeklyTestSubmissionNotifier, List<WeeklyTestSubmission>>((ref) {
+final weeklyTestSubmissionProvider = StateNotifierProvider<
+    WeeklyTestSubmissionNotifier, List<WeeklyTestSubmission>>((ref) {
   return WeeklyTestSubmissionNotifier(ref);
 });

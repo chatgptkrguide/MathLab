@@ -187,7 +187,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 _SocialLoginButton(
                   icon: Icons.g_mobiledata,
                   label: 'Google로 계속하기',
-                  onPressed: _isLoading ? null : () => _handleSocialLogin('Google'),
+                  onPressed:
+                      _isLoading ? null : () => _handleSocialLogin('Google'),
                   backgroundColor: Colors.white,
                   textColor: Colors.black87,
                   borderColor: Colors.grey[300],
@@ -197,7 +198,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 _SocialLoginButton(
                   icon: Icons.chat_bubble,
                   label: 'Kakao로 계속하기',
-                  onPressed: _isLoading ? null : () => _handleSocialLogin('Kakao'),
+                  onPressed:
+                      _isLoading ? null : () => _handleSocialLogin('Kakao'),
                   backgroundColor: const Color(0xFFFEE500),
                   textColor: Colors.black87,
                 ),
@@ -206,7 +208,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 _SocialLoginButton(
                   icon: Icons.apple,
                   label: 'Apple로 계속하기',
-                  onPressed: _isLoading ? null : () => _handleSocialLogin('Apple'),
+                  onPressed:
+                      _isLoading ? null : () => _handleSocialLogin('Apple'),
                   backgroundColor: Colors.black,
                   textColor: Colors.white,
                 ),
@@ -227,7 +230,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       onPressed: _isLoading
                           ? null
                           : () {
-                              Navigator.pushReplacementNamed(context, '/auth/signup');
+                              Navigator.pushReplacementNamed(
+                                  context, '/auth/signup');
                             },
                       child: const Text(
                         '회원가입',

@@ -30,10 +30,11 @@ class MathText extends StatelessWidget {
       final displayText = _convertLatexToUnicode(text);
       return Text(
         displayText,
-        style: style ?? AppTextStyles.bodyLarge.copyWith(
-          fontSize: fontSize,
-          color: color ?? AppColors.textPrimary,
-        ),
+        style: style ??
+            AppTextStyles.bodyLarge.copyWith(
+              fontSize: fontSize,
+              color: color ?? AppColors.textPrimary,
+            ),
         textAlign: textAlign,
       );
     }
@@ -56,10 +57,11 @@ class MathText extends StatelessWidget {
           final converted = _convertLatexToUnicode(part);
           return Text(
             converted,
-            style: style ?? AppTextStyles.bodyLarge.copyWith(
-              fontSize: fontSize,
-              color: color ?? AppColors.textPrimary,
-            ),
+            style: style ??
+                AppTextStyles.bodyLarge.copyWith(
+                  fontSize: fontSize,
+                  color: color ?? AppColors.textPrimary,
+                ),
           );
         }
         return const SizedBox.shrink();
@@ -80,14 +82,16 @@ class MathText extends StatelessWidget {
           // 분자
           Text(
             convertedNumerator,
-            style: style ?? AppTextStyles.bodyLarge.copyWith(
-              fontSize: fontSize * 0.8,
-              color: color ?? AppColors.textPrimary,
-            ),
+            style: style ??
+                AppTextStyles.bodyLarge.copyWith(
+                  fontSize: fontSize * 0.8,
+                  color: color ?? AppColors.textPrimary,
+                ),
           ),
           // 분수선
           Container(
-            width: _calculateFractionLineWidth(convertedNumerator, convertedDenominator),
+            width: _calculateFractionLineWidth(
+                convertedNumerator, convertedDenominator),
             height: 1.5,
             color: color ?? AppColors.textPrimary,
             margin: const EdgeInsets.symmetric(vertical: 1),
@@ -95,10 +99,11 @@ class MathText extends StatelessWidget {
           // 분모
           Text(
             convertedDenominator,
-            style: style ?? AppTextStyles.bodyLarge.copyWith(
-              fontSize: fontSize * 0.8,
-              color: color ?? AppColors.textPrimary,
-            ),
+            style: style ??
+                AppTextStyles.bodyLarge.copyWith(
+                  fontSize: fontSize * 0.8,
+                  color: color ?? AppColors.textPrimary,
+                ),
           ),
         ],
       ),
@@ -149,8 +154,8 @@ class MathText extends StatelessWidget {
 
     // $, $$ 제거 (디스플레이 및 인라인 수식 구분자)
     // 이중 달러 기호를 먼저 제거한 후 단일 달러 기호 제거
-    result = result.replaceAll('\$\$', '');  // 이중 달러 기호 제거
-    result = result.replaceAll('\$', '');    // 단일 달러 기호 제거
+    result = result.replaceAll('\$\$', ''); // 이중 달러 기호 제거
+    result = result.replaceAll('\$', ''); // 단일 달러 기호 제거
 
     // 제곱근
     result = result.replaceAll(r'\sqrt[3]', '∛');

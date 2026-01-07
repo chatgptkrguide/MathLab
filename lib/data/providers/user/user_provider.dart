@@ -9,6 +9,7 @@ import '../../../shared/constants/game_constants.dart';
 import '../base/base_notifier.dart';
 import '../gamification/league_provider.dart';
 import '../infrastructure/firebase_providers.dart';
+import '../auth/auth_provider.dart';
 
 /// 사용자 정보 상태 관리 (Firestore 연동 버전)
 ///
@@ -37,14 +38,18 @@ class UserNotifier extends BaseNotifier<User?> {
         User? user = await _userRepository.get(storageKey);
 
         // 2. 로컬에 없고 ID가 있으면 Firestore에서 확인
-        if (user == null && state?.id != null && state!.id.isNotEmpty && state!.id != 'default') {
+        if (user == null &&
+            state?.id != null &&
+            state!.id.isNotEmpty &&
+            state!.id != 'default') {
           logInfo('로컬에 사용자 없음, Firestore 확인: ${state!.id}');
           user = await _userRepository.getFromFirebase(state!.id);
 
           // 3. Firestore에서 가져온 사용자 정보를 로컬에 저장
           if (user != null) {
             await _userRepository.saveToLocal(state!.id, user);
-            logInfo('Firestore에서 기존 사용자 로드: ${user.name} (Level: ${user.level}, XP: ${user.xp})');
+            logInfo(
+                'Firestore에서 기존 사용자 로드: ${user.name} (Level: ${user.level}, XP: ${user.xp})');
           }
         }
 
@@ -77,12 +82,15 @@ class UserNotifier extends BaseNotifier<User?> {
     if (state == null || state!.hearts >= GameConstants.maxHearts) return;
 
     final now = DateTime.now().toUtc(); // UTC 시간 사용
-    final lastHeartUpdate = (state!.lastHeartUpdateTime ?? now).toUtc(); // UTC로 변환
+    final lastHeartUpdate =
+        (state!.lastHeartUpdateTime ?? now).toUtc(); // UTC로 변환
     final minutesPassed = now.difference(lastHeartUpdate).inMinutes;
-    final heartsToRegenerate = minutesPassed ~/ GameConstants.heartRecoveryMinutes;
+    final heartsToRegenerate =
+        minutesPassed ~/ GameConstants.heartRecoveryMinutes;
 
     if (heartsToRegenerate > 0) {
-      final newHearts = (state!.hearts + heartsToRegenerate).clamp(0, GameConstants.maxHearts);
+      final newHearts = (state!.hearts + heartsToRegenerate)
+          .clamp(0, GameConstants.maxHearts);
       final actualRegenerated = newHearts - state!.hearts;
 
       if (actualRegenerated > 0) {
@@ -91,7 +99,8 @@ class UserNotifier extends BaseNotifier<User?> {
           lastHeartUpdateTime: now,
         );
         await _saveUser();
-        logInfo('하트 자동 재생: +$actualRegenerated (현재: $newHearts/${GameConstants.maxHearts})');
+        logInfo(
+            '하트 자동 재생: +$actualRegenerated (현재: $newHearts/${GameConstants.maxHearts})');
       }
     }
   }
@@ -149,7 +158,31 @@ class UserNotifier extends BaseNotifier<User?> {
           await _updateHeartsBasedOnTime();
         } else {
           // 3. 로컬에 없는 경우 새 사용자 생성 (로컬 전용)
+          // UserAccount에서 프로필 정보 읽어오기
+          final authState = _ref.read(authProvider);
+          final currentAccount = authState.currentAccount;
+
+          // 기본 사용자 생성
           state = _dataService.getSampleUser().copyWith(id: accountId);
+
+          // UserAccount preferences에서 프로필 정보 적용
+          if (currentAccount != null && currentAccount.preferences.isNotEmpty) {
+            final prefs = currentAccount.preferences;
+
+            // 프로필 완성 여부 확인
+            final isProfileComplete = prefs['isProfileComplete'] == 'true';
+
+            // 프로필 정보 적용
+            state = state!.copyWith(
+              name: prefs['name'] as String? ?? state!.name,
+              currentGrade: prefs['grade'] as String? ?? state!.currentGrade,
+              isProfileComplete: isProfileComplete,
+            );
+
+            logInfo(
+                'UserAccount 프로필 정보 적용: ${state!.name} (프로필 완성: $isProfileComplete, 학년: ${state!.currentGrade})');
+          }
+
           await _saveUser();
 
           // Firebase 저장 비활성화 (권한 문제)
@@ -208,7 +241,8 @@ class UserNotifier extends BaseNotifier<User?> {
       // Firestore에 저장
       await _userRepository.saveToFirebase(updatedUser.id, updatedUser);
 
-      logInfo('프로필 업데이트 완료: ${updatedUser.name} (완성도: ${updatedUser.isProfileComplete})');
+      logInfo(
+          '프로필 업데이트 완료: ${updatedUser.name} (완성도: ${updatedUser.isProfileComplete})');
     } catch (e, stackTrace) {
       logError('프로필 업데이트 실패', error: e, stackTrace: stackTrace);
       rethrow;
@@ -236,7 +270,8 @@ class UserNotifier extends BaseNotifier<User?> {
     );
 
     await _saveUser();
-    logInfo('XP 추가: +$xp XP (총 $currentXP XP, 오늘 $currentDailyXP XP, 레벨 $newLevel)');
+    logInfo(
+        'XP 추가: +$xp XP (총 $currentXP XP, 오늘 $currentDailyXP XP, 레벨 $newLevel)');
 
     // Firestore 동기화 (백그라운드)
     _syncXPToFirestore(xp).catchError((error, stackTrace) {
@@ -403,8 +438,8 @@ class UserNotifier extends BaseNotifier<User?> {
 
     // UTC 기준으로 같은 날짜인지 비교
     return lastUtc.year == yesterday.year &&
-           lastUtc.month == yesterday.month &&
-           lastUtc.day == yesterday.day;
+        lastUtc.month == yesterday.month &&
+        lastUtc.day == yesterday.day;
   }
 
   /// 같은 날짜인지 확인 (년-월-일만 비교) - UTC 기준
@@ -414,8 +449,8 @@ class UserNotifier extends BaseNotifier<User?> {
     final utc2 = date2.toUtc();
 
     return utc1.year == utc2.year &&
-           utc1.month == utc2.month &&
-           utc1.day == utc2.day;
+        utc1.month == utc2.month &&
+        utc1.day == utc2.day;
   }
 
   /// 스트릭 업데이트 (매일 학습 시 호출) - DEPRECATED: incrementStreakOnStudy 사용
@@ -454,9 +489,9 @@ class UserNotifier extends BaseNotifier<User?> {
     final guestId = 'guest_${DateTime.now().millisecondsSinceEpoch}';
 
     state = _dataService.getSampleUser().copyWith(
-      id: guestId,
-      name: '게스트',
-    );
+          id: guestId,
+          name: '게스트',
+        );
 
     await _saveUser();
     logInfo('게스트 사용자 생성 완료: $guestId');
@@ -494,8 +529,8 @@ class UserNotifier extends BaseNotifier<User?> {
     final lastReset = state!.lastXPResetDate.toUtc(); // UTC로 변환
 
     final isSameDay = now.year == lastReset.year &&
-                      now.month == lastReset.month &&
-                      now.day == lastReset.day;
+        now.month == lastReset.month &&
+        now.day == lastReset.day;
 
     if (!isSameDay) {
       state = state!.copyWith(
@@ -546,7 +581,8 @@ class UserNotifier extends BaseNotifier<User?> {
   Future<void> addHearts(int amount) async {
     if (state == null) return;
 
-    final newHearts = (state!.hearts + amount).clamp(0, GameConstants.maxHearts);
+    final newHearts =
+        (state!.hearts + amount).clamp(0, GameConstants.maxHearts);
     state = state!.copyWith(
       hearts: newHearts,
       lastHeartUpdateTime: DateTime.now().toUtc(), // UTC 시간으로 기록

@@ -63,7 +63,8 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
         if (remoteLessons != null && remoteLessons.isNotEmpty) {
           // 3. 병합 (Firebase 기본 정보 + 로컬 진행률)
           if (localLessons != null) {
-            final merged = await _repository.mergeData(localLessons, remoteLessons);
+            final merged =
+                await _repository.mergeData(localLessons, remoteLessons);
             if (merged != null) {
               state = merged;
               await _repository.saveToLocal(_storageKey, merged);
@@ -110,8 +111,11 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
         await _repository.saveToLocal(_storageKey, state);
 
         // Firebase 저장 (백그라운드)
-        _repository.saveToFirebase(userId, state).catchError((error, stackTrace) {
-          logError('Firebase 저장 실패 (백그라운드)', error: error, stackTrace: stackTrace);
+        _repository
+            .saveToFirebase(userId, state)
+            .catchError((error, stackTrace) {
+          logError('Firebase 저장 실패 (백그라운드)',
+              error: error, stackTrace: stackTrace);
         });
 
         logInfo('레슨 저장 완료 (로컬 + Firebase)');
@@ -141,7 +145,8 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
 
     final lesson = state[index];
     final now = DateTime.now();
-    final isCompleting = completedProblems >= lesson.totalProblems && !lesson.isCompleted;
+    final isCompleting =
+        completedProblems >= lesson.totalProblems && !lesson.isCompleted;
 
     final updatedLesson = lesson.copyWith(
       completedProblems: completedProblems,
@@ -157,12 +162,14 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
     ];
 
     // Firestore 업데이트 (백그라운드)
-    _repository.updateLessonProgress(
+    _repository
+        .updateLessonProgress(
       lessonId: lessonId,
       completedProblems: completedProblems,
       isUnlocked: unlock ? true : null,
       completedAt: isCompleting ? now : null,
-    ).catchError((error, stackTrace) {
+    )
+        .catchError((error, stackTrace) {
       logError('Firestore 진행률 업데이트 실패', error: error, stackTrace: stackTrace);
     });
 
@@ -176,7 +183,8 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
 
   /// 다음 레슨 잠금 해제
   Future<void> _unlockNextLesson(String completedLessonId) async {
-    final currentIndex = state.indexWhere((lesson) => lesson.id == completedLessonId);
+    final currentIndex =
+        state.indexWhere((lesson) => lesson.id == completedLessonId);
     if (currentIndex == -1 || currentIndex >= state.length - 1) return;
 
     final nextLesson = state[currentIndex + 1];
@@ -195,7 +203,8 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
     );
 
     // 해당 레슨의 완료된 문제 수 계산
-    final lessonProblems = problems.where((p) => p.lessonId == problem.lessonId).toList();
+    final lessonProblems =
+        problems.where((p) => p.lessonId == problem.lessonId).toList();
     final results = _ref.read(problemResultsProvider);
     final user = _ref.read(userProvider);
 
@@ -203,7 +212,8 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
 
     final userResults = results.where((r) => r.userId == user.id).toList();
     final solvedLessonProblems = userResults
-        .where((r) => lessonProblems.any((p) => p.id == r.problemId && r.isCorrect))
+        .where((r) =>
+            lessonProblems.any((p) => p.id == r.problemId && r.isCorrect))
         .length;
 
     // 레슨 진행률 업데이트
@@ -251,8 +261,10 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
   double get overallProgress {
     if (state.isEmpty) return 0.0;
 
-    final totalProblems = state.fold(0, (sum, lesson) => sum + lesson.totalProblems);
-    final completedProblems = state.fold(0, (sum, lesson) => sum + lesson.completedProblems);
+    final totalProblems =
+        state.fold(0, (sum, lesson) => sum + lesson.totalProblems);
+    final completedProblems =
+        state.fold(0, (sum, lesson) => sum + lesson.completedProblems);
 
     return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
   }
@@ -262,8 +274,10 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
     final gradeLessons = getLessonsByGrade(grade);
     if (gradeLessons.isEmpty) return 0.0;
 
-    final totalProblems = gradeLessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
-    final completedProblems = gradeLessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
+    final totalProblems =
+        gradeLessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
+    final completedProblems =
+        gradeLessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
 
     return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
   }
@@ -300,13 +314,15 @@ class LessonNotifier extends BaseNotifier<List<Lesson>> {
 }
 
 /// 프로바이더들
-final lessonProvider = StateNotifierProvider<LessonNotifier, List<Lesson>>((ref) {
+final lessonProvider =
+    StateNotifierProvider<LessonNotifier, List<Lesson>>((ref) {
   final lessonRepository = ref.watch(lessonRepositoryProvider);
   return LessonNotifier(ref, lessonRepository);
 });
 
 /// 편의 프로바이더들
-final lessonsByGradeProvider = Provider.family<List<Lesson>, String>((ref, grade) {
+final lessonsByGradeProvider =
+    Provider.family<List<Lesson>, String>((ref, grade) {
   final lessons = ref.watch(lessonProvider);
   return lessons.where((lesson) => lesson.grade == grade).toList()
     ..sort((a, b) => a.order.compareTo(b.order));
@@ -339,8 +355,10 @@ final overallProgressProvider = Provider<double>((ref) {
   final lessons = ref.watch(lessonProvider);
   if (lessons.isEmpty) return 0.0;
 
-  final totalProblems = lessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
-  final completedProblems = lessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
+  final totalProblems =
+      lessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
+  final completedProblems =
+      lessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
 
   return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
 });
@@ -349,8 +367,10 @@ final gradeProgressProvider = Provider.family<double, String>((ref, grade) {
   final gradeLessons = ref.watch(lessonsByGradeProvider(grade));
   if (gradeLessons.isEmpty) return 0.0;
 
-  final totalProblems = gradeLessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
-  final completedProblems = gradeLessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
+  final totalProblems =
+      gradeLessons.fold(0, (sum, lesson) => sum + lesson.totalProblems);
+  final completedProblems =
+      gradeLessons.fold(0, (sum, lesson) => sum + lesson.completedProblems);
 
   return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
 });

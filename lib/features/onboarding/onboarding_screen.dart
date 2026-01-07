@@ -194,7 +194,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           vertical: AppDimensions.paddingL,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusL),
                         ),
                         elevation: 4,
                       ),
@@ -224,9 +225,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       height: 8,
       width: isActive ? 32 : 8,
       decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.surface
-            : AppColors.surface.withOpacity(0.3),
+        color:
+            isActive ? AppColors.surface : AppColors.surface.withOpacity(0.3),
         borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
     );

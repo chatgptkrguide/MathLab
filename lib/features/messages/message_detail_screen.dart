@@ -77,7 +77,8 @@ class MessageDetailScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(AppDimensions.paddingL),
                           decoration: BoxDecoration(
                             color: AppColors.background,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                            borderRadius:
+                                BorderRadius.circular(AppDimensions.radiusL),
                             border: Border.all(
                               color: AppColors.borderLight.withOpacity(0.3),
                             ),
@@ -92,7 +93,8 @@ class MessageDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimensions.paddingL),
                         // 액션 버튼
-                        if (message.actionText != null && message.actionRoute != null)
+                        if (message.actionText != null &&
+                            message.actionRoute != null)
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -104,10 +106,11 @@ class MessageDetailScreen extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.mathBlue,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(AppDimensions.radiusL),
+                                  borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusL),
                                 ),
                                 elevation: 2,
                               ),
@@ -124,7 +127,8 @@ class MessageDetailScreen extends StatelessWidget {
                         if (message.readAt != null) ...[
                           const SizedBox(height: AppDimensions.paddingL),
                           Container(
-                            padding: const EdgeInsets.all(AppDimensions.paddingM),
+                            padding:
+                                const EdgeInsets.all(AppDimensions.paddingM),
                             decoration: BoxDecoration(
                               color: AppColors.success.withOpacity(0.1),
                               borderRadius:
@@ -248,7 +252,8 @@ class MessageDetailScreen extends StatelessWidget {
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: 'support@gomath.com',
-      query: 'subject=Re: ${message.title}&body=\n\n---\n원본 메시지: ${message.body}',
+      query:
+          'subject=Re: ${message.title}&body=\n\n---\n원본 메시지: ${message.body}',
     );
 
     try {

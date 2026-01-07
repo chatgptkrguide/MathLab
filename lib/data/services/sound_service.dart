@@ -82,7 +82,8 @@ class SoundService {
   /// 사운드 활성화/비활성화
   void setSoundEnabled(bool enabled) {
     _soundEnabled = enabled;
-    Logger.info('Sound ${enabled ? 'enabled' : 'disabled'}', tag: 'SoundService');
+    Logger.info('Sound ${enabled ? 'enabled' : 'disabled'}',
+        tag: 'SoundService');
   }
 
   /// 배경 음악 활성화/비활성화
@@ -91,7 +92,8 @@ class SoundService {
     if (!enabled) {
       stopBackgroundMusic();
     }
-    Logger.info('Music ${enabled ? 'enabled' : 'disabled'}', tag: 'SoundService');
+    Logger.info('Music ${enabled ? 'enabled' : 'disabled'}',
+        tag: 'SoundService');
   }
 
   /// 사운드 활성화 상태
@@ -161,10 +163,12 @@ class SoundEffects {
   static Future<void> playXPGain() => _service.play(SoundType.xpGain);
   static Future<void> playLevelUp() => _service.play(SoundType.levelUp);
   static Future<void> playAchievement() => _service.play(SoundType.achievement);
-  static Future<void> playStreakMaintain() => _service.play(SoundType.streakMaintain);
+  static Future<void> playStreakMaintain() =>
+      _service.play(SoundType.streakMaintain);
   static Future<void> playStreakBreak() => _service.play(SoundType.streakBreak);
   static Future<void> playButtonClick() => _service.play(SoundType.buttonClick);
   static Future<void> playHeartLose() => _service.play(SoundType.heartLose);
-  static Future<void> playHeartRecover() => _service.play(SoundType.heartRecover);
+  static Future<void> playHeartRecover() =>
+      _service.play(SoundType.heartRecover);
   static Future<void> playCelebration() => _service.play(SoundType.celebration);
 }

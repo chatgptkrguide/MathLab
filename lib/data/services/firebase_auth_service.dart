@@ -13,7 +13,8 @@ class FirebaseAuthService {
   FirebaseAuthService._internal();
 
   /// Firebase Auth 인스턴스
-  final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _firebaseAuth =
+      firebase_auth.FirebaseAuth.instance;
 
   /// 소셜 로그인 서비스
   final SocialAuthService _socialAuthService = SocialAuthService();
@@ -22,7 +23,8 @@ class FirebaseAuthService {
   firebase_auth.User? get currentUser => _firebaseAuth.currentUser;
 
   /// 로그인 상태 스트림
-  Stream<firebase_auth.User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  Stream<firebase_auth.User?> get authStateChanges =>
+      _firebaseAuth.authStateChanges();
 
   /// 사용자 로그인 여부
   bool get isSignedIn => currentUser != null;
@@ -44,7 +46,8 @@ class FirebaseAuthService {
       }
 
       // Google 인증 정보 가져오기
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // Firebase 인증 자격증명 생성
       final credential = firebase_auth.GoogleAuthProvider.credential(
@@ -53,7 +56,8 @@ class FirebaseAuthService {
       );
 
       // Firebase로 로그인
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
 
       Logger.info(
         'Google Firebase 로그인 성공: ${userCredential.user?.email}',
@@ -94,13 +98,15 @@ class FirebaseAuthService {
       );
 
       // Firebase OAuthProvider 생성
-      final oauthCredential = firebase_auth.OAuthProvider("apple.com").credential(
+      final oauthCredential =
+          firebase_auth.OAuthProvider("apple.com").credential(
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode,
       );
 
       // Firebase로 로그인
-      final userCredential = await _firebaseAuth.signInWithCredential(oauthCredential);
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(oauthCredential);
 
       Logger.info(
         'Apple Firebase 로그인 성공: ${userCredential.user?.email}',

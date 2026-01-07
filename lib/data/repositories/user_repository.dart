@@ -83,7 +83,8 @@ class UserRepository extends BaseRepository<User> {
   /// 로컬 스토리지에서 사용자 조회 (UserProvider 호환성)
   Future<User?> get(String storageKey) async {
     try {
-      Logger.debug('Getting user from local storage: $storageKey (로컬 전용)', tag: repositoryName);
+      Logger.debug('Getting user from local storage: $storageKey (로컬 전용)',
+          tag: repositoryName);
 
       // Firestore 접근 비활성화 (권한 문제로 주석 처리)
       // TODO: Firebase Security Rules 설정 후 활성화
@@ -91,10 +92,12 @@ class UserRepository extends BaseRepository<User> {
       // return result.isSuccess ? result.data : null;
 
       // 현재는 로컬 전용 모드로 작동 (실제 로컬 스토리지 구현 필요)
-      Logger.debug('Local-only mode: returning null (no data)', tag: repositoryName);
+      Logger.debug('Local-only mode: returning null (no data)',
+          tag: repositoryName);
       return null;
     } catch (e) {
-      Logger.error('Failed to get user from storage', error: e, tag: repositoryName);
+      Logger.error('Failed to get user from storage',
+          error: e, tag: repositoryName);
       return null;
     }
   }
@@ -102,7 +105,8 @@ class UserRepository extends BaseRepository<User> {
   /// 로컬 스토리지에 사용자 저장 (UserProvider 호환성)
   Future<void> save(String storageKey, User user) async {
     try {
-      Logger.debug('Saving user to local storage: $storageKey (로컬 전용)', tag: repositoryName);
+      Logger.debug('Saving user to local storage: $storageKey (로컬 전용)',
+          tag: repositoryName);
 
       // Firestore 접근 비활성화 (권한 문제로 주석 처리)
       // TODO: Firebase Security Rules 설정 후 활성화
@@ -116,7 +120,8 @@ class UserRepository extends BaseRepository<User> {
       // 현재는 로컬 전용 모드로 작동 (실제 로컬 스토리지 구현 필요)
       Logger.info('User saved locally: $storageKey', tag: repositoryName);
     } catch (e) {
-      Logger.error('Failed to save user to storage', error: e, tag: repositoryName);
+      Logger.error('Failed to save user to storage',
+          error: e, tag: repositoryName);
       rethrow;
     }
   }
@@ -148,7 +153,8 @@ class UserRepository extends BaseRepository<User> {
   /// XP 업데이트 (원자적 연산)
   Future<RepositoryResult<void>> updateXP(String userId, int xpToAdd) async {
     try {
-      Logger.debug('Updating XP for user $userId: +$xpToAdd', tag: repositoryName);
+      Logger.debug('Updating XP for user $userId: +$xpToAdd',
+          tag: repositoryName);
 
       final userDocRef = firestore.collection(collectionPath).doc(userId);
       final userDoc = await userDocRef.get();
@@ -171,18 +177,23 @@ class UserRepository extends BaseRepository<User> {
       // 캐시 무효화
       invalidateCache(userId);
 
-      Logger.info('XP updated successfully: +$xpToAdd (Total: $newXP, Level: $newLevel)', tag: repositoryName);
+      Logger.info(
+          'XP updated successfully: +$xpToAdd (Total: $newXP, Level: $newLevel)',
+          tag: repositoryName);
       return RepositoryResult.success(null);
     } catch (e, stackTrace) {
-      Logger.error('Failed to update XP', error: e, stackTrace: stackTrace, tag: repositoryName);
+      Logger.error('Failed to update XP',
+          error: e, stackTrace: stackTrace, tag: repositoryName);
       return RepositoryResult.failure(e.toString());
     }
   }
 
   /// 스트릭 업데이트
-  Future<RepositoryResult<void>> updateStreak(String userId, int newStreak) async {
+  Future<RepositoryResult<void>> updateStreak(
+      String userId, int newStreak) async {
     try {
-      Logger.debug('Updating streak for user $userId: $newStreak', tag: repositoryName);
+      Logger.debug('Updating streak for user $userId: $newStreak',
+          tag: repositoryName);
 
       await firestore.collection(collectionPath).doc(userId).update({
         'streak': newStreak,
@@ -194,10 +205,12 @@ class UserRepository extends BaseRepository<User> {
       // 캐시 무효화
       invalidateCache(userId);
 
-      Logger.info('Streak updated successfully: $newStreak days', tag: repositoryName);
+      Logger.info('Streak updated successfully: $newStreak days',
+          tag: repositoryName);
       return RepositoryResult.success(null);
     } catch (e, stackTrace) {
-      Logger.error('Failed to update streak', error: e, stackTrace: stackTrace, tag: repositoryName);
+      Logger.error('Failed to update streak',
+          error: e, stackTrace: stackTrace, tag: repositoryName);
       return RepositoryResult.failure(e.toString());
     }
   }
@@ -205,7 +218,8 @@ class UserRepository extends BaseRepository<User> {
   /// 하트 업데이트
   Future<RepositoryResult<void>> updateHearts(String userId, int hearts) async {
     try {
-      Logger.debug('Updating hearts for user $userId: $hearts', tag: repositoryName);
+      Logger.debug('Updating hearts for user $userId: $hearts',
+          tag: repositoryName);
 
       await firestore.collection(collectionPath).doc(userId).update({
         'hearts': hearts,
@@ -219,7 +233,8 @@ class UserRepository extends BaseRepository<User> {
       Logger.info('Hearts updated successfully: $hearts', tag: repositoryName);
       return RepositoryResult.success(null);
     } catch (e, stackTrace) {
-      Logger.error('Failed to update hearts', error: e, stackTrace: stackTrace, tag: repositoryName);
+      Logger.error('Failed to update hearts',
+          error: e, stackTrace: stackTrace, tag: repositoryName);
       return RepositoryResult.failure(e.toString());
     }
   }
@@ -227,7 +242,8 @@ class UserRepository extends BaseRepository<User> {
   /// 사용자 완전 삭제 (모든 관련 데이터 포함)
   Future<RepositoryResult<void>> deleteUserCompletely(String userId) async {
     try {
-      Logger.info('Starting complete user deletion: $userId', tag: repositoryName);
+      Logger.info('Starting complete user deletion: $userId',
+          tag: repositoryName);
 
       final batch = firestore.batch();
 
@@ -235,7 +251,8 @@ class UserRepository extends BaseRepository<User> {
       batch.delete(firestore.collection(collectionPath).doc(userId));
 
       // 2. 사용자의 오답 노트 서브컬렉션 삭제
-      final wrongAnswersSnapshot = await firestore.collection(collectionPath)
+      final wrongAnswersSnapshot = await firestore
+          .collection(collectionPath)
           .doc(userId)
           .collection('wrongAnswers')
           .get();
@@ -276,7 +293,8 @@ class UserRepository extends BaseRepository<User> {
       Logger.info('User deleted completely: $userId', tag: repositoryName);
       return RepositoryResult.success(null);
     } catch (e, stackTrace) {
-      Logger.error('Failed to delete user completely', error: e, stackTrace: stackTrace, tag: repositoryName);
+      Logger.error('Failed to delete user completely',
+          error: e, stackTrace: stackTrace, tag: repositoryName);
       return RepositoryResult.failure(e.toString());
     }
   }
@@ -286,8 +304,7 @@ class UserRepository extends BaseRepository<User> {
     try {
       final leaguesSnapshot = await firestore
           .collection('leagues')
-          .where('participants', arrayContains: {'userId': userId})
-          .get();
+          .where('participants', arrayContains: {'userId': userId}).get();
 
       for (final leagueDoc in leaguesSnapshot.docs) {
         final leagueRef = leagueDoc.reference;
@@ -326,7 +343,8 @@ class UserRepository extends BaseRepository<User> {
 
       Logger.info('User removed from leagues: $userId', tag: repositoryName);
     } catch (e, stackTrace) {
-      Logger.error('Failed to remove user from leagues', error: e, stackTrace: stackTrace, tag: repositoryName);
+      Logger.error('Failed to remove user from leagues',
+          error: e, stackTrace: stackTrace, tag: repositoryName);
       // Non-fatal error, don't throw
     }
   }

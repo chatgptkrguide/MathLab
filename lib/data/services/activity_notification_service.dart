@@ -305,7 +305,8 @@ class ActivityNotificationService {
       final jsonList = existing.map((h) => h.toJson()).toList();
       await prefs.setString(key, jsonEncode(jsonList));
 
-      Logger.info('Notification history saved', tag: 'ActivityNotificationService');
+      Logger.info('Notification history saved',
+          tag: 'ActivityNotificationService');
     } catch (e) {
       Logger.error('Failed to save notification history', error: e);
     }
@@ -322,7 +323,8 @@ class ActivityNotificationService {
 
       final jsonList = jsonDecode(jsonStr) as List<dynamic>;
       return jsonList
-          .map((json) => NotificationHistory.fromJson(json as Map<String, dynamic>))
+          .map((json) =>
+              NotificationHistory.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       Logger.error('Failed to load notification history', error: e);

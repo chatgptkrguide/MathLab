@@ -95,7 +95,8 @@ class CourseEnrollment {
       lastAccessDate: json['lastAccessDate'] != null
           ? DateTime.parse(json['lastAccessDate'] as String)
           : null,
-      progressPercentage: (json['progressPercentage'] as num?)?.toDouble() ?? 0.0,
+      progressPercentage:
+          (json['progressPercentage'] as num?)?.toDouble() ?? 0.0,
     );
   }
 

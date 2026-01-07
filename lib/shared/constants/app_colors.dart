@@ -165,7 +165,8 @@ class AppColors {
   static Color lighten(Color color, [double amount = .1]) {
     assert(amount >= 0 && amount <= 1);
     final hsl = HSLColor.fromColor(color);
-    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    final hslLight =
+        hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
     return hslLight.toColor();
   }
 
@@ -174,18 +175,18 @@ class AppColors {
   // ==========================================
 
   // Darker variants (20% darker)
-  static const Color mathButtonBlueDark = Color(0xFF2A41CC);  // Darker blue
-  static const Color mathTealDark = Color(0xFF39A08D);  // Darker teal
-  static const Color mathYellowDark = Color(0xFFCCAD00);  // Darker yellow
-  static const Color mathOrangeDark = Color(0xFFCC7A00);  // Darker orange
-  static const Color mathRedDark = Color(0xFFCC3C3C);  // Darker red
-  static const Color mathPurpleDark = Color(0xFFA568CC);  // Darker purple
-  static const Color mathBlueDark = Color(0xFF4D81AD);  // Darker math blue
-  static const Color kakaoYellowDark = Color(0xFFCBB700);  // Darker kakao
-  static const Color levelGoldDark = Color(0xFFCCAD00);  // Darker gold
-  static const Color levelSilverDark = Color(0xFF9A9A9A);  // Darker silver
-  static const Color levelBronzeDark = Color(0xFFA46628);  // Darker bronze
-  static const Color mathGreenDark = Color(0xFF46A301);  // Darker green
+  static const Color mathButtonBlueDark = Color(0xFF2A41CC); // Darker blue
+  static const Color mathTealDark = Color(0xFF39A08D); // Darker teal
+  static const Color mathYellowDark = Color(0xFFCCAD00); // Darker yellow
+  static const Color mathOrangeDark = Color(0xFFCC7A00); // Darker orange
+  static const Color mathRedDark = Color(0xFFCC3C3C); // Darker red
+  static const Color mathPurpleDark = Color(0xFFA568CC); // Darker purple
+  static const Color mathBlueDark = Color(0xFF4D81AD); // Darker math blue
+  static const Color kakaoYellowDark = Color(0xFFCBB700); // Darker kakao
+  static const Color levelGoldDark = Color(0xFFCCAD00); // Darker gold
+  static const Color levelSilverDark = Color(0xFF9A9A9A); // Darker silver
+  static const Color levelBronzeDark = Color(0xFFA46628); // Darker bronze
+  static const Color mathGreenDark = Color(0xFF46A301); // Darker green
 
   // Additional colors
   static const Color successGreen = mathGreen;

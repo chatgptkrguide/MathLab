@@ -69,8 +69,10 @@ class OptimizedNetworkImage extends StatelessWidget {
       fadeInDuration: const Duration(milliseconds: 300),
       fadeOutDuration: const Duration(milliseconds: 200),
       useOldImageOnUrlChange: true,
-      placeholder: (context, url) => loadingWidget ?? _buildDefaultLoadingWidget(),
-      errorWidget: (context, url, error) => errorWidget ?? _buildDefaultErrorWidget(context, url),
+      placeholder: (context, url) =>
+          loadingWidget ?? _buildDefaultLoadingWidget(),
+      errorWidget: (context, url, error) =>
+          errorWidget ?? _buildDefaultErrorWidget(context, url),
     );
 
     // 접근성 지원

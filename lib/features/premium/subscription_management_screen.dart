@@ -97,7 +97,8 @@ class _SubscriptionManagementScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.premiumGold,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -335,7 +336,8 @@ class _SubscriptionManagementScreenState
                   : AppColors.textSecondary,
             ),
 
-          if (subscription.tier != PremiumTier.lifetime) const Divider(height: 24),
+          if (subscription.tier != PremiumTier.lifetime)
+            const Divider(height: 24),
 
           // 플랫폼
           _buildInfoRow(
@@ -435,7 +437,8 @@ class _SubscriptionManagementScreenState
           const SizedBox(height: 12),
 
           // 구독 취소 버튼 (취소되지 않은 경우만)
-          if (!subscription.isCancelled && subscription.tier != PremiumTier.lifetime)
+          if (!subscription.isCancelled &&
+              subscription.tier != PremiumTier.lifetime)
             _buildActionButton(
               icon: Icons.cancel_outlined,
               title: '구독 취소',

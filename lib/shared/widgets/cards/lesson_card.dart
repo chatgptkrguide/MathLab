@@ -58,108 +58,108 @@ class _LessonCardState extends State<LessonCard>
         duration: const Duration(milliseconds: 100),
         curve: Curves.easeInOut,
         child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          gradient: isLocked
-              ? null
-              : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _getGradientColors(),
-                ),
-          color: isLocked ? AppColors.disabled.withOpacity(0.1) : null,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          border: Border.all(
-            color: isLocked
-                ? AppColors.borderLight
-                : Colors.transparent,
-            width: 1,
-          ),
-          boxShadow: isLocked
-              ? null
-              : [
-                  BoxShadow(
-                    color: _getPrimaryColor().withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            gradient: isLocked
+                ? null
+                : LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: _getGradientColors(),
                   ),
-                ],
-        ),
-        child: Stack(
-          children: [
-            // 메인 콘텐츠
-            Padding(
-              padding: const EdgeInsets.all(AppDimensions.paddingL),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 아이콘
-                  _buildIcon(isLocked),
-                  const Spacer(),
-                  // 제목
-                  Text(
-                    widget.lesson.title,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: isLocked ? AppColors.disabled : AppColors.surface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppDimensions.spacingXS),
-                  // 진행률
-                  _buildProgress(isLocked, progress),
-                ],
-              ),
+            color: isLocked ? AppColors.disabled.withOpacity(0.1) : null,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+            border: Border.all(
+              color: isLocked ? AppColors.borderLight : Colors.transparent,
+              width: 1,
             ),
-            // 잠금 아이콘
-            if (isLocked)
-              Positioned(
-                top: AppDimensions.paddingS,
-                right: AppDimensions.paddingS,
-                child: Icon(
-                  Icons.lock,
-                  color: AppColors.disabled,
-                  size: 20,
-                ),
-              ),
-            // 완료 체크마크 - 펄스 애니메이션 추가
-            if (widget.lesson.isCompleted)
-              Positioned(
-                top: AppDimensions.paddingS,
-                right: AppDimensions.paddingS,
-                child: AnimatedBuilder(
-                  animation: _pulseController,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: 1.0 + (_pulseController.value * 0.15),
-                      child: Container(
-                        padding: const EdgeInsets.all(AppDimensions.paddingXS),
-                        decoration: BoxDecoration(
-                          color: AppColors.successGreen,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.successGreen
-                                  .withOpacity(0.6 * _pulseController.value),
-                              blurRadius: 8 + (4 * _pulseController.value),
-                              spreadRadius: 1 + (2 * _pulseController.value),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          color: AppColors.surface,
-                          size: 16,
-                        ),
+            boxShadow: isLocked
+                ? null
+                : [
+                    BoxShadow(
+                      color: _getPrimaryColor().withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+          ),
+          child: Stack(
+            children: [
+              // 메인 콘텐츠
+              Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingL),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 아이콘
+                    _buildIcon(isLocked),
+                    const Spacer(),
+                    // 제목
+                    Text(
+                      widget.lesson.title,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color:
+                            isLocked ? AppColors.disabled : AppColors.surface,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  },
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppDimensions.spacingXS),
+                    // 진행률
+                    _buildProgress(isLocked, progress),
+                  ],
                 ),
               ),
-          ],
+              // 잠금 아이콘
+              if (isLocked)
+                Positioned(
+                  top: AppDimensions.paddingS,
+                  right: AppDimensions.paddingS,
+                  child: Icon(
+                    Icons.lock,
+                    color: AppColors.disabled,
+                    size: 20,
+                  ),
+                ),
+              // 완료 체크마크 - 펄스 애니메이션 추가
+              if (widget.lesson.isCompleted)
+                Positioned(
+                  top: AppDimensions.paddingS,
+                  right: AppDimensions.paddingS,
+                  child: AnimatedBuilder(
+                    animation: _pulseController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: 1.0 + (_pulseController.value * 0.15),
+                        child: Container(
+                          padding:
+                              const EdgeInsets.all(AppDimensions.paddingXS),
+                          decoration: BoxDecoration(
+                            color: AppColors.successGreen,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.successGreen
+                                    .withOpacity(0.6 * _pulseController.value),
+                                blurRadius: 8 + (4 * _pulseController.value),
+                                spreadRadius: 1 + (2 * _pulseController.value),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.check,
+                            color: AppColors.surface,
+                            size: 16,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -203,9 +203,7 @@ class _LessonCardState extends State<LessonCard>
             Text(
               '${(progress * 100).round()}%',
               style: AppTextStyles.bodySmall.copyWith(
-                color: isLocked
-                    ? AppColors.disabled
-                    : AppColors.surface,
+                color: isLocked ? AppColors.disabled : AppColors.surface,
                 fontWeight: FontWeight.bold,
               ),
             ),

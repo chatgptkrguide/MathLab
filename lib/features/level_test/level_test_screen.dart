@@ -33,7 +33,9 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     if (_selectedAnswerIndex == null) return;
 
     await AppHapticFeedback.lightImpact();
-    await ref.read(levelTestProvider.notifier).submitAnswer(_selectedAnswerIndex!);
+    await ref
+        .read(levelTestProvider.notifier)
+        .submitAnswer(_selectedAnswerIndex!);
 
     setState(() {
       _selectedAnswerIndex = null;
@@ -111,13 +113,15 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
               value: progress,
               minHeight: 8,
               backgroundColor: AppColors.disabled.withOpacity(0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
             const SizedBox(height: AppDimensions.paddingL),
 
             // 문제 번호 및 난이도
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingL),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -133,8 +137,10 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                       vertical: AppDimensions.paddingS,
                     ),
                     decoration: BoxDecoration(
-                      color: _getDifficultyColor(question.difficulty).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                      color: _getDifficultyColor(question.difficulty)
+                          .withOpacity(0.1),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusM),
                       border: Border.all(
                         color: _getDifficultyColor(question.difficulty),
                       ),
@@ -167,7 +173,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
             // 문제
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingL),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -176,7 +183,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                       padding: const EdgeInsets.all(AppDimensions.paddingL),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusL),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.borderLight.withOpacity(0.15),
@@ -199,7 +207,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                     ...List.generate(
                       question.options.length,
                       (index) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
+                        padding: const EdgeInsets.only(
+                            bottom: AppDimensions.paddingM),
                         child: _OptionButton(
                           option: question.options[index],
                           index: index,
@@ -300,7 +309,9 @@ class _OptionButton extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.surface : AppColors.primary.withOpacity(0.1),
+                color: isSelected
+                    ? AppColors.surface
+                    : AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected ? AppColors.surface : AppColors.primary,
@@ -311,7 +322,8 @@ class _OptionButton extends StatelessWidget {
                 child: Text(
                   String.fromCharCode(65 + index), // A, B, C, D
                   style: TextStyle(
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                    color:
+                        isSelected ? AppColors.primary : AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -358,7 +370,8 @@ class _LevelTestResultScreen extends ConsumerWidget {
                       width: 120,
                       height: 120,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: AppColors.goldGradient),
+                        gradient: const LinearGradient(
+                            colors: AppColors.goldGradient),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -398,7 +411,8 @@ class _LevelTestResultScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(AppDimensions.paddingXL),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusXL),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.borderLight.withOpacity(0.2),
@@ -440,7 +454,8 @@ class _LevelTestResultScreen extends ConsumerWidget {
                     _StatCard(
                       icon: Icons.check_circle,
                       label: '정답',
-                      value: '${result.correctAnswers}/${result.totalQuestions}',
+                      value:
+                          '${result.correctAnswers}/${result.totalQuestions}',
                       color: AppColors.success,
                     ),
                     const SizedBox(height: AppDimensions.paddingM),

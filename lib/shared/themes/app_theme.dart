@@ -219,7 +219,8 @@ class AppTheme {
       // 스낵바 테마
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.surface),
+        contentTextStyle:
+            AppTextStyles.bodyMedium.copyWith(color: AppColors.surface),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),

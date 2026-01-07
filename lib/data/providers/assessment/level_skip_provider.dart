@@ -21,8 +21,8 @@ final activeSkipTestProvider =
 });
 
 /// 특정 테스트 ID로 스킵 테스트 조회
-final skipTestProvider =
-    FutureProvider.autoDispose.family<LevelSkipTest?, String>((ref, testId) async {
+final skipTestProvider = FutureProvider.autoDispose
+    .family<LevelSkipTest?, String>((ref, testId) async {
   final service = ref.watch(levelSkipServiceProvider);
   return service.getTest(testId);
 });

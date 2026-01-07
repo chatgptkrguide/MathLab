@@ -164,9 +164,11 @@ class Episode {
     if (episodeNumber == 1) return true; // 첫 번째 에피소드는 항상 가능
 
     // 이전 에피소드가 완료되었는지 확인
-    final previousEpisode = allEpisodes.where(
-      (e) => e.lessonId == lessonId && e.episodeNumber == episodeNumber - 1,
-    ).firstOrNull;
+    final previousEpisode = allEpisodes
+        .where(
+          (e) => e.lessonId == lessonId && e.episodeNumber == episodeNumber - 1,
+        )
+        .firstOrNull;
 
     return previousEpisode?.isCompleted ?? false;
   }
@@ -215,8 +217,10 @@ class EpisodeSet {
   /// 세트 전체 진행률
   double get overallProgress {
     if (episodes.isEmpty) return 0.0;
-    final totalProblems = episodes.fold(0, (sum, ep) => sum + ep.targetProblems);
-    final completedProblems = episodes.fold(0, (sum, ep) => sum + ep.completedProblems);
+    final totalProblems =
+        episodes.fold(0, (sum, ep) => sum + ep.targetProblems);
+    final completedProblems =
+        episodes.fold(0, (sum, ep) => sum + ep.completedProblems);
     return totalProblems > 0 ? completedProblems / totalProblems : 0.0;
   }
 

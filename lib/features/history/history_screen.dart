@@ -37,7 +37,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             children: [
               // 통합 헤더 (학습 화면과 동일한 디자인)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -53,7 +54,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
+                      icon: const Icon(Icons.menu,
+                          color: AppColors.headerText, size: 28),
                       onPressed: () {
                         final currentGrade = user?.currentGrade ?? '중1';
                         showDialog(
@@ -62,8 +64,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                             currentGrade: currentGrade,
                             onGradeSelected: (newGrade) {
                               ref.read(userProvider.notifier).updateUser(
-                                user!.copyWith(currentGrade: newGrade),
-                              );
+                                    user!.copyWith(currentGrade: newGrade),
+                                  );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('학년이 $newGrade(으)로 변경되었습니다'),
@@ -307,56 +309,69 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Widget _buildCalendarSection() {
     // 현재 날짜 가져오기
     final now = DateTime.now();
-    final months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+    final months = [
+      '1월',
+      '2월',
+      '3월',
+      '4월',
+      '5월',
+      '6월',
+      '7월',
+      '8월',
+      '9월',
+      '10월',
+      '11월',
+      '12월'
+    ];
     final currentMonth = '${months[now.month - 1]} ${now.year}';
 
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    color: AppColors.mathBlue,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    currentMonth,
-                    style: AppTextStyles.headlineSmall.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              TextButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MonthlyStatsScreen(
-                        selectedMonth: DateTime.now(),
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.bar_chart, size: 18),
-                label: Text(
-                  '통계',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.mathBlue,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: AppColors.mathBlue,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  currentMonth,
+                  style: AppTextStyles.headlineSmall.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+              ],
+            ),
+            TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MonthlyStatsScreen(
+                      selectedMonth: DateTime.now(),
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.bar_chart, size: 18),
+              label: Text(
+                '통계',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.mathBlue,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacingM),
-          _buildCalendar(),
-        ],
+            ),
+          ],
+        ),
+        const SizedBox(height: AppDimensions.spacingM),
+        _buildCalendar(),
+      ],
     );
   }
 
@@ -442,7 +457,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
 
     return Column(
-      children: weeks.map((week) => _buildWeekRow(week, completedDays)).toList(),
+      children:
+          weeks.map((week) => _buildWeekRow(week, completedDays)).toList(),
     );
   }
 
@@ -465,20 +481,22 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           return Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: isCompleted ? () {
-                // 완료한 날짜 탭 시 해당 날의 학습 기록 표시
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('$day일 학습 기록: 문제 15개 완료 🎉'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    backgroundColor: AppColors.mathBlue,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              } : null,
+              onTap: isCompleted
+                  ? () {
+                      // 완료한 날짜 탭 시 해당 날의 학습 기록 표시
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('$day일 학습 기록: 문제 15개 완료 🎉'),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: AppColors.mathBlue,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  : null,
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 width: 40,
@@ -486,17 +504,21 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 decoration: BoxDecoration(
                   color: isCompleted ? AppColors.mathBlue : Colors.transparent,
                   shape: BoxShape.circle,
-                  border: isToday ? Border.all(
-                    color: AppColors.mathBlue,
-                    width: 2,
-                  ) : null,
-                  boxShadow: isCompleted ? [
-                    BoxShadow(
-                      color: AppColors.mathBlue.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ] : null,
+                  border: isToday
+                      ? Border.all(
+                          color: AppColors.mathBlue,
+                          width: 2,
+                        )
+                      : null,
+                  boxShadow: isCompleted
+                      ? [
+                          BoxShadow(
+                            color: AppColors.mathBlue.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Center(
                   child: Column(
@@ -505,9 +527,14 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       Text(
                         '$day',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: isCompleted ? AppColors.surface :
-                                 isToday ? AppColors.mathBlue : AppColors.textPrimary,
-                          fontWeight: isCompleted || isToday ? FontWeight.bold : FontWeight.normal,
+                          color: isCompleted
+                              ? AppColors.surface
+                              : isToday
+                                  ? AppColors.mathBlue
+                                  : AppColors.textPrimary,
+                          fontWeight: isCompleted || isToday
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           fontSize: 14,
                         ),
                       ),

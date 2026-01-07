@@ -97,17 +97,18 @@ class AuthNotifier extends BaseNotifier<AuthState> {
   /// 계정 목록 로드
   Future<List<UserAccount>> _loadAccounts() async {
     return await executeWithErrorHandling(
-      () async {
-        final accounts = await storage.loadList<UserAccount>(
-          key: 'userAccounts',
-          fromJson: UserAccount.fromJson,
-        );
-        logDebug('계정 ${accounts.length}개 로드 완료');
-        return accounts;
-      },
-      errorMessage: '계정 목록 로드 실패',
-      fallback: () => <UserAccount>[],
-    ) ?? [];
+          () async {
+            final accounts = await storage.loadList<UserAccount>(
+              key: 'userAccounts',
+              fromJson: UserAccount.fromJson,
+            );
+            logDebug('계정 ${accounts.length}개 로드 완료');
+            return accounts;
+          },
+          errorMessage: '계정 목록 로드 실패',
+          fallback: () => <UserAccount>[],
+        ) ??
+        [];
   }
 
   /// 계정 목록 저장
@@ -133,127 +134,134 @@ class AuthNotifier extends BaseNotifier<AuthState> {
     AccountType accountType = AccountType.student,
   }) async {
     return await executeWithErrorHandling(
-      () async {
-        state = state.copyWith(isLoading: true);
+          () async {
+            state = state.copyWith(isLoading: true);
 
-        final existingAccounts = await _loadAccounts();
-        final emailExists = existingAccounts.any((acc) => acc.email == email);
+            final existingAccounts = await _loadAccounts();
+            final emailExists =
+                existingAccounts.any((acc) => acc.email == email);
 
-        if (emailExists) {
-          state = state.copyWith(isLoading: false, error: '이미 사용 중인 이메일입니다');
-          return false;
-        }
+            if (emailExists) {
+              state =
+                  state.copyWith(isLoading: false, error: '이미 사용 중인 이메일입니다');
+              return false;
+            }
 
-        final newAccount = UserAccount(
-          id: _generateUserId(),
-          email: email,
-          displayName: displayName,
-          createdAt: DateTime.now(),
-          lastLoginAt: DateTime.now(),
-          accountType: accountType,
-          preferences: {'grade': grade},
-        );
+            final newAccount = UserAccount(
+              id: _generateUserId(),
+              email: email,
+              displayName: displayName,
+              createdAt: DateTime.now(),
+              lastLoginAt: DateTime.now(),
+              accountType: accountType,
+              preferences: {'grade': grade},
+            );
 
-        final updatedAccounts = [...existingAccounts, newAccount];
-        await _saveAccounts(updatedAccounts);
-        await _setCurrentAccount(newAccount.id);
+            final updatedAccounts = [...existingAccounts, newAccount];
+            await _saveAccounts(updatedAccounts);
+            await _setCurrentAccount(newAccount.id);
 
-        state = AuthState(
-          isAuthenticated: true,
-          currentAccount: newAccount,
-          availableAccounts: updatedAccounts,
-          isLoading: false,
-        );
+            state = AuthState(
+              isAuthenticated: true,
+              currentAccount: newAccount,
+              availableAccounts: updatedAccounts,
+              isLoading: false,
+            );
 
-        return true;
-      },
-      errorMessage: '회원가입 실패',
-      fallback: () {
-        state = state.copyWith(isLoading: false);
-        return false;
-      },
-    ) ?? false;
+            return true;
+          },
+          errorMessage: '회원가입 실패',
+          fallback: () {
+            state = state.copyWith(isLoading: false);
+            return false;
+          },
+        ) ??
+        false;
   }
 
   /// 게스트로 시작
   Future<bool> signInAsGuest() async {
     return await executeWithErrorHandling(
-      () async {
-        state = state.copyWith(isLoading: true);
+          () async {
+            state = state.copyWith(isLoading: true);
 
-        final existingAccounts = await _loadAccounts();
-        final guestNumber = existingAccounts
-                .where((acc) => acc.email.startsWith('guest_'))
-                .length +
-            1;
+            final existingAccounts = await _loadAccounts();
+            final guestNumber = existingAccounts
+                    .where((acc) => acc.email.startsWith('guest_'))
+                    .length +
+                1;
 
-        final guestAccount = UserAccount(
-          id: _generateUserId(),
-          email: 'guest_${DateTime.now().millisecondsSinceEpoch}@gomath.local',
-          displayName: '게스트 $guestNumber',
-          createdAt: DateTime.now(),
-          lastLoginAt: DateTime.now(),
-          accountType: AccountType.student,
-          preferences: {'grade': '미설정', 'isGuest': 'true'},
-        );
+            final guestAccount = UserAccount(
+              id: _generateUserId(),
+              email:
+                  'guest_${DateTime.now().millisecondsSinceEpoch}@gomath.local',
+              displayName: '게스트 $guestNumber',
+              createdAt: DateTime.now(),
+              lastLoginAt: DateTime.now(),
+              accountType: AccountType.student,
+              preferences: {'grade': '미설정', 'isGuest': 'true'},
+            );
 
-        final updatedAccounts = [...existingAccounts, guestAccount];
-        await _saveAccounts(updatedAccounts);
-        await _setCurrentAccount(guestAccount.id);
+            final updatedAccounts = [...existingAccounts, guestAccount];
+            await _saveAccounts(updatedAccounts);
+            await _setCurrentAccount(guestAccount.id);
 
-        state = AuthState(
-          isAuthenticated: true,
-          currentAccount: guestAccount,
-          availableAccounts: updatedAccounts,
-          isLoading: false,
-        );
+            state = AuthState(
+              isAuthenticated: true,
+              currentAccount: guestAccount,
+              availableAccounts: updatedAccounts,
+              isLoading: false,
+            );
 
-        logInfo('게스트 로그인 완료: ${guestAccount.displayName}');
-        return true;
-      },
-      errorMessage: '게스트 로그인 실패',
-      fallback: () {
-        state = state.copyWith(isLoading: false);
-        return false;
-      },
-    ) ?? false;
+            logInfo('게스트 로그인 완료: ${guestAccount.displayName}');
+            return true;
+          },
+          errorMessage: '게스트 로그인 실패',
+          fallback: () {
+            state = state.copyWith(isLoading: false);
+            return false;
+          },
+        ) ??
+        false;
   }
 
   /// 로그인
   Future<bool> signIn(String email) async {
     return await executeWithErrorHandling(
-      () async {
-        state = state.copyWith(isLoading: true);
+          () async {
+            state = state.copyWith(isLoading: true);
 
-        final accounts = await _loadAccounts();
-        final account = accounts.firstWhere(
-          (acc) => acc.email == email,
-          orElse: () => throw Exception('계정을 찾을 수 없습니다'),
-        );
+            final accounts = await _loadAccounts();
+            final account = accounts.firstWhere(
+              (acc) => acc.email == email,
+              orElse: () => throw Exception('계정을 찾을 수 없습니다'),
+            );
 
-        final updatedAccount = account.copyWith(lastLoginAt: DateTime.now());
-        final updatedAccounts = accounts.map((acc) {
-          return acc.id == account.id ? updatedAccount : acc;
-        }).toList();
+            final updatedAccount =
+                account.copyWith(lastLoginAt: DateTime.now());
+            final updatedAccounts = accounts.map((acc) {
+              return acc.id == account.id ? updatedAccount : acc;
+            }).toList();
 
-        await _saveAccounts(updatedAccounts);
-        await _setCurrentAccount(updatedAccount.id);
+            await _saveAccounts(updatedAccounts);
+            await _setCurrentAccount(updatedAccount.id);
 
-        state = AuthState(
-          isAuthenticated: true,
-          currentAccount: updatedAccount,
-          availableAccounts: updatedAccounts,
-          isLoading: false,
-        );
+            state = AuthState(
+              isAuthenticated: true,
+              currentAccount: updatedAccount,
+              availableAccounts: updatedAccounts,
+              isLoading: false,
+            );
 
-        return true;
-      },
-      errorMessage: '로그인 실패',
-      fallback: () {
-        state = state.copyWith(isLoading: false);
-        return false;
-      },
-    ) ?? false;
+            return true;
+          },
+          errorMessage: '로그인 실패',
+          fallback: () {
+            state = state.copyWith(isLoading: false);
+            return false;
+          },
+        ) ??
+        false;
   }
 
   /// 계정 전환
@@ -374,7 +382,8 @@ class AuthNotifier extends BaseNotifier<AuthState> {
           errorMessage = 'Google 로그인 설정이 완료되지 않았습니다. 관리자에게 문의하세요.';
         } else if (isNetworkError) {
           errorMessage = '네트워크 연결을 확인해주세요';
-        } else if (e.toString().contains('cancelled') || e.toString().contains('cancel')) {
+        } else if (e.toString().contains('cancelled') ||
+            e.toString().contains('cancel')) {
           errorMessage = '로그인이 취소되었습니다';
         }
 
@@ -447,7 +456,8 @@ class AuthNotifier extends BaseNotifier<AuthState> {
           availableAccounts: updatedAccounts,
         );
 
-        logInfo('프로필 정보 연동 완료: ${tempProfile.name} (학년: ${tempProfile.currentGrade})');
+        logInfo(
+            '프로필 정보 연동 완료: ${tempProfile.name} (학년: ${tempProfile.currentGrade})');
       },
       errorMessage: '프로필 정보 연동 실패',
     );
@@ -472,66 +482,67 @@ class AuthNotifier extends BaseNotifier<AuthState> {
     required String uid,
   }) async {
     return await executeWithErrorHandling(
-      () async {
-        state = state.copyWith(isLoading: true);
+          () async {
+            state = state.copyWith(isLoading: true);
 
-        final existingAccounts = await _loadAccounts();
+            final existingAccounts = await _loadAccounts();
 
-        // 기존 계정 확인
-        UserAccount? existingAccount;
-        try {
-          existingAccount = existingAccounts.firstWhere(
-            (acc) => acc.email == email,
-          );
-        } catch (_) {
-          // 계정이 없으면 null
-        }
+            // 기존 계정 확인
+            UserAccount? existingAccount;
+            try {
+              existingAccount = existingAccounts.firstWhere(
+                (acc) => acc.email == email,
+              );
+            } catch (_) {
+              // 계정이 없으면 null
+            }
 
-        final UserAccount account;
-        if (existingAccount != null) {
-          // 기존 계정 업데이트
-          account = existingAccount.copyWith(
-            lastLoginAt: DateTime.now(),
-          );
-        } else {
-          // 새 계정 생성
-          account = UserAccount(
-            id: uid,
-            email: email,
-            displayName: displayName,
-            createdAt: DateTime.now(),
-            lastLoginAt: DateTime.now(),
-            accountType: AccountType.student,
-            preferences: {'grade': '미설정'},
-          );
-        }
+            final UserAccount account;
+            if (existingAccount != null) {
+              // 기존 계정 업데이트
+              account = existingAccount.copyWith(
+                lastLoginAt: DateTime.now(),
+              );
+            } else {
+              // 새 계정 생성
+              account = UserAccount(
+                id: uid,
+                email: email,
+                displayName: displayName,
+                createdAt: DateTime.now(),
+                lastLoginAt: DateTime.now(),
+                accountType: AccountType.student,
+                preferences: {'grade': '미설정'},
+              );
+            }
 
-        // 계정 저장
-        final updatedAccounts = existingAccount != null
-            ? existingAccounts.map((acc) {
-                return acc.id == account.id ? account : acc;
-              }).toList()
-            : [...existingAccounts, account];
+            // 계정 저장
+            final updatedAccounts = existingAccount != null
+                ? existingAccounts.map((acc) {
+                    return acc.id == account.id ? account : acc;
+                  }).toList()
+                : [...existingAccounts, account];
 
-        await _saveAccounts(updatedAccounts);
-        await _setCurrentAccount(account.id);
+            await _saveAccounts(updatedAccounts);
+            await _setCurrentAccount(account.id);
 
-        state = AuthState(
-          isAuthenticated: true,
-          currentAccount: account,
-          availableAccounts: updatedAccounts,
-          isLoading: false,
-        );
+            state = AuthState(
+              isAuthenticated: true,
+              currentAccount: account,
+              availableAccounts: updatedAccounts,
+              isLoading: false,
+            );
 
-        logInfo('이메일 로그인 성공: $email');
-        return true;
-      },
-      errorMessage: '이메일 로그인 실패',
-      fallback: () {
-        state = state.copyWith(isLoading: false);
-        return false;
-      },
-    ) ?? false;
+            logInfo('이메일 로그인 성공: $email');
+            return true;
+          },
+          errorMessage: '이메일 로그인 실패',
+          fallback: () {
+            state = state.copyWith(isLoading: false);
+            return false;
+          },
+        ) ??
+        false;
   }
 
   /// 로그아웃
@@ -558,7 +569,8 @@ class AuthNotifier extends BaseNotifier<AuthState> {
   /// 계정 삭제
   Future<void> deleteAccount(String accountId) async {
     final accounts = state.availableAccounts;
-    final updatedAccounts = accounts.where((acc) => acc.id != accountId).toList();
+    final updatedAccounts =
+        accounts.where((acc) => acc.id != accountId).toList();
 
     await _saveAccounts(updatedAccounts);
 
@@ -658,49 +670,50 @@ class AuthNotifier extends BaseNotifier<AuthState> {
     required String newAccountId,
   }) async {
     return await executeWithErrorHandling(
-      () async {
-        logInfo('게스트 데이터 이전: $guestAccountId → $newAccountId');
+          () async {
+            logInfo('게스트 데이터 이전: $guestAccountId → $newAccountId');
 
-        final keysToMigrate = [
-          'wrong_answers',
-          'league',
-          'messages',
-          'friends',
-          'achievements',
-          'study_history',
-          'lesson_progress',
-        ];
+            final keysToMigrate = [
+              'wrong_answers',
+              'league',
+              'messages',
+              'friends',
+              'achievements',
+              'study_history',
+              'lesson_progress',
+            ];
 
-        int migratedCount = 0;
+            int migratedCount = 0;
 
-        for (final key in keysToMigrate) {
-          final oldKey = '${key}_$guestAccountId';
-          final newKey = '${key}_$newAccountId';
+            for (final key in keysToMigrate) {
+              final oldKey = '${key}_$guestAccountId';
+              final newKey = '${key}_$newAccountId';
 
-          if (!await storage.containsKey(oldKey)) continue;
+              if (!await storage.containsKey(oldKey)) continue;
 
-          final data = await storage.getString(oldKey);
-          if (data != null && data.isNotEmpty) {
-            if (await storage.containsKey(newKey)) {
-              logWarning('이미 데이터 존재: $newKey (스킵)');
-              continue;
+              final data = await storage.getString(oldKey);
+              if (data != null && data.isNotEmpty) {
+                if (await storage.containsKey(newKey)) {
+                  logWarning('이미 데이터 존재: $newKey (스킵)');
+                  continue;
+                }
+
+                await storage.setString(newKey, data);
+                migratedCount++;
+                logInfo('데이터 이전: $oldKey → $newKey');
+                await storage.remove(oldKey);
+              }
             }
 
-            await storage.setString(newKey, data);
-            migratedCount++;
-            logInfo('데이터 이전: $oldKey → $newKey');
-            await storage.remove(oldKey);
-          }
-        }
+            logInfo('$migratedCount개 데이터 이전 완료');
+            await deleteAccount(guestAccountId);
 
-        logInfo('$migratedCount개 데이터 이전 완료');
-        await deleteAccount(guestAccountId);
-
-        return true;
-      },
-      errorMessage: '게스트 데이터 이전 실패',
-      fallback: () => false,
-    ) ?? false;
+            return true;
+          },
+          errorMessage: '게스트 데이터 이전 실패',
+          fallback: () => false,
+        ) ??
+        false;
   }
 
   /// 사용자 데이터 삭제
@@ -792,7 +805,8 @@ class AuthState {
   bool get hasMultipleAccounts => availableAccounts.length > 1;
 
   @override
-  String toString() => 'AuthState{isAuth: $isAuthenticated, account: ${currentAccount?.displayName}}';
+  String toString() =>
+      'AuthState{isAuth: $isAuthenticated, account: ${currentAccount?.displayName}}';
 }
 
 /// 프로바이더들

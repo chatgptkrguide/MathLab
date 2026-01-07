@@ -38,22 +38,26 @@ class ErrorNoteDetailDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('문제', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+            Text('문제',
+                style: AppTextStyles.titleMedium
+                    .copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: AppDimensions.spacingXS),
             Text(errorNote.question, style: AppTextStyles.bodyMedium),
             const SizedBox(height: AppDimensions.spacingM),
-
             Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('내 답', style: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold)),
+                      Text('내 답',
+                          style: AppTextStyles.titleSmall
+                              .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: AppDimensions.spacingXS),
                       Text(
                         errorNote.userAnswer,
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.errorRed),
+                        style: AppTextStyles.bodyMedium
+                            .copyWith(color: AppColors.errorRed),
                       ),
                     ],
                   ),
@@ -63,11 +67,14 @@ class ErrorNoteDetailDialog extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('정답', style: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold)),
+                      Text('정답',
+                          style: AppTextStyles.titleSmall
+                              .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: AppDimensions.spacingXS),
                       Text(
                         errorNote.correctAnswer,
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.successGreen),
+                        style: AppTextStyles.bodyMedium
+                            .copyWith(color: AppColors.successGreen),
                       ),
                     ],
                   ),
@@ -75,20 +82,23 @@ class ErrorNoteDetailDialog extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppDimensions.spacingM),
-
-            Text('해설', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+            Text('해설',
+                style: AppTextStyles.titleMedium
+                    .copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: AppDimensions.spacingXS),
             Text(errorNote.explanation, style: AppTextStyles.bodyMedium),
             const SizedBox(height: AppDimensions.spacingM),
-
             Wrap(
               spacing: AppDimensions.spacingM,
               runSpacing: AppDimensions.spacingS,
               children: [
                 _buildInfoChip('카테고리', errorNote.category, AppColors.mathBlue),
-                _buildInfoChip('난이도', errorNote.difficultyText, AppColors.mathOrange),
-                _buildInfoChip('복습', '${errorNote.reviewCount}회', AppColors.mathTeal),
-                _buildInfoChip('상태', errorNote.statusText, _getStatusColor(errorNote.status)),
+                _buildInfoChip(
+                    '난이도', errorNote.difficultyText, AppColors.mathOrange),
+                _buildInfoChip(
+                    '복습', '${errorNote.reviewCount}회', AppColors.mathTeal),
+                _buildInfoChip('상태', errorNote.statusText,
+                    _getStatusColor(errorNote.status)),
               ],
             ),
           ],

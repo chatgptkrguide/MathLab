@@ -139,7 +139,8 @@ class WrongAnswerCard extends StatelessWidget {
                         ),
                         child: Row(
                           children: const [
-                            Icon(Icons.check_rounded, color: AppColors.surface, size: 16),
+                            Icon(Icons.check_rounded,
+                                color: AppColors.surface, size: 16),
                             SizedBox(width: 4),
                             Text(
                               '완료',

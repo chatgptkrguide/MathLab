@@ -56,7 +56,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
               ),
               titleAlignment: MainAxisAlignment.spaceBetween,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: AppColors.headerText, size: 28),
+                icon: const Icon(Icons.arrow_back_rounded,
+                    color: AppColors.headerText, size: 28),
                 onPressed: () => Navigator.of(context).pop(),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -255,7 +256,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
       controller: _contentController,
       maxLines: 10,
       decoration: InputDecoration(
-        hintText: '문의 내용을 상세히 작성해주세요\n\n예시:\n- 어떤 문제가 발생했나요?\n- 언제 발생했나요?\n- 어떤 기능을 사용 중이었나요?',
+        hintText:
+            '문의 내용을 상세히 작성해주세요\n\n예시:\n- 어떤 문제가 발생했나요?\n- 언제 발생했나요?\n- 어떤 기능을 사용 중이었나요?',
         hintStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textSecondary,
           height: 1.5,

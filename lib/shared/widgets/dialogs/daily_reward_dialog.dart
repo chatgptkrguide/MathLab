@@ -97,7 +97,8 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
       child: Material(
         type: MaterialType.transparency,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXXXL),
+          margin:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.paddingXXXL),
           padding: const EdgeInsets.all(AppDimensions.paddingXXL),
           decoration: BoxDecoration(
             color: AppColors.surface,
@@ -305,7 +306,8 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
               emoji,
               style: TextStyle(
                 fontSize: 16,
-                color: isToday || isPast ? AppColors.surface : AppColors.disabled,
+                color:
+                    isToday || isPast ? AppColors.surface : AppColors.disabled,
               ),
             ),
           ),
@@ -314,9 +316,7 @@ class _DailyRewardDialogState extends State<DailyRewardDialog>
         Text(
           '$day',
           style: AppTextStyles.bodySmall.copyWith(
-            color: isToday
-                ? AppColors.mathTeal
-                : AppColors.textSecondary,
+            color: isToday ? AppColors.mathTeal : AppColors.textSecondary,
             fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
           ),
         ),

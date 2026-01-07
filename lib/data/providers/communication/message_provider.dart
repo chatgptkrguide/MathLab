@@ -172,7 +172,8 @@ class MessageNotifier extends BaseNotifier<List<Message>> {
   List<Message> get unreadMessages => state.where((m) => !m.isRead).toList();
 
   /// 중요 메시지 목록
-  List<Message> get importantMessages => state.where((m) => m.isImportant).toList();
+  List<Message> get importantMessages =>
+      state.where((m) => m.isImportant).toList();
 
   /// 푸시 알림 전송
   void _sendNotification(Message message) {

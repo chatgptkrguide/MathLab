@@ -365,9 +365,7 @@ class TierLevelScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           _buildStatusRow(
             '마지막 활동',
-            daysSinceLastActive == 0
-                ? '오늘'
-                : '$daysSinceLastActive일 전',
+            daysSinceLastActive == 0 ? '오늘' : '$daysSinceLastActive일 전',
           ),
           _buildStatusRow(
             '연속 비활동',

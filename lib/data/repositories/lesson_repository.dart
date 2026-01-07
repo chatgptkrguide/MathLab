@@ -1,4 +1,4 @@
-import 'base_repository.dart';
+import 'base/base_repository.dart';
 import '../models/learning/lesson.dart';
 import '../../shared/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,7 +32,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
 
       final lessonsList = json['lessons'] as List;
       return lessonsList
-          .map((lessonJson) => Lesson.fromJson(lessonJson as Map<String, dynamic>))
+          .map((lessonJson) =>
+              Lesson.fromJson(lessonJson as Map<String, dynamic>))
           .toList();
     } catch (e, stackTrace) {
       Logger.error(
@@ -51,7 +52,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
       await localStorageService.saveMap(storageKey, {
         'lessons': data.map((lesson) => lesson.toJson()).toList(),
       });
-      Logger.debug('로컬에 레슨 ${data.length}개 저장 완료: $storageKey', tag: 'LessonRepository');
+      Logger.debug('로컬에 레슨 ${data.length}개 저장 완료: $storageKey',
+          tag: 'LessonRepository');
     } catch (e, stackTrace) {
       Logger.error(
         '로컬 레슨 데이터 저장 실패',
@@ -83,10 +85,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
   @override
   Future<List<Lesson>?> getFromFirebase(String userId) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('lessons')
-          .orderBy('order')
-          .get();
+      final querySnapshot =
+          await _firestore.collection('lessons').orderBy('order').get();
 
       if (querySnapshot.docs.isEmpty) {
         Logger.debug('Firestore에 레슨 데이터 없음', tag: 'LessonRepository');
@@ -97,7 +97,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
           .map((doc) => Lesson.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
 
-      Logger.debug('Firestore에서 ${lessons.length}개 레슨 조회 완료', tag: 'LessonRepository');
+      Logger.debug('Firestore에서 ${lessons.length}개 레슨 조회 완료',
+          tag: 'LessonRepository');
       return lessons;
     } catch (e, stackTrace) {
       Logger.error(
@@ -121,7 +122,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
       }
 
       await batch.commit();
-      Logger.debug('Firestore에 레슨 ${data.length}개 저장 완료', tag: 'LessonRepository');
+      Logger.debug('Firestore에 레슨 ${data.length}개 저장 완료',
+          tag: 'LessonRepository');
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 레슨 데이터 저장 실패',
@@ -158,7 +160,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
   // ==================== 충돌 해결 ====================
 
   @override
-  Future<List<Lesson>?> mergeData(List<Lesson> local, List<Lesson> remote) async {
+  Future<List<Lesson>?> mergeData(
+      List<Lesson> local, List<Lesson> remote) async {
     // 레슨 데이터는 주로 읽기 전용이므로 Firebase를 우선
     // 하지만 사용자의 진행률 데이터(completedProblems, isUnlocked)는 로컬 우선
     Logger.debug('레슨 데이터 충돌 해결 시작', tag: 'LessonRepository');
@@ -191,7 +194,8 @@ class LessonRepository extends BaseRepository<List<Lesson>> {
     }
 
     mergedLessons.sort((a, b) => a.order.compareTo(b.order));
-    Logger.debug('레슨 데이터 병합 완료: ${mergedLessons.length}개', tag: 'LessonRepository');
+    Logger.debug('레슨 데이터 병합 완료: ${mergedLessons.length}개',
+        tag: 'LessonRepository');
     return mergedLessons;
   }
 

@@ -103,7 +103,8 @@ class AccountSwitcherView extends ConsumerWidget {
                     label: const Text('새 계정 추가'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary, width: 2),
+                      side:
+                          const BorderSide(color: AppColors.primary, width: 2),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -305,7 +306,8 @@ class _AccountTile extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: isCurrent ? AppColors.primary : Colors.black,
+                              color:
+                                  isCurrent ? AppColors.primary : Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),

@@ -4,14 +4,19 @@ import 'package:flutter/foundation.dart';
 enum MessageType {
   /// 시스템 메시지 (공지사항, 업데이트)
   system,
+
   /// 친구 메시지
   friend,
+
   /// 리그 관련 메시지
   league,
+
   /// 업적 달성 메시지
   achievement,
+
   /// 스트릭 관련 메시지
   streak,
+
   /// 이벤트/프로모션 메시지
   promotion,
 }
@@ -153,9 +158,7 @@ class Message {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Message &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+      other is Message && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;

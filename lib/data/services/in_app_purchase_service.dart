@@ -56,8 +56,8 @@ class InAppPurchaseService {
 
     // iOS 전용 설정
     if (Platform.isIOS) {
-      final iosPlatform =
-          _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+      final iosPlatform = _inAppPurchase
+          .getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
       await iosPlatform.setDelegate(
         ExamplePaymentQueueDelegate(),
       );
@@ -367,8 +367,7 @@ class InAppPurchaseService {
 
     // iOS 검증
     if (Platform.isIOS) {
-      final iosPurchase =
-          purchaseDetails as AppStorePurchaseDetails;
+      final iosPurchase = purchaseDetails as AppStorePurchaseDetails;
       // iOS 영수증이 있는지 확인
       if (iosPurchase.skPaymentTransaction.transactionIdentifier == null) {
         return false;

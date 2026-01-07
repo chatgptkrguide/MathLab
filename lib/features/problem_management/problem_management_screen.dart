@@ -49,7 +49,8 @@ class _ProblemManagementScreenState
   }
 
   /// 통계 요약 카드
-  Widget _buildStatisticsSummary(AsyncValue<ProblemStatistics> statisticsAsync) {
+  Widget _buildStatisticsSummary(
+      AsyncValue<ProblemStatistics> statisticsAsync) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),

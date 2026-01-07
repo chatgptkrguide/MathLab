@@ -18,7 +18,8 @@ class DuolingoLoadingIndicator extends StatefulWidget {
   });
 
   @override
-  State<DuolingoLoadingIndicator> createState() => _DuolingoLoadingIndicatorState();
+  State<DuolingoLoadingIndicator> createState() =>
+      _DuolingoLoadingIndicatorState();
 }
 
 class _DuolingoLoadingIndicatorState extends State<DuolingoLoadingIndicator>
@@ -94,7 +95,8 @@ class _DuolingoLoadingIndicatorState extends State<DuolingoLoadingIndicator>
                     borderRadius: BorderRadius.circular(widget.size / 2),
                     boxShadow: [
                       BoxShadow(
-                        color: (widget.color ?? AppColors.mathBlue).withOpacity(0.3),
+                        color: (widget.color ?? AppColors.mathBlue)
+                            .withOpacity(0.3),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
@@ -200,7 +202,8 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                   child: Transform.translate(
                     offset: Offset(
-                      (widget.width as double? ?? 200) * _shimmerAnimation.value,
+                      (widget.width as double? ?? 200) *
+                          _shimmerAnimation.value,
                       0,
                     ),
                     child: Container(

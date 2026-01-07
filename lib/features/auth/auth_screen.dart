@@ -15,7 +15,8 @@ class AuthScreen extends ConsumerStatefulWidget {
   ConsumerState<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProviderStateMixin {
+class _AuthScreenState extends ConsumerState<AuthScreen>
+    with SingleTickerProviderStateMixin {
   bool _isLoading = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -60,28 +61,34 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
   }
 
   Future<void> _handleGuestStart() async {
+    print('[DEBUG] 시작하기 버튼 클릭됨!');
     if (_isLoading) return;
 
+    setState(() => _isLoading = true);
+
     try {
-      // 1. 프로필 설정 화면으로 이동하여 정보 입력
-      final profileResult = await Navigator.of(context).push<TempProfileData>(
-        MaterialPageRoute(
-          builder: (context) => const OnboardingProfileSetupScreen(),
-        ),
-      );
+      // 테스트를 위한 임시 수정: 프로필 설정 없이 바로 게스트 계정 생성
+      print('[DEBUG] 게스트 계정 생성 (기본 프로필 사용)');
 
-      if (profileResult == null || !mounted) return;
-
-      setState(() => _isLoading = true);
-
-      // 2. 게스트 계정 생성
+      // 게스트 계정 생성
       final success = await ref.read(authProvider.notifier).signInAsGuest();
 
       if (!mounted) return;
 
       if (success) {
-        // 3. 프로필 정보를 게스트 계정에 적용
-        await ref.read(authProvider.notifier).applyTempProfileToAccount(profileResult);
+        // 기본 프로필로 시작
+        final defaultProfile = TempProfileData(
+          name: '테스터',
+          birthDate: DateTime.now().subtract(const Duration(days: 365 * 15)),
+          gender: null,
+          currentGrade: '중1',
+          schoolName: null,
+          bio: null,
+        );
+
+        await ref
+            .read(authProvider.notifier)
+            .applyTempProfileToAccount(defaultProfile);
 
         // Success feedback
         if (mounted) {
@@ -91,7 +98,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white),
                   const SizedBox(width: 12),
-                  Text('${profileResult.name}님, 환영합니다! 🎉'),
+                  Text('${defaultProfile.name}님, 환영합니다! 🎉'),
                 ],
               ),
               backgroundColor: const Color(0xFF58CC02),
@@ -106,6 +113,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
         _showError('게스트 계정 생성에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (e) {
+      print('[DEBUG] 게스트 로그인 에러: $e');
       if (mounted) _showError('예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -133,8 +141,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
 
       // 3. 구글 로그인 실행 (프로필 정보 함께 전달)
       final success = await ref.read(authProvider.notifier).signInWithGoogle(
-        tempProfile: profileResult,
-      );
+            tempProfile: profileResult,
+          );
 
       if (!mounted) return;
 
@@ -226,7 +234,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
             // 메인 컨텐츠
             SingleChildScrollView(
               child: Container(
-                constraints: BoxConstraints(minHeight: size.height - MediaQuery.of(context).padding.top),
+                constraints: BoxConstraints(
+                    minHeight:
+                        size.height - MediaQuery.of(context).padding.top),
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(
                   children: [
@@ -323,7 +333,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
                                   child: Text(
                                     '또는',
                                     style: TextStyle(
@@ -421,30 +432,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
     required VoidCallback onPressed,
     required Gradient gradient,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
+    return Container(
+      width: double.infinity,
+      height: 68,
+      decoration: BoxDecoration(
+        gradient: gradient,
         borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: double.infinity,
-          height: 68,
-          decoration: BoxDecoration(
-            gradient: gradient,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF58CC02).withOpacity(0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF58CC02).withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            print('[DEBUG] InkWell 탭 감지!');
+            onPressed();
+          },
+          borderRadius: BorderRadius.circular(20),
           child: Center(
             child: Text(
               text,
@@ -483,8 +497,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: backgroundColor == Colors.white
-                ? Colors.grey.withOpacity(0.3)
-                : backgroundColor,
+                  ? Colors.grey.withOpacity(0.3)
+                  : backgroundColor,
               width: 1.5,
             ),
             boxShadow: [

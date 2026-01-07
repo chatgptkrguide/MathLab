@@ -73,9 +73,10 @@ class PracticeCategoryScreen extends ConsumerWidget {
 
               // 카테고리 버튼들
               ...PracticeCategory.values.map((category) => Padding(
-                padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
-                child: PracticeCategoryCard(category: category),
-              )),
+                    padding:
+                        const EdgeInsets.only(bottom: AppDimensions.paddingM),
+                    child: PracticeCategoryCard(category: category),
+                  )),
             ],
           ),
         ),
@@ -204,13 +205,15 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
               value: state.progress,
               minHeight: 8,
               backgroundColor: AppColors.disabled.withOpacity(0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.successGreen),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.successGreen),
             ),
             const SizedBox(height: AppDimensions.paddingL),
 
             // 문제 번호
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingL),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -227,7 +230,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.successGreen.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusM),
                       border: Border.all(color: AppColors.successGreen),
                     ),
                     child: Row(
@@ -258,7 +262,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             // 문제
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingL),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -267,7 +272,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                       padding: const EdgeInsets.all(AppDimensions.paddingL),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusL),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.borderLight.withOpacity(0.15),
@@ -287,11 +293,13 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     const SizedBox(height: AppDimensions.paddingXL),
 
                     // 객관식 선택지
-                    if (problem.type == ProblemType.multipleChoice && problem.options != null) ...[
+                    if (problem.type == ProblemType.multipleChoice &&
+                        problem.options != null) ...[
                       ...List.generate(
                         problem.options!.length,
                         (index) => Padding(
-                          padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
+                          padding: const EdgeInsets.only(
+                              bottom: AppDimensions.paddingM),
                           child: PracticeOptionButton(
                             option: problem.options![index],
                             index: index,
@@ -325,7 +333,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         side: const BorderSide(color: AppColors.textSecondary),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusL),
                         ),
                       ),
                       child: Text(
@@ -343,7 +352,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                     flex: 3,
                     child: UnifiedButton(
                       text: '확인',
-                      onPressed: _userAnswer.trim().isNotEmpty ? _submitAnswer : null,
+                      onPressed:
+                          _userAnswer.trim().isNotEmpty ? _submitAnswer : null,
                       isEnabled: _userAnswer.trim().isNotEmpty,
                       backgroundColor: AppColors.successGreen,
                       icon: Icons.check,
@@ -457,7 +467,8 @@ class PracticeResultScreen extends ConsumerWidget {
                       await AppHapticFeedback.lightImpact();
                       await ref.read(practiceProvider.notifier).resetSession();
                       if (context.mounted) {
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
                       }
                     },
                     backgroundColor: AppColors.successGreen,
@@ -473,7 +484,8 @@ class PracticeResultScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: AppColors.primary),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusL),
                       ),
                     ),
                     child: Text(
@@ -492,4 +504,3 @@ class PracticeResultScreen extends ConsumerWidget {
     );
   }
 }
-

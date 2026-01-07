@@ -48,7 +48,8 @@ class ProblemOptions extends StatelessWidget {
         problem.choices.length,
         (index) {
           // answer가 int인 경우 정답 인덱스로 사용
-          final correctAnswerIndex = problem.answer is int ? problem.answer as int : -1;
+          final correctAnswerIndex =
+              problem.answer is int ? problem.answer as int : -1;
           final isCorrectAnswer = correctAnswerIndex == index;
 
           return FadeInWidget(

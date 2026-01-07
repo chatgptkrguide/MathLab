@@ -6,7 +6,7 @@ import '../shared/widgets/layout/custom_bottom_nav.dart';
 import '../features/home/home_screen_figma.dart';
 import '../features/lessons/figma/lessons_screen_figma.dart';
 import '../features/wrong_answer/wrong_answer_screen.dart';
-import '../features/profile/figma/profile_detail_screen_v3_new.dart';
+import '../features/profile/figma/profile_detail_screen.dart';
 import '../features/league/league_screen.dart';
 import '../data/providers/infrastructure/navigation_provider.dart';
 import '../data/providers/communication/fcm_provider.dart';
@@ -66,11 +66,11 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     final currentIndex = ref.watch(navigationProvider);
 
     final List<Widget> screens = [
-      const LessonsScreenFigma(),         // 0: 학습
-      const WrongAnswerScreen(),          // 1: 오답
-      const HomeScreenFigma(),            // 2: 홈 (가운데)
-      const ProfileDetailScreenV3New(),   // 3: 프로필 (학습자 상세)
-      const LeagueScreen(),               // 4: 리그
+      const LessonsScreenFigma(), // 0: 학습
+      const WrongAnswerScreen(), // 1: 오답
+      const HomeScreenFigma(), // 2: 홈 (가운데)
+      const ProfileDetailScreen(), // 3: 프로필 (학습자 상세)
+      const LeagueScreen(), // 4: 리그
     ];
 
     return PopScope(
@@ -117,37 +117,38 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
 
   Future<bool> _showExitDialog(BuildContext context) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('앱 종료'),
-        content: const Text('GoMath Lab을 종료하시겠습니까?'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
-              '취소',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('앱 종료'),
+            content: const Text('GoMath Lab을 종료하시겠습니까?'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              '종료',
-              style: TextStyle(
-                color: Color(0xFF4A90E2),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text(
+                  '취소',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
               ),
-            ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text(
+                  '종료',
+                  style: TextStyle(
+                    color: Color(0xFF4A90E2),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 }

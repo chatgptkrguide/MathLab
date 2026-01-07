@@ -1,10 +1,10 @@
 /// 리그 뱃지 종류
 enum LeagueBadge {
-  streak,      // 연속 학습 스트릭
-  perfect,     // 완벽한 주간
-  topScorer,   // 최다 득점
-  rising,      // 급상승
-  veteran,     // 베테랑
+  streak, // 연속 학습 스트릭
+  perfect, // 완벽한 주간
+  topScorer, // 최다 득점
+  rising, // 급상승
+  veteran, // 베테랑
 }
 
 /// 리그 뱃지 확장 메서드
@@ -57,12 +57,12 @@ extension LeagueBadgeExtension on LeagueBadge {
 
 /// 리그 등급 (하위부터 상위 순)
 enum LeagueTier {
-  bronze,    // 브론즈
-  silver,    // 실버
-  gold,      // 골드
-  platinum,  // 플래티넘
-  diamond,   // 다이아몬드
-  champion,  // 챔피언
+  bronze, // 브론즈
+  silver, // 실버
+  gold, // 골드
+  platinum, // 플래티넘
+  diamond, // 다이아몬드
+  champion, // 챔피언
 }
 
 /// 리그 티어 확장 메서드
@@ -157,11 +157,12 @@ class LeagueParticipant {
 
   factory LeagueParticipant.fromJson(Map<String, dynamic> json) {
     final badgesList = (json['badges'] as List<dynamic>?)
-        ?.map((e) => LeagueBadge.values.firstWhere(
-              (badge) => badge.toString() == e,
-              orElse: () => LeagueBadge.streak,
-            ))
-        .toList() ?? [];
+            ?.map((e) => LeagueBadge.values.firstWhere(
+                  (badge) => badge.toString() == e,
+                  orElse: () => LeagueBadge.streak,
+                ))
+            .toList() ??
+        [];
 
     return LeagueParticipant(
       userId: json['userId'] as String,
@@ -272,8 +273,12 @@ class League {
       'participants': data['participants'] ?? [],
       'weekStartDate': _timestampToString(data['weekStartDate']),
       'weekEndDate': _timestampToString(data['weekEndDate']),
-      'createdAt': data['createdAt'] != null ? _timestampToString(data['createdAt']) : null,
-      'updatedAt': data['updatedAt'] != null ? _timestampToString(data['updatedAt']) : null,
+      'createdAt': data['createdAt'] != null
+          ? _timestampToString(data['createdAt'])
+          : null,
+      'updatedAt': data['updatedAt'] != null
+          ? _timestampToString(data['updatedAt'])
+          : null,
     };
 
     return League.fromJson(jsonData);

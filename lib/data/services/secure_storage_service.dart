@@ -4,7 +4,8 @@ import '../../shared/utils/logger.dart';
 /// 보안 저장소 서비스
 /// iOS Keychain 및 Android KeyStore를 사용하여 민감한 데이터를 안전하게 저장
 class SecureStorageService {
-  static final SecureStorageService _instance = SecureStorageService._internal();
+  static final SecureStorageService _instance =
+      SecureStorageService._internal();
   factory SecureStorageService() => _instance;
   SecureStorageService._internal();
 
@@ -40,7 +41,8 @@ class SecureStorageService {
       await _storage.write(key: _keyAuthToken, value: token);
       Logger.info('인증 토큰 저장 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('인증 토큰 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('인증 토큰 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       rethrow;
     }
   }
@@ -54,7 +56,8 @@ class SecureStorageService {
       }
       return token;
     } catch (e, stackTrace) {
-      Logger.error('인증 토큰 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('인증 토큰 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -65,7 +68,8 @@ class SecureStorageService {
       await _storage.write(key: _keyRefreshToken, value: token);
       Logger.info('리프레시 토큰 저장 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('리프레시 토큰 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('리프레시 토큰 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       rethrow;
     }
   }
@@ -75,7 +79,8 @@ class SecureStorageService {
     try {
       return await _storage.read(key: _keyRefreshToken);
     } catch (e, stackTrace) {
-      Logger.error('리프레시 토큰 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('리프레시 토큰 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -87,7 +92,8 @@ class SecureStorageService {
       await _storage.delete(key: _keyRefreshToken);
       Logger.info('모든 인증 토큰 삭제 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('인증 토큰 삭제 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('인증 토큰 삭제 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -101,7 +107,8 @@ class SecureStorageService {
       await _storage.write(key: _keyUserId, value: userId);
       Logger.info('사용자 ID 저장 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('사용자 ID 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('사용자 ID 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -110,7 +117,8 @@ class SecureStorageService {
     try {
       return await _storage.read(key: _keyUserId);
     } catch (e, stackTrace) {
-      Logger.error('사용자 ID 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('사용자 ID 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -121,7 +129,8 @@ class SecureStorageService {
       await _storage.write(key: _keyUserEmail, value: email);
       Logger.info('사용자 이메일 저장 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('사용자 이메일 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('사용자 이메일 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -130,7 +139,8 @@ class SecureStorageService {
     try {
       return await _storage.read(key: _keyUserEmail);
     } catch (e, stackTrace) {
-      Logger.error('사용자 이메일 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('사용자 이메일 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -145,7 +155,8 @@ class SecureStorageService {
       await _storage.write(key: _keyFcmToken, value: token);
       Logger.info('FCM 토큰 저장 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('FCM 토큰 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('FCM 토큰 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -154,7 +165,8 @@ class SecureStorageService {
     try {
       return await _storage.read(key: _keyFcmToken);
     } catch (e, stackTrace) {
-      Logger.error('FCM 토큰 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('FCM 토큰 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -172,7 +184,8 @@ class SecureStorageService {
       );
       Logger.info('생체 인증 설정 저장: $enabled', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('생체 인증 설정 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('생체 인증 설정 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -182,7 +195,8 @@ class SecureStorageService {
       final value = await _storage.read(key: _keyBiometricEnabled);
       return value == 'true';
     } catch (e, stackTrace) {
-      Logger.error('생체 인증 설정 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('생체 인증 설정 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return false;
     }
   }
@@ -196,7 +210,8 @@ class SecureStorageService {
       );
       Logger.info('프리미엄 상태 저장: $isPremium', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('프리미엄 상태 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('프리미엄 상태 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -206,7 +221,8 @@ class SecureStorageService {
       final value = await _storage.read(key: _keyPremiumStatus);
       return value == 'true';
     } catch (e, stackTrace) {
-      Logger.error('프리미엄 상태 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('프리미엄 상태 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return false;
     }
   }
@@ -224,7 +240,8 @@ class SecureStorageService {
       );
       Logger.info('마지막 동기화 시간 저장: $time', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('마지막 동기화 시간 저장 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('마지막 동기화 시간 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -237,7 +254,8 @@ class SecureStorageService {
       }
       return null;
     } catch (e, stackTrace) {
-      Logger.error('마지막 동기화 시간 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('마지막 동기화 시간 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -252,7 +270,8 @@ class SecureStorageService {
       await _storage.write(key: key, value: value);
       Logger.debug('데이터 저장: $key', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('데이터 저장 실패: $key', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('데이터 저장 실패: $key',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       rethrow;
     }
   }
@@ -266,7 +285,8 @@ class SecureStorageService {
       }
       return value;
     } catch (e, stackTrace) {
-      Logger.error('데이터 조회 실패: $key', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('데이터 조회 실패: $key',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return null;
     }
   }
@@ -277,7 +297,8 @@ class SecureStorageService {
       await _storage.delete(key: key);
       Logger.info('데이터 삭제: $key', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('데이터 삭제 실패: $key', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('데이터 삭제 실패: $key',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -287,7 +308,8 @@ class SecureStorageService {
       await _storage.deleteAll();
       Logger.warning('보안 저장소 전체 삭제 완료', tag: 'SecureStorage');
     } catch (e, stackTrace) {
-      Logger.error('보안 저장소 전체 삭제 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('보안 저장소 전체 삭제 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
     }
   }
 
@@ -298,7 +320,8 @@ class SecureStorageService {
       Logger.debug('전체 데이터 조회 (${all.length}개)', tag: 'SecureStorage');
       return all;
     } catch (e, stackTrace) {
-      Logger.error('전체 데이터 조회 실패', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('전체 데이터 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return {};
     }
   }
@@ -309,7 +332,8 @@ class SecureStorageService {
       final value = await _storage.read(key: key);
       return value != null;
     } catch (e, stackTrace) {
-      Logger.error('키 존재 확인 실패: $key', error: e, stackTrace: stackTrace, tag: 'SecureStorage');
+      Logger.error('키 존재 확인 실패: $key',
+          error: e, stackTrace: stackTrace, tag: 'SecureStorage');
       return false;
     }
   }

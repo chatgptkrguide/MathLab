@@ -13,14 +13,16 @@ import '../../premium/premium_upgrade_screen.dart';
 import '../../premium/subscription_management_screen.dart';
 
 /// Figma 디자인 "05" 프로필 상세 페이지 - Figma Page 5 디자인 완벽 구현
-class ProfileDetailScreenV3New extends ConsumerStatefulWidget {
-  const ProfileDetailScreenV3New({super.key});
+class ProfileDetailScreen extends ConsumerStatefulWidget {
+  const ProfileDetailScreen({super.key});
 
   @override
-  ConsumerState<ProfileDetailScreenV3New> createState() => _ProfileDetailScreenV3NewState();
+  ConsumerState<ProfileDetailScreen> createState() =>
+      _ProfileDetailScreenState();
 }
 
-class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3New> with SingleTickerProviderStateMixin {
+class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -62,7 +64,8 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.headerText, size: 28),
+                    icon: const Icon(Icons.arrow_back,
+                        color: AppColors.headerText, size: 28),
                     onPressed: () => Navigator.pop(context),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -76,11 +79,13 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.settings, color: AppColors.headerText, size: 28),
+                    icon: const Icon(Icons.settings,
+                        color: AppColors.headerText, size: 28),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const SettingsScreen()),
                       );
                     },
                     padding: EdgeInsets.zero,
@@ -265,7 +270,8 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                         backgroundColor: Colors.white,
                         foregroundColor: const Color(0xFF1A1A1A),
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
@@ -907,7 +913,9 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isPremiumActive
-              ? AppColors.premiumGradient.map((c) => c.withOpacity(0.2)).toList()
+              ? AppColors.premiumGradient
+                  .map((c) => c.withOpacity(0.2))
+                  .toList()
               : [
                   const Color(0xFFE3F2FD),
                   const Color(0xFFBBDEFB).withOpacity(0.5),
@@ -939,7 +947,9 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isPremiumActive ? AppColors.premiumGold : const Color(0xFF1A1A1A),
+                        color: isPremiumActive
+                            ? AppColors.premiumGold
+                            : const Color(0xFF1A1A1A),
                       ),
                     ),
                     if (isPremiumActive) ...[
@@ -954,7 +964,9 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  isPremiumActive ? premiumStatusText : 'Get benefit from our premium',
+                  isPremiumActive
+                      ? premiumStatusText
+                      : 'Get benefit from our premium',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey.shade700,
@@ -972,7 +984,8 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                   // Premium user: Navigate to subscription management
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const SubscriptionManagementScreen(),
+                      builder: (context) =>
+                          const SubscriptionManagementScreen(),
                     ),
                   );
                 } else {
@@ -985,9 +998,12 @@ class _ProfileDetailScreenV3NewState extends ConsumerState<ProfileDetailScreenV3
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: isPremiumActive ? AppColors.premiumGold : AppColors.mathBlue,
+                backgroundColor: isPremiumActive
+                    ? AppColors.premiumGold
+                    : AppColors.mathBlue,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

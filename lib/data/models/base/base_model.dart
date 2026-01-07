@@ -35,7 +35,7 @@ mixin EquatableMixin {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other.runtimeType == runtimeType &&
-      _propsEqual((other as EquatableMixin).props);
+          _propsEqual((other as EquatableMixin).props);
 
   @override
   int get hashCode => Object.hashAll(props);
@@ -80,7 +80,8 @@ extension SafeParser on Map<String, dynamic> {
         if (value is String) return int.tryParse(value) as T? ?? defaultValue;
       } else if (T == double) {
         if (value is num) return value.toDouble() as T;
-        if (value is String) return double.tryParse(value) as T? ?? defaultValue;
+        if (value is String)
+          return double.tryParse(value) as T? ?? defaultValue;
       } else if (T == bool) {
         if (value is bool) return value as T;
         if (value is String) return (value.toLowerCase() == 'true') as T;
@@ -172,7 +173,8 @@ extension FirestoreTimestamp on DateTime {
 
     if (timestamp is Map) {
       final seconds = timestamp['_seconds'] ?? timestamp['seconds'];
-      final nanoseconds = timestamp['_nanoseconds'] ?? timestamp['nanoseconds'] ?? 0;
+      final nanoseconds =
+          timestamp['_nanoseconds'] ?? timestamp['nanoseconds'] ?? 0;
       if (seconds != null) {
         return DateTime.fromMillisecondsSinceEpoch(
           seconds * 1000 + (nanoseconds ~/ 1000000),

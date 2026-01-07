@@ -112,7 +112,9 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
     super.didUpdateWidget(oldWidget);
 
     // 답변 제출 후 애니메이션 재생
-    if (!oldWidget.isAnswerSubmitted && widget.isAnswerSubmitted && !_hasPlayedAnimation) {
+    if (!oldWidget.isAnswerSubmitted &&
+        widget.isAnswerSubmitted &&
+        !_hasPlayedAnimation) {
       _hasPlayedAnimation = true;
 
       if (_isSelected) {
@@ -143,7 +145,9 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   Color get _backgroundColor {
     if (!widget.isAnswerSubmitted) {
       // 답변 제출 전
-      return _isSelected ? AppColors.mathBlue : AppColors.surface; // GoMath blue
+      return _isSelected
+          ? AppColors.mathBlue
+          : AppColors.surface; // GoMath blue
     } else {
       // 답변 제출 후
       if (_isSelected) {
@@ -162,7 +166,9 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 테두리 색상 - GoMath style
   Color get _borderLight {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? AppColors.mathBlueDark : AppColors.borderLight; // GoMath darker blue
+      return _isSelected
+          ? AppColors.mathBlueDark
+          : AppColors.borderLight; // GoMath darker blue
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
@@ -179,7 +185,9 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 텍스트 색상 - GoMath style
   Color get _textColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? AppColors.surface : AppColors.textPrimary; // GoMath dark gray
+      return _isSelected
+          ? AppColors.surface
+          : AppColors.textPrimary; // GoMath dark gray
     } else {
       if (_isSelected || widget.isCorrectAnswer) {
         return AppColors.surface;
@@ -192,7 +200,9 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
   /// 3D 그림자 색상 - GoMath style
   Color get _getShadowColor {
     if (!widget.isAnswerSubmitted) {
-      return _isSelected ? AppColors.mathBlueDark : AppColors.borderLight; // GoMath darker blue
+      return _isSelected
+          ? AppColors.mathBlueDark
+          : AppColors.borderLight; // GoMath darker blue
     } else {
       if (_isSelected) {
         return widget.isCorrectAnswer
@@ -243,14 +253,16 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
         animation: Listenable.merge([_shakeAnimation, _celebrationAnimation]),
         builder: (context, child) {
           // 오답 흔들기 효과
-          final shakeOffset = _isSelected && widget.isAnswerSubmitted && !widget.isCorrectAnswer
-              ? math.sin(_shakeAnimation.value * math.pi * 4) * 8
-              : 0.0;
+          final shakeOffset =
+              _isSelected && widget.isAnswerSubmitted && !widget.isCorrectAnswer
+                  ? math.sin(_shakeAnimation.value * math.pi * 4) * 8
+                  : 0.0;
 
           // 정답 축하 효과 (스케일)
-          final celebrationScale = _isSelected && widget.isAnswerSubmitted && widget.isCorrectAnswer
-              ? _celebrationAnimation.value
-              : 1.0;
+          final celebrationScale =
+              _isSelected && widget.isAnswerSubmitted && widget.isCorrectAnswer
+                  ? _celebrationAnimation.value
+                  : 1.0;
 
           return Transform.translate(
             offset: Offset(shakeOffset, 0),
@@ -263,91 +275,94 @@ class _ProblemOptionButtonState extends State<ProblemOptionButton>
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-            // Duolingo-style 3D solid shadow
-            if (_isSelected && !widget.isAnswerSubmitted)
-              Positioned(
-                top: 4,
-                left: 0,
-                right: 0,
-                bottom: -4,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  decoration: BoxDecoration(
-                    color: _getShadowColor, // getter - no parentheses
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            // Main button container
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.all(AppDimensions.paddingL),
-              decoration: BoxDecoration(
-                color: _backgroundColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _borderLight,
-                  width: 3,
-                ),
-              ),
-              child: Row(
-                children: [
-                  // 선택지 번호 (A, B, C, D)
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: _textColor.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _textColor.withOpacity(0.3),
-                        width: 2,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        String.fromCharCode(65 + widget.index), // A, B, C, D
-                        style: TextStyle(
-                          color: _textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      // Duolingo-style 3D solid shadow
+                      if (_isSelected && !widget.isAnswerSubmitted)
+                        Positioned(
+                          top: 4,
+                          left: 0,
+                          right: 0,
+                          bottom: -4,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              color: _getShadowColor, // getter - no parentheses
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      // Main button container
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        padding: const EdgeInsets.all(AppDimensions.paddingL),
+                        decoration: BoxDecoration(
+                          color: _backgroundColor,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _borderLight,
+                            width: 3,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            // 선택지 번호 (A, B, C, D)
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: _textColor.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _textColor.withOpacity(0.3),
+                                  width: 2,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  String.fromCharCode(
+                                      65 + widget.index), // A, B, C, D
+                                  style: TextStyle(
+                                    color: _textColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            // 선택지 텍스트
+                            Expanded(
+                              child: MathText(
+                                widget.optionText,
+                                style: TextStyle(
+                                  color: _textColor,
+                                  fontWeight: _isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w600,
+                                  fontSize: 16,
+                                  height: 1.4,
+                                ),
+                                fontSize: 16,
+                                color: _textColor,
+                              ),
+                            ),
+                            // 정답/오답 아이콘
+                            if (_icon != null) ...[
+                              const SizedBox(width: 12),
+                              _icon!,
+                            ],
+                          ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 14),
-                  // 선택지 텍스트
-                  Expanded(
-                    child: MathText(
-                      widget.optionText,
-                      style: TextStyle(
-                        color: _textColor,
-                        fontWeight: _isSelected ? FontWeight.bold : FontWeight.w600,
-                        fontSize: 16,
-                        height: 1.4,
-                      ),
-                      fontSize: 16,
-                      color: _textColor,
-                    ),
-                  ),
-                  // 정답/오답 아이콘
-                  if (_icon != null) ...[
-                    const SizedBox(width: 12),
-                    _icon!,
-                  ],
-                ],
+                ),
               ),
             ),
-          ],
-        ),
-              ),
-            ),
-          ),
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
 }

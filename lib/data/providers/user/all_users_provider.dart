@@ -531,7 +531,8 @@ class AllUsersNotifier extends BaseNotifier<List<User>> {
 }
 
 /// Provider 선언
-final allUsersProvider = StateNotifierProvider<AllUsersNotifier, List<User>>((ref) {
+final allUsersProvider =
+    StateNotifierProvider<AllUsersNotifier, List<User>>((ref) {
   return AllUsersNotifier();
 });
 

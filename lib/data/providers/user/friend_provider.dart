@@ -137,7 +137,9 @@ class FriendsNotifier extends BaseNotifier<List<Friend>> {
 
   /// 수락된 친구 목록만 필터링
   List<Friend> get acceptedFriends {
-    return state.where((f) => f.status == FriendRequestStatus.accepted).toList();
+    return state
+        .where((f) => f.status == FriendRequestStatus.accepted)
+        .toList();
   }
 
   /// 대기 중인 친구 요청 목록
@@ -152,6 +154,7 @@ class FriendsNotifier extends BaseNotifier<List<Friend>> {
 }
 
 /// 친구 목록 프로바이더
-final friendsProvider = StateNotifierProvider<FriendsNotifier, List<Friend>>((ref) {
+final friendsProvider =
+    StateNotifierProvider<FriendsNotifier, List<Friend>>((ref) {
   return FriendsNotifier(ref);
 });

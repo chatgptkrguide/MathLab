@@ -148,7 +148,8 @@ class LeagueHeader extends StatelessWidget {
 
                 // 타이머
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -174,7 +175,8 @@ class LeagueHeader extends StatelessWidget {
 
                 // 현재 순위 카드
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -231,7 +233,8 @@ class LeagueHeader extends StatelessWidget {
                 if (canPromote || isRelegationZone) ...[
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: canPromote
@@ -241,7 +244,9 @@ class LeagueHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: (canPromote ? AppColors.mathGreen : AppColors.mathRed)
+                          color: (canPromote
+                                  ? AppColors.mathGreen
+                                  : AppColors.mathRed)
                               .withOpacity(0.4),
                           blurRadius: 8,
                           offset: const Offset(0, 4),

@@ -277,9 +277,8 @@ class LeagueService {
       if (leagueJson == null) return [];
 
       final Map<String, dynamic> allLeagues = jsonDecode(leagueJson);
-      final leagues = allLeagues.values
-          .map((json) => TierInfo.fromJson(json))
-          .toList();
+      final leagues =
+          allLeagues.values.map((json) => TierInfo.fromJson(json)).toList();
 
       // 포인트 기준 내림차순 정렬
       leagues.sort((a, b) => b.points.compareTo(a.points));

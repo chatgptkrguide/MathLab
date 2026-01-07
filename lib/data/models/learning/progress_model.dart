@@ -64,7 +64,8 @@ class ProgressModel {
       'correctAnswers': correctAnswers,
       'xpEarned': xpEarned,
       'isCompleted': isCompleted,
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'completedAt':
+          completedAt != null ? Timestamp.fromDate(completedAt!) : null,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -146,7 +147,8 @@ class DailyStudyModel {
       problemsCompleted: data['problemsCompleted'] as int? ?? 0,
       xpEarned: data['xpEarned'] as int? ?? 0,
       studyTimeMinutes: data['studyTimeMinutes'] as int? ?? 0,
-      categoryProgress: Map<String, int>.from(data['categoryProgress'] as Map? ?? {}),
+      categoryProgress:
+          Map<String, int>.from(data['categoryProgress'] as Map? ?? {}),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }

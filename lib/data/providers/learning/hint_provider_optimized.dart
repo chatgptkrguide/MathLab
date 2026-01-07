@@ -54,8 +54,7 @@ class HintProviderOptimized extends BaseNotifier<HintState> {
   static const String _storageKey = 'hint_usage';
   static const int hintCost = 10;
 
-  HintProviderOptimized(this._ref)
-      : super(const HintState(), 'HintProvider') {
+  HintProviderOptimized(this._ref) : super(const HintState(), 'HintProvider') {
     _loadState();
   }
 
@@ -100,42 +99,44 @@ class HintProviderOptimized extends BaseNotifier<HintState> {
   /// 힌트 해제
   Future<bool> unlockHint(Problem problem, int hintIndex) async {
     return await executeWithErrorHandling(
-      () async {
-        // 유효성 검증
-        if (hintIndex >= problem.hints.length) {
-          logWarning('잘못된 힌트 인덱스: $hintIndex');
-          return false;
-        }
+          () async {
+            // 유효성 검증
+            if (hintIndex >= problem.hints.length) {
+              logWarning('잘못된 힌트 인덱스: $hintIndex');
+              return false;
+            }
 
-        final hintKey = '${problem.id}_$hintIndex';
-        if (state.unlockedHints.contains(hintKey)) {
-          logWarning('이미 해제된 힌트: $hintKey');
-          return false;
-        }
+            final hintKey = '${problem.id}_$hintIndex';
+            if (state.unlockedHints.contains(hintKey)) {
+              logWarning('이미 해제된 힌트: $hintKey');
+              return false;
+            }
 
-        final user = _ref.read(userProvider);
-        if ((user?.xp ?? 0) < hintCost) {
-          logWarning('XP 부족: ${user?.xp}');
-          return false;
-        }
+            final user = _ref.read(userProvider);
+            if ((user?.xp ?? 0) < hintCost) {
+              logWarning('XP 부족: ${user?.xp}');
+              return false;
+            }
 
-        // XP 차감 및 힌트 해제
-        await _ref.read(userProvider.notifier).addXP(-hintCost);
+            // XP 차감 및 힌트 해제
+            await _ref.read(userProvider.notifier).addXP(-hintCost);
 
-        state = state.copyWith(
-          unlockedHints: [...state.unlockedHints, hintKey],
-          totalHintsUsed: state.totalHintsUsed + 1,
-          canUseHint: (user?.xp ?? 0) - hintCost >= hintCost,
-        );
+            state = state.copyWith(
+              unlockedHints: [...state.unlockedHints, hintKey],
+              totalHintsUsed: state.totalHintsUsed + 1,
+              canUseHint: (user?.xp ?? 0) - hintCost >= hintCost,
+            );
 
-        await _saveState();
+            await _saveState();
 
-        logInfo('힌트 해제: $hintKey (-$hintCost XP, 총 ${state.totalHintsUsed}회)');
-        return true;
-      },
-      errorMessage: '힌트 해제 실패',
-      fallback: () => false,
-    ) ?? false;
+            logInfo(
+                '힌트 해제: $hintKey (-$hintCost XP, 총 ${state.totalHintsUsed}회)');
+            return true;
+          },
+          errorMessage: '힌트 해제 실패',
+          fallback: () => false,
+        ) ??
+        false;
   }
 
   /// 힌트 해제 여부 확인

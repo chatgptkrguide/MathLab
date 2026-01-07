@@ -50,7 +50,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               titleAlignment: MainAxisAlignment.spaceBetween,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: AppColors.headerText, size: 28),
+                icon: const Icon(Icons.arrow_back_rounded,
+                    color: AppColors.headerText, size: 28),
                 onPressed: () {
                   if (context.mounted) Navigator.of(context).pop();
                 },
@@ -130,7 +131,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const NotificationSettingsScreen(),
+                            builder: (context) =>
+                                const NotificationSettingsScreen(),
                           ),
                         );
                       },

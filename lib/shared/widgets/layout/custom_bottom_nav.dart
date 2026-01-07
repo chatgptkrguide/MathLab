@@ -42,39 +42,39 @@ class CustomBottomNavigation extends StatelessWidget {
             ),
           ],
         ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // 새로운 순서: 학습, 오답, 홈(가운데), 프로필, 리그
-          _buildNavItem(
-            index: 0,
-            icon: Icons.school,
-            label: '학습',
-          ),
-          _buildNavItem(
-            index: 1,
-            icon: Icons.error_outline,
-            label: '오답',
-          ),
-          _buildNavItem(
-            index: 2,
-            icon: Icons.home,
-            label: '홈',
-            isSpecial: true, // 홈 탭을 특별하게 표시
-          ),
-          _buildNavItem(
-            index: 3,
-            icon: Icons.person,
-            label: '프로필',
-          ),
-          _buildNavItem(
-            index: 4,
-            icon: Icons.emoji_events,
-            label: '리그',
-          ),
-        ],
-      ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 새로운 순서: 학습, 오답, 홈(가운데), 프로필, 리그
+            _buildNavItem(
+              index: 0,
+              icon: Icons.school,
+              label: '학습',
+            ),
+            _buildNavItem(
+              index: 1,
+              icon: Icons.error_outline,
+              label: '오답',
+            ),
+            _buildNavItem(
+              index: 2,
+              icon: Icons.home,
+              label: '홈',
+              isSpecial: true, // 홈 탭을 특별하게 표시
+            ),
+            _buildNavItem(
+              index: 3,
+              icon: Icons.person,
+              label: '프로필',
+            ),
+            _buildNavItem(
+              index: 4,
+              icon: Icons.emoji_events,
+              label: '리그',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -103,16 +103,17 @@ class CustomBottomNavigation extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isSelected
-                    ? AppColors.mathButtonGradient
-                    : [
-                        AppColors.mathButtonBlue.withOpacity(0.7),
-                        AppColors.mathButtonBlue.withOpacity(0.6),
-                      ],
+                      ? AppColors.mathButtonGradient
+                      : [
+                          AppColors.mathButtonBlue.withOpacity(0.7),
+                          AppColors.mathButtonBlue.withOpacity(0.6),
+                        ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.mathButtonBlue.withOpacity(isSelected ? 0.4 : 0.25),
+                    color: AppColors.mathButtonBlue
+                        .withOpacity(isSelected ? 0.4 : 0.25),
                     blurRadius: isSelected ? 12 : 8,
                     offset: Offset(0, isSelected ? 6 : 4),
                   ),
@@ -170,7 +171,9 @@ class CustomBottomNavigation extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     isSelected ? _getSelectedIcon(icon) : icon,
-                    color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.6),
+                    color: isSelected
+                        ? AppColors.mathButtonBlue
+                        : AppColors.textSecondary.withOpacity(0.6),
                     size: isSelected ? 24 : 22,
                   ),
                 ),
@@ -179,8 +182,11 @@ class CustomBottomNavigation extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
-                      color: isSelected ? AppColors.mathButtonBlue : AppColors.textSecondary.withOpacity(0.7),
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.mathButtonBlue
+                          : AppColors.textSecondary.withOpacity(0.7),
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w500,
                       fontSize: isSelected ? 10 : 9,
                       height: 1.0,
                     ),

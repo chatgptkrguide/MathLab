@@ -294,7 +294,6 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     return '알 수 없음';
   }
 
-
   /// 답 선택 (객관식 더블 클릭 자동 제출)
   void _selectAnswer(int index) async {
     final now = DateTime.now();
@@ -302,7 +301,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // 같은 답을 500ms 이내에 다시 선택하면 자동 제출
     if (_lastSelectedIndex == index &&
         _lastSelectTime != null &&
-        now.difference(_lastSelectTime!).inMilliseconds <= GameConstants.doubleClickSubmitTimeMs) {
+        now.difference(_lastSelectTime!).inMilliseconds <=
+            GameConstants.doubleClickSubmitTimeMs) {
       // 두 번째 클릭 -> 자동 제출
       await AppHapticFeedback.success();
       setState(() {
@@ -322,7 +322,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
       });
 
       // 500ms 후에 깜빡임 중지
-      Future.delayed(const Duration(milliseconds: GameConstants.doubleClickSubmitTimeMs), () {
+      Future.delayed(
+          const Duration(milliseconds: GameConstants.doubleClickSubmitTimeMs),
+          () {
         if (mounted && _pulsingIndex == index) {
           setState(() {
             _pulsingIndex = null;
@@ -340,7 +342,7 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
     // 사용자 답안 텍스트
     final userAnswerText = _currentProblem.choices.isNotEmpty &&
-                           _selectedAnswerIndex! < _currentProblem.choices.length
+            _selectedAnswerIndex! < _currentProblem.choices.length
         ? _currentProblem.choices[_selectedAnswerIndex!]
         : '선택 없음';
 
@@ -423,9 +425,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
 
     // 레슨 진행률 업데이트
     await ref.read(lessonProvider.notifier).onProblemSolved(
-      _currentProblem.id,
-      _isCorrect,
-    );
+          _currentProblem.id,
+          _isCorrect,
+        );
   }
 
   /// 정답 처리
@@ -454,7 +456,9 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     await SoundEffects.playCorrect();
 
     // XP 업데이트
-    await ref.read(userProvider.notifier).addXP(_currentProblem.xpReward + bonusXP);
+    await ref
+        .read(userProvider.notifier)
+        .addXP(_currentProblem.xpReward + bonusXP);
     await SoundEffects.playXPGain();
 
     // 최초 정답 시 스트릭 업데이트
@@ -629,7 +633,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
@@ -771,9 +776,8 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: unlockedCount > 0
-            ? AppColors.successGreen
-            : AppColors.mathOrange,
+        backgroundColor:
+            unlockedCount > 0 ? AppColors.successGreen : AppColors.mathOrange,
         child: const Icon(
           Icons.lightbulb,
           size: 28,

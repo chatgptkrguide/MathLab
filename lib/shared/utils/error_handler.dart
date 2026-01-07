@@ -29,7 +29,8 @@ class ErrorHandler {
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode ?? 500;
           final message = _getHttpErrorMessage(statusCode);
-          Logger.error('HTTP 에러: $statusCode', tag: 'ErrorHandler', error: error);
+          Logger.error('HTTP 에러: $statusCode',
+              tag: 'ErrorHandler', error: error);
 
           return ApiException(
             message: message,
@@ -56,7 +57,8 @@ class ErrorHandler {
 
   /// Firebase Auth 에러 처리
   static AppException handleFirebaseAuthError(FirebaseAuthException error) {
-    Logger.error('Firebase Auth 에러: ${error.code}', tag: 'ErrorHandler', error: error);
+    Logger.error('Firebase Auth 에러: ${error.code}',
+        tag: 'ErrorHandler', error: error);
 
     switch (error.code) {
       case 'weak-password':
@@ -135,7 +137,8 @@ class ErrorHandler {
 
   /// Firestore 에러 처리
   static AppException handleFirestoreError(FirebaseException error) {
-    Logger.error('Firestore 에러: ${error.code}', tag: 'ErrorHandler', error: error);
+    Logger.error('Firestore 에러: ${error.code}',
+        tag: 'ErrorHandler', error: error);
 
     switch (error.code) {
       case 'permission-denied':
@@ -370,7 +373,8 @@ class RetryHelper {
         );
 
         await Future.delayed(delay);
-        delay = Duration(milliseconds: (delay.inMilliseconds * backoffMultiplier).round());
+        delay = Duration(
+            milliseconds: (delay.inMilliseconds * backoffMultiplier).round());
       }
     }
   }
@@ -383,7 +387,8 @@ class RetryHelper {
           error.type == DioExceptionType.sendTimeout ||
           error.type == DioExceptionType.receiveTimeout ||
           error.type == DioExceptionType.connectionError ||
-          (error.response?.statusCode != null && error.response!.statusCode! >= 500);
+          (error.response?.statusCode != null &&
+              error.response!.statusCode! >= 500);
     }
 
     // Firebase unavailable 에러는 재시도

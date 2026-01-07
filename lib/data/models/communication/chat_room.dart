@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 enum ChatRoomType {
   /// 1:1 대화
   direct,
+
   /// 그룹 채팅
   group,
+
   /// 학습 도우미 (AI 챗봇)
   assistant,
 }

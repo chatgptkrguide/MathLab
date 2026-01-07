@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/models.dart';
 import '../../../data/providers/user/user_provider.dart';
-import '../../../data/providers/learning/problem_provider.dart';
 import '../../../data/services/korean_math_curriculum.dart';
-import '../../../shared/constants/game_constants.dart';
-import '../../problem/problem_screen.dart';
+import '../../../shared/constants/duolingo_styles.dart';
+import '../../../shared/widgets/styled/duolingo_card.dart';
+import 'modals/grade_selection_modal.dart';
+import 'modals/lesson_selection_modal.dart';
 
 /// 홈 화면 학년/단원 선택 카드
 ///
@@ -25,296 +25,53 @@ class HomeLanguageCards extends ConsumerWidget {
     final selectedLesson = lessons.isNotEmpty ? lessons[0] : null;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: DuolingoStyles.spacing24),
       child: Row(
         children: [
           // 왼쪽: 학년 선택 버튼
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _showGradeSelectionModal(context, ref),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.blue.shade50.withOpacity(0.3),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.blue.withOpacity(0.15),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.12),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '학년',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            currentGrade,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF1A1A1A),
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_drop_down_rounded,
-                            size: 22,
-                            color: Colors.grey.shade600,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _buildGradeCard(context, ref, currentGrade),
 
           // 가운데: 화살표
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.arrow_forward_rounded,
-                size: 24,
-                color: Color(0xFF4A90E2),
-              ),
-            ),
-          ),
+          _buildArrowIcon(),
 
           // 오른쪽: 단원 선택 버튼
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _showLessonSelectionModal(context, ref, currentGrade),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.green.shade50.withOpacity(0.3),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.green.withOpacity(0.15),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green.withOpacity(0.12),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '단원',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              selectedLesson != null
-                                ? selectedLesson.title.length > 8
-                                  ? '${selectedLesson.title.substring(0, 8)}...'
-                                  : selectedLesson.title
-                                : '단원 선택',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF1A1A1A),
-                                letterSpacing: 0.3,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_drop_down_rounded,
-                            size: 22,
-                            color: Colors.grey.shade600,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _buildLessonCard(context, ref, currentGrade, selectedLesson),
         ],
       ),
     );
   }
 
-  /// 학년 선택 모달 표시
-  void _showGradeSelectionModal(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
+  /// 학년 카드 빌더
+  Widget _buildGradeCard(
+      BuildContext context, WidgetRef ref, String currentGrade) {
+    return Expanded(
+      child: DuolingoCard(
+        theme: DuolingoCardTheme.blue,
+        onTap: () => GradeSelectionModal.show(
+          context,
+          onGradeSelected: (grade) {
+            LessonSelectionModal.show(context, grade: grade);
+          },
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 핸들바
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // 제목
-            const Padding(
-              padding: EdgeInsets.all(20),
-              child: Text(
-                '학년을 선택하세요',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-            ),
-            // 학년 목록
-            ...['중1', '중2', '중3', '고1', '고2', '고3'].map((grade) {
-              final gradeInfo = _getGradeInfo(grade);
-              return _buildGradeOption(context, ref, grade, gradeInfo['emoji']!, gradeInfo['fullName']!);
-            }),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 학년 정보 반환
-  Map<String, String> _getGradeInfo(String grade) {
-    final info = {
-      '중1': {'emoji': '📚', 'fullName': '중학교 1학년'},
-      '중2': {'emoji': '📖', 'fullName': '중학교 2학년'},
-      '중3': {'emoji': '📕', 'fullName': '중학교 3학년'},
-      '고1': {'emoji': '📘', 'fullName': '고등학교 1학년'},
-      '고2': {'emoji': '📙', 'fullName': '고등학교 2학년'},
-      '고3': {'emoji': '📗', 'fullName': '고등학교 3학년'},
-    };
-    return info[grade] ?? {'emoji': '📚', 'fullName': grade};
-  }
-
-  /// 학년 옵션 아이템
-  Widget _buildGradeOption(BuildContext context, WidgetRef ref, String grade, String emoji, String fullName) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          Navigator.pop(context);
-          // 학년 업데이트
-          ProviderScope.containerOf(context).read(userProvider.notifier).updateGrade(grade);
-          // 단원 선택 모달 표시
-          Future.delayed(const Duration(milliseconds: GameConstants.normalAnimationMs), () {
-            if (!context.mounted) return;
-            _showLessonSelectionModal(context, ref, grade);
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          child: Row(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 32)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      grade,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      fullName,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
+              Text('학년', style: DuolingoStyles.cardLabelStyle),
+              const SizedBox(height: DuolingoStyles.spacing4 / 2),
+              Row(
+                children: [
+                  Text(currentGrade, style: DuolingoStyles.cardValueBlueStyle),
+                  const SizedBox(width: 2),
+                  Icon(
+                    Icons.arrow_drop_down_rounded,
+                    size: 20,
+                    color: Colors.blue.shade600,
+                  ),
+                ],
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
             ],
           ),
         ),
@@ -322,145 +79,66 @@ class HomeLanguageCards extends ConsumerWidget {
     );
   }
 
-  /// 단원 선택 모달 표시
-  void _showLessonSelectionModal(BuildContext context, WidgetRef ref, String grade) {
-    final lessons = KoreanMathCurriculum.getLessonsByGrade(grade);
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
+  /// 화살표 아이콘 빌더
+  Widget _buildArrowIcon() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.blue.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 핸들바
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // 제목
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text(
-                '$grade 단원 선택',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-            ),
-            // 단원 목록
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: lessons.length,
-                itemBuilder: (context, index) {
-                  final lesson = lessons[index];
-                  return _buildLessonOption(context, ref, lesson);
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
+        child: const Icon(
+          Icons.arrow_forward_rounded,
+          size: 24,
+          color: DuolingoStyles.duolingoBlue,
         ),
       ),
     );
   }
 
-  /// 단원 옵션 아이템
-  Widget _buildLessonOption(BuildContext context, WidgetRef ref, Lesson lesson) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () async {
-          Navigator.pop(context);
-
-          // 문제 데이터 가져오기
-          final problems = ref.read(problemProvider);
-
-          if (problems.isEmpty) {
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('해당 단원의 문제가 없습니다')),
-            );
-            return;
-          }
-
-          if (!context.mounted) return;
-          // 학습 페이지로 이동
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProblemScreen(
-                lessonId: lesson.id,
-                problems: problems,
-              ),
-            ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          child: Row(
+  /// 단원 카드 빌더
+  Widget _buildLessonCard(
+    BuildContext context,
+    WidgetRef ref,
+    String currentGrade,
+    dynamic selectedLesson,
+  ) {
+    return Expanded(
+      child: DuolingoCard(
+        theme: DuolingoCardTheme.green,
+        onTap: () => LessonSelectionModal.show(context, grade: currentGrade),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // 아이콘
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    lesson.icon,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lesson.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      lesson.description,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
+              Text('단원', style: DuolingoStyles.cardLabelStyle),
+              const SizedBox(height: DuolingoStyles.spacing4 / 2),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      selectedLesson != null
+                          ? selectedLesson.title.length > 8
+                              ? '${selectedLesson.title.substring(0, 8)}...'
+                              : selectedLesson.title
+                          : '단원 선택',
+                      style: DuolingoStyles.cardValueGreenStyle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(
+                    Icons.arrow_drop_down_rounded,
+                    size: 20,
+                    color: DuolingoStyles.duolingoGreen,
+                  ),
+                ],
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
             ],
           ),
         ),

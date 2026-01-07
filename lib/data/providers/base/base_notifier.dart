@@ -168,7 +168,8 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
   }
 
   /// 로컬 스토리지에 List 데이터 저장
-  Future<void> saveListToStorage(String key, List<Map<String, dynamic>> data) async {
+  Future<void> saveListToStorage(
+      String key, List<Map<String, dynamic>> data) async {
     await executeWithErrorHandling(
       () async {
         final jsonString = jsonEncode(data);
@@ -217,9 +218,7 @@ abstract class BaseNotifier<T> extends StateNotifier<T> {
     final data = await loadListFromStorage(key);
     if (data == null) return [];
 
-    return data
-        .map((item) => fromJson(item as Map<String, dynamic>))
-        .toList();
+    return data.map((item) => fromJson(item as Map<String, dynamic>)).toList();
   }
 
   /// 제네릭 리스트 저장 헬퍼 메서드

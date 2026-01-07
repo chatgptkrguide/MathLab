@@ -224,7 +224,8 @@ class LeagueNotifier extends BaseNotifier<LeagueState> {
 }
 
 /// 리그 Provider 정의
-final leagueProvider = StateNotifierProvider<LeagueNotifier, LeagueState>((ref) {
+final leagueProvider =
+    StateNotifierProvider<LeagueNotifier, LeagueState>((ref) {
   final leagueRepository = ref.watch(leagueRepositoryProvider);
   return LeagueNotifier(ref, leagueRepository);
 });
@@ -233,7 +234,7 @@ final leagueProvider = StateNotifierProvider<LeagueNotifier, LeagueState>((ref) 
 final currentUserRankProvider = Provider<int?>((ref) {
   final leagueState = ref.watch(leagueProvider);
   final league = leagueState.currentLeague;
-  
+
   if (league == null) return null;
   return league.getUserRank('current_user');
 });
@@ -242,7 +243,7 @@ final currentUserRankProvider = Provider<int?>((ref) {
 final canPromoteProvider = Provider<bool>((ref) {
   final leagueState = ref.watch(leagueProvider);
   final league = leagueState.currentLeague;
-  
+
   if (league == null) return false;
   return league.canPromote('current_user');
 });
@@ -251,7 +252,7 @@ final canPromoteProvider = Provider<bool>((ref) {
 final isRelegationZoneProvider = Provider<bool>((ref) {
   final leagueState = ref.watch(leagueProvider);
   final league = leagueState.currentLeague;
-  
+
   if (league == null) return false;
   return league.isRelegationZone('current_user');
 });

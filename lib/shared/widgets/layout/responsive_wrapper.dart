@@ -155,9 +155,7 @@ class ResponsiveText extends StatelessWidget {
       style: style,
       textAlign: textAlign,
       overflow: TextOverflow.ellipsis,
-      maxLines: isSmallScreen
-          ? (maxLinesSmall ?? 2)
-          : (maxLinesLarge ?? 3),
+      maxLines: isSmallScreen ? (maxLinesSmall ?? 2) : (maxLinesLarge ?? 3),
     );
   }
 }

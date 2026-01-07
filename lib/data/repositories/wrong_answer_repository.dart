@@ -59,7 +59,8 @@ class WrongAnswerRepository {
       };
 
       await localStorageService.saveMap(storageKey, json);
-      Logger.debug('로컬에 오답 목록 저장 완료: $accountId (${answers.length}개)', tag: 'WrongAnswerRepository');
+      Logger.debug('로컬에 오답 목록 저장 완료: $accountId (${answers.length}개)',
+          tag: 'WrongAnswerRepository');
     } catch (e, stackTrace) {
       Logger.error(
         '로컬 오답 목록 저장 실패',
@@ -119,7 +120,8 @@ class WrongAnswerRepository {
   Future<void> saveToFirebase(String uid, WrongAnswer answer) async {
     try {
       await firestoreService.saveWrongAnswer(uid, answer);
-      Logger.debug('Firebase에 오답 저장: ${answer.id}', tag: 'WrongAnswerRepository');
+      Logger.debug('Firebase에 오답 저장: ${answer.id}',
+          tag: 'WrongAnswerRepository');
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 오답 저장 실패',
@@ -134,7 +136,8 @@ class WrongAnswerRepository {
   // ==================== 통합 메서드 ====================
 
   /// 오답 목록 조회 (로컬 우선 + 백그라운드 동기화)
-  Future<List<WrongAnswer>> get(String accountId, {bool forceRefresh = false}) async {
+  Future<List<WrongAnswer>> get(String accountId,
+      {bool forceRefresh = false}) async {
     try {
       // 강제 새로고침이 아니면 로컬 먼저
       if (!forceRefresh) {
@@ -206,7 +209,8 @@ class WrongAnswerRepository {
         final merged = _mergeWrongAnswers(local, remote);
         await saveToLocal(accountId, merged);
 
-        Logger.debug('오답 목록 동기화 완료: ${merged.length}개', tag: 'WrongAnswerRepository');
+        Logger.debug('오답 목록 동기화 완료: ${merged.length}개',
+            tag: 'WrongAnswerRepository');
       }
     } catch (e) {
       Logger.debug('Firebase 동기화 실패 (무시됨)', tag: 'WrongAnswerRepository');
@@ -214,7 +218,8 @@ class WrongAnswerRepository {
   }
 
   /// 오답 목록 병합 (중복 제거)
-  List<WrongAnswer> _mergeWrongAnswers(List<WrongAnswer> local, List<WrongAnswer> remote) {
+  List<WrongAnswer> _mergeWrongAnswers(
+      List<WrongAnswer> local, List<WrongAnswer> remote) {
     final Map<String, WrongAnswer> merged = {};
 
     // 로컬 데이터 추가

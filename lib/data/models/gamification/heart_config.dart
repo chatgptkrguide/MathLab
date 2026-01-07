@@ -69,8 +69,11 @@ class HeartConfig {
       maxHearts: maxHearts ?? this.maxHearts,
       currentHearts: currentHearts ?? this.currentHearts,
       heartRecoveryMinutes: heartRecoveryMinutes ?? this.heartRecoveryMinutes,
-      lastHeartLostAt: clearLastHeartLostAt ? null : (lastHeartLostAt ?? this.lastHeartLostAt),
-      secondsUntilNextHeart: secondsUntilNextHeart ?? this.secondsUntilNextHeart,
+      lastHeartLostAt: clearLastHeartLostAt
+          ? null
+          : (lastHeartLostAt ?? this.lastHeartLostAt),
+      secondsUntilNextHeart:
+          secondsUntilNextHeart ?? this.secondsUntilNextHeart,
     );
   }
 

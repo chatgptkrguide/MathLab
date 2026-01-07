@@ -30,12 +30,12 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
       'icon': Icons.school,
       'color': AppColors.mathYellow,
       'gradeIcons': [
-        Icons.local_florist,  // 초1: 꽃
-        Icons.eco,            // 초2: 잎
-        Icons.park,           // 초3: 나무
-        Icons.star,           // 초4: 별
-        Icons.emoji_events,   // 초5: 트로피
-        Icons.military_tech,  // 초6: 메달
+        Icons.local_florist, // 초1: 꽃
+        Icons.eco, // 초2: 잎
+        Icons.park, // 초3: 나무
+        Icons.star, // 초4: 별
+        Icons.emoji_events, // 초5: 트로피
+        Icons.military_tech, // 초6: 메달
       ],
     },
     {
@@ -44,9 +44,9 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
       'icon': Icons.menu_book,
       'color': AppColors.mathBlue,
       'gradeIcons': [
-        Icons.menu_book,        // 중1: 책
-        Icons.import_contacts,  // 중2: 열린 책
-        Icons.school,           // 중3: 졸업모
+        Icons.menu_book, // 중1: 책
+        Icons.import_contacts, // 중2: 열린 책
+        Icons.school, // 중3: 졸업모
       ],
     },
     {
@@ -55,9 +55,9 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
       'icon': Icons.library_books,
       'color': AppColors.mathPurple,
       'gradeIcons': [
-        Icons.science,         // 고1: 과학
-        Icons.biotech,         // 고2: 실험
-        Icons.rocket_launch,   // 고3: 로켓
+        Icons.science, // 고1: 과학
+        Icons.biotech, // 고2: 실험
+        Icons.rocket_launch, // 고3: 로켓
       ],
     },
   ];
@@ -160,8 +160,11 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                           vertical: AppDimensions.paddingM,
                         ),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.surface : Colors.transparent,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                          color: isSelected
+                              ? AppColors.surface
+                              : Colors.transparent,
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusM),
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
@@ -226,7 +229,8 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                         ),
                         side: BorderSide(color: AppColors.borderLight),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusL),
                         ),
                       ),
                       child: Text(
@@ -250,7 +254,8 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                           vertical: AppDimensions.paddingM,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusL),
                         ),
                       ),
                       child: Text(
@@ -351,12 +356,10 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                     Text(
                       grade,
                       style: AppTextStyles.titleMedium.copyWith(
-                        color: isSelected
-                            ? Colors.white
-                            : AppColors.textPrimary,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.w600,
+                        color:
+                            isSelected ? Colors.white : AppColors.textPrimary,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w600,
                       ),
                     ),
                   ],

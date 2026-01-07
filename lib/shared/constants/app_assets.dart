@@ -7,13 +7,16 @@ class AppAssets {
   // ==================== 이미지 ====================
 
   /// 기본 placeholder 이미지 (이미지 로딩 실패 시)
-  static const String imagePlaceholder = 'assets/images/general/placeholder.png';
+  static const String imagePlaceholder =
+      'assets/images/general/placeholder.png';
 
   /// 프로필 기본 이미지
-  static const String profilePlaceholder = 'assets/images/general/profile_default.png';
+  static const String profilePlaceholder =
+      'assets/images/general/profile_default.png';
 
   /// 문제 이미지 placeholder
-  static const String problemImagePlaceholder = 'assets/images/general/problem_placeholder.png';
+  static const String problemImagePlaceholder =
+      'assets/images/general/problem_placeholder.png';
 
   // ==================== 로그인/소셜 ====================
 

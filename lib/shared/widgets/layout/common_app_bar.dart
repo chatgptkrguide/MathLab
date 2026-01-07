@@ -51,10 +51,7 @@ class CommonAppBar extends StatelessWidget {
             const Spacer(),
 
             // 우측 액션 버튼들
-            if (actions != null)
-              ...actions!
-            else
-              const SizedBox(width: 28),
+            if (actions != null) ...actions! else const SizedBox(width: 28),
           ],
         ),
       ),

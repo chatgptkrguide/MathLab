@@ -4,7 +4,8 @@ import '../../services/activity_notification_service.dart';
 import '../user/user_provider.dart';
 
 /// ActivityNotificationService 싱글톤 제공
-final activityNotificationServiceProvider = Provider<ActivityNotificationService>((ref) {
+final activityNotificationServiceProvider =
+    Provider<ActivityNotificationService>((ref) {
   return ActivityNotificationService();
 });
 
@@ -38,8 +39,7 @@ final inactiveDaysProvider = FutureProvider.autoDispose<int>((ref) async {
 });
 
 /// 마지막 활동 시간 제공
-final lastActivityProvider =
-    FutureProvider.autoDispose<DateTime?>((ref) async {
+final lastActivityProvider = FutureProvider.autoDispose<DateTime?>((ref) async {
   final user = ref.watch(userProvider);
   if (user == null) return null;
 

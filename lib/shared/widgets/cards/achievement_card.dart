@@ -81,7 +81,8 @@ class AchievementCard extends StatelessWidget {
                   achievement.title,
                   style: TextStyle(
                     fontSize: 10.5,
-                    color: isUnlocked ? AppColors.surface : AppColors.textPrimary,
+                    color:
+                        isUnlocked ? AppColors.surface : AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                     height: 1.2,
                     shadows: isUnlocked
@@ -230,7 +231,10 @@ class AchievementCard extends StatelessWidget {
   List<Color> _getRarityGradient() {
     switch (achievement.rarity) {
       case AchievementRarity.common:
-        return [AppColors.textSecondary, AppColors.textSecondary.withOpacity(0.8)]; // GoMath gray
+        return [
+          AppColors.textSecondary,
+          AppColors.textSecondary.withOpacity(0.8)
+        ]; // GoMath gray
       case AchievementRarity.uncommon:
         return AppColors.greenGradient;
       case AchievementRarity.rare:

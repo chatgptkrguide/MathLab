@@ -237,7 +237,8 @@ class FriendProfileScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
           child: Text(
             '학습 통계',
             style: TextStyle(
@@ -251,7 +252,8 @@ class FriendProfileScreen extends ConsumerWidget {
 
         // 통계 카드들
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
           child: Row(
             children: [
               Expanded(
@@ -276,7 +278,8 @@ class FriendProfileScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppDimensions.spacingM),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
           child: Row(
             children: [
               Expanded(
@@ -355,7 +358,8 @@ class FriendProfileScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
           child: Text(
             '획득한 업적',
             style: TextStyle(
@@ -372,7 +376,8 @@ class FriendProfileScreen extends ConsumerWidget {
           height: 100,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+            padding:
+                const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
             children: [
               _buildAchievementBadge(
                 icon: Icons.local_fire_department,
@@ -459,7 +464,8 @@ class FriendProfileScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
           child: Text(
             '최근 학습 활동',
             style: TextStyle(

@@ -33,10 +33,20 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   // 학년 옵션
   final List<String> _gradeOptions = [
-    '초1', '초2', '초3', '초4', '초5', '초6',
-    '중1', '중2', '중3',
-    '고1', '고2', '고3',
-    '대학생', '성인'
+    '초1',
+    '초2',
+    '초3',
+    '초4',
+    '초5',
+    '초6',
+    '중1',
+    '중2',
+    '중3',
+    '고1',
+    '고2',
+    '고3',
+    '대학생',
+    '성인'
   ];
 
   // 성별 옵션
@@ -241,10 +251,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               title: '프로필 설정',
               actions: [
                 TextButton(
-                  onPressed: _isLoading ? null : () {
-                    // 건너뛰기 - 최소 정보로 진행
-                    Navigator.of(context).pushReplacementNamed('/home');
-                  },
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          // 건너뛰기 - 최소 정보로 진행
+                          Navigator.of(context).pushReplacementNamed('/home');
+                        },
                   child: Text(
                     '건너뛰기',
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -324,7 +336,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: AppColors.borderLight),
+                                borderSide: const BorderSide(
+                                    color: AppColors.borderLight),
                               ),
                               filled: true,
                               fillColor: Colors.white,
@@ -350,7 +363,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(left: 12, bottom: 8),
+                              padding:
+                                  const EdgeInsets.only(left: 12, bottom: 8),
                               child: Row(
                                 children: [
                                   const Icon(
@@ -372,23 +386,31 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                               spacing: 8,
                               runSpacing: 8,
                               children: _genderOptions.map((option) {
-                                final isSelected = _selectedGender == option['value'];
+                                final isSelected =
+                                    _selectedGender == option['value'];
                                 return ChoiceChip(
                                   label: Text(option['label']!),
                                   selected: isSelected,
                                   onSelected: (selected) {
                                     setState(() {
-                                      _selectedGender = selected ? option['value'] : null;
+                                      _selectedGender =
+                                          selected ? option['value'] : null;
                                     });
                                   },
                                   selectedColor: AppColors.mathBlue,
                                   backgroundColor: Colors.white,
                                   labelStyle: TextStyle(
-                                    color: isSelected ? Colors.white : AppColors.textPrimary,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.textPrimary,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
                                   ),
                                   side: BorderSide(
-                                    color: isSelected ? AppColors.mathBlue : AppColors.borderLight,
+                                    color: isSelected
+                                        ? AppColors.mathBlue
+                                        : AppColors.borderLight,
                                   ),
                                 );
                               }).toList(),
@@ -410,7 +432,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.borderLight),
+                              borderSide: const BorderSide(
+                                  color: AppColors.borderLight),
                             ),
                             filled: true,
                             fillColor: Colors.white,

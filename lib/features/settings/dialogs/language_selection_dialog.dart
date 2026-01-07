@@ -13,7 +13,8 @@ class LanguageSelectionDialog extends StatefulWidget {
   });
 
   @override
-  State<LanguageSelectionDialog> createState() => _LanguageSelectionDialogState();
+  State<LanguageSelectionDialog> createState() =>
+      _LanguageSelectionDialogState();
 }
 
 class _LanguageSelectionDialogState extends State<LanguageSelectionDialog> {

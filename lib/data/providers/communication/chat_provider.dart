@@ -2,9 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/models.dart';
 import '../base/base_notifier.dart';
 
-
 /// 채팅방 목록 프로바이더
-final chatRoomsProvider = StateNotifierProvider<ChatRoomsNotifier, List<ChatRoom>>((ref) {
+final chatRoomsProvider =
+    StateNotifierProvider<ChatRoomsNotifier, List<ChatRoom>>((ref) {
   return ChatRoomsNotifier();
 });
 
@@ -75,7 +75,8 @@ class ChatRoomsNotifier extends BaseNotifier<List<ChatRoom>> {
   }
 
   /// 채팅방 업데이트 (마지막 메시지, 읽지 않은 개수 등)
-  Future<void> updateChatRoom(String roomId, {
+  Future<void> updateChatRoom(
+    String roomId, {
     String? lastMessage,
     DateTime? lastMessageTime,
     int? unreadCount,
@@ -113,7 +114,8 @@ class ChatRoomsNotifier extends BaseNotifier<List<ChatRoom>> {
 }
 
 /// 특정 채팅방의 메시지 목록 프로바이더
-final chatMessagesProvider = StateNotifierProvider.family<ChatMessagesNotifier, List<ChatMessage>, String>(
+final chatMessagesProvider = StateNotifierProvider.family<ChatMessagesNotifier,
+    List<ChatMessage>, String>(
   (ref, roomId) => ChatMessagesNotifier(roomId),
 );
 
@@ -151,7 +153,8 @@ class ChatMessagesNotifier extends BaseNotifier<List<ChatMessage>> {
       roomId: roomId,
       senderId: 'assistant',
       senderName: '학습 도우미',
-      content: '안녕하세요! 저는 여러분의 수학 학습을 도와드리는 AI 도우미입니다.\n\n수학 문제에 대한 질문이나 개념 설명이 필요하시면 언제든 물어보세요! 😊',
+      content:
+          '안녕하세요! 저는 여러분의 수학 학습을 도와드리는 AI 도우미입니다.\n\n수학 문제에 대한 질문이나 개념 설명이 필요하시면 언제든 물어보세요! 😊',
       type: 'text',
       sentAt: DateTime.now(),
       isRead: true,

@@ -143,9 +143,8 @@ class SubjectScore {
     return SubjectScore(
       subjectName: json['subjectName'] as String,
       score: (json['score'] as num).toDouble(),
-      maxScore: json['maxScore'] != null
-          ? (json['maxScore'] as num).toDouble()
-          : 100,
+      maxScore:
+          json['maxScore'] != null ? (json['maxScore'] as num).toDouble() : 100,
       grade: json['grade'] as String?,
       percentile: json['percentile'] as int?,
     );

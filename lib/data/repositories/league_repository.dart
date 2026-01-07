@@ -1,4 +1,4 @@
-import 'base_repository.dart';
+import 'base/base_repository.dart';
 import '../models/gamification/league.dart';
 import '../../shared/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -106,19 +106,16 @@ class LeagueRepository extends BaseRepository<League> {
           .orderBy('weeklyXp', descending: true)
           .get();
 
-      final participants = participantsSnapshot.docs
-          .asMap()
-          .entries
-          .map((entry) {
-            final index = entry.key;
-            final doc = entry.value;
-            final data = doc.data();
-            return LeagueParticipant.fromJson({
-              ...data,
-              'rank': index + 1, // 순위는 정렬 순서대로
-            });
-          })
-          .toList();
+      final participants =
+          participantsSnapshot.docs.asMap().entries.map((entry) {
+        final index = entry.key;
+        final doc = entry.value;
+        final data = doc.data();
+        return LeagueParticipant.fromJson({
+          ...data,
+          'rank': index + 1, // 순위는 정렬 순서대로
+        });
+      }).toList();
 
       final leagueData = leagueDoc.data();
       final league = League(
@@ -132,7 +129,8 @@ class LeagueRepository extends BaseRepository<League> {
         weekEndDate: (leagueData['weekEndDate'] as Timestamp).toDate(),
       );
 
-      Logger.debug('Firestore에서 리그 조회 완료: ${participants.length}명 참가', tag: 'LeagueRepository');
+      Logger.debug('Firestore에서 리그 조회 완료: ${participants.length}명 참가',
+          tag: 'LeagueRepository');
       return league;
     } catch (e, stackTrace) {
       Logger.error(
@@ -169,11 +167,13 @@ class LeagueRepository extends BaseRepository<League> {
             .collection('participants')
             .doc(participant.userId);
 
-        batch.set(participantRef, participant.toJson(), SetOptions(merge: true));
+        batch.set(
+            participantRef, participant.toJson(), SetOptions(merge: true));
       }
 
       await batch.commit();
-      Logger.debug('Firestore에 리그 데이터 저장 완료: ${data.participants.length}명', tag: 'LeagueRepository');
+      Logger.debug('Firestore에 리그 데이터 저장 완료: ${data.participants.length}명',
+          tag: 'LeagueRepository');
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 리그 데이터 저장 실패',
@@ -193,12 +193,14 @@ class LeagueRepository extends BaseRepository<League> {
 
       final batch = _firestore.batch();
       for (final leagueDoc in leaguesSnapshot.docs) {
-        final participantRef = leagueDoc.reference.collection('participants').doc(userId);
+        final participantRef =
+            leagueDoc.reference.collection('participants').doc(userId);
         batch.delete(participantRef);
       }
 
       await batch.commit();
-      Logger.debug('Firestore 리그 참가자 정보 삭제 완료: $userId', tag: 'LeagueRepository');
+      Logger.debug('Firestore 리그 참가자 정보 삭제 완료: $userId',
+          tag: 'LeagueRepository');
     } catch (e, stackTrace) {
       Logger.error(
         'Firebase 리그 데이터 삭제 실패',
@@ -247,19 +249,16 @@ class LeagueRepository extends BaseRepository<League> {
             .orderBy('weeklyXp', descending: true)
             .get();
 
-        final participants = participantsSnapshot.docs
-            .asMap()
-            .entries
-            .map((entry) {
-              final index = entry.key;
-              final doc = entry.value;
-              final data = doc.data();
-              return LeagueParticipant.fromJson({
-                ...data,
-                'rank': index + 1,
-              });
-            })
-            .toList();
+        final participants =
+            participantsSnapshot.docs.asMap().entries.map((entry) {
+          final index = entry.key;
+          final doc = entry.value;
+          final data = doc.data();
+          return LeagueParticipant.fromJson({
+            ...data,
+            'rank': index + 1,
+          });
+        }).toList();
 
         final leagueData = leagueDoc.data();
         return League(
@@ -305,7 +304,8 @@ class LeagueRepository extends BaseRepository<League> {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      Logger.info('사용자 주간 XP 업데이트: $userId = $weeklyXp', tag: 'LeagueRepository');
+      Logger.info('사용자 주간 XP 업데이트: $userId = $weeklyXp',
+          tag: 'LeagueRepository');
     } catch (e, stackTrace) {
       Logger.error(
         '사용자 XP 업데이트 실패: $userId',
@@ -405,12 +405,14 @@ class LeagueRepository extends BaseRepository<League> {
   DateTime _getWeekStartDate(DateTime date) {
     final weekday = date.weekday; // Monday = 1, Sunday = 7
     final daysToMonday = weekday - 1;
-    return DateTime(date.year, date.month, date.day).subtract(Duration(days: daysToMonday));
+    return DateTime(date.year, date.month, date.day)
+        .subtract(Duration(days: daysToMonday));
   }
 
   /// 리그 ID 생성
   String _generateLeagueId(DateTime weekStart, LeagueTier tier) {
-    final dateStr = '${weekStart.year}-${weekStart.month.toString().padLeft(2, '0')}-${weekStart.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${weekStart.year}-${weekStart.month.toString().padLeft(2, '0')}-${weekStart.day.toString().padLeft(2, '0')}';
     return '${tier.toString().split('.').last}_$dateStr';
   }
 }

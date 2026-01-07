@@ -31,7 +31,8 @@ class SyncManager {
   final LocalStorageService _localStorage = LocalStorageService();
   final FirestoreService _firestore = FirestoreService();
   final Connectivity _connectivity = Connectivity();
-  final ConflictResolutionService _conflictResolver = ConflictResolutionService();
+  final ConflictResolutionService _conflictResolver =
+      ConflictResolutionService();
 
   // Repository 인스턴스 (initialize에서 주입받음)
   // late final로 선언하여 초기화 보장 및 null 체크 제거
@@ -122,7 +123,8 @@ class SyncManager {
     final result = await _connectivity.checkConnectivity();
     _isOnline = !result.contains(ConnectivityResult.none);
 
-    Logger.info('현재 네트워크 상태: ${_isOnline ? "온라인" : "오프라인"}', tag: 'SyncManager');
+    Logger.info('현재 네트워크 상태: ${_isOnline ? "온라인" : "오프라인"}',
+        tag: 'SyncManager');
 
     // 네트워크 상태 변화 감지
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
@@ -130,7 +132,8 @@ class SyncManager {
         final wasOnline = _isOnline;
         _isOnline = !results.contains(ConnectivityResult.none);
 
-        Logger.info('네트워크 상태 변경: ${_isOnline ? "온라인" : "오프라인"}', tag: 'SyncManager');
+        Logger.info('네트워크 상태 변경: ${_isOnline ? "온라인" : "오프라인"}',
+            tag: 'SyncManager');
 
         // 오프라인 → 온라인으로 전환 시 대기 중인 작업 실행
         if (!wasOnline && _isOnline) {
@@ -153,7 +156,9 @@ class SyncManager {
     _currentStatus = _currentStatus.copyWith(
       state: state,
       message: message,
-      lastSyncAt: state == SyncState.success ? DateTime.now() : _currentStatus.lastSyncAt,
+      lastSyncAt: state == SyncState.success
+          ? DateTime.now()
+          : _currentStatus.lastSyncAt,
       pendingTasks: _pendingTasks.length,
     );
 
@@ -176,7 +181,8 @@ class SyncManager {
       final tasksJson = json['tasks'] as List<dynamic>? ?? [];
       _pendingTasks.clear();
       _pendingTasks.addAll(
-        tasksJson.map((item) => SyncTask.fromJson(item as Map<String, dynamic>)),
+        tasksJson
+            .map((item) => SyncTask.fromJson(item as Map<String, dynamic>)),
       );
 
       Logger.info('대기 중인 작업 로드: ${_pendingTasks.length}개', tag: 'SyncManager');
@@ -238,7 +244,8 @@ class SyncManager {
       try {
         await _executeTask(task);
         _pendingTasks.remove(task);
-        Logger.info('작업 완료: ${task.id} (${task.type.name})', tag: 'SyncManager');
+        Logger.info('작업 완료: ${task.id} (${task.type.name})',
+            tag: 'SyncManager');
       } catch (e) {
         Logger.warning('작업 실패: ${task.id} - $e', tag: 'SyncManager');
 
@@ -263,7 +270,8 @@ class SyncManager {
     if (_pendingTasks.isEmpty) {
       _updateStatus(SyncState.success, '모든 작업 완료');
     } else {
-      _updateStatus(SyncState.error, '일부 작업 실패 (${_pendingTasks.length}개 대기 중)');
+      _updateStatus(
+          SyncState.error, '일부 작업 실패 (${_pendingTasks.length}개 대기 중)');
     }
   }
 
@@ -305,7 +313,8 @@ class SyncManager {
     try {
       final lessonsData = task.data['lessons'] as List<dynamic>;
       final lessons = lessonsData
-          .map((lessonJson) => Lesson.fromJson(lessonJson as Map<String, dynamic>))
+          .map((lessonJson) =>
+              Lesson.fromJson(lessonJson as Map<String, dynamic>))
           .toList();
 
       await _lessonRepository.saveToFirebase(task.accountId, lessons);
@@ -345,21 +354,27 @@ class SyncManager {
   /// 레슨 데이터 다운로드
   Future<void> _downloadLessons(SyncTask task) async {
     try {
-      final remoteLessons = await _lessonRepository.getFromFirebase(task.accountId);
+      final remoteLessons =
+          await _lessonRepository.getFromFirebase(task.accountId);
 
       if (remoteLessons != null && remoteLessons.isNotEmpty) {
-        final localLessons = await _lessonRepository.getFromLocal('lessons_${task.accountId}');
+        final localLessons =
+            await _lessonRepository.getFromLocal('lessons_${task.accountId}');
 
         // 병합: 기본 정보는 Firebase, 진행률은 로컬 우선
         if (localLessons != null) {
-          final merged = await _lessonRepository.mergeData(localLessons, remoteLessons);
+          final merged =
+              await _lessonRepository.mergeData(localLessons, remoteLessons);
           if (merged != null) {
-            await _lessonRepository.saveToLocal('lessons_${task.accountId}', merged);
+            await _lessonRepository.saveToLocal(
+                'lessons_${task.accountId}', merged);
           }
         } else {
-          await _lessonRepository.saveToLocal('lessons_${task.accountId}', remoteLessons);
+          await _lessonRepository.saveToLocal(
+              'lessons_${task.accountId}', remoteLessons);
         }
-        Logger.info('레슨 데이터 다운로드 완료: ${remoteLessons.length}개', tag: 'SyncManager');
+        Logger.info('레슨 데이터 다운로드 완료: ${remoteLessons.length}개',
+            tag: 'SyncManager');
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -427,7 +442,8 @@ class SyncManager {
         await _userRepository.saveToLocal(task.accountId, user);
         Logger.info('사용자 프로필 다운로드 완료: ${task.accountId}', tag: 'SyncManager');
       } else {
-        Logger.warning('Firebase에 사용자 프로필 없음: ${task.accountId}', tag: 'SyncManager');
+        Logger.warning('Firebase에 사용자 프로필 없음: ${task.accountId}',
+            tag: 'SyncManager');
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -444,14 +460,17 @@ class SyncManager {
   Future<void> _downloadWrongAnswers(SyncTask task) async {
     try {
       // Repository를 통해 Firebase에서 다운로드
-      final wrongAnswers = await _wrongAnswerRepository.getFromFirebase(task.accountId);
+      final wrongAnswers =
+          await _wrongAnswerRepository.getFromFirebase(task.accountId);
 
       if (wrongAnswers.isNotEmpty) {
         // 로컬에 저장
         await _wrongAnswerRepository.saveToLocal(task.accountId, wrongAnswers);
-        Logger.info('오답 목록 다운로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
+        Logger.info('오답 목록 다운로드 완료: ${wrongAnswers.length}개',
+            tag: 'SyncManager');
       } else {
-        Logger.debug('Firebase에 오답 목록 없음: ${task.accountId}', tag: 'SyncManager');
+        Logger.debug('Firebase에 오답 목록 없음: ${task.accountId}',
+            tag: 'SyncManager');
       }
     } catch (e, stackTrace) {
       Logger.error(
@@ -540,13 +559,15 @@ class SyncManager {
         try {
           await _wrongAnswerRepository.saveToFirebase(accountId, wrongAnswer);
         } catch (e) {
-          Logger.warning('오답 업로드 실패: ${wrongAnswer.id} - $e', tag: 'SyncManager');
+          Logger.warning('오답 업로드 실패: ${wrongAnswer.id} - $e',
+              tag: 'SyncManager');
         }
       }
       Logger.debug('오답 목록 업로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
 
       // 3. 레슨 데이터 업로드
-      final lessons = await _lessonRepository.getFromLocal('lessons_$accountId');
+      final lessons =
+          await _lessonRepository.getFromLocal('lessons_$accountId');
       if (lessons != null && lessons.isNotEmpty) {
         await _lessonRepository.saveToFirebase(accountId, lessons);
         Logger.debug('레슨 데이터 업로드 완료: ${lessons.length}개', tag: 'SyncManager');
@@ -601,9 +622,11 @@ class SyncManager {
       }
 
       // 2. 오답 목록 다운로드
-      final remoteAnswers = await _wrongAnswerRepository.getFromFirebase(accountId);
+      final remoteAnswers =
+          await _wrongAnswerRepository.getFromFirebase(accountId);
       if (remoteAnswers.isNotEmpty) {
-        final localAnswers = await _wrongAnswerRepository.getFromLocal(accountId);
+        final localAnswers =
+            await _wrongAnswerRepository.getFromLocal(accountId);
 
         // 병합: 양쪽 데이터 통합 (중복 제거)
         final merged = _mergeWrongAnswers(localAnswers, remoteAnswers);
@@ -614,35 +637,45 @@ class SyncManager {
       // 3. 레슨 데이터 다운로드
       final remoteLessons = await _lessonRepository.getFromFirebase(accountId);
       if (remoteLessons != null && remoteLessons.isNotEmpty) {
-        final localLessons = await _lessonRepository.getFromLocal('lessons_$accountId');
+        final localLessons =
+            await _lessonRepository.getFromLocal('lessons_$accountId');
 
         // 병합: 기본 정보는 Firebase, 진행률은 로컬 우선
         if (localLessons != null) {
-          final mergedLessons = await _lessonRepository.mergeData(localLessons, remoteLessons);
+          final mergedLessons =
+              await _lessonRepository.mergeData(localLessons, remoteLessons);
           if (mergedLessons != null) {
-            await _lessonRepository.saveToLocal('lessons_$accountId', mergedLessons);
+            await _lessonRepository.saveToLocal(
+                'lessons_$accountId', mergedLessons);
           }
         } else {
-          await _lessonRepository.saveToLocal('lessons_$accountId', remoteLessons);
+          await _lessonRepository.saveToLocal(
+              'lessons_$accountId', remoteLessons);
         }
-        Logger.debug('레슨 데이터 다운로드 완료: ${remoteLessons.length}개', tag: 'SyncManager');
+        Logger.debug('레슨 데이터 다운로드 완료: ${remoteLessons.length}개',
+            tag: 'SyncManager');
       }
 
       // 4. 리그 데이터 다운로드
       final remoteLeague = await _leagueRepository.getFromFirebase(accountId);
       if (remoteLeague != null) {
-        final localLeague = await _leagueRepository.getFromLocal('league_$accountId');
+        final localLeague =
+            await _leagueRepository.getFromLocal('league_$accountId');
 
         // 병합: 리그 데이터는 Firebase 우선 (서버 데이터가 항상 최신)
         if (localLeague != null) {
-          final mergedLeague = await _leagueRepository.mergeData(localLeague, remoteLeague);
+          final mergedLeague =
+              await _leagueRepository.mergeData(localLeague, remoteLeague);
           if (mergedLeague != null) {
-            await _leagueRepository.saveToLocal('league_$accountId', mergedLeague);
+            await _leagueRepository.saveToLocal(
+                'league_$accountId', mergedLeague);
           }
         } else {
-          await _leagueRepository.saveToLocal('league_$accountId', remoteLeague);
+          await _leagueRepository.saveToLocal(
+              'league_$accountId', remoteLeague);
         }
-        Logger.debug('리그 데이터 다운로드 완료: ${remoteLeague.tier}', tag: 'SyncManager');
+        Logger.debug('리그 데이터 다운로드 완료: ${remoteLeague.tier}',
+            tag: 'SyncManager');
       }
 
       Logger.info('다운로드 완료', tag: 'SyncManager');
@@ -658,7 +691,8 @@ class SyncManager {
   }
 
   /// 오답 목록 병합 (ConflictResolutionService 사용)
-  List<WrongAnswer> _mergeWrongAnswers(List<WrongAnswer> local, List<WrongAnswer> remote) {
+  List<WrongAnswer> _mergeWrongAnswers(
+      List<WrongAnswer> local, List<WrongAnswer> remote) {
     final Map<String, WrongAnswer> merged = {};
 
     // 로컬 데이터를 맵으로 변환
@@ -743,7 +777,8 @@ class SyncManager {
       watchLessons().listen((lessons) async {
         if (lessons.isNotEmpty) {
           await _lessonRepository.saveToLocal('lessons_$userId', lessons);
-          Logger.debug('레슨 데이터 실시간 업데이트: ${lessons.length}개', tag: 'SyncManager');
+          Logger.debug('레슨 데이터 실시간 업데이트: ${lessons.length}개',
+              tag: 'SyncManager');
         }
       });
 

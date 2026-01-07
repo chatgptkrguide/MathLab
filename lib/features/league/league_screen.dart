@@ -50,7 +50,8 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                              const Icon(Icons.error_outline,
+                                  size: 64, color: AppColors.error),
                               const SizedBox(height: 16),
                               Text(
                                 '오류 발생',
@@ -67,7 +68,9 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                       : leagueState.currentLeague == null
                           ? const Center(child: Text('리그 정보가 없습니다'))
                           : RefreshIndicator(
-                              onRefresh: () => ref.read(leagueProvider.notifier).refreshLeague(),
+                              onRefresh: () => ref
+                                  .read(leagueProvider.notifier)
+                                  .refreshLeague(),
                               child: SingleChildScrollView(
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 child: Column(
@@ -104,7 +107,6 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
     );
   }
 
-
   Widget _buildLeaderboard(
     BuildContext context,
     League league,
@@ -120,7 +122,8 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
             padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Row(
               children: [
-                const Icon(Icons.leaderboard, color: AppColors.primary, size: 24),
+                const Icon(Icons.leaderboard,
+                    color: AppColors.primary, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   '리더보드',
@@ -139,12 +142,13 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
             itemCount: league.participants.length,
             itemBuilder: (context, index) {
               final participant = league.participants[index];
-              final isCurrentUser = currentUserId != null &&
-                                     participant.userId == currentUserId;
+              final isCurrentUser =
+                  currentUserId != null && participant.userId == currentUserId;
               final isTop3 = participant.rank <= 3; // 듀오링고 스타일: 상위 3명 강조
               final isPromotionZone = participant.rank <= 10;
-              final isRelegationZone = participant.rank > league.participants.length - 5 &&
-                  league.tier != LeagueTier.bronze;
+              final isRelegationZone =
+                  participant.rank > league.participants.length - 5 &&
+                      league.tier != LeagueTier.bronze;
 
               // 듀오링고 스타일: 상위 3명 특별 배경색
               Color? topRankBgColor;
@@ -179,7 +183,9 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                               end: Alignment.bottomRight,
                             )
                           : null,
-                  color: topRankBgColor == null && !isCurrentUser ? Colors.white : null,
+                  color: topRankBgColor == null && !isCurrentUser
+                      ? Colors.white
+                      : null,
                   borderRadius: BorderRadius.circular(16),
                   border: isCurrentUser
                       ? Border.all(
@@ -203,8 +209,18 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                           : isTop3
                               ? Colors.black.withOpacity(0.12)
                               : Colors.black.withOpacity(0.08),
-                      blurRadius: isCurrentUser ? 15 : isTop3 ? 10 : 8,
-                      offset: Offset(0, isCurrentUser ? 5 : isTop3 ? 4 : 3),
+                      blurRadius: isCurrentUser
+                          ? 15
+                          : isTop3
+                              ? 10
+                              : 8,
+                      offset: Offset(
+                          0,
+                          isCurrentUser
+                              ? 5
+                              : isTop3
+                                  ? 4
+                                  : 3),
                     ),
                   ],
                 ),
@@ -375,7 +391,11 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
         ),
         child: Center(
           child: Text(
-            rank == 1 ? '🥇' : rank == 2 ? '🥈' : '🥉',
+            rank == 1
+                ? '🥇'
+                : rank == 2
+                    ? '🥈'
+                    : '🥉',
             style: const TextStyle(fontSize: 24),
           ),
         ),
@@ -469,14 +489,17 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
           final isCurrentUserTier = tier == currentTier;
 
           // 도달하지 못한 리그인지 확인 (현재 티어보다 높은 티어)
-          final isLocked = currentTier != null && tier.index > currentTier.index;
+          final isLocked =
+              currentTier != null && tier.index > currentTier.index;
 
           return GestureDetector(
-            onTap: isLocked ? null : () {
-              setState(() {
-                selectedTier = tier;
-              });
-            },
+            onTap: isLocked
+                ? null
+                : () {
+                    setState(() {
+                      selectedTier = tier;
+                    });
+                  },
             child: Opacity(
               opacity: isLocked ? 0.3 : 1.0,
               child: AnimatedContainer(
@@ -571,8 +594,14 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                             tier.displayName.replaceAll(' 리그', ''),
                             style: TextStyle(
                               fontSize: isSelected ? 13 : 11,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                              color: isLocked ? Colors.white38 : (isSelected ? Colors.white : Colors.white70),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
+                              color: isLocked
+                                  ? Colors.white38
+                                  : (isSelected
+                                      ? Colors.white
+                                      : Colors.white70),
                             ),
                             textAlign: TextAlign.center,
                           ),

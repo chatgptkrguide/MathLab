@@ -2,12 +2,12 @@ import 'dart:async';
 // import 'dart:isolate';
 // import 'dart:ui';
 // import 'dart:io' show Platform;
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart'; // 주석 처리: 현재 미사용
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:workmanager/workmanager.dart';  // 일시적으로 비활성화
 import '../../shared/utils/logger.dart';
-import '../models/user/user.dart';
+// import '../models/user/user.dart'; // 주석 처리: 현재 미사용
 
 /// 하트 재생 백그라운드 서비스
 ///
@@ -21,8 +21,10 @@ class HeartRegenerationService {
 
   // 하트 재생 관련 상수
   static const int maxHearts = 5;
-  static const Duration heartRegenInterval = Duration(minutes: 30); // 30분마다 1개 재생
-  static const Duration checkInterval = Duration(minutes: 15); // 15분마다 체크 (더 자주 체크)
+  static const Duration heartRegenInterval =
+      Duration(minutes: 30); // 30분마다 1개 재생
+  static const Duration checkInterval =
+      Duration(minutes: 15); // 15분마다 체크 (더 자주 체크)
 
   // SharedPreferences 키
   static const String _lastHeartUpdateKey = 'last_heart_update_time';
@@ -76,7 +78,8 @@ class HeartRegenerationService {
     );
 
     // Android 알림 설정
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
     // 초기화 설정 결합
     const initSettings = InitializationSettings(
@@ -91,8 +94,8 @@ class HeartRegenerationService {
     );
 
     // Android 알림 채널 생성
-    final androidPlugin = _notifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
     await androidPlugin?.createNotificationChannel(androidChannel);
 
     Logger.debug('알림 시스템 초기화 완료', tag: _tag);
@@ -225,7 +228,8 @@ class HeartRegenerationService {
   }
 
   /// 하트 재생 알림 발송
-  static Future<void> _sendHeartRegenNotification(int regenerated, int total) async {
+  static Future<void> _sendHeartRegenNotification(
+      int regenerated, int total) async {
     try {
       const notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails(
@@ -307,7 +311,8 @@ class HeartRegenerationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_currentHeartsKey, hearts.clamp(0, maxHearts));
-      await prefs.setInt(_lastHeartUpdateKey, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(
+          _lastHeartUpdateKey, DateTime.now().millisecondsSinceEpoch);
 
       Logger.info('하트 수동 업데이트: $hearts', tag: _tag);
 
@@ -367,7 +372,8 @@ class HeartRegenerationService {
       final now = DateTime.now();
       final elapsed = now.difference(lastUpdate);
 
-      final minutesUntilNext = heartRegenInterval.inMinutes - (elapsed.inMinutes % heartRegenInterval.inMinutes);
+      final minutesUntilNext = heartRegenInterval.inMinutes -
+          (elapsed.inMinutes % heartRegenInterval.inMinutes);
 
       return Duration(minutes: minutesUntilNext);
     } catch (e, stackTrace) {
@@ -406,4 +412,3 @@ class HeartRegenerationService {
 //     }
 //   });
 // }
-

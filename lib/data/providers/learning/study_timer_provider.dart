@@ -142,8 +142,7 @@ final weeklyStudyStatsProvider =
 });
 
 /// 세션 기록 프로바이더
-final sessionHistoryProvider =
-    FutureProvider<List<StudySession>>((ref) async {
+final sessionHistoryProvider = FutureProvider<List<StudySession>>((ref) async {
   final service = ref.read(studyTimerServiceProvider);
   return await service.getSessionHistory();
 });

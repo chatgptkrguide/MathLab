@@ -107,7 +107,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
     final newCategoryTime = Map<String, int>.from(state!.categoryTime);
 
     // 각 문제의 카테고리별 통계 추적
-    final categoryTimePerProblem = totalTimeSpent.inSeconds ~/ (totalProblems > 0 ? totalProblems : 1);
+    final categoryTimePerProblem =
+        totalTimeSpent.inSeconds ~/ (totalProblems > 0 ? totalProblems : 1);
     for (final problem in problems) {
       final category = problem.category;
 
@@ -115,7 +116,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
       newCategoryStats[category] = (newCategoryStats[category] ?? 0) + 1;
 
       // 시간 추가 (대략적인 분배)
-      newCategoryTime[category] = (newCategoryTime[category] ?? 0) + categoryTimePerProblem;
+      newCategoryTime[category] =
+          (newCategoryTime[category] ?? 0) + categoryTimePerProblem;
     }
 
     // 정답 처리된 문제의 카테고리별 정답 수 증가
@@ -161,7 +163,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
     }
 
     // 카테고리별 시간 추가
-    newCategoryTime[category] = (newCategoryTime[category] ?? 0) + timeSpentSeconds;
+    newCategoryTime[category] =
+        (newCategoryTime[category] ?? 0) + timeSpentSeconds;
 
     state = state!.copyWith(
       categoryCorrect: newCategoryCorrect,
@@ -258,7 +261,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
 
       // 카테고리별 정답 수
       final correctCount = state!.categoryCorrect[category] ?? 0;
-      final categoryAccuracy = problemCount > 0 ? correctCount / problemCount : 0.0;
+      final categoryAccuracy =
+          problemCount > 0 ? correctCount / problemCount : 0.0;
 
       // 카테고리별 평균 시간 (초 단위)
       final totalTime = state!.categoryTime[category] ?? 0;
@@ -294,10 +298,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
     final sortedCategories = state!.categoryStats.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final strongCategories = sortedCategories
-        .take(2)
-        .map((e) => e.key)
-        .toList();
+    final strongCategories =
+        sortedCategories.take(2).map((e) => e.key).toList();
 
     final weakCategories = sortedCategories
         .skip(sortedCategories.length - 2)
@@ -319,7 +321,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
         if (hour >= 6 && hour < 12) {
           timeOfDayCounts['morning'] = (timeOfDayCounts['morning'] ?? 0) + 1;
         } else if (hour >= 12 && hour < 18) {
-          timeOfDayCounts['afternoon'] = (timeOfDayCounts['afternoon'] ?? 0) + 1;
+          timeOfDayCounts['afternoon'] =
+              (timeOfDayCounts['afternoon'] ?? 0) + 1;
         } else if (hour >= 18 && hour < 22) {
           timeOfDayCounts['evening'] = (timeOfDayCounts['evening'] ?? 0) + 1;
         } else {
@@ -341,7 +344,8 @@ class LearningStatsNotifier extends BaseNotifier<LearningStats?> {
       preferredStudyTime: preferredStudyTime,
       strongCategories: strongCategories,
       weakCategories: weakCategories,
-      recommendedFocus: weakCategories.isNotEmpty ? weakCategories.first : 'balanced',
+      recommendedFocus:
+          weakCategories.isNotEmpty ? weakCategories.first : 'balanced',
     );
   }
 
@@ -400,7 +404,8 @@ class DailyStats {
     required this.sessions,
   });
 
-  double get accuracy => problemsSolved > 0 ? correctAnswers / problemsSolved : 0.0;
+  double get accuracy =>
+      problemsSolved > 0 ? correctAnswers / problemsSolved : 0.0;
 }
 
 class WeeklyStats {
@@ -452,7 +457,8 @@ class LearningPattern {
 }
 
 /// 프로바이더들
-final learningStatsProvider = StateNotifierProvider<LearningStatsNotifier, LearningStats?>((ref) {
+final learningStatsProvider =
+    StateNotifierProvider<LearningStatsNotifier, LearningStats?>((ref) {
   return LearningStatsNotifier();
 });
 

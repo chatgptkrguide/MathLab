@@ -76,7 +76,8 @@ class LearningStats {
       'categoryStats': categoryStats,
       'categoryCorrect': categoryCorrect,
       'categoryTime': categoryTime,
-      'sessionTimestamps': sessionTimestamps.map((e) => e.toIso8601String()).toList(),
+      'sessionTimestamps':
+          sessionTimestamps.map((e) => e.toIso8601String()).toList(),
     };
   }
 

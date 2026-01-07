@@ -46,7 +46,8 @@ class ErrorActionButtons extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: filteredNotes.isNotEmpty ? onCreateCustomSet : null,
+                    onPressed:
+                        filteredNotes.isNotEmpty ? onCreateCustomSet : null,
                     icon: const Icon(Icons.library_books,
                         size: AppDimensions.iconS),
                     label: const Text('맞춤 복습 세트'),
@@ -80,7 +81,8 @@ class ErrorActionButtons extends StatelessWidget {
               const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: filteredNotes.isNotEmpty ? onCreateCustomSet : null,
+                  onPressed:
+                      filteredNotes.isNotEmpty ? onCreateCustomSet : null,
                   icon: const Icon(Icons.library_books,
                       size: AppDimensions.iconS),
                   label: const Text('맞춤 복습 세트'),

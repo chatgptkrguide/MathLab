@@ -69,7 +69,8 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
 
     // ErrorNoteProvider에서 사용자의 오답 노트 가져오기
     final allErrorNotes = ref.watch(errorNoteProvider);
-    final userErrorNotes = allErrorNotes.where((note) => note.userId == userId).toList();
+    final userErrorNotes =
+        allErrorNotes.where((note) => note.userId == userId).toList();
     final filteredNotes = _getFilteredErrorNotes(userErrorNotes);
     final errorStats = _getErrorStats(userErrorNotes);
 
@@ -107,8 +108,10 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                           delay: const Duration(milliseconds: 100),
                           child: ErrorActionButtons(
                             filteredNotes: filteredNotes,
-                            onReviewSelected: () => _reviewSelectedProblems(filteredNotes),
-                            onCreateCustomSet: () => _createCustomReviewSet(userId),
+                            onReviewSelected: () =>
+                                _reviewSelectedProblems(filteredNotes),
+                            onCreateCustomSet: () =>
+                                _createCustomReviewSet(userId),
                           ),
                         ),
                         ErrorFilterTabs(
@@ -117,8 +120,7 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
                           onTabChanged: () => setState(() {}),
                         ),
                         _buildErrorNotesList(userErrorNotes, filteredNotes),
-                        if (filteredNotes.isEmpty)
-                          const LearningTipsCard(),
+                        if (filteredNotes.isEmpty) const LearningTipsCard(),
                       ],
                     ),
                   ),
@@ -160,10 +162,9 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
     );
   }
 
-
-
   /// 오답 노트 목록
-  Widget _buildErrorNotesList(List<ErrorNote> allNotes, List<ErrorNote> filteredNotes) {
+  Widget _buildErrorNotesList(
+      List<ErrorNote> allNotes, List<ErrorNote> filteredNotes) {
     if (filteredNotes.isEmpty) {
       return _buildEmptyState(allNotes);
     }
@@ -209,7 +210,6 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
       message: '다른 탭을 확인해보세요.',
     );
   }
-
 
   // 이벤트 핸들러들
 
@@ -271,10 +271,11 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
 
   void _createReviewSetByCategory(String userId) {
     // 카테고리별 맞춤 복습 세트 생성
-    final customSet = ref.read(errorNoteProvider.notifier).createCustomReviewSet(
-      userId: userId,
-      maxCount: 10,
-    );
+    final customSet =
+        ref.read(errorNoteProvider.notifier).createCustomReviewSet(
+              userId: userId,
+              maxCount: 10,
+            );
 
     if (customSet.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -291,11 +292,12 @@ class _ErrorsScreenState extends ConsumerState<ErrorsScreen>
 
   void _createReviewSetByDifficulty(String userId) {
     // 난이도별 맞춤 복습 세트 생성 (난이도 3 이하)
-    final customSet = ref.read(errorNoteProvider.notifier).createCustomReviewSet(
-      userId: userId,
-      maxDifficulty: 3,
-      maxCount: 10,
-    );
+    final customSet =
+        ref.read(errorNoteProvider.notifier).createCustomReviewSet(
+              userId: userId,
+              maxDifficulty: 3,
+              maxCount: 10,
+            );
 
     if (customSet.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

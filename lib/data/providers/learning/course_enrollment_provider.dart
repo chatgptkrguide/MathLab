@@ -5,7 +5,8 @@ import '../user/user_provider.dart';
 import '../../../shared/utils/logger.dart';
 
 /// 과정 수강 서비스 프로바이더
-final courseEnrollmentServiceProvider = Provider<CourseEnrollmentService>((ref) {
+final courseEnrollmentServiceProvider =
+    Provider<CourseEnrollmentService>((ref) {
   return CourseEnrollmentService();
 });
 

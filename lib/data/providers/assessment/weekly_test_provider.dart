@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/models.dart';
 import '../base/base_notifier.dart';
 
-
-
 /// 주간테스트 상태 관리
 class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
   WeeklyTestNotifier() : super([], 'WeeklyTestNotifier') {
@@ -122,10 +120,14 @@ class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
       };
     }
 
-    final totalStudents = weekTests.fold<int>(0, (sum, test) => sum + test.totalStudents);
-    final totalSubmitted = weekTests.fold<int>(0, (sum, test) => sum + test.submittedCount);
-    final averageRate = totalStudents > 0 ? (totalSubmitted / totalStudents) * 100 : 0.0;
-    final completedTests = weekTests.where((test) => test.submissionRate == 100.0).length;
+    final totalStudents =
+        weekTests.fold<int>(0, (sum, test) => sum + test.totalStudents);
+    final totalSubmitted =
+        weekTests.fold<int>(0, (sum, test) => sum + test.submittedCount);
+    final averageRate =
+        totalStudents > 0 ? (totalSubmitted / totalStudents) * 100 : 0.0;
+    final completedTests =
+        weekTests.where((test) => test.submissionRate == 100.0).length;
 
     return {
       'totalTests': weekTests.length,
@@ -149,7 +151,9 @@ class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
 
     final activeTests = classTests.where((test) => !test.isOverdue).length;
     final overdueTests = classTests.where((test) => test.isOverdue).length;
-    final avgRate = classTests.fold<double>(0.0, (sum, test) => sum + test.submissionRate) / classTests.length;
+    final avgRate =
+        classTests.fold<double>(0.0, (sum, test) => sum + test.submissionRate) /
+            classTests.length;
 
     return {
       'totalTests': classTests.length,
@@ -161,6 +165,7 @@ class WeeklyTestNotifier extends BaseNotifier<List<WeeklyTest>> {
 }
 
 /// Provider 선언
-final weeklyTestProvider = StateNotifierProvider<WeeklyTestNotifier, List<WeeklyTest>>((ref) {
+final weeklyTestProvider =
+    StateNotifierProvider<WeeklyTestNotifier, List<WeeklyTest>>((ref) {
   return WeeklyTestNotifier();
 });

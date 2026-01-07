@@ -39,47 +39,47 @@ class HomeScreenFigma extends ConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // 상단: "안녕하세요!" + 스트릭
                     HomeTopSection(user: user),
 
-              const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
-              // 중앙: 로봇 캐릭터 + 진행률 링
-              const HomeRobotSection(),
+                    // 중앙: 로봇 캐릭터 + 진행률 링 (크기 축소)
+                    const HomeRobotSection(),
 
-              const SizedBox(height: 32),
+                    const SizedBox(height: 20),
 
-              // 오늘의 목표 카드
-              _buildTodayGoalCard(context, user),
+                    // 오늘의 목표 카드
+                    _buildTodayGoalCard(context, user),
 
-              const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-              // 학습 시작하기 버튼
-              const HomeStartButton(),
+                    // 학습 시작하기 버튼 (듀오링고 스타일)
+                    const HomeStartButton(),
 
-              const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
-              // 하단 스탯 카드들 (XP, 레벨, 연속)
-              HomeStatsCards(user: user),
+                    // 하단 스탯 카드들 (XP, 레벨, 연속) - 컴팩트하게
+                    HomeStatsCards(user: user),
 
-              const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
-              // 친구 활동 섹션
-              const HomeFriendsActivity(),
+                    // 친구 활동 섹션
+                    const HomeFriendsActivity(),
 
-              const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-              // 학년 선택 카드
-              const HomeLanguageCards(),
+                    // 학년 선택 카드
+                    const HomeLanguageCards(),
 
-              const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-              // 데일리 챌린지 배너
-              const HomeDailyChallenge(),
+                    // 데일리 챌린지 배너
+                    const HomeDailyChallenge(),
 
-              const SizedBox(height: 100), // 네비게이션 바 공간
+                    const SizedBox(height: 80), // 네비게이션 바 공간 축소
                   ],
                 ),
               ),

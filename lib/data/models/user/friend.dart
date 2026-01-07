@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 enum FriendRequestStatus {
   /// 보류 중 (요청 대기)
   pending,
+
   /// 수락됨
   accepted,
+
   /// 거절됨
   rejected,
 }

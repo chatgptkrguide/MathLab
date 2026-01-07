@@ -64,7 +64,8 @@ class GradeSelectionDrawer extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.school, color: AppColors.mathBlue, size: 24),
+                    const Icon(Icons.school,
+                        color: AppColors.mathBlue, size: 24),
                     const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +173,9 @@ class GradeSelectionDrawer extends ConsumerWidget {
                     child: InkWell(
                       onTap: () async {
                         // 학년 변경
-                        await ref.read(userProvider.notifier).updateCurrentGrade(grade);
+                        await ref
+                            .read(userProvider.notifier)
+                            .updateCurrentGrade(grade);
 
                         if (context.mounted) {
                           Navigator.pop(context);

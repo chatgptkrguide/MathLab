@@ -160,9 +160,7 @@ class WeeklyTest {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WeeklyTest &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+      other is WeeklyTest && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;

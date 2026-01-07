@@ -49,7 +49,9 @@ class LevelTestState {
   /// 답변한 문제 수
   int get answeredCount {
     if (currentTest == null) return 0;
-    return currentTest!.questions.where((q) => q.userAnswerIndex != null).length;
+    return currentTest!.questions
+        .where((q) => q.userAnswerIndex != null)
+        .length;
   }
 }
 
@@ -226,13 +228,15 @@ class LevelTestProvider extends BaseNotifier<LevelTestState> {
     final isCorrect = answerIndex == currentQ.correctAnswerIndex;
 
     // 현재 문제 업데이트
-    final updatedQuestions = List<LevelTestQuestion>.from(state.currentTest!.questions);
+    final updatedQuestions =
+        List<LevelTestQuestion>.from(state.currentTest!.questions);
     updatedQuestions[state.currentQuestionIndex] = currentQ.copyWith(
       userAnswerIndex: answerIndex,
       isCorrect: isCorrect,
     );
 
-    final updatedTest = state.currentTest!.copyWith(questions: updatedQuestions);
+    final updatedTest =
+        state.currentTest!.copyWith(questions: updatedQuestions);
 
     // 다음 문제로 이동 or 완료
     final nextIndex = state.currentQuestionIndex + 1;
@@ -282,7 +286,8 @@ class LevelTestProvider extends BaseNotifier<LevelTestState> {
   /// 결과 계산
   LevelTestResult _calculateResult(LevelTest test) {
     final totalQuestions = test.questions.length;
-    final correctAnswers = test.questions.where((q) => q.isCorrect == true).length;
+    final correctAnswers =
+        test.questions.where((q) => q.isCorrect == true).length;
     final accuracy = correctAnswers / totalQuestions;
 
     // 카테고리별 점수

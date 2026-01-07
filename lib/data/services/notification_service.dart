@@ -37,7 +37,8 @@ class NotificationService {
       // 4. FCM 메시지 핸들러 설정
       _setupMessageHandlers();
 
-      Logger.info('NotificationService initialized', tag: 'NotificationService');
+      Logger.info('NotificationService initialized',
+          tag: 'NotificationService');
     } catch (e) {
       Logger.error('Failed to initialize NotificationService', error: e);
     }
@@ -70,7 +71,8 @@ class NotificationService {
       // 토큰 갱신 리스너
       _firebaseMessaging.onTokenRefresh.listen((newToken) {
         _fcmToken = newToken;
-        Logger.info('FCM Token refreshed: $newToken', tag: 'NotificationService');
+        Logger.info('FCM Token refreshed: $newToken',
+            tag: 'NotificationService');
         // TODO: 서버에 새 토큰 저장
       });
     } catch (e) {
@@ -81,7 +83,8 @@ class NotificationService {
   /// 로컬 알림 초기화
   Future<void> _initializeLocalNotifications() async {
     // Android 설정
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
     // iOS 설정
     const iosSettings = DarwinInitializationSettings(
@@ -261,7 +264,8 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time,
       );
 
-      Logger.info('Streak reminder scheduled at $hour:00', tag: 'NotificationService');
+      Logger.info('Streak reminder scheduled at $hour:00',
+          tag: 'NotificationService');
     } catch (e) {
       Logger.error('Failed to schedule streak reminder', error: e);
     }
@@ -302,7 +306,8 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
 
-      Logger.info('Heart recovery notification scheduled', tag: 'NotificationService');
+      Logger.info('Heart recovery notification scheduled',
+          tag: 'NotificationService');
     } catch (e) {
       Logger.error('Failed to schedule heart recovery notification', error: e);
     }
@@ -343,7 +348,8 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
       );
 
-      Logger.info('League end notification scheduled', tag: 'NotificationService');
+      Logger.info('League end notification scheduled',
+          tag: 'NotificationService');
     } catch (e) {
       Logger.error('Failed to schedule league end notification', error: e);
     }
@@ -384,7 +390,8 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time,
       );
 
-      Logger.info('Daily challenge notification scheduled', tag: 'NotificationService');
+      Logger.info('Daily challenge notification scheduled',
+          tag: 'NotificationService');
     } catch (e) {
       Logger.error('Failed to schedule daily challenge notification', error: e);
     }
@@ -394,7 +401,8 @@ class NotificationService {
   TZDateTime _nextInstanceOfTime(int hour, int minute) {
     final location = getLocation('Asia/Seoul');
     final now = TZDateTime.now(location);
-    var scheduledDate = TZDateTime(location, now.year, now.month, now.day, hour, minute);
+    var scheduledDate =
+        TZDateTime(location, now.year, now.month, now.day, hour, minute);
 
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));

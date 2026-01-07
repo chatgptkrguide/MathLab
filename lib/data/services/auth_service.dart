@@ -73,7 +73,8 @@ class AuthService {
       }
 
       // Google 인증 정보 가져오기
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // Firebase 인증 자격증명 생성
       final credential = GoogleAuthProvider.credential(

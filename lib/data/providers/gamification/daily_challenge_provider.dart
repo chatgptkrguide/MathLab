@@ -75,7 +75,8 @@ class DailyChallengeProvider extends BaseNotifier<DailyChallengeState> {
           // 챌린지 리스트 복원
           final challengesData = data['challenges'] as List<dynamic>?;
           final challenges = challengesData
-                  ?.map((c) => DailyChallenge.fromJson(c as Map<String, dynamic>))
+                  ?.map(
+                      (c) => DailyChallenge.fromJson(c as Map<String, dynamic>))
                   .toList() ??
               [];
 
@@ -157,7 +158,8 @@ class DailyChallengeProvider extends BaseNotifier<DailyChallengeState> {
   }
 
   /// 챌린지 타입별 생성
-  DailyChallenge _createChallenge(ChallengeType type, int index, DateTime date) {
+  DailyChallenge _createChallenge(
+      ChallengeType type, int index, DateTime date) {
     final id = 'challenge_${date.year}_${date.month}_${date.day}_$index';
 
     switch (type) {
@@ -239,8 +241,8 @@ class DailyChallengeProvider extends BaseNotifier<DailyChallengeState> {
   Future<void> updateProgress(ChallengeType type, int value) async {
     final updatedChallenges = state.challenges.map((challenge) {
       if (challenge.type == type && !challenge.isCompleted) {
-        final newValue = (challenge.currentValue + value)
-            .clamp(0, challenge.targetValue);
+        final newValue =
+            (challenge.currentValue + value).clamp(0, challenge.targetValue);
         final newChallenge = challenge.copyWith(currentValue: newValue);
 
         // 완료되었으면 XP 지급

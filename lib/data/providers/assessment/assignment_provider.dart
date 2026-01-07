@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/models.dart';
 import '../base/base_notifier.dart';
 
-
-
 /// 과제 상태 관리
 class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
   AssignmentNotifier() : super([], 'AssignmentNotifier') {
@@ -58,7 +56,9 @@ class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
   /// 과제 수정
   Future<void> updateAssignment(Assignment updatedAssignment) async {
     state = state.map((assignment) {
-      return assignment.id == updatedAssignment.id ? updatedAssignment : assignment;
+      return assignment.id == updatedAssignment.id
+          ? updatedAssignment
+          : assignment;
     }).toList();
     await _saveAssignments();
   }
@@ -76,12 +76,16 @@ class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
 
   /// 진행 중인 과제 조회
   List<Assignment> getActiveAssignments() {
-    return state.where((assignment) => assignment.status == AssignmentStatus.active).toList();
+    return state
+        .where((assignment) => assignment.status == AssignmentStatus.active)
+        .toList();
   }
 
   /// 마감된 과제 조회
   List<Assignment> getClosedAssignments() {
-    return state.where((assignment) => assignment.status == AssignmentStatus.closed).toList();
+    return state
+        .where((assignment) => assignment.status == AssignmentStatus.closed)
+        .toList();
   }
 
   /// 마감 임박 과제 조회 (3일 이내)
@@ -99,7 +103,8 @@ class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
     bool hasChanges = false;
 
     state = state.map((assignment) {
-      if (assignment.status == AssignmentStatus.active && assignment.isOverdue) {
+      if (assignment.status == AssignmentStatus.active &&
+          assignment.isOverdue) {
         hasChanges = true;
         return assignment.copyWith(status: AssignmentStatus.closed);
       }
@@ -124,6 +129,7 @@ class AssignmentNotifier extends BaseNotifier<List<Assignment>> {
 }
 
 /// Provider 선언
-final assignmentProvider = StateNotifierProvider<AssignmentNotifier, List<Assignment>>((ref) {
+final assignmentProvider =
+    StateNotifierProvider<AssignmentNotifier, List<Assignment>>((ref) {
   return AssignmentNotifier();
 });

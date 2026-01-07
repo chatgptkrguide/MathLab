@@ -85,7 +85,8 @@ class _FallbackImageState extends State<FallbackImage> {
     // Asset 경로에서 타입 추론
     if (widget.assetPath.contains('badge')) {
       return _buildBadgePlaceholder();
-    } else if (widget.assetPath.contains('profile') || widget.assetPath.contains('avatar')) {
+    } else if (widget.assetPath.contains('profile') ||
+        widget.assetPath.contains('avatar')) {
       return _buildProfilePlaceholder();
     } else if (widget.assetPath.contains('google')) {
       return _buildGooglePlaceholder();
@@ -220,4 +221,3 @@ class _FallbackImageState extends State<FallbackImage> {
     );
   }
 }
-

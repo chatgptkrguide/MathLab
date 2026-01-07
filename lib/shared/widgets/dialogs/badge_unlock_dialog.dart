@@ -263,7 +263,8 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: _rarityColor.withOpacity(0.5 * _badgeGlowAnimation.value),
+                        color: _rarityColor
+                            .withOpacity(0.5 * _badgeGlowAnimation.value),
                         blurRadius: 30,
                         spreadRadius: 10,
                       ),

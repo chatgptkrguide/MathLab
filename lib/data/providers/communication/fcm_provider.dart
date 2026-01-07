@@ -26,7 +26,8 @@ final fcmTokenProvider = FutureProvider<String?>((ref) async {
       final token = await messaging.getToken();
       Logger.info('FCM 토큰: $token', tag: 'FCM');
       return token;
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       Logger.info('FCM 임시 권한 승인됨', tag: 'FCM');
       final token = await messaging.getToken();
       return token;
@@ -35,7 +36,8 @@ final fcmTokenProvider = FutureProvider<String?>((ref) async {
       return null;
     }
   } catch (e, stackTrace) {
-    Logger.error('FCM 토큰 가져오기 실패', error: e, stackTrace: stackTrace, tag: 'FCM');
+    Logger.error('FCM 토큰 가져오기 실패',
+        error: e, stackTrace: stackTrace, tag: 'FCM');
     return null;
   }
 });
@@ -85,7 +87,8 @@ class FcmService {
 
       Logger.info('FCM 서비스 초기화 완료', tag: 'FCM');
     } catch (e, stackTrace) {
-      Logger.error('FCM 서비스 초기화 실패', error: e, stackTrace: stackTrace, tag: 'FCM');
+      Logger.error('FCM 서비스 초기화 실패',
+          error: e, stackTrace: stackTrace, tag: 'FCM');
     }
   }
 
@@ -143,7 +146,8 @@ class FcmService {
       await _messaging.subscribeToTopic(topic);
       Logger.info('토픽 구독: $topic', tag: 'FCM');
     } catch (e, stackTrace) {
-      Logger.error('토픽 구독 실패: $topic', error: e, stackTrace: stackTrace, tag: 'FCM');
+      Logger.error('토픽 구독 실패: $topic',
+          error: e, stackTrace: stackTrace, tag: 'FCM');
     }
   }
 
@@ -153,7 +157,8 @@ class FcmService {
       await _messaging.unsubscribeFromTopic(topic);
       Logger.info('토픽 구독 해제: $topic', tag: 'FCM');
     } catch (e, stackTrace) {
-      Logger.error('토픽 구독 해제 실패: $topic', error: e, stackTrace: stackTrace, tag: 'FCM');
+      Logger.error('토픽 구독 해제 실패: $topic',
+          error: e, stackTrace: stackTrace, tag: 'FCM');
     }
   }
 
@@ -164,7 +169,8 @@ class FcmService {
       Logger.info('현재 FCM 토큰: $token', tag: 'FCM');
       return token;
     } catch (e, stackTrace) {
-      Logger.error('FCM 토큰 가져오기 실패', error: e, stackTrace: stackTrace, tag: 'FCM');
+      Logger.error('FCM 토큰 가져오기 실패',
+          error: e, stackTrace: stackTrace, tag: 'FCM');
       return null;
     }
   }
@@ -175,7 +181,8 @@ class FcmService {
       await _messaging.deleteToken();
       Logger.info('FCM 토큰 삭제 완료', tag: 'FCM');
     } catch (e, stackTrace) {
-      Logger.error('FCM 토큰 삭제 실패', error: e, stackTrace: stackTrace, tag: 'FCM');
+      Logger.error('FCM 토큰 삭제 실패',
+          error: e, stackTrace: stackTrace, tag: 'FCM');
     }
   }
 }

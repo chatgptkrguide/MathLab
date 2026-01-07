@@ -44,7 +44,8 @@ class StatCard extends StatelessWidget {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final isVerySmall = constraints.maxHeight < 80 || constraints.maxWidth < 80;
+            final isVerySmall =
+                constraints.maxHeight < 80 || constraints.maxWidth < 80;
 
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +62,9 @@ class StatCard extends StatelessWidget {
                 Flexible(
                   child: Text(
                     label,
-                    style: (isVerySmall ? AppTextStyles.labelSmall : AppTextStyles.statLabel),
+                    style: (isVerySmall
+                        ? AppTextStyles.labelSmall
+                        : AppTextStyles.statLabel),
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     maxLines: isVerySmall ? 1 : 2,

@@ -183,7 +183,8 @@ class ErrorNoteNotifier extends BaseNotifier<List<ErrorNote>> {
       unreviewed: userNotes.where((note) => note.reviewCount == 0).length,
       reviewedOnce: userNotes.where((note) => note.reviewCount == 1).length,
       reviewedTwice: userNotes.where((note) => note.reviewCount >= 2).length,
-      mastered: userNotes.where((note) => note.status == ErrorStatus.mastered).length,
+      mastered:
+          userNotes.where((note) => note.status == ErrorStatus.mastered).length,
       needingReview: userNotes.where((note) => note.needsReview).length,
     );
   }
@@ -200,15 +201,19 @@ class ErrorNoteNotifier extends BaseNotifier<List<ErrorNote>> {
 
     // 필터 적용
     if (category != null) {
-      filteredNotes = filteredNotes.where((note) => note.category == category).toList();
+      filteredNotes =
+          filteredNotes.where((note) => note.category == category).toList();
     }
 
     if (maxDifficulty != null) {
-      filteredNotes = filteredNotes.where((note) => note.difficulty <= maxDifficulty).toList();
+      filteredNotes = filteredNotes
+          .where((note) => note.difficulty <= maxDifficulty)
+          .toList();
     }
 
     if (status != null) {
-      filteredNotes = filteredNotes.where((note) => note.status == status).toList();
+      filteredNotes =
+          filteredNotes.where((note) => note.status == status).toList();
     }
 
     // 복습이 필요한 순서대로 정렬
@@ -325,12 +330,14 @@ class ErrorNoteStats {
 }
 
 /// 프로바이더들
-final errorNoteProvider = StateNotifierProvider<ErrorNoteNotifier, List<ErrorNote>>((ref) {
+final errorNoteProvider =
+    StateNotifierProvider<ErrorNoteNotifier, List<ErrorNote>>((ref) {
   return ErrorNoteNotifier();
 });
 
 /// 편의 프로바이더들
-final errorNoteStatsProvider = Provider.family<ErrorNoteStats, String>((ref, userId) {
+final errorNoteStatsProvider =
+    Provider.family<ErrorNoteStats, String>((ref, userId) {
   final errorNotes = ref.watch(errorNoteProvider);
   final userNotes = errorNotes.where((note) => note.userId == userId).toList();
 
@@ -339,19 +346,22 @@ final errorNoteStatsProvider = Provider.family<ErrorNoteStats, String>((ref, use
     unreviewed: userNotes.where((note) => note.reviewCount == 0).length,
     reviewedOnce: userNotes.where((note) => note.reviewCount == 1).length,
     reviewedTwice: userNotes.where((note) => note.reviewCount >= 2).length,
-    mastered: userNotes.where((note) => note.status == ErrorStatus.mastered).length,
+    mastered:
+        userNotes.where((note) => note.status == ErrorStatus.mastered).length,
     needingReview: userNotes.where((note) => note.needsReview).length,
   );
 });
 
-final reviewNeededNotesProvider = Provider.family<List<ErrorNote>, String>((ref, userId) {
+final reviewNeededNotesProvider =
+    Provider.family<List<ErrorNote>, String>((ref, userId) {
   final errorNotes = ref.watch(errorNoteProvider);
   return errorNotes
       .where((note) => note.userId == userId && note.needsReview)
       .toList();
 });
 
-final scheduledReviewNotesProvider = Provider.family<List<ErrorNote>, String>((ref, userId) {
+final scheduledReviewNotesProvider =
+    Provider.family<List<ErrorNote>, String>((ref, userId) {
   final errorNotes = ref.watch(errorNoteProvider);
   final now = DateTime.now();
 

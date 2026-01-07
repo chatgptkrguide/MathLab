@@ -128,9 +128,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                 vertical: 12,
               ),
               decoration: BoxDecoration(
-                color: isMe
-                    ? AppColors.primary
-                    : AppColors.surface,
+                color: isMe ? AppColors.primary : AppColors.surface,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -283,7 +281,8 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     if (content.isEmpty) return;
 
     final user = ref.read(userProvider);
-    final notifier = ref.read(chatMessagesProvider(widget.chatRoom.id).notifier);
+    final notifier =
+        ref.read(chatMessagesProvider(widget.chatRoom.id).notifier);
 
     // 메시지 전송
     await notifier.sendMessage(
@@ -311,18 +310,21 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
 
   /// AI 학습 도우미 자동 응답
   Future<void> _sendAssistantResponse(String userMessage) async {
-    final notifier = ref.read(chatMessagesProvider(widget.chatRoom.id).notifier);
+    final notifier =
+        ref.read(chatMessagesProvider(widget.chatRoom.id).notifier);
 
     // 간단한 응답 로직 (실제로는 AI API 연동 필요)
     String response;
     if (userMessage.contains('문제') || userMessage.contains('풀이')) {
       response = '문제를 풀어드리겠습니다! 문제의 내용을 자세히 알려주시면, 단계별로 설명해드릴게요. 📝';
     } else if (userMessage.contains('개념') || userMessage.contains('설명')) {
-      response = '개념 설명을 도와드리겠습니다! 어떤 개념에 대해 궁금하신가요? 예를 들어, 함수, 방정식, 도형 등을 말씀해주세요. 📚';
+      response =
+          '개념 설명을 도와드리겠습니다! 어떤 개념에 대해 궁금하신가요? 예를 들어, 함수, 방정식, 도형 등을 말씀해주세요. 📚';
     } else if (userMessage.contains('도와') || userMessage.contains('질문')) {
       response = '네, 무엇을 도와드릴까요? 수학 문제나 개념에 대해 자유롭게 질문해주세요! 😊';
     } else {
-      response = '흥미로운 질문이네요! 더 자세히 설명해주시면 도움을 드릴 수 있을 것 같습니다. 어떤 부분이 궁금하신가요? 🤔';
+      response =
+          '흥미로운 질문이네요! 더 자세히 설명해주시면 도움을 드릴 수 있을 것 같습니다. 어떤 부분이 궁금하신가요? 🤔';
     }
 
     await notifier.sendMessage(
@@ -375,16 +377,21 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               leading: const Icon(Icons.refresh),
               title: const Text('새로고침'),
               onTap: () {
-                ref.read(chatMessagesProvider(widget.chatRoom.id).notifier).refresh();
+                ref
+                    .read(chatMessagesProvider(widget.chatRoom.id).notifier)
+                    .refresh();
                 Navigator.pop(context);
               },
             ),
             if (widget.chatRoom.type != ChatRoomType.assistant)
               ListTile(
                 leading: const Icon(Icons.delete, color: AppColors.error),
-                title: const Text('대화 삭제', style: TextStyle(color: AppColors.error)),
+                title: const Text('대화 삭제',
+                    style: TextStyle(color: AppColors.error)),
                 onTap: () async {
-                  await ref.read(chatRoomsProvider.notifier).deleteChatRoom(widget.chatRoom.id);
+                  await ref
+                      .read(chatRoomsProvider.notifier)
+                      .deleteChatRoom(widget.chatRoom.id);
                   if (context.mounted) {
                     Navigator.pop(context); // 옵션 닫기
                     Navigator.pop(context); // 채팅 화면 닫기

@@ -36,9 +36,12 @@ class LearningPathPainter extends CustomPainter {
       final controlPoint2Y = startY + (endY - startY) * 0.7;
 
       path.cubicTo(
-        controlPoint1X, controlPoint1Y,
-        controlPoint2X, controlPoint2Y,
-        endX, endY,
+        controlPoint1X,
+        controlPoint1Y,
+        controlPoint2X,
+        controlPoint2Y,
+        endX,
+        endY,
       );
     }
 

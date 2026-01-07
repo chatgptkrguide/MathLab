@@ -28,7 +28,9 @@ class PracticeCategoryCard extends ConsumerWidget {
         if (category == PracticeCategory.errorNote) {
           await ref.read(practiceProvider.notifier).startErrorNotePractice();
         } else {
-          await ref.read(practiceProvider.notifier).startCategoryPractice(category);
+          await ref
+              .read(practiceProvider.notifier)
+              .startCategoryPractice(category);
         }
 
         if (context.mounted) {

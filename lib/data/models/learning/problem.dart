@@ -77,9 +77,14 @@ class Problem {
       ),
       category: json['category'] as String,
       difficulty: json['difficulty'] as int,
-      choices: (json['choices'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      choices: (json['choices'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
       answer: json['answer'],
-      hints: (json['hints'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      hints:
+          (json['hints'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              [],
       explanation: json['explanation'] as String?,
       imageUrl: json['imageUrl'] as String?,
       answerImageUrl: json['answerImageUrl'] as String?,
@@ -108,9 +113,15 @@ class Problem {
   // 기존 코드 호환성을 위한 getter들
   List<String>? get options => choices.isNotEmpty ? choices : null;
   String? get lessonId => metadata?['lessonId'] as String?;
-  List<String> get tags => (metadata?['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+  List<String> get tags =>
+      (metadata?['tags'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ??
+      [];
   int get xpReward => (metadata?['xpReward'] as int?) ?? 10;
-  String? get correctAnswer => answer is String ? answer as String : (answer is int && choices.isNotEmpty ? choices[answer as int] : null);
+  String? get correctAnswer => answer is String
+      ? answer as String
+      : (answer is int && choices.isNotEmpty ? choices[answer as int] : null);
   int? get correctAnswerIndex => answer is int ? answer as int : null;
 
   // 한국 교육과정 관련 getter들
@@ -118,10 +129,12 @@ class Problem {
   String? get chapter => metadata?['chapter'] as String?;
 
   /// 학교급 (초등/중등/고등) 추출
-  SchoolLevel? get schoolLevel => grade != null ? SchoolLevel.fromGrade(grade!) : null;
+  SchoolLevel? get schoolLevel =>
+      grade != null ? SchoolLevel.fromGrade(grade!) : null;
 
   /// 학년 번호 (1-6 또는 1-3)
-  int? get gradeNumber => grade != null ? SchoolLevel.getGradeNumber(grade!) : null;
+  int? get gradeNumber =>
+      grade != null ? SchoolLevel.getGradeNumber(grade!) : null;
 
   String get typeIcon {
     switch (type) {

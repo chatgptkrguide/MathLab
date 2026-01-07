@@ -24,10 +24,12 @@ class SocialLoginButton extends StatelessWidget {
       button: true,
       enabled: enabled,
       label: _getButtonText(),
-      onTap: enabled ? () async {
-        await AppHapticFeedback.selectionClick();
-        onPressed?.call();
-      } : null,
+      onTap: enabled
+          ? () async {
+              await AppHapticFeedback.selectionClick();
+              onPressed?.call();
+            }
+          : null,
       child: Container(
         width: double.infinity,
         height: 56,
@@ -52,20 +54,26 @@ class SocialLoginButton extends StatelessWidget {
             // Main button
             Container(
               decoration: BoxDecoration(
-                color: enabled ? _getBackgroundColor() : AppColors.borderLight, // GoMath disabled gray
+                color: enabled
+                    ? _getBackgroundColor()
+                    : AppColors.borderLight, // GoMath disabled gray
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: enabled ? _getShadowColor() : AppColors.borderLight.withOpacity(0.8), // Darker border
+                  color: enabled
+                      ? _getShadowColor()
+                      : AppColors.borderLight.withOpacity(0.8), // Darker border
                   width: 3,
                 ),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: enabled ? () async {
-                    await AppHapticFeedback.selectionClick();
-                    onPressed?.call();
-                  } : null,
+                  onTap: enabled
+                      ? () async {
+                          await AppHapticFeedback.selectionClick();
+                          onPressed?.call();
+                        }
+                      : null,
                   borderRadius: BorderRadius.circular(12),
                   child: Center(
                     child: Padding(
@@ -79,7 +87,8 @@ class SocialLoginButton extends StatelessWidget {
                               width: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation(_getTextColor()),
+                                valueColor:
+                                    AlwaysStoppedAnimation(_getTextColor()),
                               ),
                             )
                           : Row(

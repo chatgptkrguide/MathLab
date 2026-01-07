@@ -26,7 +26,8 @@ class ProblemNotifier extends BaseNotifier<List<Problem>> {
       () async {
         logInfo('문제 데이터 로드 시작');
 
-        final String data = await rootBundle.loadString('assets/data/problems.json');
+        final String data =
+            await rootBundle.loadString('assets/data/problems.json');
         final Map<String, dynamic> jsonData = jsonDecode(data);
         final List<dynamic> problemsData = jsonData['problems'];
 
@@ -60,9 +61,8 @@ class ProblemNotifier extends BaseNotifier<List<Problem>> {
 
   /// 랜덤 문제 조회
   List<Problem> getRandomProblems({int count = 10, String? category}) {
-    List<Problem> filteredProblems = category != null
-        ? getProblemsByCategory(category)
-        : state;
+    List<Problem> filteredProblems =
+        category != null ? getProblemsByCategory(category) : state;
 
     if (filteredProblems.isEmpty) {
       logWarning('랜덤 문제 조회 실패: 문제 없음');
@@ -148,7 +148,8 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
         final data = await loadListFromStorage(GameConstants.problemResultsKey);
         if (data != null) {
           final results = data
-              .map((item) => ProblemResult.fromJson(item as Map<String, dynamic>))
+              .map((item) =>
+                  ProblemResult.fromJson(item as Map<String, dynamic>))
               .toList();
           state = results;
           logInfo('문제 결과 ${results.length}개 로드 완료');
@@ -195,7 +196,8 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
   }
 
   /// 카테고리별 정답률
-  Map<String, double> getCategoryAccuracy(String userId, List<Problem> problems) {
+  Map<String, double> getCategoryAccuracy(
+      String userId, List<Problem> problems) {
     final userResults = getResultsByUser(userId);
     final categoryAccuracy = <String, double>{};
 
@@ -205,15 +207,15 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
           .toList();
 
       if (categoryResults.isNotEmpty) {
-        final correctCount = categoryResults
-            .where((result) => result.isCorrect)
-            .length;
+        final correctCount =
+            categoryResults.where((result) => result.isCorrect).length;
 
         if (!categoryAccuracy.containsKey(problem.category)) {
           categoryAccuracy[problem.category] = 0.0;
         }
 
-        categoryAccuracy[problem.category] = correctCount / categoryResults.length;
+        categoryAccuracy[problem.category] =
+            correctCount / categoryResults.length;
       }
     }
 
@@ -232,16 +234,14 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
     final today = DateTime(now.year, now.month, now.day);
 
     final userResults = getResultsByUser(userId);
-    return userResults
-        .where((result) {
-          final resultDate = DateTime(
-            result.solvedAt.year,
-            result.solvedAt.month,
-            result.solvedAt.day,
-          );
-          return resultDate.isAtSameMomentAs(today);
-        })
-        .length;
+    return userResults.where((result) {
+      final resultDate = DateTime(
+        result.solvedAt.year,
+        result.solvedAt.month,
+        result.solvedAt.day,
+      );
+      return resultDate.isAtSameMomentAs(today);
+    }).length;
   }
 
   /// 틀린 문제들 조회 (오답 노트용)
@@ -272,7 +272,8 @@ class ProblemResultsNotifier extends BaseNotifier<List<ProblemResult>> {
     final userResults = getResultsByUser(userId);
     if (userResults.isEmpty) return 0.0;
 
-    final totalTime = userResults.fold(0, (total, result) => total + result.timeSpentSeconds);
+    final totalTime =
+        userResults.fold(0, (total, result) => total + result.timeSpentSeconds);
     return totalTime / userResults.length;
   }
 
@@ -400,7 +401,8 @@ class LearningSession {
   /// 평균 풀이 시간
   double get averageTimePerProblem {
     if (results.isEmpty) return 0.0;
-    final totalTime = results.fold(0, (total, result) => total + result.timeSpentSeconds);
+    final totalTime =
+        results.fold(0, (total, result) => total + result.timeSpentSeconds);
     return totalTime / results.length;
   }
 
@@ -435,7 +437,8 @@ class LearningSessionSummary {
   });
 
   /// 정답률
-  double get accuracy => totalProblems > 0 ? correctAnswers / totalProblems : 0.0;
+  double get accuracy =>
+      totalProblems > 0 ? correctAnswers / totalProblems : 0.0;
 
   /// 성과 등급
   String get performanceGrade {
@@ -449,22 +452,26 @@ class LearningSessionSummary {
 }
 
 /// 프로바이더들
-final problemProvider = StateNotifierProvider<ProblemNotifier, List<Problem>>((ref) {
+final problemProvider =
+    StateNotifierProvider<ProblemNotifier, List<Problem>>((ref) {
   return ProblemNotifier();
 });
 
-final problemResultsProvider = StateNotifierProvider<ProblemResultsNotifier, List<ProblemResult>>((ref) {
+final problemResultsProvider =
+    StateNotifierProvider<ProblemResultsNotifier, List<ProblemResult>>((ref) {
   return ProblemResultsNotifier();
 });
 
-final learningSessionProvider = StateNotifierProvider<LearningSessionNotifier, LearningSession?>((ref) {
+final learningSessionProvider =
+    StateNotifierProvider<LearningSessionNotifier, LearningSession?>((ref) {
   return LearningSessionNotifier();
 });
 
 /// 편의 프로바이더들
 final currentProblemProvider = Provider<Problem?>((ref) {
   final session = ref.watch(learningSessionProvider);
-  if (session == null || session.currentProblemIndex >= session.problems.length) {
+  if (session == null ||
+      session.currentProblemIndex >= session.problems.length) {
     return null;
   }
   return session.problems[session.currentProblemIndex];

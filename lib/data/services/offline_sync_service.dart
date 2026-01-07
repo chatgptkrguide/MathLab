@@ -34,7 +34,8 @@ class OfflineSyncService {
 
       Logger.info('오프라인 동기화 서비스 초기화 완료 (온라인: $_isOnline)', tag: 'OfflineSync');
     } catch (e, stackTrace) {
-      Logger.error('오프라인 동기화 서비스 초기화 실패', error: e, stackTrace: stackTrace, tag: 'OfflineSync');
+      Logger.error('오프라인 동기화 서비스 초기화 실패',
+          error: e, stackTrace: stackTrace, tag: 'OfflineSync');
     }
   }
 
@@ -51,7 +52,9 @@ class OfflineSyncService {
     final wasOnline = _isOnline;
     _isOnline = _isConnected(results);
 
-    Logger.info('네트워크 상태 변경: ${wasOnline ? "온라인" : "오프라인"} → ${_isOnline ? "온라인" : "오프라인"}', tag: 'OfflineSync');
+    Logger.info(
+        '네트워크 상태 변경: ${wasOnline ? "온라인" : "오프라인"} → ${_isOnline ? "온라인" : "오프라인"}',
+        tag: 'OfflineSync');
 
     // 오프라인에서 온라인으로 전환되면 동기화 시도
     if (!wasOnline && _isOnline) {
@@ -68,7 +71,8 @@ class OfflineSyncService {
 
       // 큐 크기 제한 확인
       if (queue.length >= _maxQueueSize) {
-        Logger.warning('동기화 큐가 가득 찼습니다 (${queue.length}/$_maxQueueSize)', tag: 'OfflineSync');
+        Logger.warning('동기화 큐가 가득 찼습니다 (${queue.length}/$_maxQueueSize)',
+            tag: 'OfflineSync');
         // 가장 오래된 항목 제거
         queue.removeAt(0);
       }
@@ -77,7 +81,8 @@ class OfflineSyncService {
       queue.add(operation.toJson());
       await prefs.setString(_queueKey, jsonEncode(queue));
 
-      Logger.info('동기화 큐에 작업 추가: ${operation.type} (큐 크기: ${queue.length})', tag: 'OfflineSync');
+      Logger.info('동기화 큐에 작업 추가: ${operation.type} (큐 크기: ${queue.length})',
+          tag: 'OfflineSync');
 
       // 온라인 상태이면 즉시 동기화 시도
       if (_isOnline && !_isSyncing) {
@@ -86,7 +91,8 @@ class OfflineSyncService {
 
       return true;
     } catch (e, stackTrace) {
-      Logger.error('동기화 큐 추가 실패', error: e, stackTrace: stackTrace, tag: 'OfflineSync');
+      Logger.error('동기화 큐 추가 실패',
+          error: e, stackTrace: stackTrace, tag: 'OfflineSync');
       return false;
     }
   }
@@ -140,9 +146,11 @@ class OfflineSyncService {
       // 실패한 작업만 다시 큐에 저장
       await prefs.setString(_queueKey, jsonEncode(failedOperations));
 
-      Logger.info('동기화 완료: 성공 $successCount개, 실패 ${failedOperations.length}개', tag: 'OfflineSync');
+      Logger.info('동기화 완료: 성공 $successCount개, 실패 ${failedOperations.length}개',
+          tag: 'OfflineSync');
     } catch (e, stackTrace) {
-      Logger.error('동기화 실패', error: e, stackTrace: stackTrace, tag: 'OfflineSync');
+      Logger.error('동기화 실패',
+          error: e, stackTrace: stackTrace, tag: 'OfflineSync');
     } finally {
       _isSyncing = false;
     }
@@ -151,7 +159,8 @@ class OfflineSyncService {
   /// 개별 작업 실행
   Future<bool> _executeOperation(SyncOperation operation) async {
     try {
-      Logger.debug('작업 실행: ${operation.type} - ${operation.endpoint}', tag: 'OfflineSync');
+      Logger.debug('작업 실행: ${operation.type} - ${operation.endpoint}',
+          tag: 'OfflineSync');
 
       // TODO: 실제 API 호출 로직 구현
       // final response = await dio.request(
@@ -168,7 +177,8 @@ class OfflineSyncService {
       await Future.delayed(const Duration(milliseconds: 100));
       return true;
     } catch (e, stackTrace) {
-      Logger.error('작업 실행 실패: ${operation.type}', error: e, stackTrace: stackTrace, tag: 'OfflineSync');
+      Logger.error('작업 실행 실패: ${operation.type}',
+          error: e, stackTrace: stackTrace, tag: 'OfflineSync');
       return false;
     }
   }
@@ -182,7 +192,8 @@ class OfflineSyncService {
 
       return queue.map((json) => SyncOperation.fromJson(json)).toList();
     } catch (e, stackTrace) {
-      Logger.error('큐 조회 실패', error: e, stackTrace: stackTrace, tag: 'OfflineSync');
+      Logger.error('큐 조회 실패',
+          error: e, stackTrace: stackTrace, tag: 'OfflineSync');
       return [];
     }
   }
@@ -200,7 +211,8 @@ class OfflineSyncService {
       await prefs.remove(_queueKey);
       Logger.info('동기화 큐 전체 삭제', tag: 'OfflineSync');
     } catch (e, stackTrace) {
-      Logger.error('큐 삭제 실패', error: e, stackTrace: stackTrace, tag: 'OfflineSync');
+      Logger.error('큐 삭제 실패',
+          error: e, stackTrace: stackTrace, tag: 'OfflineSync');
     }
   }
 
@@ -273,13 +285,13 @@ class SyncOperation {
 
 /// 동기화 작업 타입
 enum SyncOperationType {
-  problemAnswer,    // 문제 답변 제출
-  studySession,     // 학습 세션 기록
-  achievement,      // 업적 달성
-  userProgress,     // 사용자 진행 상황
-  wrongAnswer,      // 오답 저장
-  friendRequest,    // 친구 요청
-  message,          // 메시지 전송
-  settings,         // 설정 변경
-  other,            // 기타
+  problemAnswer, // 문제 답변 제출
+  studySession, // 학습 세션 기록
+  achievement, // 업적 달성
+  userProgress, // 사용자 진행 상황
+  wrongAnswer, // 오답 저장
+  friendRequest, // 친구 요청
+  message, // 메시지 전송
+  settings, // 설정 변경
+  other, // 기타
 }

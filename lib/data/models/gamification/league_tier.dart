@@ -83,7 +83,8 @@ class TierInfo {
       lastActiveDate: DateTime.parse(json['lastActiveDate'] as String),
       consecutiveInactiveDays: json['consecutiveInactiveDays'] as int? ?? 0,
       canRecover: json['canRecover'] as bool? ?? false,
-      problemsSolvedSinceDemotion: json['problemsSolvedSinceDemotion'] as int? ?? 0,
+      problemsSolvedSinceDemotion:
+          json['problemsSolvedSinceDemotion'] as int? ?? 0,
     );
   }
 
@@ -104,7 +105,8 @@ class TierInfo {
       points: points ?? this.points,
       rank: rank ?? this.rank,
       lastActiveDate: lastActiveDate ?? this.lastActiveDate,
-      consecutiveInactiveDays: consecutiveInactiveDays ?? this.consecutiveInactiveDays,
+      consecutiveInactiveDays:
+          consecutiveInactiveDays ?? this.consecutiveInactiveDays,
       canRecover: canRecover ?? this.canRecover,
       problemsSolvedSinceDemotion:
           problemsSolvedSinceDemotion ?? this.problemsSolvedSinceDemotion,

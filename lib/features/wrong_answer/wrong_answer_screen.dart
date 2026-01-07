@@ -76,19 +76,22 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                     // 복습 필요 탭
                     ReviewNeededTab(
                       provider: provider,
-                      onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
+                      onTap: (wrongAnswer) =>
+                          _navigateToProblem(context, wrongAnswer),
                     ),
 
                     // 최근 오답 탭
                     RecentTab(
                       provider: provider,
-                      onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
+                      onTap: (wrongAnswer) =>
+                          _navigateToProblem(context, wrongAnswer),
                     ),
 
                     // 완료 탭
                     MasteredTab(
                       provider: provider,
-                      onTap: (wrongAnswer) => _navigateToProblem(context, wrongAnswer),
+                      onTap: (wrongAnswer) =>
+                          _navigateToProblem(context, wrongAnswer),
                     ),
                   ],
                 ),
@@ -99,7 +102,6 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
       ),
     );
   }
-
 
   /// 통계 카드 - 심플하고 깔끔한 디자인
   Widget _buildStatsCards(WrongAnswerState state) {
@@ -221,14 +223,16 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                   ),
                 ),
                 const SizedBox(width: 8),
-                if (state.selectedCategory != null || state.selectedDifficulty != null)
+                if (state.selectedCategory != null ||
+                    state.selectedDifficulty != null)
                   GestureDetector(
                     onTap: () {
                       provider.clearFilters();
                       AppHapticFeedback.lightImpact();
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.errorRed.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -262,14 +266,19 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                       backgroundColor: AppColors.background,
                       selectedColor: AppColors.mathBlue,
                       labelStyle: TextStyle(
-                        color: isSelected ? AppColors.surface : AppColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        color: isSelected
+                            ? AppColors.surface
+                            : AppColors.textPrimary,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w600,
                         fontSize: 14,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
-                          color: isSelected ? AppColors.mathBlue : AppColors.borderLight,
+                          color: isSelected
+                              ? AppColors.mathBlue
+                              : AppColors.borderLight,
                           width: 1.5,
                         ),
                       ),
@@ -324,8 +333,11 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                       backgroundColor: AppColors.background,
                       selectedColor: color,
                       labelStyle: TextStyle(
-                        color: isSelected ? AppColors.surface : AppColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        color: isSelected
+                            ? AppColors.surface
+                            : AppColors.textPrimary,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w600,
                         fontSize: 14,
                       ),
                       shape: RoundedRectangleBorder(

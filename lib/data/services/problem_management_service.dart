@@ -50,8 +50,7 @@ class ProblemManagementService {
         // 기존 문제 업데이트
         final existing = statuses[existingIndex];
         final newAttempts = [...existing.attempts, attempt];
-        final newCorrectCount =
-            existing.correctCount + (isCorrect ? 1 : 0);
+        final newCorrectCount = existing.correctCount + (isCorrect ? 1 : 0);
 
         // 상태 결정
         ProblemState newState;
@@ -254,8 +253,7 @@ class ProblemManagementService {
       // 전체 정답률 계산
       double overallAccuracy = 0.0;
       if (totalProblems > 0) {
-        final totalCorrect =
-            statuses.fold(0, (sum, s) => sum + s.correctCount);
+        final totalCorrect = statuses.fold(0, (sum, s) => sum + s.correctCount);
         final totalAttempts =
             statuses.fold(0, (sum, s) => sum + s.attemptCount);
         if (totalAttempts > 0) {

@@ -21,7 +21,8 @@ class LessonsScreenFigma extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
     final displayGrade = user?.currentGrade ?? '중1';
-    final currentLessonIndex = ref.watch(currentLessonIndexProvider(displayGrade));
+    final currentLessonIndex =
+        ref.watch(currentLessonIndexProvider(displayGrade));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -34,7 +35,8 @@ class LessonsScreenFigma extends ConsumerWidget {
             children: [
               // 상단 바 (학습 제목 + 메뉴 버튼)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -50,7 +52,8 @@ class LessonsScreenFigma extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.menu, color: AppColors.headerText, size: 28),
+                      icon: const Icon(Icons.menu,
+                          color: AppColors.headerText, size: 28),
                       onPressed: () {
                         _showGradeSelectionDrawer(context, ref);
                       },
@@ -119,13 +122,15 @@ class LessonsScreenFigma extends ConsumerWidget {
   }
 
   /// 듀오링고 스타일 학습 경로 (지그재그 레이아웃)
-  Widget _buildLearningPath(BuildContext context, WidgetRef ref, int currentLessonIndex) {
+  Widget _buildLearningPath(
+      BuildContext context, WidgetRef ref, int currentLessonIndex) {
     final screenWidth = MediaQuery.of(context).size.width;
     final user = ref.watch(userProvider);
     final displayGrade = user?.currentGrade ?? '중1';
 
     // 현재 학년에 따른 한국 수학 교육과정 데이터 가져오기
-    final curriculumLessons = KoreanMathCurriculum.getLessonsByGrade(displayGrade);
+    final curriculumLessons =
+        KoreanMathCurriculum.getLessonsByGrade(displayGrade);
 
     // 레슨 데이터를 UI 형식으로 변환
     final lessons = curriculumLessons.asMap().entries.map((entry) {
@@ -163,9 +168,11 @@ class LessonsScreenFigma extends ConsumerWidget {
                 bottom: index == lessons.length - 1 ? 100 : 0,
               ),
               child: Align(
-                alignment: isLeft ? Alignment.centerLeft : Alignment.centerRight,
+                alignment:
+                    isLeft ? Alignment.centerLeft : Alignment.centerRight,
                 child: Container(
-                  margin: EdgeInsets.only(left: isLeft ? 24 : 0, right: isLeft ? 0 : 24),
+                  margin: EdgeInsets.only(
+                      left: isLeft ? 24 : 0, right: isLeft ? 0 : 24),
                   child: LessonCard(
                     image: lesson['image'] as String,
                     label: lesson['label'] as String,
@@ -173,7 +180,8 @@ class LessonsScreenFigma extends ConsumerWidget {
                     isCurrent: index == currentLessonIndex,
                     isCompleted: lesson['isCompleted'] as bool,
                     height: 160,
-                    onTap: () => _navigateToProblems(context, ref, lesson['lessonId'] as String?),
+                    onTap: () => _navigateToProblems(
+                        context, ref, lesson['lessonId'] as String?),
                     onLongPress: () => _showLessonOptions(
                       context,
                       ref,
@@ -193,18 +201,28 @@ class LessonsScreenFigma extends ConsumerWidget {
   /// 레슨 인덱스에 따른 이미지 파일명 반환
   String _getLessonImage(int index) {
     final images = [
-      'book_pencil', 'book', 'rulers', 'bag', 'clock',
-      'winner', 'laptop', 'globe', 'blackboard', 'microscope',
+      'book_pencil',
+      'book',
+      'rulers',
+      'bag',
+      'clock',
+      'winner',
+      'laptop',
+      'globe',
+      'blackboard',
+      'microscope',
     ];
     return images[index % images.length];
   }
 
   /// 문제 풀이 화면으로 네비게이션
-  Future<void> _navigateToProblems(BuildContext context, WidgetRef ref, String? lessonId) async {
+  Future<void> _navigateToProblems(
+      BuildContext context, WidgetRef ref, String? lessonId) async {
     if (lessonId == null) return;
 
     // 문제 데이터 가져오기
-    final problems = ref.read(problemProvider.notifier).getProblemsByLesson(lessonId);
+    final problems =
+        ref.read(problemProvider.notifier).getProblemsByLesson(lessonId);
 
     // 문제 풀이 화면으로 이동
     if (context.mounted) {
@@ -264,7 +282,8 @@ class LessonsScreenFigma extends ConsumerWidget {
 
             // 레벨 스킵 테스트 옵션
             ListTile(
-              leading: const Icon(Icons.flash_on, color: AppColors.warning, size: 32),
+              leading: const Icon(Icons.flash_on,
+                  color: AppColors.warning, size: 32),
               title: const Text(
                 '레벨 스킵 테스트',
                 style: TextStyle(
@@ -290,7 +309,8 @@ class LessonsScreenFigma extends ConsumerWidget {
 
             // 일반 학습 옵션
             ListTile(
-              leading: const Icon(Icons.play_arrow, color: AppColors.primary, size: 32),
+              leading: const Icon(Icons.play_arrow,
+                  color: AppColors.primary, size: 32),
               title: const Text(
                 '일반 학습 시작',
                 style: TextStyle(

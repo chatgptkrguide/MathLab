@@ -183,7 +183,8 @@ abstract class BaseRepository<T extends BaseModel> {
       _logInfo('Document fetched: $id');
       return RepositoryResult.success(data);
     } catch (e, stackTrace) {
-      _logError('Failed to fetch document: $id', error: e, stackTrace: stackTrace);
+      _logError('Failed to fetch document: $id',
+          error: e, stackTrace: stackTrace);
       return RepositoryResult.failure(e.toString());
     }
   }
@@ -191,7 +192,8 @@ abstract class BaseRepository<T extends BaseModel> {
   /// 모든 문서 조회
   Future<RepositoryResult<List<T>>> getAll({
     int? limit,
-    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)? queryBuilder,
+    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)?
+        queryBuilder,
   }) async {
     try {
       _logDebug('Fetching all documents');
@@ -219,7 +221,9 @@ abstract class BaseRepository<T extends BaseModel> {
 
   /// 조건부 쿼리
   Future<RepositoryResult<List<T>>> query(
-    Query<Map<String, dynamic>> Function(CollectionReference<Map<String, dynamic>>) queryBuilder,
+    Query<Map<String, dynamic>> Function(
+            CollectionReference<Map<String, dynamic>>)
+        queryBuilder,
   ) async {
     try {
       _logDebug('Executing query');
@@ -266,7 +270,8 @@ abstract class BaseRepository<T extends BaseModel> {
 
       return RepositoryResult.success(null);
     } catch (e, stackTrace) {
-      _logError('Failed to update document: ${item.id}', error: e, stackTrace: stackTrace);
+      _logError('Failed to update document: ${item.id}',
+          error: e, stackTrace: stackTrace);
       return RepositoryResult.failure(e.toString());
     }
   }
@@ -283,7 +288,8 @@ abstract class BaseRepository<T extends BaseModel> {
 
       return RepositoryResult.success(null);
     } catch (e, stackTrace) {
-      _logError('Failed to delete document: $id', error: e, stackTrace: stackTrace);
+      _logError('Failed to delete document: $id',
+          error: e, stackTrace: stackTrace);
       return RepositoryResult.failure(e.toString());
     }
   }
@@ -294,7 +300,8 @@ abstract class BaseRepository<T extends BaseModel> {
       final doc = await _collection.doc(id).get();
       return doc.exists;
     } catch (e, stackTrace) {
-      _logError('Failed to check existence: $id', error: e, stackTrace: stackTrace);
+      _logError('Failed to check existence: $id',
+          error: e, stackTrace: stackTrace);
       return false;
     }
   }
@@ -387,13 +394,15 @@ abstract class BaseRepository<T extends BaseModel> {
       _saveToCache(id, data);
       return data;
     }).handleError((error, stackTrace) {
-      _logError('Stream error for document: $id', error: error, stackTrace: stackTrace);
+      _logError('Stream error for document: $id',
+          error: error, stackTrace: stackTrace);
     });
   }
 
   /// 모든 문서 실시간 스트림
   Stream<List<T>> watchAll({
-    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)? queryBuilder,
+    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)?
+        queryBuilder,
   }) {
     Query<Map<String, dynamic>> query = _collection;
 
@@ -404,7 +413,8 @@ abstract class BaseRepository<T extends BaseModel> {
     return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => fromFirestore(doc)).toList();
     }).handleError((error, stackTrace) {
-      _logError('Stream error for all documents', error: error, stackTrace: stackTrace);
+      _logError('Stream error for all documents',
+          error: error, stackTrace: stackTrace);
     });
   }
 
@@ -414,7 +424,8 @@ abstract class BaseRepository<T extends BaseModel> {
   Future<RepositoryResult<PaginatedResult<T>>> getPaginated({
     int pageSize = 20,
     DocumentSnapshot? lastDocument,
-    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)? queryBuilder,
+    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)?
+        queryBuilder,
   }) async {
     try {
       Query<Map<String, dynamic>> query = _collection;

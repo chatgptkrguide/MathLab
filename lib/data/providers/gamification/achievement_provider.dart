@@ -26,7 +26,8 @@ class AchievementState {
     return AchievementState(
       achievements: achievements ?? this.achievements,
       unlockedIds: unlockedIds ?? this.unlockedIds,
-      recentlyUnlocked: clearRecent ? null : (recentlyUnlocked ?? this.recentlyUnlocked),
+      recentlyUnlocked:
+          clearRecent ? null : (recentlyUnlocked ?? this.recentlyUnlocked),
     );
   }
 
@@ -37,7 +38,8 @@ class AchievementState {
     for (final achievement in achievements) {
       progressMap[achievement.id] = achievement.currentValue;
       if (achievement.isUnlocked && achievement.unlockedAt != null) {
-        unlockedDates[achievement.id] = achievement.unlockedAt!.toIso8601String();
+        unlockedDates[achievement.id] =
+            achievement.unlockedAt!.toIso8601String();
       }
     }
 
@@ -84,9 +86,11 @@ class AchievementState {
 
   int get unlockedCount => achievements.where((a) => a.isUnlocked).length;
   int get totalCount => achievements.length;
-  double get completionRate => totalCount > 0 ? unlockedCount / totalCount : 0.0;
+  double get completionRate =>
+      totalCount > 0 ? unlockedCount / totalCount : 0.0;
 
-  Achievement firstWhere(bool Function(Achievement) test, {Achievement Function()? orElse}) {
+  Achievement firstWhere(bool Function(Achievement) test,
+      {Achievement Function()? orElse}) {
     return achievements.firstWhere(test, orElse: orElse);
   }
 
@@ -221,13 +225,15 @@ class AchievementProvider extends BaseNotifier<AchievementState> {
   }
 
   /// 업적 조건 체크
-  Future<void> checkAchievements(User user, {Map<String, dynamic>? stats}) async {
+  Future<void> checkAchievements(User user,
+      {Map<String, dynamic>? stats}) async {
     final newlyUnlocked = <Achievement>[];
 
     for (final achievement in state.achievements) {
       if (achievement.isUnlocked) continue;
 
-      final (shouldUnlock, progress) = _evaluateAchievement(achievement, user, stats);
+      final (shouldUnlock, progress) =
+          _evaluateAchievement(achievement, user, stats);
 
       await _updateProgress(achievement.id, progress);
 
@@ -266,7 +272,9 @@ class AchievementProvider extends BaseNotifier<AchievementState> {
         progress = stats?['perfectStreak'] ?? 0;
       case AchievementType.time:
         final bestTime = stats?['bestTime'] ?? double.infinity;
-        progress = (achievement.requiredValue - bestTime).clamp(0, achievement.requiredValue).toInt();
+        progress = (achievement.requiredValue - bestTime)
+            .clamp(0, achievement.requiredValue)
+            .toInt();
         shouldUnlock = bestTime <= achievement.requiredValue;
         return (shouldUnlock, progress);
       default:
@@ -345,12 +353,14 @@ class AchievementProvider extends BaseNotifier<AchievementState> {
 
     if (achievement.id != achievementId) return 0.0;
 
-    return (achievement.currentValue / achievement.requiredValue).clamp(0.0, 1.0);
+    return (achievement.currentValue / achievement.requiredValue)
+        .clamp(0.0, 1.0);
   }
 
   int get unlockedCount => state.unlockedIds.length;
   int get totalCount => state.achievements.length;
-  double get completionRate => totalCount > 0 ? unlockedCount / totalCount : 0.0;
+  double get completionRate =>
+      totalCount > 0 ? unlockedCount / totalCount : 0.0;
 }
 
 /// Achievement 확장 메서드

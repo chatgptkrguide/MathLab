@@ -78,7 +78,8 @@ class UserAccount {
   }
 
   /// 아바타 이미지 또는 이니셜
-  String get avatarText => displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
+  String get avatarText =>
+      displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
 
   /// 계정 타입별 색상
   String get accountColor {

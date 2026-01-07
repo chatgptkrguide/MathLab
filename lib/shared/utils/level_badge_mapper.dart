@@ -41,10 +41,10 @@ class LevelBadgeMapper {
   /// 레벨에 따른 티어 이름 반환
   static String getTierName(int level) {
     if (level <= 0) return '초보자';
-    if (level <= 10) return 'A Tier';    // A Lv1-3
-    if (level <= 20) return 'H Tier';    // H Lv1-3
-    if (level <= 30) return 'GT Tier';   // GT Lv1-3
-    return 'Legend';                      // 레전드
+    if (level <= 10) return 'A Tier'; // A Lv1-3
+    if (level <= 20) return 'H Tier'; // H Lv1-3
+    if (level <= 30) return 'GT Tier'; // GT Lv1-3
+    return 'Legend'; // 레전드
   }
 
   /// 레벨에 따른 세부 랭크 이름 반환
@@ -64,10 +64,10 @@ class LevelBadgeMapper {
 
   /// 레벨에 따른 티어 색상 반환 (hex)
   static int getTierColor(int level) {
-    if (level <= 0) return 0xFF9E9E9E;   // Gray
-    if (level <= 10) return 0xFF9C27B0;  // A - Purple
-    if (level <= 20) return 0xFF2196F3;  // H - Blue
-    if (level <= 30) return 0xFF4CAF50;  // GT - Green
-    return 0xFFFFD700;                    // Legend - Gold
+    if (level <= 0) return 0xFF9E9E9E; // Gray
+    if (level <= 10) return 0xFF9C27B0; // A - Purple
+    if (level <= 20) return 0xFF2196F3; // H - Blue
+    if (level <= 30) return 0xFF4CAF50; // GT - Green
+    return 0xFFFFD700; // Legend - Gold
   }
 }

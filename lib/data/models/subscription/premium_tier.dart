@@ -89,7 +89,8 @@ enum PremiumTier {
   bool get isPremium => this != PremiumTier.free;
 
   /// 정기 구독 여부 (자동 갱신 가능)
-  bool get isRecurring => this == PremiumTier.monthly || this == PremiumTier.yearly;
+  bool get isRecurring =>
+      this == PremiumTier.monthly || this == PremiumTier.yearly;
 
   @override
   String toString() => value;

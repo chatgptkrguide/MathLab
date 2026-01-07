@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/game_constants.dart';
 import '../../../data/models/models.dart';
-import '../../profile/figma/profile_detail_screen_v3_new.dart';
+import '../../profile/figma/profile_detail_screen.dart';
 
 /// 홈 화면 상단 섹션
 ///
@@ -61,13 +61,14 @@ class HomeTopSection extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProfileDetailScreenV3New(),
+                    builder: (context) => const ProfileDetailScreen(),
                   ),
                 );
               },
               borderRadius: BorderRadius.circular(28),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [

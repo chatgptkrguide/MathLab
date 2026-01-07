@@ -151,7 +151,8 @@ class _UnifiedButtonState extends State<UnifiedButton>
 
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.isEnabled && !widget.isLoading && widget.onPressed != null;
+    final enabled =
+        widget.isEnabled && !widget.isLoading && widget.onPressed != null;
 
     Widget buttonContent = Container(
       width: widget.width ?? double.infinity,

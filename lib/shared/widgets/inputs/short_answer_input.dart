@@ -110,15 +110,17 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
       builder: (context, child) {
         double shakeOffset = 0;
         if (widget.showResult && !widget.isCorrect) {
-          shakeOffset = _shakeAnimation.value * 10 *
-                       (1 - _shakeAnimation.value) *
-                       (1 - ((_animationController.value * 4) % 1 > 0.5 ? 1 : -1));
+          shakeOffset = _shakeAnimation.value *
+              10 *
+              (1 - _shakeAnimation.value) *
+              (1 - ((_animationController.value * 4) % 1 > 0.5 ? 1 : -1));
         }
 
         return Transform.translate(
           offset: Offset(shakeOffset, 0),
           child: Container(
-            margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
+            margin:
+                const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -149,7 +151,9 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                     style: AppTextStyles.headlineMedium.copyWith(
                       fontWeight: FontWeight.bold,
                       color: widget.showResult
-                          ? (widget.isCorrect ? AppColors.mathGreen : AppColors.duolingoRed)
+                          ? (widget.isCorrect
+                              ? AppColors.mathGreen
+                              : AppColors.duolingoRed)
                           : AppColors.textPrimary,
                     ),
                     decoration: InputDecoration(
@@ -158,14 +162,17 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
                         color: AppColors.textSecondary,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(AppDimensions.paddingL),
+                      contentPadding:
+                          const EdgeInsets.all(AppDimensions.paddingL),
                       suffixIcon: suffixIcon,
                     ),
                     onSubmitted: widget.onSubmitted,
                     inputFormatters: _getInputFormatters(),
                   ),
                 ),
-                if (widget.showResult && !widget.isCorrect && widget.correctAnswer != null)
+                if (widget.showResult &&
+                    !widget.isCorrect &&
+                    widget.correctAnswer != null)
                   Padding(
                     padding: const EdgeInsets.only(top: AppDimensions.spacingS),
                     child: Row(
@@ -198,7 +205,8 @@ class _ShortAnswerInputState extends State<ShortAnswerInput>
     switch (widget.keyboardType) {
       case TextInputType.number:
         return [
-          FilteringTextInputFormatter.allow(RegExp(r'[\d\-\+\.\,\/]')), // 숫자, 사칙연산, 소수점, 분수
+          FilteringTextInputFormatter.allow(
+              RegExp(r'[\d\-\+\.\,\/]')), // 숫자, 사칙연산, 소수점, 분수
         ];
       default:
         return [
@@ -301,7 +309,8 @@ class MathKeyboard extends StatelessWidget {
             backgroundColor: AppColors.background,
             foregroundColor: AppColors.textPrimary,
             elevation: 1,
-            padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
+            padding:
+                const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
@@ -327,7 +336,8 @@ class MathKeyboard extends StatelessWidget {
             backgroundColor: AppColors.duolingoOrange.withOpacity(0.1),
             foregroundColor: AppColors.duolingoOrange,
             elevation: 1,
-            padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
+            padding:
+                const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
@@ -348,7 +358,8 @@ class MathKeyboard extends StatelessWidget {
             backgroundColor: AppColors.duolingoRed.withOpacity(0.1),
             foregroundColor: AppColors.duolingoRed,
             elevation: 1,
-            padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
+            padding:
+                const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),

@@ -113,7 +113,8 @@ class User implements BaseModel {
   /// Firestore DocumentSnapshot으로부터 User 객체 생성
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
-    final createdAt = (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final createdAt =
+        (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
 
     return User(
       id: doc.id,
@@ -124,12 +125,15 @@ class User implements BaseModel {
       xp: data['totalXP'] as int? ?? 0,
       streakDays: data['streak'] as int? ?? 0,
       currentGrade: data['currentGrade'] as String? ?? '중1',
-      avatarUrl: data['photoURL'] as String? ?? data['avatarUrl'] as String? ?? '',
+      avatarUrl:
+          data['photoURL'] as String? ?? data['avatarUrl'] as String? ?? '',
       hearts: data['hearts'] as int? ?? 5,
       dailyXP: data['dailyXP'] as int? ?? 0,
-      lastXPResetDate: (data['lastXPResetDate'] as Timestamp?)?.toDate() ?? createdAt,
+      lastXPResetDate:
+          (data['lastXPResetDate'] as Timestamp?)?.toDate() ?? createdAt,
       lastStudyDate: (data['lastStudyDate'] as Timestamp?)?.toDate(),
-      lastHeartUpdateTime: (data['lastHeartUpdateTime'] as Timestamp?)?.toDate(),
+      lastHeartUpdateTime:
+          (data['lastHeartUpdateTime'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
       birthDate: (data['birthDate'] as Timestamp?)?.toDate(),
       gender: data['gender'] as String?,
@@ -194,9 +198,12 @@ class User implements BaseModel {
       'streakDays': streakDays,
       'hearts': hearts,
       'dailyXP': dailyXP,
-      'lastStudyDate': lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
+      'lastStudyDate':
+          lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
       'lastXPResetDate': Timestamp.fromDate(lastXPResetDate),
-      'lastHeartUpdateTime': lastHeartUpdateTime != null ? Timestamp.fromDate(lastHeartUpdateTime!) : null,
+      'lastHeartUpdateTime': lastHeartUpdateTime != null
+          ? Timestamp.fromDate(lastHeartUpdateTime!)
+          : null,
       'birthDate': birthDate != null ? Timestamp.fromDate(birthDate!) : null,
       'gender': gender,
       'phoneNumber': phoneNumber,
@@ -205,7 +212,9 @@ class User implements BaseModel {
       'isProfileComplete': isProfileComplete,
       'isPremium': isPremium,
       'premiumTier': premiumTier.value,
-      'premiumExpiryDate': premiumExpiryDate != null ? Timestamp.fromDate(premiumExpiryDate!) : null,
+      'premiumExpiryDate': premiumExpiryDate != null
+          ? Timestamp.fromDate(premiumExpiryDate!)
+          : null,
       'hasHadTrial': hasHadTrial,
       'createdAt': Timestamp.fromDate(joinDate),
       'updatedAt': Timestamp.now(),

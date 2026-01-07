@@ -23,9 +23,9 @@ class FirestoreService {
       Logger.info('Firestore에 사용자 프로필 저장: $uid', tag: 'FirestoreService');
 
       await _firestore.collection('users').doc(uid).set(
-        user.toFirestore(),
-        SetOptions(merge: true),
-      );
+            user.toFirestore(),
+            SetOptions(merge: true),
+          );
 
       Logger.info('사용자 프로필 저장 완료', tag: 'FirestoreService');
     } catch (e, stackTrace) {
@@ -66,7 +66,11 @@ class FirestoreService {
   /// 사용자 프로필 실시간 감지
   Stream<User?> watchUserProfile(String uid) {
     try {
-      return _firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+      return _firestore
+          .collection('users')
+          .doc(uid)
+          .snapshots()
+          .map((snapshot) {
         if (!snapshot.exists) return null;
         return User.fromFirestore(snapshot);
       });
@@ -82,7 +86,8 @@ class FirestoreService {
   }
 
   /// 사용자 프로필 업데이트 (기존 메서드 유지)
-  Future<void> updateUserProfile(String userId, Map<String, dynamic> data) async {
+  Future<void> updateUserProfile(
+      String userId, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('users').doc(userId).update({
         ...data,
@@ -114,7 +119,8 @@ class FirestoreService {
 
         // 카테고리별 XP 추가
         if (category != null) {
-          final categoryXP = Map<String, int>.from(userDoc.data()!['categoryXP'] as Map? ?? {});
+          final categoryXP = Map<String, int>.from(
+              userDoc.data()!['categoryXP'] as Map? ?? {});
           categoryXP[category] = (categoryXP[category] ?? 0) + xp;
           updateData['categoryXP'] = categoryXP;
         }
@@ -135,14 +141,16 @@ class FirestoreService {
         final userDoc = await transaction.get(userRef);
         if (!userDoc.exists) throw Exception('사용자를 찾을 수 없습니다.');
 
-        final lastStudyDate = (userDoc.data()!['lastStudyDate'] as Timestamp?)?.toDate();
+        final lastStudyDate =
+            (userDoc.data()!['lastStudyDate'] as Timestamp?)?.toDate();
         final now = DateTime.now();
         final today = DateTime(now.year, now.month, now.day);
 
         int newStreak = userDoc.data()!['streak'] as int? ?? 0;
 
         if (lastStudyDate != null) {
-          final lastStudy = DateTime(lastStudyDate.year, lastStudyDate.month, lastStudyDate.day);
+          final lastStudy = DateTime(
+              lastStudyDate.year, lastStudyDate.month, lastStudyDate.day);
           final difference = today.difference(lastStudy).inDays;
 
           if (difference == 1) {
@@ -197,11 +205,11 @@ class FirestoreService {
   }
 
   /// 사용자의 진행상황 가져오기
-  Future<List<ProgressModel>> getUserProgress(String userId, {String? grade}) async {
+  Future<List<ProgressModel>> getUserProgress(String userId,
+      {String? grade}) async {
     try {
-      Query query = _firestore
-          .collection('progress')
-          .where('userId', isEqualTo: userId);
+      Query query =
+          _firestore.collection('progress').where('userId', isEqualTo: userId);
 
       if (grade != null) {
         query = query.where('grade', isEqualTo: grade);
@@ -217,7 +225,8 @@ class FirestoreService {
   }
 
   /// 특정 레슨 진행상황 가져오기
-  Future<ProgressModel?> getLessonProgress(String userId, String lessonId) async {
+  Future<ProgressModel?> getLessonProgress(
+      String userId, String lessonId) async {
     try {
       final progressId = '${userId}_$lessonId';
       final doc = await _firestore.collection('progress').doc(progressId).get();
@@ -252,8 +261,10 @@ class FirestoreService {
         if (progressDoc.exists) {
           // 기존 진행상황 업데이트
           final data = progressDoc.data()!;
-          final newProblemsCompleted = (data['problemsCompleted'] as int? ?? 0) + 1;
-          final newCorrectAnswers = (data['correctAnswers'] as int? ?? 0) + (isCorrect ? 1 : 0);
+          final newProblemsCompleted =
+              (data['problemsCompleted'] as int? ?? 0) + 1;
+          final newCorrectAnswers =
+              (data['correctAnswers'] as int? ?? 0) + (isCorrect ? 1 : 0);
           final newXP = (data['xpEarned'] as int? ?? 0) + xpEarned;
 
           transaction.update(progressRef, {
@@ -295,14 +306,14 @@ class FirestoreService {
 
       // 일일 학습 기록 업데이트
       await _recordDailyStudy(userId, xpEarned, chapter);
-
     } catch (e) {
       throw Exception('문제 완료 기록 실패: $e');
     }
   }
 
   /// 일일 학습 기록
-  Future<void> _recordDailyStudy(String userId, int xpEarned, String category) async {
+  Future<void> _recordDailyStudy(
+      String userId, int xpEarned, String category) async {
     try {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -313,7 +324,8 @@ class FirestoreService {
 
       if (dailyDoc.exists) {
         // 오늘 기록 업데이트
-        final categoryProgress = Map<String, int>.from(dailyDoc.data()!['categoryProgress'] as Map? ?? {});
+        final categoryProgress = Map<String, int>.from(
+            dailyDoc.data()!['categoryProgress'] as Map? ?? {});
         categoryProgress[category] = (categoryProgress[category] ?? 0) + 1;
 
         await dailyRef.update({
@@ -339,7 +351,8 @@ class FirestoreService {
   }
 
   /// 사용자의 일일 학습 기록 가져오기
-  Future<List<DailyStudyModel>> getDailyStudies(String userId, {int days = 7}) async {
+  Future<List<DailyStudyModel>> getDailyStudies(String userId,
+      {int days = 7}) async {
     try {
       final endDate = DateTime.now();
       final startDate = endDate.subtract(Duration(days: days));
@@ -371,9 +384,7 @@ class FirestoreService {
           .limit(limit)
           .get();
 
-      return snapshot.docs
-          .map((doc) => User.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => User.fromFirestore(doc)).toList();
     } catch (e) {
       throw Exception('리더보드 조회 실패: $e');
     }
@@ -403,7 +414,8 @@ class FirestoreService {
   /// 오답 저장 (서브컬렉션)
   Future<void> saveWrongAnswer(String uid, WrongAnswer wrongAnswer) async {
     try {
-      Logger.info('Firestore에 오답 저장: ${wrongAnswer.id}', tag: 'FirestoreService');
+      Logger.info('Firestore에 오답 저장: ${wrongAnswer.id}',
+          tag: 'FirestoreService');
 
       await _firestore
           .collection('users')
@@ -446,10 +458,12 @@ class FirestoreService {
           .orderBy('timestamp', descending: true)
           .get();
 
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
+      return snapshot.docs
+          .map((doc) => {
+                'id': doc.id,
+                ...doc.data(),
+              })
+          .toList();
     } catch (e, stackTrace) {
       Logger.error(
         '오답 목록 조회 실패',
@@ -471,10 +485,12 @@ class FirestoreService {
           .orderBy('timestamp', descending: true)
           .snapshots()
           .map((snapshot) {
-        return snapshot.docs.map((doc) => {
-          'id': doc.id,
-          ...doc.data(),
-        }).toList();
+        return snapshot.docs
+            .map((doc) => {
+                  'id': doc.id,
+                  ...doc.data(),
+                })
+            .toList();
       });
     } catch (e, stackTrace) {
       Logger.error(
@@ -516,7 +532,11 @@ class FirestoreService {
   /// 리그 실시간 감지
   Stream<League?> watchLeague(String leagueId) {
     try {
-      return _firestore.collection('leagues').doc(leagueId).snapshots().map((snapshot) {
+      return _firestore
+          .collection('leagues')
+          .doc(leagueId)
+          .snapshots()
+          .map((snapshot) {
         if (!snapshot.exists) return null;
         return League.fromFirestore(snapshot);
       });

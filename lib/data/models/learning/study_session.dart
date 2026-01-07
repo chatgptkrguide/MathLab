@@ -131,7 +131,8 @@ class DailyStudyStats {
     return DailyStudyStats(
       date: DateTime.parse(json['date'] as String),
       totalSeconds: json['totalSeconds'] as int,
-      activityDurations: (json['activityDurations'] as Map<String, dynamic>).map(
+      activityDurations:
+          (json['activityDurations'] as Map<String, dynamic>).map(
         (key, value) => MapEntry(
           StudyActivityType.values.firstWhere((e) => e.name == key),
           value as int,

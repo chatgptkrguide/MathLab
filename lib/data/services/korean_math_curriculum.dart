@@ -629,7 +629,10 @@ class KoreanMathCurriculum {
       case '중3':
         return getMiddleSchool3Lessons();
       case '고1':
-        return [...getHighSchool1Part1Lessons(), ...getHighSchool1Part2Lessons()];
+        return [
+          ...getHighSchool1Part1Lessons(),
+          ...getHighSchool1Part2Lessons()
+        ];
       case '고2':
         return getHighSchool2Lessons();
       case '고3':

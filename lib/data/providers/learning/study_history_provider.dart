@@ -75,9 +75,7 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
       }
 
       // DateTime을 날짜만 문자열로 변환 (시간 제거)
-      final dateStrings = state
-          .map((date) => _dateOnlyString(date))
-          .toList()
+      final dateStrings = state.map((date) => _dateOnlyString(date)).toList()
         ..sort(); // 정렬
 
       final historyString = dateStrings.join(',');
