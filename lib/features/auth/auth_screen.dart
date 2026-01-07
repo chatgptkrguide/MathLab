@@ -288,7 +288,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 180), // GoMath Lab과 버튼 사이 간격
+                    const SizedBox(height: 120), // GoMath Lab과 버튼 사이 간격 줄임
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
@@ -297,19 +297,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                         opacity: _fadeAnimation,
                         child: Column(
                           children: [
-                            // 시작하기 버튼 (메인)
+                            // 시작하기 버튼 (메인) - 더 크고 눈에 띄게
                             _buildMainButton(
                               text: '시작하기',
                               onPressed: _handleGuestStart,
                               gradient: const LinearGradient(
                                 colors: [
                                   Color(0xFF58CC02),
-                                  Color(0xFF4CAF50),
+                                  Color(0xFF46A302),
                                 ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
                               ),
                             ),
 
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
                             // 구분선
                             Row(
@@ -423,18 +425,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         child: Container(
           width: double.infinity,
-          height: 64,
+          height: 68,
           decoration: BoxDecoration(
             gradient: gradient,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity( 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
+                color: const Color(0xFF58CC02).withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -442,11 +449,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
             child: Text(
               text,
               style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
                 color: Colors.white,
                 fontFamily: 'NexonGothic',
-                letterSpacing: 1.0,
+                letterSpacing: 1.2,
               ),
             ),
           ),
@@ -467,37 +474,45 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           width: double.infinity,
-          height: 56,
+          height: 60,
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: backgroundColor,
-              width: 2,
+              color: backgroundColor == Colors.white
+                ? Colors.grey.withOpacity(0.3)
+                : backgroundColor,
+              width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity( 0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: backgroundColor.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: textColor, size: 24),
+              Icon(icon, color: textColor, size: 26),
               const SizedBox(width: 12),
               Text(
                 text,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
                   color: textColor,
                   fontFamily: 'NexonGothic',
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
