@@ -10,6 +10,7 @@ export 'animations/xp_animation_widget.dart';
 export 'badges/rank_badge.dart';
 
 // Buttons
+export 'buttons/gradient_3d_button.dart';
 export 'buttons/header_icon_button.dart';
 export 'buttons/social_login_button.dart';
 export 'buttons/unified_button.dart';
@@ -19,6 +20,9 @@ export 'cards/achievement_card.dart';
 export 'cards/daily_goal_card.dart';
 export 'cards/lesson_card.dart';
 export 'cards/stat_card.dart';
+
+// Containers
+export 'containers/gradient_container.dart';
 
 // Styled widgets
 export 'styled/duolingo_card.dart';
@@ -41,6 +45,7 @@ export 'images/optimized_network_image.dart';
 
 // Indicators
 export 'indicators/circular_level_badge.dart';
+export 'indicators/gradient_progress_bar.dart';
 export 'indicators/loading_widgets.dart';
 
 // Inputs
