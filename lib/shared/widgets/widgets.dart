@@ -10,29 +10,24 @@ export 'animations/xp_animation_widget.dart';
 export 'badges/rank_badge.dart';
 
 // Buttons
-// export 'buttons/animated_button.dart'; // 삭제됨: UnifiedButton으로 통합
-// export 'buttons/duolingo_button.dart'; // 삭제됨: UnifiedButton으로 통합
 export 'buttons/header_icon_button.dart';
-// export 'buttons/primary_button.dart'; // 삭제됨: UnifiedButton으로 통합
 export 'buttons/social_login_button.dart';
 export 'buttons/unified_button.dart';
 
 // Cards
 export 'cards/achievement_card.dart';
 export 'cards/daily_goal_card.dart';
-// export 'cards/duolingo_card.dart'; // 삭제됨: styled/duolingo_card.dart로 통합
 export 'cards/lesson_card.dart';
 export 'cards/stat_card.dart';
 
 // Styled widgets
-export 'styled/duolingo_card.dart'; // Duolingo 스타일 카드 (통합 버전)
+export 'styled/duolingo_card.dart';
 
 // Drawers
 export 'drawers/learning_calendar_drawer.dart';
 export 'drawers/top_slide_drawer.dart';
 
 // Feedback
-// export 'feedback/animated_snackbar.dart'; // 삭제됨: 미사용 위젯
 export 'feedback/empty_state.dart';
 export 'feedback/error_display.dart';
 export 'feedback/feedback.dart';
