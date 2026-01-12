@@ -37,49 +37,51 @@ class HomeScreenFigma extends ConsumerWidget {
 
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 100), // 네비게이션 바 여유 공간
                 child: Column(
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // 상단: "안녕하세요!" + 스트릭
                     HomeTopSection(user: user),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
-                    // 중앙: 로봇 캐릭터 + 진행률 링 (크기 축소)
+                    // 중앙: 로봇 캐릭터 + 진행률 링
                     const HomeRobotSection(),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
                     // 오늘의 목표 카드
                     _buildTodayGoalCard(context, user),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // 학습 시작하기 버튼 (듀오링고 스타일)
                     const HomeStartButton(),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
-                    // 하단 스탯 카드들 (XP, 레벨, 연속) - 컴팩트하게
+                    // 하단 스탯 카드들 (XP, 레벨, 연속)
                     HomeStatsCards(user: user),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
                     // 친구 활동 섹션
                     const HomeFriendsActivity(),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // 학년 선택 카드
                     const HomeLanguageCards(),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // 데일리 챌린지 배너
                     const HomeDailyChallenge(),
 
-                    const SizedBox(height: 100), // 네비게이션 바 공간 (UX 개선: 80 → 100)
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),

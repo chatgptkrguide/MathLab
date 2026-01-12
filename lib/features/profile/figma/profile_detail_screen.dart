@@ -48,7 +48,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
           children: [
             // 헤더 (뒤로가기 + 프로필 타이틀 + 설정)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -56,8 +56,8 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
                   colors: AppColors.headerBlueGradient,
                 ),
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
                 ),
               ),
               child: Row(
@@ -100,37 +100,37 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // User Profile Card with Edit Button & Level Progress
                     _buildUserProfileCard(user, context),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // 팔로워 / XP / 팔로잉 통계
                     _buildFollowerStats(),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // 연속 학습 이력 카드
                     _buildStreakCard(user),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
                     // 탭 섹션 (대수, 공통수학 1, 공통수학 2)
                     _buildTabSection(),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
                     // Badges Section
                     _buildBadgesSection(),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
                     // Your Statistics Section
                     _buildStatisticsSection(),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
                     // Premium Upgrade Card
                     _buildPremiumCard(),
@@ -221,7 +221,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
                       ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 18),
 
               // 이름 + 유저명 + Edit Profile 버튼
               Expanded(
@@ -240,14 +240,14 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         const PremiumBadge(
                           size: PremiumBadgeSize.small,
                           style: PremiumBadgeStyle.iconOnly,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       '@${user?.email.split('@').first ?? 'jojoselvey04'}',
                       style: TextStyle(
@@ -255,7 +255,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     // Edit Profile 버튼
                     ElevatedButton(
                       onPressed: () {
@@ -313,7 +313,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
           // 레벨 뱃지 + 진행률
           Row(
@@ -349,7 +349,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
 
               // 레벨명 + 진행률
               Expanded(
@@ -377,7 +377,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     // 진행률 바
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
@@ -465,7 +465,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen>
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(
           value,
           style: const TextStyle(

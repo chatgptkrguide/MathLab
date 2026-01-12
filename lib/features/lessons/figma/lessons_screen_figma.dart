@@ -36,7 +36,7 @@ class LessonsScreenFigma extends ConsumerWidget {
               // 상단 바 (학습 제목 + 메뉴 버튼)
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -44,8 +44,8 @@ class LessonsScreenFigma extends ConsumerWidget {
                     colors: AppColors.headerBlueGradient,
                   ),
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(28),
+                    bottomRight: Radius.circular(28),
                   ),
                 ),
                 child: Row(
@@ -105,12 +105,12 @@ class LessonsScreenFigma extends ConsumerWidget {
               // Quick Action Buttons (Practice & Level Test)
               const QuickActionButtons(),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
               // 듀오링고 스타일 학습 경로 (지그재그)
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.only(top: 20, bottom: 100),
                   child: _buildLearningPath(context, ref, currentLessonIndex),
                 ),
               ),
@@ -164,8 +164,8 @@ class LessonsScreenFigma extends ConsumerWidget {
 
             return Container(
               margin: EdgeInsets.only(
-                top: index == 0 ? 0 : 40,
-                bottom: index == lessons.length - 1 ? 100 : 0,
+                top: index == 0 ? 0 : 48,
+                bottom: index == lessons.length - 1 ? 0 : 0,
               ),
               child: Align(
                 alignment:

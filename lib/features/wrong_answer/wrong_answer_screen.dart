@@ -106,11 +106,8 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
   /// 통계 카드 - 심플하고 깔끔한 디자인
   Widget _buildStatsCards(WrongAnswerState state) {
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.paddingM,
-      ),
-      padding: const EdgeInsets.all(AppDimensions.paddingL),
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
@@ -169,7 +166,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: color, size: 28),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Text(
           value,
           style: TextStyle(
@@ -178,7 +175,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         Text(
           label,
           style: AppTextStyles.bodySmall.copyWith(
@@ -204,10 +201,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingL,
-        vertical: AppDimensions.paddingS,
-      ),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -222,7 +216,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 if (state.selectedCategory != null ||
                     state.selectedDifficulty != null)
                   GestureDetector(
@@ -248,7 +242,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -288,7 +282,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
           ],
           // 난이도 필터
           if (difficulties.isNotEmpty) ...[
@@ -299,7 +293,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -380,7 +374,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
   /// 탭 바 - Duolingo 스타일
   Widget _buildTabBar(WrongAnswerState state) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppColors.background,

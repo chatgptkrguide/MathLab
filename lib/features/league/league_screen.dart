@@ -75,7 +75,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 child: Column(
                                   children: [
-                                    const SizedBox(height: 16),
+                                    const SizedBox(height: 20),
 
                                     // 리그 정보 헤더
                                     LeagueHeader(
@@ -85,8 +85,12 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                                       isRelegationZone: isRelegationZone,
                                     ),
 
+                                    const SizedBox(height: 16),
+
                                     // 승급/강등 안내
                                     const LeaguePromotionInfo(),
+
+                                    const SizedBox(height: 16),
 
                                     // 리더보드
                                     _buildLeaderboard(
@@ -161,7 +165,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
               }
 
               return Container(
-                margin: const EdgeInsets.only(bottom: 12),
+                margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
                   // 듀오링고 스타일: 현재 사용자와 상위 3명 그라데이션
                   gradient: isCurrentUser
@@ -478,10 +482,10 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
 
     return Container(
       height: 120,
-      margin: const EdgeInsets.symmetric(vertical: 16),
+      margin: const EdgeInsets.fromLTRB(0, 16, 0, 20),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: LeagueTier.values.length,
         itemBuilder: (context, index) {
           final tier = LeagueTier.values[index];
