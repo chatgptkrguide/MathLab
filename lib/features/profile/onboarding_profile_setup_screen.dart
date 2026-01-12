@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/user/user_provider.dart';
 import '../../data/services/temp_profile_storage.dart';
-import '../../shared/widgets/buttons/unified_button.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/utils/logger.dart';
@@ -37,24 +35,6 @@ class _OnboardingProfileSetupScreenState
   int? _selectedBirthDay;
   String? _selectedGender;
   String _selectedGrade = '중1';
-
-  // 학년 옵션
-  final List<String> _gradeOptions = [
-    '초1',
-    '초2',
-    '초3',
-    '초4',
-    '초5',
-    '초6',
-    '중1',
-    '중2',
-    '중3',
-    '고1',
-    '고2',
-    '고3',
-    '대학생',
-    '성인'
-  ];
 
   // 성별 옵션
   final List<Map<String, String>> _genderOptions = [

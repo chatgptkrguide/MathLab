@@ -6,7 +6,6 @@ import '../models/user/user.dart';
 import '../models/learning/progress_model.dart';
 import '../models/learning/wrong_answer.dart';
 import '../models/gamification/league.dart';
-import '../../shared/utils/logger.dart';
 
 /// Firestore 데이터베이스 서비스 (통합 Facade)
 ///

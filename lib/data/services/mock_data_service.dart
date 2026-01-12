@@ -554,18 +554,4 @@ class MockDataService {
 
     return problems;
   }
-
-  List<String> _generateOptions(int seed) {
-    final base = seed + 5;
-    return [
-      '$base',
-      '${base + 1}',
-      '${base - 1}',
-      '${base + 2}',
-    ];
-  }
-
-  String _calculateAnswer(int index) {
-    return '${index + 5}';
-  }
 }
