@@ -26,6 +26,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void initState() {
     super.initState();
     _setupAnimations();
+
+    // QA 테스트를 위해 자동으로 게스트 로그인 (3초 후)
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        print('[DEBUG] 자동 게스트 로그인 시작 (QA 테스트용)');
+        _handleGuestStart();
+      }
+    });
   }
 
   void _setupAnimations() {
@@ -298,7 +306,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 120), // GoMath Lab과 버튼 사이 간격 줄임
+                    const SizedBox(height: 180), // GoMath Lab과 버튼 사이 간격
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
