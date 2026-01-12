@@ -3,6 +3,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'local_storage_service.dart';
 import 'firestore_service.dart';
 import 'conflict_resolution_service.dart';
+import 'sync/user_sync_service.dart';
+import 'sync/learning_sync_service.dart';
+import 'sync/gamification_sync_service.dart';
 import '../models/sync/sync_status.dart';
 import '../models/sync/sync_task.dart';
 import '../models/user/user.dart';
@@ -40,6 +43,11 @@ class SyncManager {
   late final WrongAnswerRepository _wrongAnswerRepository;
   late final LessonRepository _lessonRepository;
   late final LeagueRepository _leagueRepository;
+
+  // 전문 동기화 서비스 인스턴스
+  late final UserSyncService _userSyncService;
+  late final LearningProgressSyncService _learningSyncService;
+  late final GamificationSyncService _gamificationSyncService;
 
   // 동기화 상태 스트림
   final _syncStatusController = StreamController<SyncStatus>.broadcast();
@@ -86,6 +94,20 @@ class SyncManager {
           LeagueRepository(
             localStorageService: _localStorage,
           );
+
+      // 전문 동기화 서비스 초기화
+      _userSyncService = UserSyncService(
+        userRepository: _userRepository,
+        conflictResolver: _conflictResolver,
+      );
+      _learningSyncService = LearningProgressSyncService(
+        wrongAnswerRepository: _wrongAnswerRepository,
+        lessonRepository: _lessonRepository,
+        conflictResolver: _conflictResolver,
+      );
+      _gamificationSyncService = GamificationSyncService(
+        leagueRepository: _leagueRepository,
+      );
 
       // 오프라인 큐 로드
       await _loadPendingTasks();
@@ -273,213 +295,53 @@ class SyncManager {
     }
   }
 
-  /// 단일 작업 실행
+  /// 단일 작업 실행 (전문 서비스에 위임)
   Future<void> _executeTask(SyncTask task) async {
     switch (task.type) {
       case SyncTaskType.uploadUserProfile:
-        await _uploadUserProfile(task);
+        final userData = task.data['user'] as Map<String, dynamic>;
+        final user = User.fromJson(userData);
+        await _userSyncService.uploadUserProfile(task.accountId, user);
         break;
 
       case SyncTaskType.uploadWrongAnswer:
-        await _uploadWrongAnswer(task);
+        final wrongAnswerData = task.data['wrongAnswer'] as Map<String, dynamic>;
+        final wrongAnswer = WrongAnswer.fromJson(wrongAnswerData);
+        await _learningSyncService.uploadWrongAnswer(task.accountId, wrongAnswer);
         break;
 
       case SyncTaskType.uploadStudyHistory:
-        await _uploadLessons(task);
+        final lessonsData = task.data['lessons'] as List<dynamic>;
+        final lessons = lessonsData
+            .map((lessonJson) => Lesson.fromJson(lessonJson as Map<String, dynamic>))
+            .toList();
+        await _learningSyncService.uploadLessons(task.accountId, lessons);
         break;
 
       case SyncTaskType.uploadLeague:
-        await _uploadLeague(task);
+        final leagueData = task.data['league'] as Map<String, dynamic>;
+        final league = League.fromJson(leagueData);
+        await _gamificationSyncService.uploadLeague(task.accountId, league);
         break;
 
       case SyncTaskType.downloadUserProfile:
-        await _downloadUserProfile(task);
+        await _userSyncService.downloadUserProfile(task.accountId);
         break;
 
       case SyncTaskType.downloadWrongAnswers:
-        await _downloadWrongAnswers(task);
+        await _learningSyncService.downloadWrongAnswers(task.accountId);
         break;
 
       case SyncTaskType.downloadStudyHistory:
-        await _downloadLessons(task);
+        await _learningSyncService.downloadLessons(task.accountId);
         break;
     }
   }
 
-  /// 레슨 데이터 업로드
-  Future<void> _uploadLessons(SyncTask task) async {
-    try {
-      final lessonsData = task.data['lessons'] as List<dynamic>;
-      final lessons = lessonsData
-          .map((lessonJson) =>
-              Lesson.fromJson(lessonJson as Map<String, dynamic>))
-          .toList();
-
-      await _lessonRepository.saveToFirebase(task.accountId, lessons);
-
-      Logger.info('레슨 데이터 업로드 완료: ${lessons.length}개', tag: 'SyncManager');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '레슨 데이터 업로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
-
-  /// 리그 데이터 업로드
-  Future<void> _uploadLeague(SyncTask task) async {
-    try {
-      final leagueData = task.data['league'] as Map<String, dynamic>;
-      final league = League.fromJson(leagueData);
-
-      await _leagueRepository.saveToFirebase(task.accountId, league);
-
-      Logger.info('리그 데이터 업로드 완료: ${league.tier}', tag: 'SyncManager');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '리그 데이터 업로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
-
-  /// 레슨 데이터 다운로드
-  Future<void> _downloadLessons(SyncTask task) async {
-    try {
-      final remoteLessons =
-          await _lessonRepository.getFromFirebase(task.accountId);
-
-      if (remoteLessons != null && remoteLessons.isNotEmpty) {
-        final localLessons =
-            await _lessonRepository.getFromLocal('lessons_${task.accountId}');
-
-        // 병합: 기본 정보는 Firebase, 진행률은 로컬 우선
-        if (localLessons != null) {
-          final merged =
-              await _lessonRepository.mergeData(localLessons, remoteLessons);
-          if (merged != null) {
-            await _lessonRepository.saveToLocal(
-                'lessons_${task.accountId}', merged);
-          }
-        } else {
-          await _lessonRepository.saveToLocal(
-              'lessons_${task.accountId}', remoteLessons);
-        }
-        Logger.info('레슨 데이터 다운로드 완료: ${remoteLessons.length}개',
-            tag: 'SyncManager');
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        '레슨 데이터 다운로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
-
-  /// 사용자 프로필 업로드
-  Future<void> _uploadUserProfile(SyncTask task) async {
-    try {
-      // task.data에서 User 객체 복원
-      final userData = task.data['user'] as Map<String, dynamic>;
-      final user = User.fromJson(userData);
-
-      // Repository를 통해 Firebase에 업로드
-      await _userRepository.saveToFirebase(task.accountId, user);
-
-      Logger.info('사용자 프로필 업로드 완료: ${task.accountId}', tag: 'SyncManager');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '사용자 프로필 업로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
-
-  /// 오답 업로드
-  Future<void> _uploadWrongAnswer(SyncTask task) async {
-    try {
-      // task.data에서 WrongAnswer 객체 복원
-      final wrongAnswerData = task.data['wrongAnswer'] as Map<String, dynamic>;
-      final wrongAnswer = WrongAnswer.fromJson(wrongAnswerData);
-
-      // Repository를 통해 Firebase에 업로드
-      await _wrongAnswerRepository.saveToFirebase(task.accountId, wrongAnswer);
-
-      Logger.info('오답 업로드 완료: ${wrongAnswer.id}', tag: 'SyncManager');
-    } catch (e, stackTrace) {
-      Logger.error(
-        '오답 업로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
-
-  /// 사용자 프로필 다운로드
-  Future<void> _downloadUserProfile(SyncTask task) async {
-    try {
-      // Repository를 통해 Firebase에서 다운로드
-      final user = await _userRepository.getFromFirebase(task.accountId);
-
-      if (user != null) {
-        // 로컬에 저장
-        await _userRepository.saveToLocal(task.accountId, user);
-        Logger.info('사용자 프로필 다운로드 완료: ${task.accountId}', tag: 'SyncManager');
-      } else {
-        Logger.warning('Firebase에 사용자 프로필 없음: ${task.accountId}',
-            tag: 'SyncManager');
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        '사용자 프로필 다운로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
-
-  /// 오답 목록 다운로드
-  Future<void> _downloadWrongAnswers(SyncTask task) async {
-    try {
-      // Repository를 통해 Firebase에서 다운로드
-      final wrongAnswers =
-          await _wrongAnswerRepository.getFromFirebase(task.accountId);
-
-      if (wrongAnswers.isNotEmpty) {
-        // 로컬에 저장
-        await _wrongAnswerRepository.saveToLocal(task.accountId, wrongAnswers);
-        Logger.info('오답 목록 다운로드 완료: ${wrongAnswers.length}개',
-            tag: 'SyncManager');
-      } else {
-        Logger.debug('Firebase에 오답 목록 없음: ${task.accountId}',
-            tag: 'SyncManager');
-      }
-    } catch (e, stackTrace) {
-      Logger.error(
-        '오답 목록 다운로드 실패',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'SyncManager',
-      );
-      rethrow;
-    }
-  }
+  // 개별 업로드/다운로드 메서드는 전문 서비스로 이동됨
+  // - UserSyncService: 사용자 프로필
+  // - LearningProgressSyncService: 오답, 레슨
+  // - GamificationSyncService: 리그
 
   // ==================== 수동 동기화 ====================
 
@@ -537,7 +399,7 @@ class SyncManager {
     }
   }
 
-  /// 단방향 업로드
+  /// 단방향 업로드 (전문 서비스에 위임)
   Future<void> uploadChanges(String accountId) async {
     if (!_isOnline) return;
 
@@ -547,34 +409,23 @@ class SyncManager {
       // 1. 사용자 프로필 업로드
       final user = await _userRepository.getFromLocal(accountId);
       if (user != null) {
-        await _userRepository.saveToFirebase(accountId, user);
+        await _userSyncService.uploadUserProfile(accountId, user);
         Logger.debug('사용자 프로필 업로드 완료', tag: 'SyncManager');
       }
 
-      // 2. 오답 목록 업로드
-      final wrongAnswers = await _wrongAnswerRepository.getFromLocal(accountId);
-      for (final wrongAnswer in wrongAnswers) {
-        try {
-          await _wrongAnswerRepository.saveToFirebase(accountId, wrongAnswer);
-        } catch (e) {
-          Logger.warning('오답 업로드 실패: ${wrongAnswer.id} - $e',
-              tag: 'SyncManager');
-        }
-      }
-      Logger.debug('오답 목록 업로드 완료: ${wrongAnswers.length}개', tag: 'SyncManager');
+      // 2. 학습 데이터 업로드 (오답 + 레슨)
+      await _learningSyncService.uploadAllWrongAnswers(accountId);
 
-      // 3. 레슨 데이터 업로드
-      final lessons =
-          await _lessonRepository.getFromLocal('lessons_$accountId');
+      final lessons = await _lessonRepository.getFromLocal('lessons_$accountId');
       if (lessons != null && lessons.isNotEmpty) {
-        await _lessonRepository.saveToFirebase(accountId, lessons);
+        await _learningSyncService.uploadLessons(accountId, lessons);
         Logger.debug('레슨 데이터 업로드 완료: ${lessons.length}개', tag: 'SyncManager');
       }
 
-      // 4. 리그 데이터 업로드
+      // 3. 게이미피케이션 데이터 업로드 (리그)
       final league = await _leagueRepository.getFromLocal('league_$accountId');
       if (league != null) {
-        await _leagueRepository.saveToFirebase(accountId, league);
+        await _gamificationSyncService.uploadLeague(accountId, league);
         Logger.debug('리그 데이터 업로드 완료: ${league.tier}', tag: 'SyncManager');
       }
 
@@ -590,91 +441,25 @@ class SyncManager {
     }
   }
 
-  /// 단방향 다운로드
+  /// 단방향 다운로드 (전문 서비스에 위임)
   Future<void> downloadChanges(String accountId) async {
     if (!_isOnline) return;
 
     try {
       Logger.info('Firebase → 로컬 다운로드 시작', tag: 'SyncManager');
 
-      // 1. 사용자 프로필 다운로드
-      final remoteUser = await _userRepository.getFromFirebase(accountId);
-      if (remoteUser != null) {
-        final localUser = await _userRepository.getFromLocal(accountId);
+      // 1. 사용자 프로필 다운로드 (충돌 해결 포함)
+      await _userSyncService.downloadUserProfile(accountId);
+      Logger.debug('사용자 프로필 다운로드 완료', tag: 'SyncManager');
 
-        // 충돌 해결 - ConflictResolutionService 사용
-        if (localUser != null) {
-          final resolvedData = _conflictResolver.resolveConflict(
-            'user',
-            accountId,
-            localUser.toJson(),
-            remoteUser.toJson(),
-          );
-          final resolvedUser = User.fromJson(resolvedData);
-          await _userRepository.saveToLocal(accountId, resolvedUser);
-          Logger.debug('사용자 프로필 충돌 해결 및 병합 완료', tag: 'SyncManager');
-        } else {
-          await _userRepository.saveToLocal(accountId, remoteUser);
-        }
-        Logger.debug('사용자 프로필 다운로드 완료', tag: 'SyncManager');
-      }
+      // 2. 학습 데이터 다운로드 (오답 + 레슨, 병합 포함)
+      await _learningSyncService.downloadWrongAnswers(accountId);
+      await _learningSyncService.downloadLessons(accountId);
+      Logger.debug('학습 데이터 다운로드 완료', tag: 'SyncManager');
 
-      // 2. 오답 목록 다운로드
-      final remoteAnswers =
-          await _wrongAnswerRepository.getFromFirebase(accountId);
-      if (remoteAnswers.isNotEmpty) {
-        final localAnswers =
-            await _wrongAnswerRepository.getFromLocal(accountId);
-
-        // 병합: 양쪽 데이터 통합 (중복 제거)
-        final merged = _mergeWrongAnswers(localAnswers, remoteAnswers);
-        await _wrongAnswerRepository.saveToLocal(accountId, merged);
-        Logger.debug('오답 목록 다운로드 완료: ${merged.length}개', tag: 'SyncManager');
-      }
-
-      // 3. 레슨 데이터 다운로드
-      final remoteLessons = await _lessonRepository.getFromFirebase(accountId);
-      if (remoteLessons != null && remoteLessons.isNotEmpty) {
-        final localLessons =
-            await _lessonRepository.getFromLocal('lessons_$accountId');
-
-        // 병합: 기본 정보는 Firebase, 진행률은 로컬 우선
-        if (localLessons != null) {
-          final mergedLessons =
-              await _lessonRepository.mergeData(localLessons, remoteLessons);
-          if (mergedLessons != null) {
-            await _lessonRepository.saveToLocal(
-                'lessons_$accountId', mergedLessons);
-          }
-        } else {
-          await _lessonRepository.saveToLocal(
-              'lessons_$accountId', remoteLessons);
-        }
-        Logger.debug('레슨 데이터 다운로드 완료: ${remoteLessons.length}개',
-            tag: 'SyncManager');
-      }
-
-      // 4. 리그 데이터 다운로드
-      final remoteLeague = await _leagueRepository.getFromFirebase(accountId);
-      if (remoteLeague != null) {
-        final localLeague =
-            await _leagueRepository.getFromLocal('league_$accountId');
-
-        // 병합: 리그 데이터는 Firebase 우선 (서버 데이터가 항상 최신)
-        if (localLeague != null) {
-          final mergedLeague =
-              await _leagueRepository.mergeData(localLeague, remoteLeague);
-          if (mergedLeague != null) {
-            await _leagueRepository.saveToLocal(
-                'league_$accountId', mergedLeague);
-          }
-        } else {
-          await _leagueRepository.saveToLocal(
-              'league_$accountId', remoteLeague);
-        }
-        Logger.debug('리그 데이터 다운로드 완료: ${remoteLeague.tier}',
-            tag: 'SyncManager');
-      }
+      // 3. 게이미피케이션 데이터 다운로드 (리그, 병합 포함)
+      await _gamificationSyncService.downloadLeague(accountId);
+      Logger.debug('리그 데이터 다운로드 완료', tag: 'SyncManager');
 
       Logger.info('다운로드 완료', tag: 'SyncManager');
     } catch (e, stackTrace) {
@@ -686,52 +471,6 @@ class SyncManager {
       );
       throw Exception('다운로드 실패: $e');
     }
-  }
-
-  /// 오답 목록 병합 (ConflictResolutionService 사용)
-  List<WrongAnswer> _mergeWrongAnswers(
-      List<WrongAnswer> local, List<WrongAnswer> remote) {
-    final Map<String, WrongAnswer> merged = {};
-
-    // 로컬 데이터를 맵으로 변환
-    final localMap = <String, WrongAnswer>{};
-    for (final answer in local) {
-      localMap[answer.id] = answer;
-    }
-
-    // 원격 데이터를 맵으로 변환
-    final remoteMap = <String, WrongAnswer>{};
-    for (final answer in remote) {
-      remoteMap[answer.id] = answer;
-    }
-
-    // 모든 고유 ID 수집
-    final allIds = {...localMap.keys, ...remoteMap.keys};
-
-    // 각 오답에 대해 충돌 해결
-    for (final id in allIds) {
-      final localAnswer = localMap[id];
-      final remoteAnswer = remoteMap[id];
-
-      if (localAnswer != null && remoteAnswer != null) {
-        // 충돌 해결이 필요한 경우
-        final resolvedData = _conflictResolver.resolveConflict(
-          'wrongAnswer',
-          id,
-          localAnswer.toJson(),
-          remoteAnswer.toJson(),
-        );
-        merged[id] = WrongAnswer.fromJson(resolvedData);
-      } else if (localAnswer != null) {
-        // 로컬에만 있는 경우
-        merged[id] = localAnswer;
-      } else if (remoteAnswer != null) {
-        // 원격에만 있는 경우
-        merged[id] = remoteAnswer;
-      }
-    }
-
-    return merged.values.toList();
   }
 
   // ==================== 실시간 스트림 ====================
