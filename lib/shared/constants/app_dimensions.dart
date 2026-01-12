@@ -98,4 +98,47 @@ class AppDimensions {
   static const double shadowOpacity = 0.15;
   static const double shadowBlurRadius = 16.0;
   static const shadowOffset = Offset(0, -4);
+
+  // ==========================================
+  // Auth Screen Specific (로그인 화면 전용)
+  // ==========================================
+
+  /// 메인 버튼 높이 (시작하기 버튼)
+  static const double mainButtonHeight = 68.0;
+
+  /// 소셜 로그인 버튼 높이
+  static const double socialButtonHeight = 60.0;
+
+  /// 챗봇 캐릭터 크기
+  static const double chatbotImageSize = 206.0;
+
+  /// 로고 너비
+  static const double logoWidth = 170.0;
+
+  /// 로고 높이
+  static const double logoHeight = 66.0;
+
+  /// 화면 좌우 기본 패딩
+  static const double screenHorizontalPadding = 32.0;
+
+  /// Math is 텍스트 상단 간격
+  static const double authMathIsTopSpacing = 60.0;
+
+  /// Math is와 Fun 사이 간격
+  static const double authMathIsFunSpacing = 30.0;
+
+  /// Chatbot 위치 (top position)
+  static const double authChatbotTopPosition = 130.0;
+
+  /// GoMath Lab과 버튼 사이 간격
+  static const double authGomathButtonSpacing = 180.0;
+
+  /// 버튼 사이 간격
+  static const double authButtonSpacing = 20.0;
+
+  /// 구분선과 버튼 사이 간격
+  static const double authDividerButtonSpacing = 16.0;
+
+  /// 버튼 사이 작은 간격
+  static const double authButtonSmallSpacing = 12.0;
 }

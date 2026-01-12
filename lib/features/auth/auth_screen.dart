@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/app_durations.dart';
 import '../../data/providers/auth/auth_provider.dart';
 import '../../data/services/temp_profile_storage.dart';
 import '../profile/onboarding_profile_setup_screen.dart';
@@ -26,19 +28,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void initState() {
     super.initState();
     _setupAnimations();
-
-    // QA 테스트를 위해 자동으로 게스트 로그인 (3초 후)
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        print('[DEBUG] 자동 게스트 로그인 시작 (QA 테스트용)');
-        _handleGuestStart();
-      }
-    });
   }
 
   void _setupAnimations() {
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: AppDurations.authAnimation,
       vsync: this,
     );
 
@@ -69,15 +63,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Future<void> _handleGuestStart() async {
-    print('[DEBUG] 시작하기 버튼 클릭됨!');
     if (_isLoading) return;
 
     setState(() => _isLoading = true);
 
     try {
-      // 테스트를 위한 임시 수정: 프로필 설정 없이 바로 게스트 계정 생성
-      print('[DEBUG] 게스트 계정 생성 (기본 프로필 사용)');
-
       // 게스트 계정 생성
       final success = await ref.read(authProvider.notifier).signInAsGuest();
 
@@ -109,9 +99,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   Text('${defaultProfile.name}님, 환영합니다! 🎉'),
                 ],
               ),
-              backgroundColor: const Color(0xFF58CC02),
+              backgroundColor: AppColors.mathGreen,
               behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 2),
+              duration: AppDurations.snackBarShort,
             ),
           );
         }
@@ -121,7 +111,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         _showError('게스트 계정 생성에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (e) {
-      print('[DEBUG] 게스트 로그인 에러: $e');
       if (mounted) _showError('예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -169,9 +158,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   Text('${profileResult.name}님, 환영합니다! 🎉'),
                 ],
               ),
-              backgroundColor: const Color(0xFF58CC02),
+              backgroundColor: AppColors.mathGreen,
               behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 2),
+              duration: AppDurations.snackBarShort,
             ),
           );
         }
@@ -245,7 +234,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 constraints: BoxConstraints(
                     minHeight:
                         size.height - MediaQuery.of(context).padding.top),
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.screenHorizontalPadding),
                 child: Column(
                   children: [
                     // 상단 영역: Math is + Fun!!! + Chatbot (겹침)
@@ -256,7 +246,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         // 배경 텍스트들 (뒤쪽 레이어)
                         Column(
                           children: [
-                            const SizedBox(height: 60), // Math is를 아래로 이동
+                            SizedBox(
+                                height: AppDimensions.authMathIsTopSpacing), // Math is를 아래로 이동
                             // "Math is" (회전됨, 약간 기울어짐)
                             Transform.rotate(
                               angle: -0.0098, // -0.56도를 라디안으로: -0.56 * pi/180
@@ -268,7 +259,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 30), // Math is → Fun 간격 줄임
+                            SizedBox(
+                                height: AppDimensions
+                                    .authMathIsFunSpacing), // Math is → Fun 간격
                             // "Fun!!!"
                             FadeTransition(
                               opacity: _fadeAnimation,
@@ -281,13 +274,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         ),
                         // Chatbot 캐릭터 (앞쪽 레이어, 텍스트 위에)
                         Positioned(
-                          top: 130, // Math is 위치 조정에 따라 Chatbot도 조정
+                          top: AppDimensions
+                              .authChatbotTopPosition, // Chatbot 위치
                           child: FadeTransition(
                             opacity: _fadeAnimation,
                             child: Image.asset(
                               'assets/images/login/chatbot.png',
-                              width: 206,
-                              height: 206,
+                              width: AppDimensions.chatbotImageSize,
+                              height: AppDimensions.chatbotImageSize,
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -306,7 +300,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 180), // GoMath Lab과 버튼 사이 간격
+                    SizedBox(
+                        height: AppDimensions
+                            .authGomathButtonSpacing), // GoMath Lab과 버튼 사이 간격
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
@@ -329,7 +325,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               ),
                             ),
 
-                            const SizedBox(height: 20),
+                            SizedBox(height: AppDimensions.authButtonSpacing),
 
                             // 구분선
                             Row(
@@ -361,7 +357,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               ],
                             ),
 
-                            const SizedBox(height: 16),
+                            SizedBox(
+                                height: AppDimensions.authDividerButtonSpacing),
 
                             // Google 로그인
                             _buildSocialButton(
@@ -372,7 +369,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               onPressed: _handleGoogleLogin,
                             ),
 
-                            const SizedBox(height: 12),
+                            SizedBox(
+                                height: AppDimensions.authButtonSmallSpacing),
 
                             // Kakao 로그인
                             _buildSocialButton(
@@ -383,7 +381,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               onPressed: _handleKakaoLogin,
                             ),
 
-                            const SizedBox(height: 12),
+                            SizedBox(
+                                height: AppDimensions.authButtonSmallSpacing),
 
                             // Email 로그인
                             _buildSocialButton(
@@ -406,8 +405,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       opacity: _fadeAnimation,
                       child: Image.asset(
                         'assets/images/login/logo.png',
-                        width: 170,
-                        height: 66,
+                        width: AppDimensions.logoWidth,
+                        height: AppDimensions.logoHeight,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -442,7 +441,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }) {
     return Container(
       width: double.infinity,
-      height: 68,
+      height: AppDimensions.mainButtonHeight,
       decoration: BoxDecoration(
         gradient: gradient,
         borderRadius: BorderRadius.circular(20),
@@ -462,10 +461,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            print('[DEBUG] InkWell 탭 감지!');
-            onPressed();
-          },
+          onTap: onPressed,
           borderRadius: BorderRadius.circular(20),
           child: Center(
             child: Text(
@@ -499,7 +495,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         borderRadius: BorderRadius.circular(16),
         child: Container(
           width: double.infinity,
-          height: 60,
+          height: AppDimensions.socialButtonHeight,
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(16),
