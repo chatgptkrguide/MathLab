@@ -96,8 +96,8 @@ class CustomBottomNavigation extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: 60,
-              height: 60,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -105,28 +105,28 @@ class CustomBottomNavigation extends StatelessWidget {
                   colors: isSelected
                       ? AppColors.mathButtonGradient
                       : [
-                          AppColors.mathButtonBlue.withOpacity(0.7),
-                          AppColors.mathButtonBlue.withOpacity(0.6),
+                          AppColors.mathButtonBlue.withOpacity(0.75),
+                          AppColors.mathButtonBlue.withOpacity(0.65),
                         ],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.mathButtonBlue
-                        .withOpacity(isSelected ? 0.4 : 0.25),
-                    blurRadius: isSelected ? 12 : 8,
-                    offset: Offset(0, isSelected ? 6 : 4),
+                        .withOpacity(isSelected ? 0.35 : 0.2),
+                    blurRadius: isSelected ? 10 : 6,
+                    offset: Offset(0, isSelected ? 4 : 3),
                   ),
                 ],
               ),
               child: Center(
                 child: AnimatedScale(
                   duration: const Duration(milliseconds: 200),
-                  scale: isSelected ? 1.1 : 1.0,
+                  scale: isSelected ? 1.05 : 1.0,
                   child: Icon(
                     icon,
                     color: AppColors.surface,
-                    size: 26, // 약간 작게 조정
+                    size: 24,
                   ),
                 ),
               ),
@@ -142,10 +142,10 @@ class CustomBottomNavigation extends StatelessWidget {
         onTap: () => onTap(index),
         behavior: HitTestBehavior.opaque,
         child: Container(
-            constraints: const BoxConstraints(minHeight: 40, minWidth: 40),
+            constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
             padding: const EdgeInsets.symmetric(
-              horizontal: 1.0,
-              vertical: 2.0,
+              horizontal: 4.0,
+              vertical: 4.0,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -154,36 +154,37 @@ class CustomBottomNavigation extends StatelessWidget {
                 // 상단 인디케이터
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  height: 3,
-                  width: isSelected ? 30 : 0,
+                  height: 2.5,
+                  width: isSelected ? 28 : 0,
                   decoration: BoxDecoration(
                     color: AppColors.mathButtonBlue,
                     borderRadius: BorderRadius.circular(1.5),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     isSelected ? _getSelectedIcon(icon) : icon,
                     color: isSelected
                         ? AppColors.mathButtonBlue
-                        : AppColors.textSecondary.withOpacity(0.6),
-                    size: isSelected ? 26 : 24, // 24→26, 22→24 (UX 개선: 더 잘 보이도록)
+                        : AppColors.textSecondary.withOpacity(0.65),
+                    size: isSelected ? 25 : 23,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Flexible(
                   child: Text(
                     label,
                     style: TextStyle(
                       color: isSelected
                           ? AppColors.mathButtonBlue
-                          : AppColors.textSecondary.withOpacity(0.7),
+                          : AppColors.textSecondary.withOpacity(0.75),
                       fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.w500,
-                      fontSize: isSelected ? 11 : 10, // 10→11, 9→10 (UX 개선: 가독성 향상)
-                      height: 1.0,
+                          isSelected ? FontWeight.bold : FontWeight.w600,
+                      fontSize: isSelected ? 10.5 : 9.5,
+                      height: 1.1,
+                      letterSpacing: 0.2,
                     ),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -193,7 +194,6 @@ class CustomBottomNavigation extends StatelessWidget {
               ],
             ),
           ),
-        ),
       ),
     );
   }
