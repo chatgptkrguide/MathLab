@@ -307,15 +307,16 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
   /// 정답 텍스트 가져오기
   String _getCorrectAnswerText() {
     // 주관식 문제의 경우 (answer가 String인 경우)
-    if (_currentProblem.answer is String) {
-      return _currentProblem.answer as String;
+    final stringAnswer = _currentProblem.getAnswerAsString();
+    if (stringAnswer != null) {
+      return stringAnswer;
     }
 
     // 객관식 문제의 경우 (answer가 int인 경우)
-    if (_currentProblem.answer is int && _currentProblem.choices.isNotEmpty) {
-      final correctIndex = _currentProblem.answer as int;
-      if (correctIndex >= 0 && correctIndex < _currentProblem.choices.length) {
-        return _currentProblem.choices[correctIndex];
+    final intAnswer = _currentProblem.getAnswerAsInt();
+    if (intAnswer != null && _currentProblem.choices.isNotEmpty) {
+      if (intAnswer >= 0 && intAnswer < _currentProblem.choices.length) {
+        return _currentProblem.choices[intAnswer];
       }
     }
 
@@ -387,11 +388,14 @@ class _ProblemScreenState extends ConsumerState<ProblemScreen>
     // 답안 정규화 (공백 제거)
     final userAnswer = _answerController.text.trim();
 
-    // 정답 가져오기
-    String correctAnswer = '';
-    if (_currentProblem.answer is String) {
-      correctAnswer = (_currentProblem.answer as String).trim();
+    // 정답 가져오기 (타입 안전하게)
+    final correctAnswerString = _currentProblem.getAnswerAsString();
+    if (correctAnswerString == null) {
+      // 답변이 String이 아닌 경우 오류 처리
+      _isCorrect = false;
+      return;
     }
+    final correctAnswer = correctAnswerString.trim();
 
     // 정답 체크
     if (_currentProblem.type == ProblemType.calculation) {

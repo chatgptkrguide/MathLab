@@ -9,7 +9,8 @@ class Problem {
   final String category;
   final int difficulty; // 1-5
   final List<String> choices; // 객관식 선택지
-  final dynamic answer; // 정답 (객관식: int index, 주관식: String)
+  final Object answer; // 정답 (객관식: int index, 주관식: String)
+  // Note: Object 타입 사용으로 런타임 타입 체크 강제. int 또는 String만 허용됨.
   final List<String> hints; // 힌트 리스트
   final String? explanation; // 풀이 설명
   final String? imageUrl; // 문제 이미지 경로
@@ -179,6 +180,20 @@ class Problem {
     }
     return false;
   }
+
+  /// 타입 안전한 정수 답변 가져오기 (객관식용)
+  int? getAnswerAsInt() {
+    return answer is int ? answer as int : null;
+  }
+
+  /// 타입 안전한 문자열 답변 가져오기 (주관식용)
+  String? getAnswerAsString() {
+    return answer is String ? answer as String : null;
+  }
+
+  /// 답변 타입 검증
+  bool isAnswerInt() => answer is int;
+  bool isAnswerString() => answer is String;
 }
 
 /// 문제 유형
