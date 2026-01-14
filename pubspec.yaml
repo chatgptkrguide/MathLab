@@ -1,5 +1,5 @@
 name: mathlab
-description: "A new Flutter project."
+description: "게임처럼 즐기는 매일의 수학 학습 앱 - MathLab"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
