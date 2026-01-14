@@ -1,24 +1,25 @@
 /// MathLab 앱의 커스텀 예외 클래스 계층 구조
-/// 
+///
 /// 모든 앱 예외는 AppException을 상속받아야 하며,
 /// 사용자에게 표시할 수 있는 메시지를 포함해야 합니다.
+library;
 
 /// 기본 앱 예외 클래스
 abstract class AppException implements Exception {
   /// 사용자에게 표시할 메시지
   final String message;
-  
+
   /// 개발자를 위한 상세 정보 (로깅용)
   final String? details;
-  
+
   /// 원본 에러 (있는 경우)
   final Object? originalError;
-  
+
   /// 스택 트레이스
   final StackTrace? stackTrace;
 
-  const AppException(
-    this.message, {
+  const AppException({
+    required this.message,
     this.details,
     this.originalError,
     this.stackTrace,
@@ -189,12 +190,13 @@ class FirestoreException extends DataException {
 
 /// 비즈니스 규칙 위반
 class BusinessException extends AppException {
-  const BusinessException(
-    super.message, {
+  const BusinessException({
+    required super.message,
     super.details,
     super.originalError,
     super.stackTrace,
   });
+}
 
 /// 작업 중복 (이미 진행 중인 작업)
 class DuplicateOperationException extends BusinessException {

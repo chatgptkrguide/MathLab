@@ -1051,12 +1051,12 @@ class _OnboardingProfileSetupScreenState
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _selectedGrade != null && grades.contains(_selectedGrade)
+            color: grades.contains(_selectedGrade)
                 ? color
                 : AppColors.borderLight,
             width: 3,
           ),
-          boxShadow: _selectedGrade != null && grades.contains(_selectedGrade)
+          boxShadow: grades.contains(_selectedGrade)
               ? [
                   BoxShadow(
                     color: color.withValues(alpha: 0.2),
