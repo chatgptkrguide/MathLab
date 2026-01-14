@@ -43,33 +43,36 @@ abstract class AppException implements Exception {
 
 /// 네트워크 연결 실패
 class NetworkException extends AppException {
-  const NetworkException([
+  const NetworkException({
     super.message = '네트워크 연결에 실패했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// API 요청 타임아웃
 class TimeoutException extends AppException {
-  const TimeoutException([
+  const TimeoutException({
     super.message = '요청 시간이 초과되었습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// 서버 에러 (5xx)
 class ServerException extends AppException {
   final int? statusCode;
 
-  const ServerException([
+  const ServerException({
     super.message = '서버에서 오류가 발생했습니다',
     super.details,
     this.statusCode,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 인증 관련 예외
@@ -77,30 +80,33 @@ class ServerException extends AppException {
 
 /// 인증 실패
 class AuthException extends AppException {
-  const AuthException([
+  const AuthException({
     super.message = '인증에 실패했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// 권한 없음 (403)
 class UnauthorizedException extends AppException {
-  const UnauthorizedException([
+  const UnauthorizedException({
     super.message = '접근 권한이 없습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// 세션 만료
 class SessionExpiredException extends AuthException {
-  const SessionExpiredException([
+  const SessionExpiredException({
     super.message = '세션이 만료되었습니다. 다시 로그인해주세요',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 데이터 관련 예외
@@ -108,30 +114,33 @@ class SessionExpiredException extends AuthException {
 
 /// 데이터 로드 실패
 class DataException extends AppException {
-  const DataException([
+  const DataException({
     super.message = '데이터를 불러올 수 없습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// 데이터를 찾을 수 없음 (404)
 class NotFoundException extends DataException {
-  const NotFoundException([
+  const NotFoundException({
     super.message = '요청한 데이터를 찾을 수 없습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// 데이터 파싱 실패
 class ParseException extends DataException {
-  const ParseException([
+  const ParseException({
     super.message = '데이터 형식이 올바르지 않습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 유효성 검증 예외
@@ -141,13 +150,14 @@ class ParseException extends DataException {
 class ValidationException extends AppException {
   final Map<String, String>? fieldErrors;
 
-  const ValidationException([
+  const ValidationException({
     super.message = '입력값이 올바르지 않습니다',
     super.details,
     this.fieldErrors,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 저장소 관련 예외
@@ -155,21 +165,23 @@ class ValidationException extends AppException {
 
 /// 로컬 저장소 에러
 class StorageException extends AppException {
-  const StorageException([
+  const StorageException({
     super.message = '저장소 작업에 실패했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// Firestore 에러
 class FirestoreException extends DataException {
-  const FirestoreException([
+  const FirestoreException({
     super.message = '데이터베이스 작업에 실패했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 비즈니스 로직 예외
@@ -186,21 +198,23 @@ class BusinessException extends AppException {
 
 /// 작업 중복 (이미 진행 중인 작업)
 class DuplicateOperationException extends BusinessException {
-  const DuplicateOperationException([
+  const DuplicateOperationException({
     super.message = '이미 진행 중인 작업입니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 /// 리소스 제한 초과
 class ResourceLimitException extends BusinessException {
-  const ResourceLimitException([
+  const ResourceLimitException({
     super.message = '허용된 제한을 초과했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 캐시 관련 예외
@@ -208,12 +222,13 @@ class ResourceLimitException extends BusinessException {
 
 /// 캐시 에러
 class CacheException extends AppException {
-  const CacheException([
+  const CacheException({
     super.message = '캐시 작업에 실패했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
+}
 
 // ==========================================
 // 알 수 없는 예외
@@ -221,10 +236,10 @@ class CacheException extends AppException {
 
 /// 예상치 못한 에러
 class UnknownException extends AppException {
-  const UnknownException([
+  const UnknownException({
     super.message = '예상치 못한 오류가 발생했습니다',
     super.details,
     super.originalError,
     super.stackTrace,
-  ]);
+  });
 }

@@ -8,12 +8,15 @@ import '../../constants/app_text_styles.dart';
 /// - 그라데이션 배경
 /// - 둥근 하단 모서리
 /// - 다양한 레이아웃 옵션 지원
-class CommonAppHeader extends StatelessWidget {
+class CommonAppHeader extends StatelessWidget implements PreferredSizeWidget {
   /// 헤더 제목
   final String title;
 
   /// 우측에 표시할 액션 위젯들
   final List<Widget>? actions;
+
+  /// 뒤로가기 버튼 표시 여부
+  final bool showBackButton;
 
   /// 좌측에 표시할 위젯 (일반적으로 뒤로가기 또는 메뉴 버튼)
   final Widget? leading;
@@ -34,12 +37,16 @@ class CommonAppHeader extends StatelessWidget {
     super.key,
     required this.title,
     this.actions,
+    this.showBackButton = true,
     this.leading,
     this.centerTitle = true,
     this.icon,
     this.iconColor,
     this.iconSize = 28,
   });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 30);
 
   @override
   Widget build(BuildContext context) {
