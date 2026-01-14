@@ -254,7 +254,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -271,7 +271,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 Text(
                   '달성한 업적',
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -291,7 +291,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               vertical: 8,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -355,7 +355,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -371,8 +371,8 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               height: 60,
               decoration: BoxDecoration(
                 color: achievement.isUnlocked
-                    ? AppColors.mathYellow.withOpacity(0.1)
-                    : AppColors.textSecondary.withOpacity(0.1),
+                    ? AppColors.mathYellow.withValues(alpha: 0.1)
+                    : AppColors.textSecondary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -410,7 +410,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.success.withOpacity(0.1),
+                            color: AppColors.success.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(

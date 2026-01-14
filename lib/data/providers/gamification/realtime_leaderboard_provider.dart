@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/utils/logger.dart';
-import '../../models/user/user_model.dart';
+import '../../models/user/user.dart' as user_model;
 
 /// 리더보드 기간
 enum LeaderboardPeriod {
@@ -39,21 +39,21 @@ class LeaderboardEntry {
   });
 
   factory LeaderboardEntry.fromUserModel(
-    UserModel user,
+    user_model.User user,
     int rank,
     bool isCurrentUser,
   ) {
     return LeaderboardEntry(
-      userId: user.uid,
-      userName: user.displayName ?? '알 수 없음',
+      userId: user.id,
+      userName: user.name,
       photoUrl: user.photoUrl ?? '',
       rank: rank,
       xp: user.xp,
       level: user.level,
-      streakDays: user.streakCount,
-      grade: user.grade,
+      streakDays: user.streakDays,
+      grade: user.currentGrade,
       isCurrentUser: isCurrentUser,
-      lastActiveAt: user.lastActive ?? DateTime.now(),
+      lastActiveAt: user.lastStudyDate ?? DateTime.now(),
     );
   }
 }
@@ -62,16 +62,16 @@ class LeaderboardEntry {
 class RealtimeLeaderboardNotifier
     extends StateNotifier<AsyncValue<List<LeaderboardEntry>>> {
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final firebase_auth.FirebaseAuth _auth;
   LeaderboardPeriod _period;
   StreamSubscription<QuerySnapshot>? _subscription;
 
   RealtimeLeaderboardNotifier({
     FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
+    firebase_auth.FirebaseAuth? auth,
     LeaderboardPeriod period = LeaderboardPeriod.weekly,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
+        _auth = auth ?? firebase_auth.FirebaseAuth.instance,
         _period = period,
         super(const AsyncValue.loading()) {
     _initialize();
@@ -146,8 +146,10 @@ class RealtimeLeaderboardNotifier
 
       for (var doc in snapshot.docs) {
         try {
-          final user = UserModel.fromFirestore(doc);
-          final isCurrentUser = user.uid == _currentUserId;
+          final user = user_model.User.fromFirestore(
+            doc as DocumentSnapshot<Map<String, dynamic>>,
+          );
+          final isCurrentUser = user.id == _currentUserId;
 
           entries.add(
             LeaderboardEntry.fromUserModel(user, rank, isCurrentUser),

@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/utils/logger.dart';
-import '../../models/user/user_model.dart';
+import '../../models/user/user.dart' as user_model;
 
 /// 친구 관계 상태
 enum FriendshipStatus {
@@ -110,15 +110,15 @@ class FriendActivity {
 }
 
 /// 친구 시스템 Provider
-class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
+class FriendProvider extends StateNotifier<AsyncValue<List<user_model.User>>> {
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final firebase_auth.FirebaseAuth _auth;
 
   FriendProvider({
     FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
+    firebase_auth.FirebaseAuth? auth,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
+        _auth = auth ?? firebase_auth.FirebaseAuth.instance,
         super(const AsyncValue.loading()) {
     _initialize();
   }
@@ -165,7 +165,7 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
           .toList();
 
       // 친구 정보 조회 (배치로 10개씩)
-      final List<UserModel> friends = [];
+      final List<user_model.User> friends = [];
       for (var i = 0; i < friendIds.length; i += 10) {
         final batch = friendIds.skip(i).take(10).toList();
         final usersSnapshot = await _firestore
@@ -174,7 +174,7 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
             .get();
 
         friends.addAll(
-          usersSnapshot.docs.map((doc) => UserModel.fromFirestore(doc)),
+          usersSnapshot.docs.map((doc) => user_model.User.fromFirestore(doc)),
         );
       }
 
@@ -195,7 +195,7 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
       // 현재 사용자 정보 가져오기
       final currentUserDoc =
           await _firestore.collection('users').doc(_currentUserId).get();
-      final currentUser = UserModel.fromFirestore(currentUserDoc);
+      final currentUser = user_model.User.fromFirestore(currentUserDoc);
 
       // 이미 요청이 있는지 확인
       final existingRequest = await _firestore
@@ -214,7 +214,7 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
       final request = FriendRequest(
         id: '',
         fromUserId: _currentUserId!,
-        fromUserName: currentUser.displayName ?? '알 수 없음',
+        fromUserName: currentUser.name,
         fromUserPhotoUrl: currentUser.photoUrl ?? '',
         toUserId: targetUserId,
         createdAt: DateTime.now(),
@@ -388,7 +388,7 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
           return Stream.value([]);
         }
 
-        final friendIds = friends.map((f) => f.uid).toList();
+        final friendIds = friends.map((f) => f.id).toList();
 
         return _firestore
             .collection('user_activities')
@@ -416,12 +416,12 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
     try {
       final userDoc =
           await _firestore.collection('users').doc(_currentUserId).get();
-      final user = UserModel.fromFirestore(userDoc);
+      final user = user_model.User.fromFirestore(userDoc);
 
       final activity = FriendActivity(
         id: '',
         userId: _currentUserId!,
-        userName: user.displayName ?? '알 수 없음',
+        userName: user.name,
         userPhotoUrl: user.photoUrl ?? '',
         activityType: activityType,
         description: description,
@@ -438,7 +438,7 @@ class FriendProvider extends StateNotifier<AsyncValue<List<UserModel>>> {
 
 /// Provider 정의
 final friendProvider =
-    StateNotifierProvider<FriendProvider, AsyncValue<List<UserModel>>>((ref) {
+    StateNotifierProvider<FriendProvider, AsyncValue<List<user_model.User>>>((ref) {
   return FriendProvider();
 });
 

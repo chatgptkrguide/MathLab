@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/utils/logger.dart';
-import '../../models/user/user_model.dart';
+import '../../models/user/user.dart' as user_model;
 
 /// 그룹 학습 모델
 class StudyGroup {
@@ -85,13 +85,13 @@ class StudyGroup {
 /// 그룹 학습 Provider
 class StudyGroupProvider extends StateNotifier<AsyncValue<List<StudyGroup>>> {
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final firebase_auth.FirebaseAuth _auth;
 
   StudyGroupProvider({
     FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
+    firebase_auth.FirebaseAuth? auth,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
+        _auth = auth ?? firebase_auth.FirebaseAuth.instance,
         super(const AsyncValue.loading()) {
     _initialize();
   }
@@ -148,14 +148,14 @@ class StudyGroupProvider extends StateNotifier<AsyncValue<List<StudyGroup>>> {
       // 현재 사용자 정보
       final userDoc =
           await _firestore.collection('users').doc(_currentUserId).get();
-      final user = UserModel.fromFirestore(userDoc);
+      final user = user_model.User.fromFirestore(userDoc);
 
       // 그룹 생성
       final groupData = {
         'name': name,
         'description': description,
         'creatorId': _currentUserId,
-        'creatorName': user.displayName ?? '알 수 없음',
+        'creatorName': user.name,
         'memberIds': [_currentUserId],
         'memberCount': 1,
         'maxMembers': maxMembers,
@@ -303,7 +303,7 @@ final studyGroupProvider =
 
 /// 내가 속한 그룹 목록 (실시간 업데이트)
 final myGroupsProvider = StreamProvider<List<StudyGroup>>((ref) {
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  final currentUserId = firebase_auth.FirebaseAuth.instance.currentUser?.uid;
   if (currentUserId == null) {
     return Stream.value([]);
   }
@@ -320,7 +320,7 @@ final myGroupsProvider = StreamProvider<List<StudyGroup>>((ref) {
 
 /// 그룹 멤버 목록
 final groupMembersProvider =
-    FutureProvider.family<List<UserModel>, String>((ref, groupId) async {
+    FutureProvider.family<List<user_model.User>, String>((ref, groupId) async {
   final firestore = FirebaseFirestore.instance;
 
   try {
@@ -332,7 +332,7 @@ final groupMembersProvider =
     if (memberIds.isEmpty) return [];
 
     // 멤버 정보 가져오기 (배치로 10명씩)
-    final List<UserModel> members = [];
+    final List<user_model.User> members = [];
     for (var i = 0; i < memberIds.length; i += 10) {
       final batch = memberIds.skip(i).take(10).toList();
       final usersSnapshot = await firestore
@@ -341,7 +341,7 @@ final groupMembersProvider =
           .get();
 
       members.addAll(
-        usersSnapshot.docs.map((doc) => UserModel.fromFirestore(doc)),
+        usersSnapshot.docs.map((doc) => user_model.User.fromFirestore(doc)),
       );
     }
 

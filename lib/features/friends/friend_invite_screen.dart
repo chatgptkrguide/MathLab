@@ -36,7 +36,7 @@ class _FriendInviteScreenState extends ConsumerState<FriendInviteScreen> {
 
     try {
       final user = ref.read(userProvider);
-      _inviteCode = user?.uid?.substring(0, 8).toUpperCase() ?? 'INVITE123';
+      _inviteCode = user?.id.substring(0, 8).toUpperCase() ?? 'INVITE123';
     } catch (e) {
       _inviteCode = 'INVITE123';
     } finally {

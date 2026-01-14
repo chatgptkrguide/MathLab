@@ -75,7 +75,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.mathYellow,
-                    AppColors.mathYellow.withOpacity(0.7),
+                    AppColors.mathYellow.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -112,7 +112,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -126,7 +126,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.mathYellow.withOpacity(0.1),
+                          color: AppColors.mathYellow.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -236,7 +236,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -261,7 +261,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                     Text(
                       '3개의 문제를 풀고 보너스 XP를 받으세요!',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -366,10 +366,10 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                   height: 48,
                   decoration: BoxDecoration(
                     color: isCompleted
-                        ? AppColors.success.withOpacity(0.1)
+                        ? AppColors.success.withValues(alpha: 0.1)
                         : isLocked
-                            ? AppColors.textSecondary.withOpacity(0.1)
-                            : AppColors.primary.withOpacity(0.1),
+                            ? AppColors.textSecondary.withValues(alpha: 0.1)
+                            : AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -447,10 +447,10 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.mathYellow.withOpacity(0.1),
+        color: AppColors.mathYellow.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.mathYellow.withOpacity(0.3),
+          color: AppColors.mathYellow.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -459,7 +459,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.mathYellow.withOpacity(0.2),
+              color: AppColors.mathYellow.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
