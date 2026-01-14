@@ -38,6 +38,7 @@ class AppColors {
   // ==========================================
 
   static const Color primary = mathButtonBlue;
+  static const Color primaryLight = Color(0xFFE3EEFF); // primary의 밝은 버전
   static const Color success = mathGreen;
   static const Color error = mathRed;
   static const Color warning = mathOrange;
@@ -47,6 +48,7 @@ class AppColors {
   // ==========================================
 
   static const Color background = Color(0xFFF8F9FA);
+  static const Color backgroundGray = Color(0xFFF5F5F5); // 회색 배경
   static const Color surface = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF1A1A1A);
   static const Color textSecondary = Color(0xFF4A4A4A);

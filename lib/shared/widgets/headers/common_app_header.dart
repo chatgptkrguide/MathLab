@@ -201,7 +201,8 @@ class CommonAppHeaderWithMenu extends StatelessWidget {
 /// 뒤로가기 버튼이 있는 공통 헤더
 ///
 /// 좌측에 뒤로가기 버튼이 있고 중앙에 제목이 있는 헤더
-class CommonAppHeaderWithBack extends StatelessWidget {
+class CommonAppHeaderWithBack extends StatelessWidget
+    implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBackPressed;
   final IconData? icon;
@@ -216,6 +217,9 @@ class CommonAppHeaderWithBack extends StatelessWidget {
     this.iconColor,
     this.iconSize = 28,
   });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 30);
 
   @override
   Widget build(BuildContext context) {
