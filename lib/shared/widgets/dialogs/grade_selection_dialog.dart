@@ -314,7 +314,7 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                       ? LinearGradient(
                           colors: [
                             schoolColor,
-                            schoolColor.withOpacity(0.8),
+                            schoolColor.withValues(alpha: 0.8),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -333,7 +333,7 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: schoolColor.withOpacity(0.3),
+                            color: schoolColor.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -377,7 +377,7 @@ class _GradeSelectionDialogState extends State<GradeSelectionDialog> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.success.withOpacity(0.3),
+                          color: AppColors.success.withValues(alpha: 0.3),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
                         ),

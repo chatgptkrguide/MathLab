@@ -53,7 +53,7 @@ class HomeHeader extends ConsumerWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: IconButton(
@@ -92,7 +92,7 @@ class HomeHeader extends ConsumerWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.mathRed.withOpacity(0.4),
+                            color: AppColors.mathRed.withValues(alpha: 0.4),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),

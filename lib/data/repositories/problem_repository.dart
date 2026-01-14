@@ -107,23 +107,33 @@ class ProblemRepository {
             metadata['subject'] = subject;
           }
 
-          if (data.containsKey('chapter'))
+          if (data.containsKey('chapter')) {
             metadata['chapter'] = data['chapter'];
-          if (data.containsKey('section'))
+          }
+          if (data.containsKey('section')) {
             metadata['section'] = data['section'];
-          if (data.containsKey('problemCode'))
+          }
+          if (data.containsKey('problemCode')) {
             metadata['problemCode'] = data['problemCode'];
-          if (data.containsKey('difficultyLevel'))
+          }
+          if (data.containsKey('difficultyLevel')) {
             metadata['difficultyLevel'] = data['difficultyLevel'];
-          if (data.containsKey('assessmentElements'))
+          }
+          if (data.containsKey('assessmentElements')) {
             metadata['assessmentElements'] = data['assessmentElements'];
-          if (data.containsKey('tags')) metadata['tags'] = data['tags'];
-          if (data.containsKey('xpReward'))
+          }
+          if (data.containsKey('tags')) {
+            metadata['tags'] = data['tags'];
+          }
+          if (data.containsKey('xpReward')) {
             metadata['xpReward'] = data['xpReward'];
-          if (data.containsKey('lessonId'))
+          }
+          if (data.containsKey('lessonId')) {
             metadata['lessonId'] = data['lessonId'];
-          if (data.containsKey('solution'))
+          }
+          if (data.containsKey('solution')) {
             metadata['solution'] = data['solution'];
+          }
 
           return Problem(
             id: data['id'] as String,

@@ -69,7 +69,7 @@ class ProblemHeader extends ConsumerWidget {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: AppColors.surface.withOpacity(0.2),
+        color: AppColors.surface.withValues(alpha: 0.2),
         shape: BoxShape.circle,
       ),
       child: IconButton(
@@ -109,7 +109,7 @@ class ProblemHeader extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -181,7 +181,7 @@ class ProblemHeader extends ConsumerWidget {
         Container(
           height: 12,
           decoration: BoxDecoration(
-            color: AppColors.surface.withOpacity(0.25),
+            color: AppColors.surface.withValues(alpha: 0.25),
             borderRadius: BorderRadius.circular(10),
           ),
         ),
@@ -203,7 +203,7 @@ class ProblemHeader extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.mathYellow.withOpacity(0.3),
+                      color: AppColors.mathYellow.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

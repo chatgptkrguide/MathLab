@@ -24,15 +24,15 @@ class LeaguePromotionInfo extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.mathGreen.withOpacity(0.15),
-                    AppColors.mathGreen.withOpacity(0.05),
+                    AppColors.mathGreen.withValues(alpha: 0.15),
+                    AppColors.mathGreen.withValues(alpha: 0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.mathGreen.withOpacity(0.3),
+                  color: AppColors.mathGreen.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -41,7 +41,7 @@ class LeaguePromotionInfo extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.mathGreen.withOpacity(0.2),
+                      color: AppColors.mathGreen.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -80,15 +80,15 @@ class LeaguePromotionInfo extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.mathRed.withOpacity(0.15),
-                    AppColors.mathRed.withOpacity(0.05),
+                    AppColors.mathRed.withValues(alpha: 0.15),
+                    AppColors.mathRed.withValues(alpha: 0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.mathRed.withOpacity(0.3),
+                  color: AppColors.mathRed.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -97,7 +97,7 @@ class LeaguePromotionInfo extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.mathRed.withOpacity(0.2),
+                      color: AppColors.mathRed.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

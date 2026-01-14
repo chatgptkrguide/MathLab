@@ -171,7 +171,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -268,7 +268,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.borderLight.withOpacity(0.2),
+            color: AppColors.borderLight.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -513,7 +513,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   boxShadow: isCompleted
                       ? [
                           BoxShadow(
-                            color: AppColors.mathBlue.withOpacity(0.3),
+                            color: AppColors.mathBlue.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),

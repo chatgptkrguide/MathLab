@@ -99,7 +99,7 @@ class FriendsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -123,7 +123,7 @@ class FriendsScreen extends ConsumerWidget {
       child: ListTile(
         onTap: () => _showFriendActions(context, ref, friend),
         leading: CircleAvatar(
-          backgroundColor: AppColors.accentCyan.withOpacity(0.1),
+          backgroundColor: AppColors.accentCyan.withValues(alpha: 0.1),
           child: Text(
             friend.name[0].toUpperCase(),
             style: TextStyle(
@@ -192,10 +192,10 @@ class FriendsScreen extends ConsumerWidget {
   ) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      color: AppColors.primary.withOpacity(0.05),
+      color: AppColors.primary.withValues(alpha: 0.05),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withOpacity(0.1),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
           child: Text(
             friend.name[0].toUpperCase(),
             style: TextStyle(
@@ -265,14 +265,14 @@ class FriendsScreen extends ConsumerWidget {
           Icon(
             Icons.people_outline,
             size: 64,
-            color: AppColors.textSecondary.withOpacity(0.5),
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             '친구가 없습니다',
             style: TextStyle(
               fontSize: 16,
-              color: AppColors.textSecondary.withOpacity(0.7),
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 8),
@@ -280,7 +280,7 @@ class FriendsScreen extends ConsumerWidget {
             '친구를 추가해보세요!',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary.withOpacity(0.5),
+              color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
           ),
         ],

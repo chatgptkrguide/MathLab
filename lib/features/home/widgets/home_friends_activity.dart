@@ -47,7 +47,7 @@ class HomeFriendsActivity extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -114,20 +114,20 @@ class HomeFriendsActivity extends ConsumerWidget {
         gradient: LinearGradient(
           colors: [
             Colors.white,
-            AppColors.primary.withOpacity(0.03),
+            AppColors.primary.withValues(alpha: 0.03),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.15),
+          color: AppColors.primary.withValues(alpha: 0.15),
           width: 2,
           style: BorderStyle.solid,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.08),
+            color: AppColors.primary.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -207,12 +207,12 @@ class HomeFriendsActivity extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.accentCyan.withOpacity(0.15),
+            color: AppColors.accentCyan.withValues(alpha: 0.15),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -230,8 +230,8 @@ class HomeFriendsActivity extends ConsumerWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.accentCyan.withOpacity(0.2),
-                    AppColors.accentCyan.withOpacity(0.1),
+                    AppColors.accentCyan.withValues(alpha: 0.2),
+                    AppColors.accentCyan.withValues(alpha: 0.1),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -239,7 +239,7 @@ class HomeFriendsActivity extends ConsumerWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentCyan.withOpacity(0.2),
+                    color: AppColors.accentCyan.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),

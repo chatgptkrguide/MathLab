@@ -197,7 +197,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
         FadeTransition(
           opacity: _backdropAnimation,
           child: Container(
-            color: AppColors.cardShadow.withOpacity(0.8),
+            color: AppColors.cardShadow.withValues(alpha: 0.8),
           ),
         ),
 
@@ -241,8 +241,8 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    _rarityColor.withOpacity(0.3 * _badgeGlowAnimation.value),
-                    _rarityColor.withOpacity(0.0),
+                    _rarityColor.withValues(alpha: 0.3 * _badgeGlowAnimation.value),
+                    _rarityColor.withValues(alpha: 0.0),
                   ],
                   stops: const [0.5, 1.0],
                 ),
@@ -258,13 +258,13 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                       end: Alignment.bottomRight,
                       colors: [
                         _rarityColor,
-                        _rarityColor.withOpacity(0.7),
+                        _rarityColor.withValues(alpha: 0.7),
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: _rarityColor
-                            .withOpacity(0.5 * _badgeGlowAnimation.value),
+                            .withValues(alpha: 0.5 * _badgeGlowAnimation.value),
                         blurRadius: 30,
                         spreadRadius: 10,
                       ),
@@ -298,7 +298,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
             borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
             boxShadow: [
               BoxShadow(
-                color: AppColors.cardShadow.withOpacity(0.2),
+                color: AppColors.cardShadow.withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -339,7 +339,7 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                   gradient: LinearGradient(
                     colors: [
                       _rarityColor,
-                      _rarityColor.withOpacity(0.8),
+                      _rarityColor.withValues(alpha: 0.8),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusL),
@@ -382,10 +382,10 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingL),
                 decoration: BoxDecoration(
-                  color: AppColors.mathBlue.withOpacity(0.1),
+                  color: AppColors.mathBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   border: Border.all(
-                    color: AppColors.mathBlue.withOpacity(0.3),
+                    color: AppColors.mathBlue.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -422,13 +422,13 @@ class _BadgeUnlockDialogState extends State<BadgeUnlockDialog>
                     gradient: LinearGradient(
                       colors: [
                         _rarityColor,
-                        _rarityColor.withOpacity(0.8),
+                        _rarityColor.withValues(alpha: 0.8),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     boxShadow: [
                       BoxShadow(
-                        color: _rarityColor.withOpacity(0.3),
+                        color: _rarityColor.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

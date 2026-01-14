@@ -149,9 +149,9 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     decoration: InputDecoration(
                       labelText: '이름',
                       labelStyle:
-                          TextStyle(color: Colors.white.withOpacity(0.7)),
+                          TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.1),
+                      fillColor: Colors.white.withValues(alpha: 0.1),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -177,9 +177,9 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: '이메일',
-                    labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
+                    fillColor: Colors.white.withValues(alpha: 0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -206,9 +206,9 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: '비밀번호',
-                    labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
+                    fillColor: Colors.white.withValues(alpha: 0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -282,7 +282,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   child: Text(
                     _isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -308,7 +308,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             decoration: InputDecoration(
                               hintText: '이메일을 입력하세요',
                               hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5)),
+                                  color: Colors.white.withValues(alpha: 0.5)),
                             ),
                           ),
                           actions: [
@@ -319,11 +319,12 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             TextButton(
                               onPressed: () async {
                                 if (emailController.text.isNotEmpty) {
+                                  final navigator = Navigator.of(context);
                                   await _authService.sendPasswordResetEmail(
                                     emailController.text.trim(),
                                   );
                                   if (mounted) {
-                                    Navigator.pop(context);
+                                    navigator.pop();
                                     _showError('비밀번호 재설정 이메일을 전송했습니다');
                                   }
                                 }
@@ -337,7 +338,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     child: Text(
                       '비밀번호를 잊으셨나요?',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 14,
                       ),
                     ),

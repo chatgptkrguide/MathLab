@@ -12,15 +12,15 @@ class GuestLoginPrompt extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.mathYellow.withOpacity(0.1),
+        color: AppColors.mathYellow.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.mathYellow.withOpacity(0.3),
+          color: AppColors.mathYellow.withValues(alpha: 0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.mathYellow.withOpacity(0.1),
+            color: AppColors.mathYellow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -34,7 +34,7 @@ class GuestLoginPrompt extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.mathYellow.withOpacity(0.2),
+                  color: AppColors.mathYellow.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

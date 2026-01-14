@@ -93,7 +93,7 @@ class DuolingoStyles {
           spreadRadius: shadowSpreadRadius,
         ),
         BoxShadow(
-          color: duolingoGreen.withOpacity(0.4),
+          color: duolingoGreen.withValues(alpha: 0.4),
           blurRadius: shadowBlurRadius,
           offset: const Offset(0, 4),
         ),
@@ -108,7 +108,7 @@ class DuolingoStyles {
           spreadRadius: shadowSpreadRadius,
         ),
         BoxShadow(
-          color: duolingoGreen.withOpacity(0.3),
+          color: duolingoGreen.withValues(alpha: 0.3),
           blurRadius: shadowBlurRadius,
           offset: const Offset(0, 3),
         ),
@@ -117,13 +117,13 @@ class DuolingoStyles {
   /// 듀오링고 블루 3D 그림자
   static List<BoxShadow> get blueShadow => [
         BoxShadow(
-          color: Colors.blue.shade300.withOpacity(0.4),
+          color: Colors.blue.shade300.withValues(alpha: 0.4),
           offset: const Offset(0, shadowOffset),
           blurRadius: shadowSpreadRadius,
           spreadRadius: shadowSpreadRadius,
         ),
         BoxShadow(
-          color: Colors.blue.shade200.withOpacity(0.3),
+          color: Colors.blue.shade200.withValues(alpha: 0.3),
           blurRadius: shadowBlurRadius,
           offset: const Offset(0, 4),
         ),
@@ -138,7 +138,7 @@ class DuolingoStyles {
           spreadRadius: shadowSpreadRadius,
         ),
         BoxShadow(
-          color: Colors.grey.shade200.withOpacity(0.5),
+          color: Colors.grey.shade200.withValues(alpha: 0.5),
           blurRadius: shadowBlurRadius,
           offset: const Offset(0, 4),
         ),
@@ -152,8 +152,8 @@ class DuolingoStyles {
   static BoxDecoration get topHighlight => BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(0.8),
-            Colors.white.withOpacity(0.0),
+            Colors.white.withValues(alpha: 0.8),
+            Colors.white.withValues(alpha: 0.0),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -168,8 +168,8 @@ class DuolingoStyles {
   static BoxDecoration get topHighlightPressed => BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(0.1),
-            Colors.white.withOpacity(0.0),
+            Colors.white.withValues(alpha: 0.1),
+            Colors.white.withValues(alpha: 0.0),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,

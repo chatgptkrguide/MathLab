@@ -186,7 +186,7 @@ class _UnifiedButtonState extends State<UnifiedButton>
               border: Border.all(
                 color: enabled
                     ? _effectiveShadowColor
-                    : AppColors.borderLight.withOpacity(0.8),
+                    : AppColors.borderLight.withValues(alpha: 0.8),
                 width: 3,
               ),
             ),

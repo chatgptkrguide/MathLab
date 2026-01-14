@@ -105,37 +105,6 @@ class _OnboardingProfileSetupScreenState
     }
   }
 
-  Future<void> _selectBirthDate() async {
-    final currentDate = DateTime.now();
-    final initialDate = _selectedBirthDate ?? DateTime(currentDate.year - 15);
-
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: currentDate,
-      locale: const Locale('ko', 'KR'),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.mathBlue,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        _selectedBirthDate = pickedDate;
-      });
-    }
-  }
-
   void _updateBirthDate() {
     if (_selectedBirthYear != null &&
         _selectedBirthMonth != null &&
@@ -152,10 +121,6 @@ class _OnboardingProfileSetupScreenState
         });
       }
     }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.year}년 ${date.month.toString().padLeft(2, '0')}월 ${date.day.toString().padLeft(2, '0')}일';
   }
 
   int _calculateAge(DateTime birthDate) {
@@ -247,7 +212,7 @@ class _OnboardingProfileSetupScreenState
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: duolingoGreen.withOpacity(0.4),
+                        color: duolingoGreen.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -270,7 +235,7 @@ class _OnboardingProfileSetupScreenState
                   child: Container(
                     height: 12,
                     decoration: BoxDecoration(
-                      color: AppColors.borderLight.withOpacity(0.5),
+                      color: AppColors.borderLight.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Stack(
@@ -280,8 +245,8 @@ class _OnboardingProfileSetupScreenState
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                AppColors.borderLight.withOpacity(0.3),
-                                AppColors.borderLight.withOpacity(0.1),
+                                AppColors.borderLight.withValues(alpha: 0.3),
+                                AppColors.borderLight.withValues(alpha: 0.1),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(12),
@@ -302,7 +267,7 @@ class _OnboardingProfileSetupScreenState
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: duolingoGreen.withOpacity(0.4),
+                                color: duolingoGreen.withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -319,7 +284,7 @@ class _OnboardingProfileSetupScreenState
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.mathBlue.withOpacity(0.1),
+                    color: AppColors.mathBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -412,10 +377,10 @@ class _OnboardingProfileSetupScreenState
           Container(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.95),
+              color: Colors.white.withValues(alpha: 0.95),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -818,7 +783,7 @@ class _OnboardingProfileSetupScreenState
                                       ? [
                                           BoxShadow(
                                             color: AppColors.mathBlue
-                                                .withOpacity(0.3),
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 12,
                                             offset: const Offset(0, 4),
                                           ),
@@ -1047,7 +1012,7 @@ class _OnboardingProfileSetupScreenState
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: color.withOpacity(0.3),
+                                      color: color.withValues(alpha: 0.3),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
@@ -1094,7 +1059,7 @@ class _OnboardingProfileSetupScreenState
           boxShadow: _selectedGrade != null && grades.contains(_selectedGrade)
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.2),
+                    color: color.withValues(alpha: 0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -1108,7 +1073,7 @@ class _OnboardingProfileSetupScreenState
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -1133,16 +1098,14 @@ class _OnboardingProfileSetupScreenState
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _selectedGrade != null && grades.contains(_selectedGrade)
-                        ? _selectedGrade!
+                    grades.contains(_selectedGrade)
+                        ? _selectedGrade
                         : '탭하여 선택',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: _selectedGrade != null &&
-                              grades.contains(_selectedGrade)
+                      color: grades.contains(_selectedGrade)
                           ? color
                           : AppColors.textSecondary,
-                      fontWeight: _selectedGrade != null &&
-                              grades.contains(_selectedGrade)
+                      fontWeight: grades.contains(_selectedGrade)
                           ? FontWeight.w600
                           : FontWeight.normal,
                     ),
@@ -1153,7 +1116,7 @@ class _OnboardingProfileSetupScreenState
             // 화살표
             Icon(
               Icons.arrow_forward_ios,
-              color: _selectedGrade != null && grades.contains(_selectedGrade)
+              color: grades.contains(_selectedGrade)
                   ? color
                   : AppColors.textSecondary,
               size: 20,

@@ -82,7 +82,7 @@ class LoadingOverlayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black.withOpacity(0.5),
+      color: Colors.black.withValues(alpha: 0.5),
       child: InkWell(
         onTap: barrierDismissible ? onDismiss : null,
         child: Center(
@@ -93,7 +93,7 @@ class LoadingOverlayWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),

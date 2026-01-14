@@ -9,7 +9,7 @@ class LearningPathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFBDBDBD).withOpacity(0.5)
+      ..color = const Color(0xFFBDBDBD).withValues(alpha: 0.5)
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

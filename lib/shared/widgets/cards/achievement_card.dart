@@ -46,21 +46,21 @@ class AchievementCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: isUnlocked
-                ? _getRarityColor().withOpacity(0.3)
+                ? _getRarityColor().withValues(alpha: 0.3)
                 : AppColors.borderLight,
             width: isUnlocked ? 2 : 1,
           ),
           boxShadow: isUnlocked
               ? [
                   BoxShadow(
-                    color: _getRarityColor().withOpacity(0.25),
+                    color: _getRarityColor().withValues(alpha: 0.25),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ]
               : [
                   BoxShadow(
-                    color: AppColors.textSecondary.withOpacity(0.05),
+                    color: AppColors.textSecondary.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -88,7 +88,7 @@ class AchievementCard extends StatelessWidget {
                     shadows: isUnlocked
                         ? [
                             Shadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               offset: const Offset(0, 1),
                               blurRadius: 2,
                             ),
@@ -121,7 +121,7 @@ class AchievementCard extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             _getRarityColor(),
-                            _getRarityColor().withOpacity(0.7),
+                            _getRarityColor().withValues(alpha: 0.7),
                           ],
                         ),
                       ),
@@ -147,7 +147,7 @@ class AchievementCard extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.surface.withOpacity(0.25),
+                  color: AppColors.surface.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -188,27 +188,27 @@ class AchievementCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.surface.withOpacity(0.4),
-                  AppColors.surface.withOpacity(0.2),
+                  AppColors.surface.withValues(alpha: 0.4),
+                  AppColors.surface.withValues(alpha: 0.2),
                 ],
               )
             : LinearGradient(
                 colors: [
-                  AppColors.disabled.withOpacity(0.15),
-                  AppColors.disabled.withOpacity(0.08),
+                  AppColors.disabled.withValues(alpha: 0.15),
+                  AppColors.disabled.withValues(alpha: 0.08),
                 ],
               ),
         shape: BoxShape.circle,
         border: Border.all(
           color: isUnlocked
-              ? AppColors.surface.withOpacity(0.3)
-              : AppColors.disabled.withOpacity(0.2),
+              ? AppColors.surface.withValues(alpha: 0.3)
+              : AppColors.disabled.withValues(alpha: 0.2),
           width: 2,
         ),
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: AppColors.surface.withOpacity(0.2),
+                  color: AppColors.surface.withValues(alpha: 0.2),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -233,7 +233,7 @@ class AchievementCard extends StatelessWidget {
       case AchievementRarity.common:
         return [
           AppColors.textSecondary,
-          AppColors.textSecondary.withOpacity(0.8)
+          AppColors.textSecondary.withValues(alpha: 0.8)
         ]; // GoMath gray
       case AchievementRarity.uncommon:
         return AppColors.greenGradient;

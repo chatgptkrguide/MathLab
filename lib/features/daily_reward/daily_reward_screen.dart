@@ -152,9 +152,9 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -224,7 +224,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                 color: AppColors.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -296,7 +296,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen>
                 child: Container(
                   padding: const EdgeInsets.all(AppDimensions.paddingL),
                   decoration: BoxDecoration(
-                    color: AppColors.disabled.withOpacity(0.3),
+                    color: AppColors.disabled.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                   child: Row(
@@ -353,27 +353,27 @@ class _DayRewardCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppDimensions.paddingL),
             decoration: BoxDecoration(
               color: isCurrentDay
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.1)
                   : AppColors.surface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
                 color: isCurrentDay
                     ? AppColors.primary
                     : isClaimed
-                        ? AppColors.success.withOpacity(0.5)
+                        ? AppColors.success.withValues(alpha: 0.5)
                         : AppColors.borderLight,
                 width: isCurrentDay ? 2 : 1,
               ),
               boxShadow: [
                 if (isCurrentDay)
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.2),
+                    color: AppColors.primary.withValues(alpha: 0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   )
                 else if (!isLocked)
                   BoxShadow(
-                    color: AppColors.borderLight.withOpacity(0.15),
+                    color: AppColors.borderLight.withValues(alpha: 0.15),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),

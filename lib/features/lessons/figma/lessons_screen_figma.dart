@@ -48,57 +48,62 @@ class LessonsScreenFigma extends ConsumerWidget {
                     bottomRight: Radius.circular(28),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.menu,
-                          color: AppColors.headerText, size: 28),
-                      onPressed: () {
-                        _showGradeSelectionDrawer(context, ref);
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '학습',
-                            style: AppTextStyles.headlineMedium.copyWith(
-                              color: AppColors.headerText,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.headerText.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              displayGrade,
-                              style: AppTextStyles.bodyMedium.copyWith(
+                child: SafeArea(
+                  bottom: false,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.menu,
+                            color: AppColors.headerText, size: 28),
+                        onPressed: () {
+                          _showGradeSelectionDrawer(context, ref);
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '학습',
+                              style: AppTextStyles.headlineMedium.copyWith(
                                 color: AppColors.headerText,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize: 22,
+                                letterSpacing: 0.5,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.headerText.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                displayGrade,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.headerText,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 48), // 대칭을 위한 빈 공간
-                  ],
+                      const SizedBox(width: 48), // 대칭을 위한 빈 공간
+                    ],
+                  ),
                 ),
               ),
 

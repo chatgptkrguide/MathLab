@@ -113,7 +113,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textSecondary.withOpacity(0.1),
+            color: AppColors.textSecondary.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -228,7 +228,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.errorRed.withOpacity(0.1),
+                        color: AppColors.errorRed.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -391,7 +391,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textSecondary.withOpacity(0.15),
+              color: AppColors.textSecondary.withValues(alpha: 0.15),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),

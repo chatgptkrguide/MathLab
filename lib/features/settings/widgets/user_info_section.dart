@@ -30,7 +30,7 @@ class UserInfoSection extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 width: 3,
               ),
             ),
@@ -57,7 +57,7 @@ class UserInfoSection extends StatelessWidget {
             user?.email ?? 'guest@gomath.com',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],

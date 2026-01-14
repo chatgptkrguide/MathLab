@@ -79,18 +79,18 @@ class _HintSectionState extends ConsumerState<HintSection>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.mathOrange.withOpacity(0.04),
-              AppColors.mathOrange.withOpacity(0.015),
+              AppColors.mathOrange.withValues(alpha: 0.04),
+              AppColors.mathOrange.withValues(alpha: 0.015),
             ],
           ),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: AppColors.mathOrange.withOpacity(0.18),
+            color: AppColors.mathOrange.withValues(alpha: 0.18),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.mathOrange.withOpacity(0.08),
+              color: AppColors.mathOrange.withValues(alpha: 0.08),
               blurRadius: 16,
               offset: const Offset(0, 3),
             ),
@@ -125,13 +125,13 @@ class _HintSectionState extends ConsumerState<HintSection>
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                AppColors.mathOrange.withOpacity(_glowAnimation.value),
-                                AppColors.mathOrange.withOpacity(_glowAnimation.value * 0.7),
+                                AppColors.mathOrange.withValues(alpha: _glowAnimation.value),
+                                AppColors.mathOrange.withValues(alpha: _glowAnimation.value * 0.7),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.mathOrange.withOpacity(_glowAnimation.value),
+                                color: AppColors.mathOrange.withValues(alpha: _glowAnimation.value),
                                 blurRadius: 20,
                                 spreadRadius: 2,
                               ),
@@ -194,7 +194,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                                 child: Container(
                                   height: 6,
                                   decoration: BoxDecoration(
-                                    color: AppColors.borderLight.withOpacity(0.3),
+                                    color: AppColors.borderLight.withValues(alpha: 0.3),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: FractionallySizedBox(
@@ -205,7 +205,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                                         gradient: LinearGradient(
                                           colors: [
                                             AppColors.mathOrange,
-                                            AppColors.mathOrange.withOpacity(0.7),
+                                            AppColors.mathOrange.withValues(alpha: 0.7),
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(3),
@@ -240,13 +240,13 @@ class _HintSectionState extends ConsumerState<HintSection>
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            AppColors.mathOrange.withOpacity(0.15),
-                            AppColors.mathOrange.withOpacity(0.08),
+                            AppColors.mathOrange.withValues(alpha: 0.15),
+                            AppColors.mathOrange.withValues(alpha: 0.08),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.mathOrange.withOpacity(0.3),
+                          color: AppColors.mathOrange.withValues(alpha: 0.3),
                           width: 2,
                         ),
                       ),
@@ -278,7 +278,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColors.mathOrange.withOpacity(0.1),
+                          color: AppColors.mathOrange.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -387,7 +387,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                       Text(
                         '-${HintProviderOptimized.hintCost} XP',
                         style: TextStyle(
-                          color: AppColors.surface.withOpacity(0.9),
+                          color: AppColors.surface.withValues(alpha: 0.9),
                           fontSize: 13,
                         ),
                       ),
@@ -436,7 +436,7 @@ class _HintSectionState extends ConsumerState<HintSection>
                       Text(
                         '${HintProviderOptimized.hintCost} XP 필요',
                         style: TextStyle(
-                          color: AppColors.surface.withOpacity(0.9),
+                          color: AppColors.surface.withValues(alpha: 0.9),
                           fontSize: 13,
                         ),
                       ),
@@ -515,23 +515,23 @@ class _HintItemState extends State<_HintItem>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.successGreen.withOpacity(0.08),
-                  AppColors.successGreen.withOpacity(0.04),
+                  AppColors.successGreen.withValues(alpha: 0.08),
+                  AppColors.successGreen.withValues(alpha: 0.04),
                 ],
               )
             : LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.disabled.withOpacity(0.05),
-                  AppColors.disabled.withOpacity(0.02),
+                  AppColors.disabled.withValues(alpha: 0.05),
+                  AppColors.disabled.withValues(alpha: 0.02),
                 ],
               ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: widget.isUnlocked
-              ? AppColors.successGreen.withOpacity(0.3)
-              : AppColors.borderLight.withOpacity(0.5),
+              ? AppColors.successGreen.withValues(alpha: 0.3)
+              : AppColors.borderLight.withValues(alpha: 0.5),
           width: 2,
         ),
       ),
@@ -572,7 +572,7 @@ class _HintItemState extends State<_HintItem>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.successGreen.withOpacity(0.3),
+                  color: AppColors.successGreen.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -596,7 +596,7 @@ class _HintItemState extends State<_HintItem>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.successGreen.withOpacity(0.15),
+                    color: AppColors.successGreen.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -639,13 +639,13 @@ class _HintItemState extends State<_HintItem>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.disabled.withOpacity(0.2),
-                AppColors.disabled.withOpacity(0.1),
+                AppColors.disabled.withValues(alpha: 0.2),
+                AppColors.disabled.withValues(alpha: 0.1),
               ],
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.borderLight.withOpacity(0.5),
+              color: AppColors.borderLight.withValues(alpha: 0.5),
               width: 2,
             ),
           ),
@@ -674,7 +674,7 @@ class _HintItemState extends State<_HintItem>
                 children: [
                   Icon(
                     Icons.diamond,
-                    color: AppColors.mathOrange.withOpacity(0.7),
+                    color: AppColors.mathOrange.withValues(alpha: 0.7),
                     size: 18,
                   ),
                   const SizedBox(width: 6),
@@ -742,20 +742,20 @@ class _HintItemState extends State<_HintItem>
                             end: Alignment.bottomCenter,
                             colors: [
                               AppColors.disabled,
-                              AppColors.disabled.withOpacity(0.8),
+                              AppColors.disabled.withValues(alpha: 0.8),
                             ],
                           ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: widget.canUnlock
                           ? AppColors.mathOrangeDark
-                          : AppColors.disabled.withOpacity(0.6),
+                          : AppColors.disabled.withValues(alpha: 0.6),
                       width: 2,
                     ),
                     boxShadow: widget.canUnlock
                         ? [
                             BoxShadow(
-                              color: AppColors.mathOrange.withOpacity(0.4),
+                              color: AppColors.mathOrange.withValues(alpha: 0.4),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),

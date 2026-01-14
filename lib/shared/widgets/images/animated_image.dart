@@ -363,7 +363,7 @@ class _BadgeImageState extends State<BadgeImage>
                       height: widget.size,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withValues(alpha: 0.6),
                       ),
                       child: const Icon(
                         Icons.lock,
@@ -380,8 +380,8 @@ class _BadgeImageState extends State<BadgeImage>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.mathGold.withOpacity(
-                            1.0 - _controller.value,
+                          color: AppColors.mathGold.withValues(
+                            alpha: 1.0 - _controller.value,
                           ),
                           width: 3,
                         ),

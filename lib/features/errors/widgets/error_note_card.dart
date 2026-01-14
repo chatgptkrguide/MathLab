@@ -38,7 +38,7 @@ class ErrorNoteCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.borderLight.withOpacity(0.2),
+                color: AppColors.borderLight.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -103,7 +103,7 @@ class ErrorNoteCard extends StatelessWidget {
                     vertical: AppDimensions.spacingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.warningOrange.withOpacity(0.1),
+                    color: AppColors.warningOrange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Text(

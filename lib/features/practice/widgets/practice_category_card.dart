@@ -49,7 +49,7 @@ class PracticeCategoryCard extends ConsumerWidget {
           border: Border.all(color: AppColors.borderLight),
           boxShadow: [
             BoxShadow(
-              color: AppColors.borderLight.withOpacity(0.15),
+              color: AppColors.borderLight.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -62,7 +62,7 @@ class PracticeCategoryCard extends ConsumerWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: _getCategoryColor(category).withOpacity(0.1),
+                color: _getCategoryColor(category).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Center(

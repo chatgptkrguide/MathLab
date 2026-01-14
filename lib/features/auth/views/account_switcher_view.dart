@@ -86,7 +86,7 @@ class AccountSwitcherView extends ConsumerWidget {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -2),
                   ),
@@ -283,7 +283,7 @@ class _AccountTile extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: isCurrent
-                    ? AppColors.primary.withOpacity(0.2)
+                    ? AppColors.primary.withValues(alpha: 0.2)
                     : Colors.grey[200],
                 child: Icon(
                   isGuest ? Icons.person_outline : Icons.account_circle,

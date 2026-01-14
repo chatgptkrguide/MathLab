@@ -109,8 +109,8 @@ class FeatureGateWidget extends ConsumerWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black.withOpacity(0.3),
-              Colors.black.withOpacity(0.6),
+              Colors.black.withValues(alpha: 0.3),
+              Colors.black.withValues(alpha: 0.6),
             ],
           ),
         ),
@@ -126,7 +126,7 @@ class FeatureGateWidget extends ConsumerWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.premiumGold.withOpacity(0.5),
+                      color: AppColors.premiumGold.withValues(alpha: 0.5),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -146,7 +146,7 @@ class FeatureGateWidget extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -282,7 +282,7 @@ class FeatureGateButton extends ConsumerWidget {
       ),
       style: style ??
           ElevatedButton.styleFrom(
-            backgroundColor: AppColors.premiumGold.withOpacity(0.2),
+            backgroundColor: AppColors.premiumGold.withValues(alpha: 0.2),
             foregroundColor: AppColors.premiumGold,
           ),
     );

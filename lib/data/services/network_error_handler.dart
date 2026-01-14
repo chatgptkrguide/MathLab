@@ -62,7 +62,6 @@ class NetworkError {
       case NetworkErrorType.cancelled:
         return '요청이 취소되었습니다 ⛔';
       case NetworkErrorType.unknown:
-      default:
         return '알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요 ❓';
     }
   }
@@ -254,7 +253,6 @@ class NetworkErrorHandler {
         );
 
       case DioExceptionType.unknown:
-      default:
         return NetworkError(
           type: NetworkErrorType.unknown,
           message: error.message ?? 'Unknown error',
@@ -451,7 +449,6 @@ class NetworkErrorHandler {
       case NetworkErrorType.cancelled:
         return Icons.cancel;
       case NetworkErrorType.unknown:
-      default:
         return Icons.help_outline;
     }
   }
@@ -494,7 +491,6 @@ class NetworkErrorHandler {
       case NetworkErrorType.cancelled:
         return '요청 취소됨';
       case NetworkErrorType.unknown:
-      default:
         return '오류 발생';
     }
   }

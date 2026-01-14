@@ -574,7 +574,7 @@ class UserNotifier extends BaseNotifier<User?> {
       logInfo('하트 소진 - 백그라운드 재생 타이머 시작');
     }
 
-    logInfo('하트 감소: ${newHearts}/${GameConstants.maxHearts}');
+    logInfo('하트 감소: $newHearts/${GameConstants.maxHearts}');
   }
 
   /// 하트 추가

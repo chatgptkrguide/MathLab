@@ -89,14 +89,14 @@ class _DuolingoLoadingIndicatorState extends State<DuolingoLoadingIndicator>
                     gradient: LinearGradient(
                       colors: [
                         widget.color ?? AppColors.mathBlue,
-                        (widget.color ?? AppColors.mathBlue).withOpacity(0.6),
+                        (widget.color ?? AppColors.mathBlue).withValues(alpha: 0.6),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(widget.size / 2),
                     boxShadow: [
                       BoxShadow(
                         color: (widget.color ?? AppColors.mathBlue)
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
@@ -192,7 +192,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
               // 베이스 색상
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.borderLight.withOpacity(0.3),
+                  color: AppColors.borderLight.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                 ),
               ),
@@ -212,7 +212,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            AppColors.borderLight.withOpacity(0.5),
+                            AppColors.borderLight.withValues(alpha: 0.5),
                             Colors.transparent,
                           ],
                           stops: const [0.0, 0.5, 1.0],

@@ -44,50 +44,32 @@ abstract class AppException implements Exception {
 /// 네트워크 연결 실패
 class NetworkException extends AppException {
   const NetworkException([
-    String message = '네트워크 연결에 실패했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '네트워크 연결에 실패했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// API 요청 타임아웃
 class TimeoutException extends AppException {
   const TimeoutException([
-    String message = '요청 시간이 초과되었습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '요청 시간이 초과되었습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// 서버 에러 (5xx)
 class ServerException extends AppException {
   final int? statusCode;
 
   const ServerException([
-    String message = '서버에서 오류가 발생했습니다',
-    String? details,
+    super.message = '서버에서 오류가 발생했습니다',
+    super.details,
     this.statusCode,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 인증 관련 예외
@@ -96,47 +78,29 @@ class ServerException extends AppException {
 /// 인증 실패
 class AuthException extends AppException {
   const AuthException([
-    String message = '인증에 실패했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '인증에 실패했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// 권한 없음 (403)
 class UnauthorizedException extends AppException {
   const UnauthorizedException([
-    String message = '접근 권한이 없습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '접근 권한이 없습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// 세션 만료
 class SessionExpiredException extends AuthException {
   const SessionExpiredException([
-    String message = '세션이 만료되었습니다. 다시 로그인해주세요',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details,
-          originalError,
-          stackTrace,
-        );
-}
+    super.message = '세션이 만료되었습니다. 다시 로그인해주세요',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 데이터 관련 예외
@@ -145,47 +109,29 @@ class SessionExpiredException extends AuthException {
 /// 데이터 로드 실패
 class DataException extends AppException {
   const DataException([
-    String message = '데이터를 불러올 수 없습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '데이터를 불러올 수 없습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// 데이터를 찾을 수 없음 (404)
 class NotFoundException extends DataException {
   const NotFoundException([
-    String message = '요청한 데이터를 찾을 수 없습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details,
-          originalError,
-          stackTrace,
-        );
-}
+    super.message = '요청한 데이터를 찾을 수 없습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// 데이터 파싱 실패
 class ParseException extends DataException {
   const ParseException([
-    String message = '데이터 형식이 올바르지 않습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details,
-          originalError,
-          stackTrace,
-        );
-}
+    super.message = '데이터 형식이 올바르지 않습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 유효성 검증 예외
@@ -196,18 +142,12 @@ class ValidationException extends AppException {
   final Map<String, String>? fieldErrors;
 
   const ValidationException([
-    String message = '입력값이 올바르지 않습니다',
-    String? details,
+    super.message = '입력값이 올바르지 않습니다',
+    super.details,
     this.fieldErrors,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 저장소 관련 예외
@@ -216,32 +156,20 @@ class ValidationException extends AppException {
 /// 로컬 저장소 에러
 class StorageException extends AppException {
   const StorageException([
-    String message = '저장소 작업에 실패했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '저장소 작업에 실패했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// Firestore 에러
 class FirestoreException extends DataException {
   const FirestoreException([
-    String message = '데이터베이스 작업에 실패했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details,
-          originalError,
-          stackTrace,
-        );
-}
+    super.message = '데이터베이스 작업에 실패했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 비즈니스 로직 예외
@@ -250,47 +178,29 @@ class FirestoreException extends DataException {
 /// 비즈니스 규칙 위반
 class BusinessException extends AppException {
   const BusinessException(
-    String message, {
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  }) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message, {
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  });
 
 /// 작업 중복 (이미 진행 중인 작업)
 class DuplicateOperationException extends BusinessException {
   const DuplicateOperationException([
-    String message = '이미 진행 중인 작업입니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '이미 진행 중인 작업입니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 /// 리소스 제한 초과
 class ResourceLimitException extends BusinessException {
   const ResourceLimitException([
-    String message = '허용된 제한을 초과했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '허용된 제한을 초과했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 캐시 관련 예외
@@ -299,17 +209,11 @@ class ResourceLimitException extends BusinessException {
 /// 캐시 에러
 class CacheException extends AppException {
   const CacheException([
-    String message = '캐시 작업에 실패했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
-}
+    super.message = '캐시 작업에 실패했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 
 // ==========================================
 // 알 수 없는 예외
@@ -318,14 +222,9 @@ class CacheException extends AppException {
 /// 예상치 못한 에러
 class UnknownException extends AppException {
   const UnknownException([
-    String message = '예상치 못한 오류가 발생했습니다',
-    String? details,
-    Object? originalError,
-    StackTrace? stackTrace,
-  ]) : super(
-          message,
-          details: details,
-          originalError: originalError,
-          stackTrace: stackTrace,
-        );
+    super.message = '예상치 못한 오류가 발생했습니다',
+    super.details,
+    super.originalError,
+    super.stackTrace,
+  ]);
 }

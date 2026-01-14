@@ -63,7 +63,7 @@ class HeartWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.mathRed.withOpacity(0.1),
+        color: AppColors.mathRed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -128,7 +128,7 @@ class HeartInfoDialog extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.mathBlue.withOpacity(0.1),
+                  color: AppColors.mathBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
                 child: Column(

@@ -90,7 +90,7 @@ class _HomeStartButtonState extends State<HomeStartButton>
               // 주변 부드러운 그림자
               BoxShadow(
                 color:
-                    const Color(0xFF58CC02).withOpacity(_isPressed ? 0.3 : 0.4),
+                    const Color(0xFF58CC02).withValues(alpha: _isPressed ? 0.3 : 0.4),
                 blurRadius: _isPressed ? 8 : 12,
                 offset: Offset(0, _isPressed ? 3 : 6),
               ),
@@ -125,8 +125,8 @@ class _HomeStartButtonState extends State<HomeStartButton>
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.white.withOpacity(_isPressed ? 0.1 : 0.3),
-                          Colors.white.withOpacity(0.0),
+                          Colors.white.withValues(alpha: _isPressed ? 0.1 : 0.3),
+                          Colors.white.withValues(alpha: 0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

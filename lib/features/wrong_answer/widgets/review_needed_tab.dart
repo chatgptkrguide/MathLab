@@ -28,7 +28,7 @@ class ReviewNeededTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.mathYellow.withOpacity(0.1),
+                color: AppColors.mathYellow.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

@@ -35,7 +35,7 @@ class QuickActionButtons extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4CAF50).withOpacity(0.3),
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -84,7 +84,7 @@ class QuickActionButtons extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF9800).withOpacity(0.3),
+                        color: const Color(0xFFFF9800).withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),

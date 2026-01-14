@@ -44,7 +44,7 @@ class CommonAppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -52,11 +52,14 @@ class CommonAppHeader extends StatelessWidget {
           colors: AppColors.headerBlueGradient,
         ),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
         ),
       ),
-      child: _buildContent(),
+      child: SafeArea(
+        bottom: false,
+        child: _buildContent(),
+      ),
     );
   }
 
@@ -83,7 +86,8 @@ class CommonAppHeader extends StatelessWidget {
               style: AppTextStyles.headlineMedium.copyWith(
                 color: AppColors.headerText,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.0,
+                fontSize: 22,
+                letterSpacing: 0.5,
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
@@ -121,7 +125,8 @@ class CommonAppHeader extends StatelessWidget {
                   style: AppTextStyles.headlineMedium.copyWith(
                     color: AppColors.headerText,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
+                    fontSize: 22,
+                    letterSpacing: 0.5,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

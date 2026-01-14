@@ -158,10 +158,10 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
               Color? topRankBgColor;
               if (isTop3) {
                 topRankBgColor = participant.rank == 1
-                    ? const Color(0xFFFFD700).withOpacity(0.15) // 금색
+                    ? const Color(0xFFFFD700).withValues(alpha: 0.15) // 금색
                     : participant.rank == 2
-                        ? const Color(0xFFC0C0C0).withOpacity(0.15) // 은색
-                        : const Color(0xFFCD7F32).withOpacity(0.15); // 동색
+                        ? const Color(0xFFC0C0C0).withValues(alpha: 0.15) // 은색
+                        : const Color(0xFFCD7F32).withValues(alpha: 0.15); // 동색
               }
 
               return Container(
@@ -171,8 +171,8 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                   gradient: isCurrentUser
                       ? LinearGradient(
                           colors: [
-                            AppColors.primary.withOpacity(0.12),
-                            AppColors.primary.withOpacity(0.05),
+                            AppColors.primary.withValues(alpha: 0.12),
+                            AppColors.primary.withValues(alpha: 0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -181,7 +181,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                           ? LinearGradient(
                               colors: [
                                 topRankBgColor,
-                                topRankBgColor.withOpacity(0.05),
+                                topRankBgColor.withValues(alpha: 0.05),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -209,10 +209,10 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                   boxShadow: [
                     BoxShadow(
                       color: isCurrentUser
-                          ? AppColors.primary.withOpacity(0.3)
+                          ? AppColors.primary.withValues(alpha: 0.3)
                           : isTop3
-                              ? Colors.black.withOpacity(0.12)
-                              : Colors.black.withOpacity(0.08),
+                              ? Colors.black.withValues(alpha: 0.12)
+                              : Colors.black.withValues(alpha: 0.08),
                       blurRadius: isCurrentUser
                           ? 15
                           : isTop3
@@ -336,7 +336,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                                 color: (isPromotionZone
                                         ? AppColors.mathGreen
                                         : AppColors.mathRed)
-                                    .withOpacity(0.15),
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
@@ -387,7 +387,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                       : rank == 2
                           ? const Color(0xFFC0C0C0)
                           : const Color(0xFFCD7F32))
-                  .withOpacity(0.4),
+                  .withValues(alpha: 0.4),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -515,17 +515,17 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                   gradient: LinearGradient(
                     colors: isLocked
                         ? [
-                            Colors.grey.withOpacity(0.3),
-                            Colors.grey.withOpacity(0.2),
+                            Colors.grey.withValues(alpha: 0.3),
+                            Colors.grey.withValues(alpha: 0.2),
                           ]
                         : isSelected
                             ? [
                                 Color(tier.color),
-                                Color(tier.color).withOpacity(0.8),
+                                Color(tier.color).withValues(alpha: 0.8),
                               ]
                             : [
-                                Color(tier.color).withOpacity(0.3),
-                                Color(tier.color).withOpacity(0.2),
+                                Color(tier.color).withValues(alpha: 0.3),
+                                Color(tier.color).withValues(alpha: 0.2),
                               ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -540,14 +540,14 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Color(tier.color).withOpacity(0.5),
+                            color: Color(tier.color).withValues(alpha: 0.5),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
                         ]
                       : [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 5,
                             offset: const Offset(0, 2),
                           ),
@@ -566,7 +566,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                               width: isSelected ? 50 : 40,
                               height: isSelected ? 50 : 40,
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.4),
+                                color: Colors.black.withValues(alpha: 0.4),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
@@ -624,7 +624,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.mathYellow.withOpacity(0.5),
+                                color: AppColors.mathYellow.withValues(alpha: 0.5),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),

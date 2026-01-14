@@ -80,7 +80,7 @@ class MessageDetailScreen extends StatelessWidget {
                             borderRadius:
                                 BorderRadius.circular(AppDimensions.radiusL),
                             border: Border.all(
-                              color: AppColors.borderLight.withOpacity(0.3),
+                              color: AppColors.borderLight.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
@@ -130,11 +130,11 @@ class MessageDetailScreen extends StatelessWidget {
                             padding:
                                 const EdgeInsets.all(AppDimensions.paddingM),
                             decoration: BoxDecoration(
-                              color: AppColors.success.withOpacity(0.1),
+                              color: AppColors.success.withValues(alpha: 0.1),
                               borderRadius:
                                   BorderRadius.circular(AppDimensions.radiusM),
                               border: Border.all(
-                                color: AppColors.success.withOpacity(0.3),
+                                color: AppColors.success.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -176,13 +176,13 @@ class MessageDetailScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            _getIconColor().withOpacity(0.1),
-            _getIconColor().withOpacity(0.05),
+            _getIconColor().withValues(alpha: 0.1),
+            _getIconColor().withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: _getIconColor().withOpacity(0.3),
+          color: _getIconColor().withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -192,7 +192,7 @@ class MessageDetailScreen extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: _getIconColor().withOpacity(0.2),
+              color: _getIconColor().withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(28),
             ),
             child: Icon(

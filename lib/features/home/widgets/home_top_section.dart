@@ -46,7 +46,7 @@ class HomeTopSection extends StatelessWidget {
                   isGuest ? '게스트로 학습 중' : '$userName의 수학 학습',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -73,24 +73,24 @@ class HomeTopSection extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       Colors.white,
-                      Colors.orange.shade50.withOpacity(0.5),
+                      Colors.orange.shade50.withValues(alpha: 0.5),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                    color: Colors.orange.withOpacity(0.2),
+                    color: Colors.orange.withValues(alpha: 0.2),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orange.withOpacity(0.25),
+                      color: Colors.orange.withValues(alpha: 0.25),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -101,7 +101,7 @@ class HomeTopSection extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.15),
+                        color: Colors.orange.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Image.asset(

@@ -10,7 +10,6 @@ export 'animations/xp_animation_widget.dart';
 export 'badges/rank_badge.dart';
 
 // Buttons
-export 'buttons/gradient_3d_button.dart';
 export 'buttons/header_icon_button.dart';
 export 'buttons/social_login_button.dart';
 export 'buttons/unified_button.dart';

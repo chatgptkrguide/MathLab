@@ -30,13 +30,13 @@ class ProblemExplanation extends StatelessWidget {
         padding: const EdgeInsets.all(AppDimensions.paddingL),
         decoration: BoxDecoration(
           color: isCorrect
-              ? AppColors.successGreen.withOpacity(0.1)
-              : AppColors.warningOrange.withOpacity(0.1),
+              ? AppColors.successGreen.withValues(alpha: 0.1)
+              : AppColors.warningOrange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: isCorrect
-                ? AppColors.successGreen.withOpacity(0.3)
-                : AppColors.warningOrange.withOpacity(0.3),
+                ? AppColors.successGreen.withValues(alpha: 0.3)
+                : AppColors.warningOrange.withValues(alpha: 0.3),
             width: 2,
           ),
         ),

@@ -11,10 +11,10 @@ class LearningTipsCard extends StatelessWidget {
       margin: const EdgeInsets.all(AppDimensions.paddingL),
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.warningOrange.withOpacity(0.1),
+        color: AppColors.warningOrange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
-          color: AppColors.warningOrange.withOpacity(0.3),
+          color: AppColors.warningOrange.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

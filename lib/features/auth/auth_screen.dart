@@ -106,7 +106,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           );
         }
 
-        Navigator.of(context).pushReplacementNamed('/home');
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
       } else {
         _showError('게스트 계정 생성에 실패했습니다. 다시 시도해주세요.');
       }
@@ -165,7 +167,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           );
         }
 
-        Navigator.of(context).pushReplacementNamed('/home');
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
       } else {
         _showError('Google 로그인에 실패했습니다. 다시 시도해주세요.');
       }
@@ -333,7 +337,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: Colors.white.withValues(alpha: 0.2),
                                   ),
                                 ),
                                 Padding(
@@ -342,7 +346,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                   child: Text(
                                     '또는',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.6),
+                                      color: Colors.white.withValues(alpha: 0.6),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -351,7 +355,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: Colors.white.withValues(alpha: 0.2),
                                   ),
                                 ),
                               ],
@@ -447,12 +451,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF58CC02).withOpacity(0.4),
+            color: const Color(0xFF58CC02).withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -501,18 +505,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: backgroundColor == Colors.white
-                  ? Colors.grey.withOpacity(0.3)
+                  ? Colors.grey.withValues(alpha: 0.3)
                   : backgroundColor,
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: backgroundColor.withOpacity(0.3),
+                color: backgroundColor.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),

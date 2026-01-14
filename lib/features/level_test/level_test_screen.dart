@@ -112,7 +112,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
             LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              backgroundColor: AppColors.disabled.withOpacity(0.2),
+              backgroundColor: AppColors.disabled.withValues(alpha: 0.2),
               valueColor:
                   const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
@@ -138,7 +138,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: _getDifficultyColor(question.difficulty)
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       borderRadius:
                           BorderRadius.circular(AppDimensions.radiusM),
                       border: Border.all(
@@ -187,7 +187,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                             BorderRadius.circular(AppDimensions.radiusL),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.borderLight.withOpacity(0.15),
+                            color: AppColors.borderLight.withValues(alpha: 0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -291,13 +291,13 @@ class _OptionButton extends StatelessWidget {
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               )
             else
               BoxShadow(
-                color: AppColors.borderLight.withOpacity(0.1),
+                color: AppColors.borderLight.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -311,7 +311,7 @@ class _OptionButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.surface
-                    : AppColors.primary.withOpacity(0.1),
+                    : AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected ? AppColors.surface : AppColors.primary,
@@ -375,7 +375,7 @@ class _LevelTestResultScreen extends ConsumerWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -415,7 +415,7 @@ class _LevelTestResultScreen extends ConsumerWidget {
                             BorderRadius.circular(AppDimensions.radiusXL),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.borderLight.withOpacity(0.2),
+                            color: AppColors.borderLight.withValues(alpha: 0.2),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -508,9 +508,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

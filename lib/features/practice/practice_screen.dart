@@ -44,10 +44,10 @@ class PracticeCategoryScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppDimensions.paddingL),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -204,7 +204,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             LinearProgressIndicator(
               value: state.progress,
               minHeight: 8,
-              backgroundColor: AppColors.disabled.withOpacity(0.2),
+              backgroundColor: AppColors.disabled.withValues(alpha: 0.2),
               valueColor:
                   const AlwaysStoppedAnimation<Color>(AppColors.successGreen),
             ),
@@ -229,7 +229,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                       vertical: AppDimensions.paddingS,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.successGreen.withOpacity(0.1),
+                      color: AppColors.successGreen.withValues(alpha: 0.1),
                       borderRadius:
                           BorderRadius.circular(AppDimensions.radiusM),
                       border: Border.all(color: AppColors.successGreen),
@@ -276,7 +276,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                             BorderRadius.circular(AppDimensions.radiusL),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.borderLight.withOpacity(0.15),
+                            color: AppColors.borderLight.withValues(alpha: 0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -397,7 +397,7 @@ class PracticeResultScreen extends ConsumerWidget {
                       width: 120,
                       height: 120,
                       decoration: BoxDecoration(
-                        color: AppColors.successGreen.withOpacity(0.1),
+                        color: AppColors.successGreen.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: AppColors.successGreen,

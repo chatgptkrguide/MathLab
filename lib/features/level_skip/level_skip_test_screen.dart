@@ -145,8 +145,8 @@ class _LevelSkipTestScreenState extends ConsumerState<LevelSkipTestScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: test.currentAccuracy >= test.requiredAccuracy
-                ? AppColors.success.withOpacity(0.1)
-                : AppColors.warning.withOpacity(0.1),
+                ? AppColors.success.withValues(alpha: 0.1)
+                : AppColors.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -173,7 +173,7 @@ class _LevelSkipTestScreenState extends ConsumerState<LevelSkipTestScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -429,8 +429,8 @@ class LevelSkipResultScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.primary.withOpacity(0.1),
-                              AppColors.accentCyan.withOpacity(0.1),
+                              AppColors.primary.withValues(alpha: 0.1),
+                              AppColors.accentCyan.withValues(alpha: 0.1),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(16),
@@ -499,7 +499,7 @@ class LevelSkipResultScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

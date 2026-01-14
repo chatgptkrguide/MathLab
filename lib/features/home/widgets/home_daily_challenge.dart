@@ -91,7 +91,7 @@ class _HomeDailyChallengeState extends State<HomeDailyChallenge>
             boxShadow: [
               BoxShadow(
                 color:
-                    const Color(0xFFFF9800).withOpacity(_isPressed ? 0.4 : 0.3),
+                    const Color(0xFFFF9800).withValues(alpha: _isPressed ? 0.4 : 0.3),
                 blurRadius: _isPressed ? 12 : 8,
                 offset: Offset(0, _isPressed ? 2 : 4),
               ),
@@ -117,7 +117,7 @@ class _HomeDailyChallengeState extends State<HomeDailyChallenge>
                       '오늘의 챌린지 미션을 완료해 보세요',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.95),
+                        color: Colors.white.withValues(alpha: 0.95),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -125,10 +125,10 @@ class _HomeDailyChallengeState extends State<HomeDailyChallenge>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.25),
+                        color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 1.5,
                         ),
                       ),

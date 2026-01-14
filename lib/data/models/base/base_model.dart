@@ -80,8 +80,9 @@ extension SafeParser on Map<String, dynamic> {
         if (value is String) return int.tryParse(value) as T? ?? defaultValue;
       } else if (T == double) {
         if (value is num) return value.toDouble() as T;
-        if (value is String)
+        if (value is String) {
           return double.tryParse(value) as T? ?? defaultValue;
+        }
       } else if (T == bool) {
         if (value is bool) return value as T;
         if (value is String) return (value.toLowerCase() == 'true') as T;
