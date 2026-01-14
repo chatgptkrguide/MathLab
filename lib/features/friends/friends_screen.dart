@@ -4,8 +4,11 @@ import '../../data/models/models.dart';
 import '../../data/providers/user/friend_provider.dart';
 import '../../data/providers/communication/chat_provider.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/utils/level_badge_mapper.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
+import '../../shared/widgets/cards/user_card.dart';
+import '../../shared/widgets/sections/section_header.dart';
+import '../../shared/widgets/dialogs/confirm_dialog.dart';
+import '../../shared/widgets/empty_states/empty_state.dart';
 import '../chat/chat_detail_screen.dart';
 import 'friend_profile_screen.dart';
 import 'user_search_screen.dart';
@@ -35,7 +38,12 @@ class FriendsScreen extends ConsumerWidget {
             // 친구 목록
             Expanded(
               child: friends.isEmpty
-                  ? _buildEmptyState()
+                  ? EmptyState(
+                      icon: Icons.people_outline,
+                      title: '친구가 없습니다',
+                      subtitle: '친구를 추가해보세요!',
+                      iconColor: AppColors.textSecondary,
+                    )
                   : RefreshIndicator(
                       onRefresh: () => notifier.refresh(),
                       child: ListView(
@@ -43,8 +51,10 @@ class FriendsScreen extends ConsumerWidget {
                         children: [
                           // 대기 중인 친구 요청
                           if (pendingRequests.isNotEmpty) ...[
-                            _buildSectionHeader(
-                                '친구 요청', pendingRequests.length),
+                            SectionHeader(
+                              title: '친구 요청',
+                              count: pendingRequests.length,
+                            ),
                             ...pendingRequests.map((friend) {
                               return _buildPendingRequestItem(
                                   context, ref, friend);
@@ -54,9 +64,18 @@ class FriendsScreen extends ConsumerWidget {
 
                           // 친구 목록
                           if (acceptedFriends.isNotEmpty) ...[
-                            _buildSectionHeader('내 친구', acceptedFriends.length),
+                            SectionHeader(
+                              title: '내 친구',
+                              count: acceptedFriends.length,
+                            ),
                             ...acceptedFriends.map((friend) {
-                              return _buildFriendItem(context, ref, friend);
+                              return UserCard(
+                                name: friend.name,
+                                level: friend.level,
+                                xp: friend.xp,
+                                photoUrl: friend.profileImageUrl,
+                                onTap: () => _showFriendActions(context, ref, friend),
+                              );
                             }),
                           ],
                         ],
@@ -76,109 +95,6 @@ class FriendsScreen extends ConsumerWidget {
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
-        ),
-      ),
-    );
-  }
-
-  /// 섹션 헤더
-  Widget _buildSectionHeader(String title, int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 친구 아이템
-  Widget _buildFriendItem(BuildContext context, WidgetRef ref, Friend friend) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: ListTile(
-        onTap: () => _showFriendActions(context, ref, friend),
-        leading: CircleAvatar(
-          backgroundColor: AppColors.accentCyan.withValues(alpha: 0.1),
-          child: Text(
-            friend.name[0].toUpperCase(),
-            style: TextStyle(
-              color: AppColors.accentCyan,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(
-          friend.name,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        subtitle: Row(
-          children: [
-            // 레벨 배지
-            Image.asset(
-              LevelBadgeMapper.getBadgeImagePath(friend.level),
-              width: 18,
-              height: 18,
-              errorBuilder: (context, error, stackTrace) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.workspace_premium,
-                        size: 14, color: AppColors.mathGold),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Lv.${friend.level}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(width: 12),
-            Icon(Icons.star, size: 14, color: AppColors.mathYellow),
-            const SizedBox(width: 4),
-            Text(
-              '${friend.xp} XP',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: AppColors.textSecondary,
         ),
       ),
     );
@@ -256,38 +172,6 @@ class FriendsScreen extends ConsumerWidget {
     );
   }
 
-  /// 빈 상태
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: AppColors.textSecondary.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '친구가 없습니다',
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColors.textSecondary.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '친구를 추가해보세요!',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// 친구 추가 - 사용자 검색 화면으로 이동
   void _showAddFriendDialog(BuildContext context, WidgetRef ref) {
     Navigator.push(
@@ -356,31 +240,13 @@ class FriendsScreen extends ConsumerWidget {
               onTap: () async {
                 Navigator.pop(context);
 
-                final shouldDelete = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('친구 삭제'),
-                    content: Text('${friend.name}님을 친구 목록에서 삭제하시겠습니까?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('취소'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.error,
-                        ),
-                        child: const Text(
-                          '삭제',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
+                final shouldDelete = await ConfirmDialog.showDelete(
+                  context,
+                  title: '친구 삭제',
+                  content: '${friend.name}님을 친구 목록에서 삭제하시겠습니까?',
                 );
 
-                if (shouldDelete == true) {
+                if (shouldDelete) {
                   await ref
                       .read(friendsProvider.notifier)
                       .removeFriend(friend.id);

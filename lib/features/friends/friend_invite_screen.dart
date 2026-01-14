@@ -456,14 +456,16 @@ class _FriendInviteScreenState extends ConsumerState<FriendInviteScreen> {
 
   /// 카카오톡 공유
   Future<void> _shareKakao() async {
-    // TODO: 카카오톡 SDK 연동
-    _showSnackBar('카카오톡 공유 기능 준비 중입니다');
+    // 카카오톡 공유는 일반 공유 API를 사용
+    // 안드로이드/iOS의 Share Sheet에서 카카오톡 선택 가능
+    await _shareGeneral();
   }
 
   /// SMS 공유
   Future<void> _shareSMS() async {
-    // TODO: SMS 공유 기능
-    _showSnackBar('문자 공유 기능 준비 중입니다');
+    // SMS 공유는 일반 공유 API를 사용
+    // Share Sheet에서 메시지 앱 선택 가능
+    await _shareGeneral();
   }
 
   void _showSnackBar(String message) {

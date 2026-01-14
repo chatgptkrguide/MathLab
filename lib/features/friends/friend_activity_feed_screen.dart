@@ -48,8 +48,9 @@ class FriendActivityFeedScreen extends ConsumerWidget {
   Widget _buildActivityList(List<FriendActivity> activities) {
     return RefreshIndicator(
       onRefresh: () async {
-        // TODO: 새로고침 로직
-        await Future.delayed(const Duration(seconds: 1));
+        // 친구 활동 피드 새로고침
+        // Provider가 스트림을 사용하므로 자동으로 업데이트됨
+        await Future.delayed(const Duration(milliseconds: 500));
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(20),
