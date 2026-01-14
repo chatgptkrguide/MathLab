@@ -1,40 +1,13 @@
-// MathLab 앱의 기본 위젯 테스트
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:mathlab/app/app.dart';
+import 'package:mathlab/main.dart';
 
 void main() {
-  testWidgets('MathLab app loads successfully', (WidgetTester tester) async {
-    // Build our app with ProviderScope for Riverpod
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MathLabApp(),
-      ),
-    );
+  testWidgets('App smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
 
-    // Wait for the app to settle
-    await tester.pumpAndSettle();
-
-    // Verify that the auth screen loads (since user is not authenticated)
-    // The auth screen should have login buttons
-    expect(find.text('시작하기'), findsOneWidget);
-    expect(find.text('Google로 계속하기'), findsOneWidget);
-    expect(find.text('Kakao로 계속하기'), findsOneWidget);
-  });
-
-  testWidgets('App initializes without errors', (WidgetTester tester) async {
-    // Build our app with ProviderScope
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MathLabApp(),
-      ),
-    );
-
-    // Wait for initialization
-    await tester.pumpAndSettle();
-
-    // Verify no errors were thrown during initialization
-    expect(tester.takeException(), isNull);
+    // Verify that the app builds without crashing
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }

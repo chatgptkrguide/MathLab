@@ -1,15 +1,27 @@
-# 🧮 GoMath - 게이미피케이션 수학 학습 앱
+# 🧮 MathLab - 게이미피케이션 수학 학습 앱
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.27.1-02569B?logo=flutter)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.24.0-02569B?logo=flutter)](https://flutter.dev)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Deploy](https://github.com/chatgptkrguide/MathLab/actions/workflows/deploy.yml/badge.svg)](https://github.com/chatgptkrguide/MathLab/actions/workflows/deploy.yml)
+[![CI](https://github.com/chatgptkrguide/MathLab/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/chatgptkrguide/MathLab/actions)
 
 듀오링고 스타일의 게이미피케이션을 적용한 **재미있는 수학 학습 모바일 앱**입니다.
 매일 짧은 시간 동안 꾸준히 수학을 학습하며 동기를 유지할 수 있도록 설계되었습니다.
 
-## 🌐 데모
+## 🚀 빠른 시작
 
-**웹 버전**: [https://chatgptkrguide.github.io/MathLab/](https://chatgptkrguide.github.io/MathLab/)
+### 배포 준비 완료! ✅
+
+모든 코드 준비가 완료되었습니다. 지금 바로 배포할 수 있습니다!
+
+```bash
+# 1. 상태 점검
+./scripts/health_check.sh
+
+# 2. 릴리즈 빌드
+./scripts/build_release.sh
+```
+
+📖 **자세한 배포 가이드**: [DEPLOYMENT_READY.md](DEPLOYMENT_READY.md)
 
 ## ✨ 주요 기능
 
@@ -28,167 +40,126 @@
 
 ### 📊 학습 관리
 - **일일 목표**: 개인 맞춤형 일일 XP 목표 설정
-- **학습 통계**: 상세한 학습 진행 상황 및 통계
+- **학습 통계**: 일일/주간/월간 학습 데이터 시각화
 - **오답 노트**: 틀린 문제 자동 저장 및 복습
-- **학습 리마인더**: 알림을 통한 학습 습관 형성
+- **진도 추적**: 실시간 학습 진도 확인
 
-## 🛠 기술 스택
+### 👥 소셜 기능
+- **친구 시스템**: 친구 추가 및 학습 활동 공유
+- **리더보드**: 전국 순위 및 친구 순위
+- **그룹 학습**: 스터디 그룹 생성 및 참여
 
-### Frontend
-- **Framework**: Flutter 3.27.1 (크로스 플랫폼)
-- **상태관리**: Riverpod 2.4.9
-- **로컬 저장**: SharedPreferences, Hive
-- **애니메이션**: Lottie, Confetti
+## 🛠️ 기술 스택
 
-### Backend & Authentication
-- **인증**: Firebase Authentication
-- **소셜 로그인**: Google, Kakao, Apple Sign-in
-- **데이터베이스**: Local Storage (향후 PostgreSQL + Redis)
+- **Framework**: Flutter 3.24.0
+- **언어**: Dart 3.5.0
+- **상태 관리**: Riverpod 2.4.9
+- **Backend**: Firebase (Auth, Firestore, Storage, Analytics)
+- **디자인**: Material Design 3, Custom Duolingo-inspired UI
+- **테스팅**: flutter_test, integration_test
 
-### 주요 라이브러리
-```yaml
-dependencies:
-  flutter_riverpod: ^2.4.9      # 상태 관리
-  shared_preferences: ^2.2.2     # 로컬 저장
-  lottie: ^2.7.0                 # 애니메이션
-  confetti: ^0.7.0               # 축하 효과
-  firebase_core: ^3.10.0         # Firebase
-  firebase_auth: ^5.3.4          # 인증
-  google_sign_in: ^6.2.1         # Google 로그인
-  kakao_flutter_sdk: ^1.9.5      # Kakao 로그인
-  sign_in_with_apple: ^6.1.3     # Apple 로그인
-```
-
-## 📱 지원 플랫폼
-
-- ✅ **iOS** (iPhone, iPad)
-- ✅ **Android** (스마트폰, 태블릿)
-- ✅ **Web** (데스크톱 브라우저)
-- 🚧 macOS (개발 중)
-- 🚧 Windows (개발 중)
-
-## 🚀 시작하기
+## 📱 개발 환경 설정
 
 ### 요구사항
-
-- Flutter SDK 3.27.1 이상
-- Dart 3.5.0 이상
-- Android Studio / Xcode (모바일 빌드용)
+- Flutter SDK 3.24.0 이상
+- Dart SDK 3.5.0 이상
+- iOS: Xcode 15.0 이상 (macOS만 해당)
+- Android: Android Studio, JDK 17
 
 ### 설치 및 실행
 
-1. **저장소 클론**
-   ```bash
-   git clone https://github.com/chatgptkrguide/MathLab.git
-   cd MathLab
-   ```
+```bash
+# 1. 저장소 클론
+git clone https://github.com/chatgptkrguide/MathLab.git
+cd MathLab
 
-2. **의존성 설치**
-   ```bash
-   flutter pub get
-   ```
+# 2. 의존성 설치
+flutter pub get
 
-3. **앱 실행**
-   ```bash
-   # iOS
-   flutter run -d ios
+# 3. 환경 변수 설정
+cp .env.example .env
+# .env 파일에서 실제 값으로 교체
 
-   # Android
-   flutter run -d android
+# 4. 앱 실행
+flutter run
+```
 
-   # Web
-   flutter run -d chrome
-   ```
+## 📦 배포
 
-### 빌드
+### Android
 
 ```bash
-# Android APK
-flutter build apk --release
+# 1. 키스토어 생성
+./scripts/create_keystore.sh
 
-# iOS (macOS 필요)
+# 2. App Bundle 빌드
+./scripts/build_release.sh
+# 또는
+flutter build appbundle --release
+```
+
+### iOS
+
+```bash
+# 1. iOS 빌드
+./scripts/build_release.sh
+# 또는  
 flutter build ios --release
 
-# Web
-flutter build web --release
+# 2. Xcode에서 아카이브
+open ios/Runner.xcworkspace
 ```
 
-## 📖 커리큘럼
+📖 **전체 배포 가이드**: [README_DEPLOYMENT.md](README_DEPLOYMENT.md)
 
-### 기초 과정
-- 사칙연산 (덧셈, 뺄셈, 곱셈, 나눗셈)
-- 분수와 소수
-- 비와 비율
+## 🧪 테스트
 
-### 중급 과정
-- 대수 (방정식, 부등식, 함수)
-- 기하 (도형, 각도, 면적, 부피)
-- 통계와 확률
+```bash
+# 단위 테스트
+flutter test
 
-### 고급 과정 (예정)
-- 미적분 (극한, 미분, 적분)
-- 선형대수
-- 고급 통계
+# 커버리지 리포트
+flutter test --coverage
 
-## 🎨 디자인 시스템
-
-프로젝트는 **Figma 디자인 시스템**을 기반으로 구축되었습니다.
-
-- **색상**: 밝고 친근한 GoMath 브랜드 색상 팔레트
-- **타이포그래피**: 가독성 중심의 폰트 계층 구조
-- **애니메이션**: 부드럽고 자연스러운 전환 효과
-- **레이아웃**: 모바일 우선 반응형 디자인
-
-자세한 내용은 [DESIGN_GUIDE.md](DESIGN_GUIDE.md)를 참조하세요.
-
-## 📂 프로젝트 구조
-
-```
-lib/
-├── app/                    # 앱 설정 및 라우팅
-├── data/
-│   ├── models/            # 데이터 모델
-│   ├── providers/         # Riverpod 상태 관리
-│   └── services/          # API 및 저장소 서비스
-├── features/              # 기능별 화면
-│   ├── auth/             # 인증
-│   ├── home/             # 홈 화면
-│   ├── lessons/          # 레슨
-│   ├── problem/          # 문제 풀이
-│   ├── profile/          # 프로필
-│   └── ...
-├── shared/
-│   ├── constants/        # 상수 (색상, 스타일 등)
-│   ├── widgets/          # 공통 위젯
-│   ├── utils/            # 유틸리티
-│   └── themes/           # 테마
-└── main.dart             # 앱 진입점
+# 코드 분석
+flutter analyze
 ```
 
-## 🎯 로드맵
+## 📖 문서
 
-### Phase 1 (MVP) - ✅ 완료
-- [x] 기초 UI/UX 구현
-- [x] 게이미피케이션 시스템
-- [x] 레벨 테스트
-- [x] 기본 문제 풀이 시스템
-- [x] 소셜 로그인 연동
+### 배포 관련
+- [빠른 배포 가이드](DEPLOYMENT_READY.md) ⭐ 시작하기 좋음
+- [상세 배포 가이드](docs/STORE_DEPLOYMENT_GUIDE.md)
+- [스토어 에셋 가이드](docs/STORE_ASSETS_GUIDE.md)
 
-### Phase 2 - 🚧 진행 중
-- [ ] 백엔드 API 구축
-- [ ] 실시간 데이터 동기화
-- [ ] 친구 시스템
-- [ ] 그룹 학습 기능
+### 법률 문서
+- [개인정보 처리방침](docs/PRIVACY_POLICY.md)
+- [서비스 이용약관](docs/TERMS_OF_SERVICE.md)
 
-### Phase 3 - 📋 계획
-- [ ] AI 튜터 모드
-- [ ] 오프라인 모드
-- [ ] 부모 모드 (자녀 학습 추적)
-- [ ] 다국어 지원
+### 개발 문서
+- [프로젝트 구조](CLAUDE.md)
+- [디자인 가이드](DESIGN_GUIDE.md)
+
+## 🔧 유틸리티 스크립트
+
+```bash
+# 프로젝트 상태 점검
+./scripts/health_check.sh
+
+# 키스토어 생성
+./scripts/create_keystore.sh
+
+# 릴리즈 빌드
+./scripts/build_release.sh
+
+# 앱 아이콘 생성
+python3 scripts/generate_icon_placeholder.py
+
+# Fastlane 설정
+./fastlane_setup.sh
+```
 
 ## 🤝 기여하기
-
-기여를 환영합니다! 다음 단계를 따라주세요:
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -196,16 +167,15 @@ lib/
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 라이선스
+## 📄 라이센스
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 MIT 라이센스로 제공됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 ## 📞 문의
 
-프로젝트 관련 문의사항은 [Issues](https://github.com/chatgptkrguide/MathLab/issues)에 등록해 주세요.
+- **Email**: support@mathlab.com
+- **Website**: https://mathlab.com
 
 ---
 
-**Made with ❤️ by GoMath Team**
-
-🤖 Enhanced with [Claude Code](https://claude.com/claude-code)
+**Made with ❤️ using Flutter**

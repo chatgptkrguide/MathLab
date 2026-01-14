@@ -1,0 +1,45 @@
+Learn Math Like a Game, Every Day!
+
+MathLab is a gamified math learning app inspired by Duolingo. Study math for a few minutes each day, level up, and improve your skills while having fun!
+
+Key Features:
+
+📚 Comprehensive Curriculum
+- From basic arithmetic to calculus
+- Elementary, middle, and high school coverage
+- Personalized learning paths
+
+🎮 Gamification
+- XP and leveling system
+- Daily learning streaks
+- League system to compete with friends
+- Collect achievements and badges
+
+🏆 Real-time Leaderboard
+- Weekly league participation
+- National rankings
+- Compare skills with friends
+
+👥 Social Learning
+- Add and invite friends
+- Achieve goals together
+- Share learning activities
+
+📊 Learning Analytics
+- Daily/weekly/monthly statistics
+- Automatic weakness analysis
+- Customized review schedule
+
+💡 Smart Learning Support
+- Step-by-step hints
+- Concept explanation cards
+- Auto-save incorrect answers
+- AI-based difficulty adjustment
+
+✨ Special Features
+- Daily challenges
+- Practice mode
+- Dark mode support
+- Offline learning available
+
+Conquer math in just 10 minutes a day with MathLab!
