@@ -19,24 +19,24 @@ class CustomBottomNavigation extends StatelessWidget {
       container: true,
       label: '하단 네비게이션',
       child: Container(
-        height: 58 + MediaQuery.of(context).padding.bottom,
+        height: 68 + MediaQuery.of(context).padding.bottom,
         padding: EdgeInsets.only(
           left: 1,
           right: 1,
           top: 4,
-          bottom: MediaQuery.of(context).padding.bottom + 2,
+          bottom: MediaQuery.of(context).padding.bottom + 8,
         ),
         decoration: BoxDecoration(
           color: AppColors.surface,
           border: Border(
             top: BorderSide(
-              color: AppColors.borderLight.withOpacity(0.1),
+              color: AppColors.borderLight.withValues(alpha: 0.1),
               width: 0.5,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -105,15 +105,15 @@ class CustomBottomNavigation extends StatelessWidget {
                   colors: isSelected
                       ? AppColors.mathButtonGradient
                       : [
-                          AppColors.mathButtonBlue.withOpacity(0.75),
-                          AppColors.mathButtonBlue.withOpacity(0.65),
+                          AppColors.mathButtonBlue.withValues(alpha: 0.75),
+                          AppColors.mathButtonBlue.withValues(alpha: 0.65),
                         ],
                 ),
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.mathButtonBlue
-                        .withOpacity(isSelected ? 0.35 : 0.2),
+                        .withValues(alpha: isSelected ? 0.35 : 0.2),
                     blurRadius: isSelected ? 10 : 6,
                     offset: Offset(0, isSelected ? 4 : 3),
                   ),
@@ -168,7 +168,7 @@ class CustomBottomNavigation extends StatelessWidget {
                     isSelected ? _getSelectedIcon(icon) : icon,
                     color: isSelected
                         ? AppColors.mathButtonBlue
-                        : AppColors.textSecondary.withOpacity(0.65),
+                        : AppColors.textSecondary.withValues(alpha: 0.65),
                     size: isSelected ? 25 : 23,
                   ),
                 ),
@@ -179,7 +179,7 @@ class CustomBottomNavigation extends StatelessWidget {
                     style: TextStyle(
                       color: isSelected
                           ? AppColors.mathButtonBlue
-                          : AppColors.textSecondary.withOpacity(0.75),
+                          : AppColors.textSecondary.withValues(alpha: 0.75),
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.w600,
                       fontSize: isSelected ? 10.5 : 9.5,
