@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/gamification/daily_challenge.dart';
+import '../../repositories/daily_challenge_repository.dart';
 import '../user/user_provider.dart';
 import '../base/base_notifier.dart';
 
