@@ -159,13 +159,46 @@ python3 scripts/generate_icon_placeholder.py
 ./fastlane_setup.sh
 ```
 
+## 📊 프로젝트 통계
+
+- **총 Dart 파일**: 327개
+- **총 코드 라인**: 81,231줄
+- **주요 기능**: 15개 이상
+- **테스트 커버리지**: 진행 중
+
 ## 🤝 기여하기
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+MathLab은 오픈소스 프로젝트이며 여러분의 기여를 환영합니다!
+
+### 기여 방법
+
+1. **프로젝트 Fork**: GitHub에서 이 프로젝트를 Fork하세요
+2. **Feature Branch 생성**: `git checkout -b feature/AmazingFeature`
+3. **변경사항 Commit**: `git commit -m 'feat: Add some AmazingFeature'`
+4. **Branch Push**: `git push origin feature/AmazingFeature`
+5. **Pull Request 생성**: GitHub에서 PR을 열어주세요
+
+### 기여 가이드라인
+
+자세한 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요:
+- 코드 스타일 가이드
+- 커밋 메시지 규칙
+- PR 체크리스트
+- 테스트 작성 가이드
+
+### 코드 품질 검사
+
+PR 생성 전에 코드 품질을 확인하세요:
+
+```bash
+# 전체 품질 검사
+./scripts/code_quality.sh
+
+# 개별 검사
+flutter analyze        # 코드 분석
+flutter test          # 테스트 실행
+dart format .         # 코드 포맷팅
+```
 
 ## 📄 라이센스
 
