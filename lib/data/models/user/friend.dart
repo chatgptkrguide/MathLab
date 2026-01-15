@@ -37,6 +37,9 @@ class Friend {
     this.acceptedAt,
   });
 
+  /// photoUrl getter for backward compatibility
+  String? get photoUrl => profileImageUrl;
+
   factory Friend.fromJson(Map<String, dynamic> json) {
     return Friend(
       id: json['id'] as String,
