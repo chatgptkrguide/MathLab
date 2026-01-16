@@ -3,11 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 import 'app/app.dart';
 import 'shared/constants/app_colors.dart';
 import 'data/services/notification_service.dart';
 import 'data/services/sound_service.dart';
+import 'data/services/streak_service.dart';
 import 'shared/utils/logger.dart';
 
 // Export initializeTimezone from notification_service
@@ -17,6 +20,24 @@ export 'data/services/notification_service.dart' show initializeTimezone;
 void main() async {
   // Flutter 위젯 바인딩 초기화
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    // .env 파일 로드
+    await dotenv.load(fileName: ".env");
+    Logger.info('.env file loaded successfully', tag: 'Main');
+  } catch (e) {
+    Logger.error('Failed to load .env file', error: e, tag: 'Main');
+  }
+
+  try {
+    // Kakao SDK 초기화
+    KakaoSdk.init(
+      nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '',
+    );
+    Logger.info('Kakao SDK initialized successfully', tag: 'Main');
+  } catch (e) {
+    Logger.error('Failed to initialize Kakao SDK', error: e, tag: 'Main');
+  }
 
   try {
     // Firebase 초기화
@@ -56,6 +77,14 @@ void main() async {
       Logger.info('SoundService initialized successfully', tag: 'Main');
     } catch (e) {
       Logger.error('Failed to initialize SoundService', error: e, tag: 'Main');
+    }
+
+    try {
+      // 스트릭 서비스 초기화
+      await StreakService().initialize();
+      Logger.info('StreakService initialized successfully', tag: 'Main');
+    } catch (e) {
+      Logger.error('Failed to initialize StreakService', error: e, tag: 'Main');
     }
   });
 

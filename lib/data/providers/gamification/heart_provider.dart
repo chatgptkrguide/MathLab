@@ -1,51 +1,109 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/gamification/heart_config.dart';
 import '../../../shared/utils/logger.dart';
+import '../user/user_provider.dart';
 
-/// 하트 시스템 상태 관리 Provider
+/// 하트 시스템 상태 관리 Provider (Firebase 연동)
 class HeartNotifier extends StateNotifier<HeartConfig> {
+  final Ref ref;
   Timer? _recoveryTimer;
   static const String _heartStorageKey = 'heart_config';
 
-  HeartNotifier() : super(const HeartConfig()) {
+  HeartNotifier(this.ref) : super(const HeartConfig()) {
     _loadHeartState();
     _startRecoveryTimer();
   }
 
-  /// 로컬 저장소에서 하트 상태 로드
+  /// 로컬 및 Firebase에서 하트 상태 로드
   Future<void> _loadHeartState() async {
     try {
+      // 1. 로컬 저장소에서 먼저 로드 (빠른 초기화)
       final prefs = await SharedPreferences.getInstance();
-      final heartJson = prefs.getString(_heartStorageKey);
+      final heartJsonString = prefs.getString(_heartStorageKey);
 
-      if (heartJson != null) {
-        final heartData = Map<String, dynamic>.from(
-          // JSON decode 필요 시 json.decode 사용
-          {}..addAll({'data': heartJson}),
-        );
-
+      if (heartJsonString != null) {
+        final heartData = jsonDecode(heartJsonString) as Map<String, dynamic>;
         state = HeartConfig.fromJson(heartData);
-        Logger.info('하트 상태 로드 완료: ${state.currentHearts}/${state.maxHearts}',
+        Logger.info('하트 상태 로컬 로드 완료: ${state.currentHearts}/${state.maxHearts}',
             tag: 'Heart');
       }
+
+      // 2. Firebase에서 최신 데이터 동기화
+      await _syncFromFirebase();
     } catch (e, stackTrace) {
       Logger.error('하트 상태 로드 실패',
           error: e, stackTrace: stackTrace, tag: 'Heart');
     }
   }
 
+  /// Firebase에서 하트 상태 동기화
+  Future<void> _syncFromFirebase() async {
+    try {
+      final user = ref.read(userProvider);
+      if (user == null) return;
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .get();
+
+      if (userDoc.exists) {
+        final data = userDoc.data();
+        if (data != null) {
+          final hearts = data['hearts'] as int? ?? state.maxHearts;
+          final lastHeartUpdate = data['lastHeartUpdateTime'] as Timestamp?;
+
+          state = state.copyWith(
+            currentHearts: hearts,
+            lastHeartLostAt: lastHeartUpdate?.toDate(),
+          );
+
+          await _saveHeartStateLocally();
+          Logger.info('Firebase 하트 동기화 완료: $hearts/${state.maxHearts}',
+              tag: 'Heart');
+        }
+      }
+    } catch (e, stackTrace) {
+      Logger.error('Firebase 하트 동기화 실패',
+          error: e, stackTrace: stackTrace, tag: 'Heart');
+    }
+  }
+
   /// 로컬 저장소에 하트 상태 저장
-  Future<void> _saveHeartState() async {
+  Future<void> _saveHeartStateLocally() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final heartJson = state.toJson();
-      await prefs.setString(_heartStorageKey, heartJson.toString());
+      await prefs.setString(_heartStorageKey, jsonEncode(heartJson));
 
-      Logger.info('하트 상태 저장 완료', tag: 'Heart');
+      Logger.debug('하트 상태 로컬 저장 완료', tag: 'Heart');
     } catch (e, stackTrace) {
-      Logger.error('하트 상태 저장 실패',
+      Logger.error('하트 상태 로컬 저장 실패',
+          error: e, stackTrace: stackTrace, tag: 'Heart');
+    }
+  }
+
+  /// Firebase에 하트 상태 저장
+  Future<void> _saveHeartStateToFirebase() async {
+    try {
+      final user = ref.read(userProvider);
+      if (user == null) return;
+
+      await FirebaseFirestore.instance.collection('users').doc(user.id).update({
+        'hearts': state.currentHearts,
+        'lastHeartUpdateTime': state.lastHeartLostAt != null
+            ? Timestamp.fromDate(state.lastHeartLostAt!)
+            : null,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      Logger.info('하트 상태 Firebase 저장 완료', tag: 'Heart');
+    } catch (e, stackTrace) {
+      Logger.error('하트 상태 Firebase 저장 실패',
           error: e, stackTrace: stackTrace, tag: 'Heart');
     }
   }
@@ -124,7 +182,9 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
       lastHeartLostAt: now,
     );
 
-    await _saveHeartState();
+    // 로컬 및 Firebase에 저장
+    await _saveHeartStateLocally();
+    await _saveHeartStateToFirebase();
 
     // 하트가 0이 되었을 때 타이머 시작
     if (state.isEmpty) {
@@ -145,7 +205,9 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
       clearLastHeartLostAt: newHearts >= state.maxHearts,
     );
 
-    await _saveHeartState();
+    // 로컬 및 Firebase에 저장
+    await _saveHeartStateLocally();
+    await _saveHeartStateToFirebase();
 
     Logger.info('하트 획득: ${state.currentHearts}/${state.maxHearts}',
         tag: 'Heart');
@@ -158,7 +220,9 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
       clearLastHeartLostAt: true,
     );
 
-    await _saveHeartState();
+    // 로컬 및 Firebase에 저장
+    await _saveHeartStateLocally();
+    await _saveHeartStateToFirebase();
 
     Logger.info('하트 전체 복구: ${state.currentHearts}/${state.maxHearts}',
         tag: 'Heart');
@@ -167,7 +231,10 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
   /// 하트 초기화 (디버그/테스트용)
   Future<void> resetHearts() async {
     state = const HeartConfig();
-    await _saveHeartState();
+
+    // 로컬 및 Firebase에 저장
+    await _saveHeartStateLocally();
+    await _saveHeartStateToFirebase();
 
     Logger.info('하트 초기화 완료', tag: 'Heart');
   }
@@ -179,7 +246,7 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
   }
 }
 
-/// 하트 Provider
+/// 하트 Provider (Firebase 연동)
 final heartProvider = StateNotifierProvider<HeartNotifier, HeartConfig>((ref) {
-  return HeartNotifier();
+  return HeartNotifier(ref);
 });

@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../base/base_notifier.dart';
 
 import '../auth/auth_provider.dart';
+import '../user/user_provider.dart';
 
-/// 학습 이력 상태 관리 (날짜별 학습 완료 기록)
+/// 학습 이력 상태 관리 (날짜별 학습 완료 기록, Firebase 연동)
 class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
   final Ref ref;
 
@@ -89,7 +91,7 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
     }
   }
 
-  /// 오늘 날짜를 학습 완료로 표시
+  /// 오늘 날짜를 학습 완료로 표시 (Firebase 연동)
   Future<void> markTodayAsCompleted() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -99,6 +101,36 @@ class StudyHistoryNotifier extends BaseNotifier<Set<DateTime>> {
       final newState = Set<DateTime>.from(state)..add(today);
       state = newState;
       await _saveHistory();
+      await _saveToFirebase(today);
+    }
+  }
+
+  /// Firebase에 학습 기록 저장
+  Future<void> _saveToFirebase(DateTime date) async {
+    try {
+      final user = ref.read(userProvider);
+      if (user == null) return;
+
+      final dateString = _dateOnlyString(date);
+
+      // daily_studies 컬렉션에 저장
+      await FirebaseFirestore.instance
+          .collection('daily_studies')
+          .doc('${user.id}_$dateString')
+          .set({
+        'userId': user.id,
+        'date': Timestamp.fromDate(date),
+        'completedAt': FieldValue.serverTimestamp(),
+        'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      logInfo('학습 기록 Firebase 저장 완료: $dateString');
+    } catch (e, stackTrace) {
+      logError(
+        'Firebase 학습 기록 저장 실패',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
