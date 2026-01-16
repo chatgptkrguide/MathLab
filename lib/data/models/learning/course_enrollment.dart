@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
 
 /// 과정 수강 제한 상수
 class CourseEnrollmentLimits {
@@ -12,8 +14,9 @@ class CourseEnrollmentLimits {
 /// 과정 수강 데이터 모델
 /// 사용자가 여러 과정을 동시에 수강할 수 있도록 관리합니다.
 @immutable
-class CourseEnrollment {
+class CourseEnrollment implements BaseModel {
   /// 수강 ID
+  @override
   final String id;
 
   /// 사용자 ID
@@ -63,6 +66,7 @@ class CourseEnrollment {
   }
 
   /// JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -76,6 +80,47 @@ class CourseEnrollment {
       'lastAccessDate': lastAccessDate?.toIso8601String(),
       'progressPercentage': progressPercentage,
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'courseId': courseId,
+      'courseName': courseName,
+      'enrolledDate': Timestamp.fromDate(enrolledDate),
+      'status': status.name,
+      'completedLessons': completedLessons,
+      'totalLessons': totalLessons,
+      'lastAccessDate': lastAccessDate != null ? Timestamp.fromDate(lastAccessDate!) : null,
+      'progressPercentage': progressPercentage,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory CourseEnrollment.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return CourseEnrollment(
+      id: doc.id,
+      userId: data['userId'] as String,
+      courseId: data['courseId'] as String,
+      courseName: data['courseName'] as String,
+      enrolledDate: (data['enrolledDate'] as Timestamp).toDate(),
+      status: EnrollmentStatus.values.firstWhere(
+        (e) => e.name == data['status'],
+        orElse: () => EnrollmentStatus.active,
+      ),
+      completedLessons: data['completedLessons'] as int? ?? 0,
+      totalLessons: data['totalLessons'] as int? ?? 0,
+      lastAccessDate: data['lastAccessDate'] != null
+          ? (data['lastAccessDate'] as Timestamp).toDate()
+          : null,
+      progressPercentage:
+          (data['progressPercentage'] as num?)?.toDouble() ?? 0.0,
+    );
   }
 
   /// JSON에서 생성

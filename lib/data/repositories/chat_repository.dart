@@ -1,6 +1,8 @@
 import '../models/communication/chat_room.dart';
 import 'base/base_repository.dart';
 
+export '../models/communication/chat_room.dart' show ChatRoomType;
+
 class ChatRepository extends BaseRepository<ChatRoom> {
   ChatRepository()
       : super(
@@ -32,22 +34,37 @@ class ChatRepository extends BaseRepository<ChatRoom> {
       for (final room in result.data!) {
         if (room.participantIds.contains(userId1) &&
             room.participantIds.contains(userId2)) {
-          return RepositoryResult.success(data: room);
+          return RepositoryResult.success(room);
         }
       }
     }
-    return RepositoryResult.success(data: null);
+    return RepositoryResult.success(null);
   }
 
   Future<RepositoryResult<ChatRoom>> createChatRoom(
-    List<String> participantIds,
-  ) async {
+    List<String> participantIds, {
+    String? name,
+    ChatRoomType type = ChatRoomType.direct,
+  }) async {
+    final now = DateTime.now();
+    final chatRoomId = '${participantIds.join('_')}_${now.millisecondsSinceEpoch}';
+
     final chatRoom = ChatRoom(
-      id: '',
+      id: chatRoomId,
+      name: name ?? '채팅방',
+      type: type,
       participantIds: participantIds,
-      createdAt: DateTime.now(),
-      lastMessageAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
     );
-    return create(chatRoom);
+
+    final createResult = await create(chatRoom);
+    if (!createResult.isSuccess) {
+      return RepositoryResult.failure(
+        createResult.error ?? 'Failed to create chat room',
+      );
+    }
+
+    return RepositoryResult.success(chatRoom);
   }
 }

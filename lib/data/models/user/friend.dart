@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
 
 /// 친구 요청 상태
 enum FriendRequestStatus {
@@ -14,7 +16,8 @@ enum FriendRequestStatus {
 
 /// 친구 모델
 @immutable
-class Friend {
+class Friend implements BaseModel {
+  @override
   final String id;
   final String userId;
   final String name;
@@ -59,6 +62,7 @@ class Friend {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -71,6 +75,44 @@ class Friend {
       'createdAt': createdAt.toIso8601String(),
       'acceptedAt': acceptedAt?.toIso8601String(),
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'name': name,
+      'profileImageUrl': profileImageUrl,
+      'level': level,
+      'xp': xp,
+      'status': status.name,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'acceptedAt': acceptedAt != null ? Timestamp.fromDate(acceptedAt!) : null,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory Friend.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return Friend(
+      id: doc.id,
+      userId: data['userId'] as String,
+      name: data['name'] as String,
+      profileImageUrl: data['profileImageUrl'] as String?,
+      level: data['level'] as int,
+      xp: data['xp'] as int,
+      status: FriendRequestStatus.values.firstWhere(
+        (e) => e.name == data['status'],
+        orElse: () => FriendRequestStatus.pending,
+      ),
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      acceptedAt: data['acceptedAt'] != null
+          ? (data['acceptedAt'] as Timestamp).toDate()
+          : null,
+    );
   }
 
   Friend copyWith({

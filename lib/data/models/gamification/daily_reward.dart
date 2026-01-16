@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 일일 보상 시스템
 /// 매일 로그인 시 보상 제공
-class DailyReward {
+class DailyReward implements BaseModel {
+  @override
+  final String id;
   final int day; // 연속 로그인 일수 (1~7일 반복)
   final RewardType type;
   final int amount;
@@ -8,6 +13,7 @@ class DailyReward {
   final String emoji;
 
   const DailyReward({
+    required this.id,
     required this.day,
     required this.type,
     required this.amount,
@@ -18,6 +24,7 @@ class DailyReward {
   /// 7일 주기 보상
   static List<DailyReward> weeklyRewards = [
     const DailyReward(
+      id: 'day_1',
       day: 1,
       type: RewardType.xp,
       amount: 10,
@@ -25,6 +32,7 @@ class DailyReward {
       emoji: '🔶',
     ),
     const DailyReward(
+      id: 'day_2',
       day: 2,
       type: RewardType.xp,
       amount: 15,
@@ -32,6 +40,7 @@ class DailyReward {
       emoji: '🔶',
     ),
     const DailyReward(
+      id: 'day_3',
       day: 3,
       type: RewardType.hearts,
       amount: 1,
@@ -39,6 +48,7 @@ class DailyReward {
       emoji: '❤️',
     ),
     const DailyReward(
+      id: 'day_4',
       day: 4,
       type: RewardType.xp,
       amount: 20,
@@ -46,6 +56,7 @@ class DailyReward {
       emoji: '🔶',
     ),
     const DailyReward(
+      id: 'day_5',
       day: 5,
       type: RewardType.xp,
       amount: 25,
@@ -53,6 +64,7 @@ class DailyReward {
       emoji: '🔶',
     ),
     const DailyReward(
+      id: 'day_6',
       day: 6,
       type: RewardType.hearts,
       amount: 2,
@@ -60,6 +72,7 @@ class DailyReward {
       emoji: '❤️',
     ),
     const DailyReward(
+      id: 'day_7',
       day: 7,
       type: RewardType.xp,
       amount: 50,
@@ -83,6 +96,7 @@ class DailyReward {
 
   factory DailyReward.fromJson(Map<String, dynamic> json) {
     return DailyReward(
+      id: json['id'] as String,
       day: json['day'] as int,
       type: RewardType.values.firstWhere(
         (t) => t.name == json['type'],
@@ -94,7 +108,21 @@ class DailyReward {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'day': day,
+      'type': type.name,
+      'amount': amount,
+      'displayName': displayName,
+      'emoji': emoji,
+    };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
     return {
       'day': day,
       'type': type.name,
@@ -103,14 +131,54 @@ class DailyReward {
       'emoji': emoji,
     };
   }
+
+  /// Firestore 문서에서 생성
+  factory DailyReward.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return DailyReward(
+      id: doc.id,
+      day: data['day'] as int,
+      type: RewardType.values.firstWhere(
+        (t) => t.name == data['type'],
+        orElse: () => RewardType.xp,
+      ),
+      amount: data['amount'] as int,
+      displayName: data['displayName'] as String,
+      emoji: data['emoji'] as String,
+    );
+  }
 }
 
-/// 보상 타입
+/// 보상 타입 (Duolingo 스타일로 확장)
 enum RewardType {
+  /// XP (기본 보상)
   xp,
+
+  /// 하트 (생명)
   hearts,
-  gems, // 미래 확장용
-  unlock, // 특별 레슨 잠금 해제 등
+
+  /// XP 부스트 (일정 시간 동안 XP 2배)
+  xpBoost,
+
+  /// Streak Freeze (Streak 보호)
+  streakFreeze,
+
+  /// 힌트 팩 (힌트 3개)
+  hintPack,
+
+  /// 전체 하트 충전
+  heartRefill,
+
+  /// 특별 레슨 잠금 해제
+  unlock,
+
+  /// 젬 (프리미엄 화폐)
+  gems,
+
+  /// 프리미엄 체험 (24시간)
+  premiumTrial,
 }
 
 /// 연속 학습 보너스

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/models.dart';
-import '../../repositories/message_repository.dart';
 import '../base/base_notifier.dart';
 import '../auth/auth_provider.dart';
 

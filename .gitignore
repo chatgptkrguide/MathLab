@@ -149,3 +149,16 @@ secrets.dart
 # 소셜 로그인 설정 (OAuth)
 oauth_config.json
 kakao_config.json
+
+# Firebase Admin Key (보안)
+firebase-admin-key.json
+firebase*.json
+!firebase.json
+
+# 환경변수 복사본
+.env 2
+
+# Setup 문서 (보안 정보 포함)
+FIREBASE_SETUP.md
+KAKAO_LOGIN_SETUP.md
+FIREBASE_SERVICES_SETUP.md

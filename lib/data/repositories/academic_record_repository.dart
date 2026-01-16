@@ -38,15 +38,20 @@ class AcademicRecordRepository extends BaseRepository<AcademicRecord> {
   ) async {
     final result = await getRecordsBySubject(userId, subject);
     if (!result.isSuccess || result.data == null || result.data!.isEmpty) {
-      return RepositoryResult.success(data: 0.0);
+      return RepositoryResult.success(0.0);
     }
 
-    final average = result.data!.fold<double>(
-          0.0,
-          (sum, record) => sum + record.grade,
-        ) /
-        result.data!.length;
+    // 각 레코드에서 해당 과목의 점수를 가져와서 평균 계산
+    final scores = result.data!
+        .where((record) => record.scores.containsKey(subject))
+        .map((record) => record.scores[subject]!.score)
+        .toList();
 
-    return RepositoryResult.success(data: average);
+    if (scores.isEmpty) {
+      return RepositoryResult.success(0.0);
+    }
+
+    final average = scores.reduce((a, b) => a + b) / scores.length;
+    return RepositoryResult.success(average);
   }
 }

@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 레벨 테스트 모델
-class LevelTest {
+class LevelTest implements BaseModel {
+  @override
   final String id;
   final List<LevelTestQuestion> questions;
   final DateTime createdAt;
@@ -34,6 +38,7 @@ class LevelTest {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -43,6 +48,35 @@ class LevelTest {
       'finalLevel': finalLevel,
       'accuracy': accuracy,
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'questions': questions.map((q) => q.toJson()).toList(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'isCompleted': isCompleted,
+      'finalLevel': finalLevel,
+      'accuracy': accuracy,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory LevelTest.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return LevelTest(
+      id: doc.id,
+      questions: (data['questions'] as List<dynamic>)
+          .map((q) => LevelTestQuestion.fromJson(q as Map<String, dynamic>))
+          .toList(),
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      isCompleted: data['isCompleted'] as bool? ?? false,
+      finalLevel: data['finalLevel'] as int?,
+      accuracy: data['accuracy']?.toDouble(),
+    );
   }
 
   factory LevelTest.fromJson(Map<String, dynamic> json) {

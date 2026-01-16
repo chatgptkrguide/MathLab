@@ -1,5 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 앱 설정 모델
-class AppSettings {
+class AppSettings implements BaseModel {
+  @override
+  final String id;
+
   /// 알림 설정
   final bool notificationsEnabled;
 
@@ -25,6 +31,7 @@ class AppSettings {
   final bool darkModeEnabled;
 
   const AppSettings({
+    required this.id,
     this.notificationsEnabled = true,
     this.soundEnabled = true,
     this.vibrationEnabled = true,
@@ -36,6 +43,7 @@ class AppSettings {
   });
 
   AppSettings copyWith({
+    String? id,
     bool? notificationsEnabled,
     bool? soundEnabled,
     bool? vibrationEnabled,
@@ -46,6 +54,7 @@ class AppSettings {
     bool? darkModeEnabled,
   }) {
     return AppSettings(
+      id: id ?? this.id,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
@@ -57,7 +66,24 @@ class AppSettings {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'notificationsEnabled': notificationsEnabled,
+      'soundEnabled': soundEnabled,
+      'vibrationEnabled': vibrationEnabled,
+      'language': language,
+      'dailyGoalXP': dailyGoalXP,
+      'reminderTime': reminderTime,
+      'reminderEnabled': reminderEnabled,
+      'darkModeEnabled': darkModeEnabled,
+    };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
     return {
       'notificationsEnabled': notificationsEnabled,
       'soundEnabled': soundEnabled,
@@ -70,8 +96,27 @@ class AppSettings {
     };
   }
 
+  /// Firestore 문서에서 생성
+  factory AppSettings.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return AppSettings(
+      id: doc.id,
+      notificationsEnabled: data['notificationsEnabled'] as bool? ?? true,
+      soundEnabled: data['soundEnabled'] as bool? ?? true,
+      vibrationEnabled: data['vibrationEnabled'] as bool? ?? true,
+      language: data['language'] as String? ?? 'ko',
+      dailyGoalXP: data['dailyGoalXP'] as int? ?? 20,
+      reminderTime: data['reminderTime'] as String?,
+      reminderEnabled: data['reminderEnabled'] as bool? ?? false,
+      darkModeEnabled: data['darkModeEnabled'] as bool? ?? false,
+    );
+  }
+
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
+      id: json['id'] as String? ?? 'default',
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
       soundEnabled: json['soundEnabled'] as bool? ?? true,
       vibrationEnabled: json['vibrationEnabled'] as bool? ?? true,

@@ -9,7 +9,8 @@ import '../base/base_notifier.dart';
 /// - updateAndSave로 상태 업데이트 + 저장 단순화
 /// - 자동 에러 처리로 try-catch 제거
 class SettingsNotifier extends BaseNotifier<AppSettings> {
-  SettingsNotifier() : super(const AppSettings(), 'SettingsProvider') {
+  SettingsNotifier()
+      : super(const AppSettings(id: 'default_settings'), 'SettingsProvider') {
     _loadSettings();
   }
 
@@ -111,7 +112,7 @@ class SettingsNotifier extends BaseNotifier<AppSettings> {
     logWarning('설정 초기화 시작');
 
     await updateAndSave(
-      const AppSettings(),
+      const AppSettings(id: 'default_settings'),
       saveKey: _settingsKey,
       toJson: (s) => s.toJson(),
     );

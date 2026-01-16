@@ -74,25 +74,32 @@ class AchievementRepository extends BaseRepository<Achievement> {
       final result = await getById(achievementId);
       if (!result.isSuccess || result.data == null) {
         return RepositoryResult.failure(
-          error: result.error ?? 'Achievement not found',
+          result.error ?? 'Achievement not found',
         );
       }
 
       final achievement = result.data!;
-      final isUnlocked = currentProgress >= achievement.requiredProgress;
+      final isUnlocked = currentProgress >= achievement.requiredValue;
 
       final updated = achievement.copyWith(
-        currentProgress: currentProgress,
+        currentValue: currentProgress,
         isUnlocked: isUnlocked,
         unlockedAt: isUnlocked && achievement.unlockedAt == null
             ? DateTime.now()
             : achievement.unlockedAt,
       );
 
-      return update(updated);
+      final updateResult = await update(updated);
+      if (!updateResult.isSuccess) {
+        return RepositoryResult.failure(
+          updateResult.error ?? 'Failed to update',
+        );
+      }
+
+      return RepositoryResult.success(updated);
     } catch (e) {
       return RepositoryResult.failure(
-        error: 'Failed to update achievement progress: $e',
+        'Failed to update achievement progress: $e',
       );
     }
   }
@@ -105,25 +112,32 @@ class AchievementRepository extends BaseRepository<Achievement> {
       final result = await getById(achievementId);
       if (!result.isSuccess || result.data == null) {
         return RepositoryResult.failure(
-          error: result.error ?? 'Achievement not found',
+          result.error ?? 'Achievement not found',
         );
       }
 
       final achievement = result.data!;
       if (achievement.isUnlocked) {
-        return RepositoryResult.success(data: achievement);
+        return RepositoryResult.success(achievement);
       }
 
       final unlocked = achievement.copyWith(
         isUnlocked: true,
         unlockedAt: DateTime.now(),
-        currentProgress: achievement.requiredProgress,
+        currentValue: achievement.requiredValue,
       );
 
-      return update(unlocked);
+      final updateResult = await update(unlocked);
+      if (!updateResult.isSuccess) {
+        return RepositoryResult.failure(
+          updateResult.error ?? 'Failed to update',
+        );
+      }
+
+      return RepositoryResult.success(unlocked);
     } catch (e) {
       return RepositoryResult.failure(
-        error: 'Failed to unlock achievement: $e',
+        'Failed to unlock achievement: $e',
       );
     }
   }

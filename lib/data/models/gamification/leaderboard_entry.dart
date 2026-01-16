@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 리더보드 엔트리 모델
-class LeaderboardEntry {
+class LeaderboardEntry implements BaseModel {
+  @override
+  String get id => userId; // userId를 id로 사용
   final String userId;
   final String userName;
   final String? avatarUrl;
@@ -41,6 +46,7 @@ class LeaderboardEntry {
   }
 
   /// LeaderboardEntry 객체를 JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
@@ -54,6 +60,41 @@ class LeaderboardEntry {
       'isCurrentUser': isCurrentUser,
       'lastActiveAt': lastActiveAt.toIso8601String(),
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userName': userName,
+      'avatarUrl': avatarUrl,
+      'rank': rank,
+      'xp': xp,
+      'level': level,
+      'streakDays': streakDays,
+      'grade': grade,
+      'isCurrentUser': isCurrentUser,
+      'lastActiveAt': Timestamp.fromDate(lastActiveAt),
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory LeaderboardEntry.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return LeaderboardEntry(
+      userId: doc.id,
+      userName: data['userName'] as String,
+      avatarUrl: data['avatarUrl'] as String?,
+      rank: data['rank'] as int,
+      xp: data['xp'] as int,
+      level: data['level'] as int,
+      streakDays: data['streakDays'] as int,
+      grade: data['grade'] as String,
+      isCurrentUser: data['isCurrentUser'] as bool? ?? false,
+      lastActiveAt: (data['lastActiveAt'] as Timestamp).toDate(),
+    );
   }
 
   /// LeaderboardEntry 객체 복사

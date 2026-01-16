@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
 
 /// 채팅방 타입
 enum ChatRoomType {
@@ -14,8 +16,9 @@ enum ChatRoomType {
 
 /// 채팅방 모델
 @immutable
-class ChatRoom {
+class ChatRoom implements BaseModel {
   /// 채팅방 ID
+  @override
   final String id;
 
   /// 채팅방 이름
@@ -80,6 +83,7 @@ class ChatRoom {
   }
 
   /// JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -93,6 +97,46 @@ class ChatRoom {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'type': type.name,
+      'participantIds': participantIds,
+      'iconUrl': iconUrl,
+      'lastMessage': lastMessage,
+      'lastMessageTime': lastMessageTime != null ? Timestamp.fromDate(lastMessageTime!) : null,
+      'unreadCount': unreadCount,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory ChatRoom.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return ChatRoom(
+      id: doc.id,
+      name: data['name'] as String,
+      type: ChatRoomType.values.firstWhere(
+        (e) => e.name == data['type'],
+        orElse: () => ChatRoomType.direct,
+      ),
+      participantIds: List<String>.from(data['participantIds'] as List),
+      iconUrl: data['iconUrl'] as String?,
+      lastMessage: data['lastMessage'] as String?,
+      lastMessageTime: data['lastMessageTime'] != null
+          ? (data['lastMessageTime'] as Timestamp).toDate()
+          : null,
+      unreadCount: data['unreadCount'] as int? ?? 0,
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+    );
   }
 
   /// 복사 생성자

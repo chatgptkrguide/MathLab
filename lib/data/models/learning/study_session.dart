@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 학습 세션 데이터 모델
 /// 사용자의 학습 시간을 추적하고 기록합니다.
-class StudySession {
+class StudySession implements BaseModel {
+  @override
   final String id;
   final String userId;
   final DateTime startTime;
@@ -29,6 +33,7 @@ class StudySession {
   }
 
   /// JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -38,6 +43,38 @@ class StudySession {
       'durationSeconds': durationSeconds,
       'activityType': activityType.name,
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'startTime': Timestamp.fromDate(startTime),
+      'endTime': endTime != null ? Timestamp.fromDate(endTime!) : null,
+      'durationSeconds': durationSeconds,
+      'activityType': activityType.name,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory StudySession.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return StudySession(
+      id: doc.id,
+      userId: data['userId'] as String,
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: data['endTime'] != null
+          ? (data['endTime'] as Timestamp).toDate()
+          : null,
+      durationSeconds: data['durationSeconds'] as int,
+      activityType: StudyActivityType.values.firstWhere(
+        (e) => e.name == data['activityType'],
+        orElse: () => StudyActivityType.other,
+      ),
+    );
   }
 
   /// JSON에서 생성

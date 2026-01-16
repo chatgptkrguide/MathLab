@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
 import 'problem.dart';
 
 /// 연습 모드 세션
-class PracticeSession {
+class PracticeSession implements BaseModel {
+  @override
   final String id;
   final String category; // 카테고리: 기초산술, 대수, 기하 등
   final List<Problem> problems;
@@ -82,6 +85,7 @@ class PracticeSession {
     return correctCount / answeredCount;
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -95,6 +99,45 @@ class PracticeSession {
       'incorrectCount': incorrectCount,
       'skippedCount': skippedCount,
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'category': category,
+      'problems': problems.map((p) => p.toJson()).toList(),
+      'startedAt': Timestamp.fromDate(startedAt),
+      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'isCompleted': isCompleted,
+      'currentProblemIndex': currentProblemIndex,
+      'correctCount': correctCount,
+      'incorrectCount': incorrectCount,
+      'skippedCount': skippedCount,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory PracticeSession.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return PracticeSession(
+      id: doc.id,
+      category: data['category'] as String,
+      problems: (data['problems'] as List<dynamic>)
+          .map((p) => Problem.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      startedAt: (data['startedAt'] as Timestamp).toDate(),
+      completedAt: data['completedAt'] != null
+          ? (data['completedAt'] as Timestamp).toDate()
+          : null,
+      isCompleted: data['isCompleted'] as bool? ?? false,
+      currentProblemIndex: data['currentProblemIndex'] as int? ?? 0,
+      correctCount: data['correctCount'] as int? ?? 0,
+      incorrectCount: data['incorrectCount'] as int? ?? 0,
+      skippedCount: data['skippedCount'] as int? ?? 0,
+    );
   }
 
   factory PracticeSession.fromJson(Map<String, dynamic> json) {

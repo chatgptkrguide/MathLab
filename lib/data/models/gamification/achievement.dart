@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 업적 정보 모델
-class Achievement {
+class Achievement implements BaseModel {
+  @override
   final String id;
   final String title;
   final String description;
@@ -85,6 +89,7 @@ class Achievement {
   }
 
   /// Achievement 객체를 JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -99,6 +104,49 @@ class Achievement {
       'xpReward': xpReward,
       'rarity': rarity.toString().split('.').last,
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'title': title,
+      'description': description,
+      'icon': icon,
+      'type': type.toString().split('.').last,
+      'requiredValue': requiredValue,
+      'currentValue': currentValue,
+      'isUnlocked': isUnlocked,
+      'unlockedAt': unlockedAt != null ? Timestamp.fromDate(unlockedAt!) : null,
+      'xpReward': xpReward,
+      'rarity': rarity.toString().split('.').last,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory Achievement.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return Achievement(
+      id: doc.id,
+      title: data['title'] as String,
+      description: data['description'] as String,
+      icon: data['icon'] as String,
+      type: AchievementType.values.firstWhere(
+        (e) => e.toString().split('.').last == data['type'],
+      ),
+      requiredValue: data['requiredValue'] as int,
+      currentValue: data['currentValue'] as int,
+      isUnlocked: data['isUnlocked'] as bool,
+      unlockedAt: data['unlockedAt'] != null
+          ? (data['unlockedAt'] as Timestamp).toDate()
+          : null,
+      xpReward: data['xpReward'] as int,
+      rarity: AchievementRarity.values.firstWhere(
+        (e) => e.toString().split('.').last == data['rarity'],
+      ),
+    );
   }
 
   /// Achievement 객체 복사 (일부 값 변경)

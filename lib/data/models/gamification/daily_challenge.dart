@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 일일 챌린지 모델
-class DailyChallenge {
+class DailyChallenge implements BaseModel {
+  @override
   final String id;
   final ChallengeType type;
   final String title;
@@ -58,6 +62,7 @@ class DailyChallenge {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -70,6 +75,42 @@ class DailyChallenge {
       'date': date.toIso8601String(),
       'isCompleted': isCompleted,
     };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'type': type.name,
+      'title': title,
+      'description': description,
+      'targetValue': targetValue,
+      'currentValue': currentValue,
+      'xpReward': xpReward,
+      'date': Timestamp.fromDate(date),
+      'isCompleted': isCompleted,
+    };
+  }
+
+  /// Firestore 문서에서 생성
+  factory DailyChallenge.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return DailyChallenge(
+      id: doc.id,
+      type: ChallengeType.values.firstWhere(
+        (e) => e.name == data['type'],
+        orElse: () => ChallengeType.solveProblems,
+      ),
+      title: data['title'] as String,
+      description: data['description'] as String,
+      targetValue: data['targetValue'] as int,
+      currentValue: data['currentValue'] as int? ?? 0,
+      xpReward: data['xpReward'] as int,
+      date: (data['date'] as Timestamp).toDate(),
+      isCompleted: data['isCompleted'] as bool? ?? false,
+    );
   }
 
   factory DailyChallenge.fromJson(Map<String, dynamic> json) {

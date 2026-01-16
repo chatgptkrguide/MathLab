@@ -148,7 +148,8 @@ class HeartNotifier extends StateNotifier<HeartConfig> {
         clearLastHeartLostAt: isFullyRecovered,
       );
 
-      _saveHeartState();
+      _saveHeartStateLocally();
+      _saveHeartStateToFirebase();
 
       Logger.info('하트 복구: ${state.currentHearts}/${state.maxHearts}',
           tag: 'Heart');

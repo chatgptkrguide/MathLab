@@ -16,7 +16,7 @@ class CourseEnrollmentRepository extends BaseRepository<CourseEnrollment> {
     return query(
       (ref) => ref
           .where('userId', isEqualTo: userId)
-          .orderBy('enrolledAt', descending: true),
+          .orderBy('enrolledDate', descending: true),
     );
   }
 
@@ -26,8 +26,8 @@ class CourseEnrollmentRepository extends BaseRepository<CourseEnrollment> {
     return query(
       (ref) => ref
           .where('userId', isEqualTo: userId)
-          .where('status', isEqualTo: 'active')
-          .orderBy('enrolledAt', descending: true),
+          .where('status', isEqualTo: EnrollmentStatus.active.name)
+          .orderBy('enrolledDate', descending: true),
     );
   }
 
@@ -43,39 +43,65 @@ class CourseEnrollmentRepository extends BaseRepository<CourseEnrollment> {
     );
 
     return RepositoryResult.success(
-      data: result.isSuccess && result.data != null && result.data!.isNotEmpty,
+      result.isSuccess && result.data != null && result.data!.isNotEmpty,
     );
   }
 
   Future<RepositoryResult<CourseEnrollment>> enrollCourse(
     String userId,
     String courseId,
+    String courseName,
   ) async {
+    final now = DateTime.now();
+    final enrollmentId = '${userId}_${courseId}_${now.millisecondsSinceEpoch}';
+
     final enrollment = CourseEnrollment(
-      id: '',
+      id: enrollmentId,
       userId: userId,
       courseId: courseId,
-      enrolledAt: DateTime.now(),
-      status: 'active',
-      progress: 0,
+      courseName: courseName,
+      enrolledDate: now,
+      status: EnrollmentStatus.active,
+      progressPercentage: 0.0,
     );
-    return create(enrollment);
+
+    final createResult = await create(enrollment);
+    if (!createResult.isSuccess) {
+      return RepositoryResult.failure(
+        createResult.error ?? 'Failed to enroll course',
+      );
+    }
+
+    return RepositoryResult.success(enrollment);
   }
 
   Future<RepositoryResult<CourseEnrollment>> updateProgress(
     String enrollmentId,
-    int progress,
+    double progressPercentage,
   ) async {
     final result = await getById(enrollmentId);
     if (!result.isSuccess || result.data == null) {
-      return RepositoryResult.failure(error: 'Enrollment not found');
+      return RepositoryResult.failure('Enrollment not found');
     }
 
-    final updated = result.data!.copyWith(
-      progress: progress,
-      status: progress >= 100 ? 'completed' : 'active',
-      completedAt: progress >= 100 ? DateTime.now() : null,
+    final enrollment = result.data!;
+    final status = progressPercentage >= 100
+        ? EnrollmentStatus.completed
+        : EnrollmentStatus.active;
+
+    final updated = enrollment.copyWith(
+      progressPercentage: progressPercentage,
+      status: status,
+      lastAccessDate: DateTime.now(),
     );
-    return update(updated);
+
+    final updateResult = await update(updated);
+    if (!updateResult.isSuccess) {
+      return RepositoryResult.failure(
+        updateResult.error ?? 'Failed to update progress',
+      );
+    }
+
+    return RepositoryResult.success(updated);
   }
 }

@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../base/base_model.dart';
+
 /// 학업 성적 데이터 모델
 /// 학교 성적, 모의고사 성적 등을 관리합니다.
-class AcademicRecord {
+class AcademicRecord implements BaseModel {
+  @override
   final String id;
   final String userId;
   final AcademicRecordType type;
@@ -26,12 +30,29 @@ class AcademicRecord {
   });
 
   /// JSON으로 변환
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'userId': userId,
       'type': type.name,
       'date': date.toIso8601String(),
+      'semester': semester,
+      'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
+      'averageScore': averageScore,
+      'rank': rank,
+      'totalStudents': totalStudents,
+      'memo': memo,
+    };
+  }
+
+  /// Firestore 형식으로 변환
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'type': type.name,
+      'date': Timestamp.fromDate(date),
       'semester': semester,
       'scores': scores.map((key, value) => MapEntry(key, value.toJson())),
       'averageScore': averageScore,
@@ -62,6 +83,33 @@ class AcademicRecord {
       rank: json['rank'] as int?,
       totalStudents: json['totalStudents'] as int?,
       memo: json['memo'] as String?,
+    );
+  }
+
+  /// Firestore 문서에서 생성
+  factory AcademicRecord.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return AcademicRecord(
+      id: doc.id,
+      userId: data['userId'] as String,
+      type: AcademicRecordType.values.firstWhere(
+        (e) => e.name == data['type'],
+        orElse: () => AcademicRecordType.schoolExam,
+      ),
+      date: (data['date'] as Timestamp).toDate(),
+      semester: data['semester'] as String,
+      scores: (data['scores'] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(
+          key,
+          SubjectScore.fromJson(value as Map<String, dynamic>),
+        ),
+      ),
+      averageScore: data['averageScore'] as double?,
+      rank: data['rank'] as int?,
+      totalStudents: data['totalStudents'] as int?,
+      memo: data['memo'] as String?,
     );
   }
 
