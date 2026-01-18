@@ -66,11 +66,11 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     final currentIndex = ref.watch(navigationProvider);
 
     final List<Widget> screens = [
-      const LessonsScreenFigma(), // 0: 학습
-      const WrongAnswerScreen(), // 1: 오답
-      const HomeScreenFigma(), // 2: 홈 (가운데)
-      const ProfileDetailScreen(), // 3: 프로필 (학습자 상세)
-      const LeagueScreen(), // 4: 리그
+      const HomeScreenFigma(), // 0: 홈
+      const LessonsScreenFigma(), // 1: 학습 (주요 기능)
+      const LeagueScreen(), // 2: 리그 (가운데 - 게이미피케이션)
+      const WrongAnswerScreen(), // 3: 오답
+      const ProfileDetailScreen(), // 4: 프로필
     ];
 
     return PopScope(
@@ -79,7 +79,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         if (didPop) return;
 
         // 홈 탭이 아닌 경우 홈으로 돌아가기
-        if (currentIndex != 2) {
+        if (currentIndex != 0) {
           ref.read(navigationProvider.notifier).goToHome();
           _provideFeedback();
           return;
