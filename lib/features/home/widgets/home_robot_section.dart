@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/indicators/circular_progress_ring.dart';
 
-/// 홈 화면 로봇 섹션
+/// 홈 화면 로봇 섹션 (2026-01-23 업데이트)
 ///
 /// 포함 내용:
 /// - 로봇 캐릭터 이미지

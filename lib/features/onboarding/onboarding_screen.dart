@@ -46,67 +46,43 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final LocalStorageService _storage = LocalStorageService();
 
   int _currentPage = 0;
-  static const int _totalPages = 6;
+  static const int _totalPages = 3;
 
-  // 온보딩 페이지 데이터
+  // 온보딩 페이지 데이터 (6개 → 3개로 축소)
   final List<OnboardingPageData> _pages = const [
+    // 페이지 1: 환영 + 핵심 가치 제안
     OnboardingPageData(
       icon: Icons.menu_book,
       title: 'MathLab에 오신 것을\n환영합니다!',
-      description: '매일 5분, 수학이 쉬워지는\n즐거운 학습 여정을 시작해요',
+      description: '매일 5분, 수학이 쉬워지는\n게임처럼 즐거운 학습 여정',
       gradient: AppColors.mathBlueGradient,
-    ),
-    OnboardingPageData(
-      icon: Icons.diamond_outlined,
-      title: 'XP와 레벨 시스템',
-      description: '문제를 풀면서 XP를 획득하고\nBronze부터 Diamond까지 레벨업하세요',
-      gradient: AppColors.mathOrangeGradient,
       features: [
-        '문제당 최대 15 XP 획득',
-        '5개 레벨: Bronze → Diamond',
-        '꾸준한 성장 추적',
+        '듀오링고 스타일 게임 학습',
+        '단계별 맞춤 커리큘럼',
+        '재미있는 성취 시스템',
       ],
     ),
-    OnboardingPageData(
-      icon: Icons.local_fire_department,
-      title: '스트릭과 하트',
-      description: '매일 학습하며 스트릭을 유지하고\n하트를 관리하세요',
-      gradient: AppColors.mathPurpleGradient,
-      features: [
-        '연속 학습 스트릭 추적',
-        '하트 5개로 시작',
-        '30분마다 하트 1개 재생',
-      ],
-    ),
+    // 페이지 2: 통합 게이미피케이션 (XP + 스트릭 + 리그)
     OnboardingPageData(
       icon: Icons.emoji_events,
-      title: '주간 리그 경쟁',
-      description: '50명과 함께 주간 리그에서\n경쟁하며 승급을 노리세요',
+      title: '함께 성장하는\n학습 경험',
+      description: 'XP를 쌓고, 연속 학습하며\n친구들과 경쟁해보세요',
       gradient: [
-        AppColors.mathYellow, // GoMath 골드
-        AppColors.mathOrange, // GoMath 오렌지
+        AppColors.mathYellow,
+        AppColors.mathOrange,
       ],
       features: [
-        '상위 20% 승급',
-        '하위 20% 강등',
-        '매주 월요일 초기화',
+        '📊 XP & 레벨: Bronze → Diamond',
+        '🔥 스트릭: 매일 학습 동기부여',
+        '🏆 주간 리그: 50명과 경쟁',
+        '💡 힌트 & 오답노트로 복습',
       ],
     ),
-    OnboardingPageData(
-      icon: Icons.lightbulb,
-      title: '힌트와 오답 노트',
-      description: '막힐 때는 힌트를 사용하고\n틀린 문제는 복습하세요',
-      gradient: AppColors.mathPurpleGradient,
-      features: [
-        '힌트 1개당 10 XP',
-        '오답 자동 저장',
-        '망각 곡선 기반 복습',
-      ],
-    ),
+    // 페이지 3: 시작하기
     OnboardingPageData(
       icon: Icons.flag,
-      title: '지금 바로 시작하세요!',
-      description: '매일 5분으로 수학 실력을\n쌓아가는 여정을 시작해보세요',
+      title: '지금 바로\n시작하세요!',
+      description: '3분이면 설정 완료!\n오늘부터 수학 실력을 쌓아가요',
       gradient: AppColors.mathBlueGradient,
       isLast: true,
     ),
