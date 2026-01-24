@@ -1,0 +1,121 @@
+name: mathlab
+description: "게이미피케이션 기반 수학 학습 앱 - MathLab"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ========================================
+  # 상태 관리
+  # ========================================
+  flutter_riverpod: ^2.6.1
+  riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # ========================================
+  # Firebase (필수)
+  # ========================================
+  firebase_core: ^3.9.0
+  firebase_auth: ^5.3.4
+  cloud_firestore: ^5.6.0
+  firebase_storage: ^12.3.12
+  firebase_messaging: ^15.1.7
+  firebase_analytics: ^11.3.12
+  firebase_crashlytics: ^4.1.11
+
+  # ========================================
+  # 보안 및 환경 관리 (필수)
+  # ========================================
+  flutter_dotenv: ^5.2.1
+  flutter_secure_storage: ^9.2.2
+
+  # ========================================
+  # 소셜 로그인
+  # ========================================
+  google_sign_in: ^6.2.2
+  kakao_flutter_sdk: ^1.10.0
+
+  # ========================================
+  # 네트워킹
+  # ========================================
+  dio: ^5.7.0
+  http: ^1.2.2
+  connectivity_plus: ^6.1.1
+
+  # ========================================
+  # 로컬 저장소
+  # ========================================
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  shared_preferences: ^2.3.5
+  path_provider: ^2.1.5
+
+  # ========================================
+  # UI/UX
+  # ========================================
+  cached_network_image: ^3.4.1
+  flutter_svg: ^2.0.14
+  google_fonts: ^6.2.1
+  lottie: ^3.2.0
+  shimmer: ^3.0.0
+
+  # ========================================
+  # 유틸리티
+  # ========================================
+  intl: ^0.20.1
+  url_launcher: ^6.3.2
+  permission_handler: ^11.3.1
+  package_info_plus: ^8.1.2
+  uuid: ^4.5.1
+  equatable: ^2.0.7
+  logger: ^2.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # ========================================
+  # 린트 및 코드 품질
+  # ========================================
+  flutter_lints: ^5.0.0
+
+  # ========================================
+  # 코드 생성
+  # ========================================
+  build_runner: ^2.4.13
+  json_serializable: ^6.9.2
+  riverpod_generator: ^2.6.3
+
+flutter:
+  uses-material-design: true
+
+  # ========================================
+  # Assets
+  # ========================================
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/illustrations/
+    - assets/animations/
+    - .env
+    - .env.production
+
+  # ========================================
+  # Fonts
+  # ========================================
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Regular.ttf
+        - asset: assets/fonts/Pretendard-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Pretendard-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Pretendard-Medium.ttf
+          weight: 500
