@@ -4,8 +4,8 @@ import '../../../data/models/learning/problem.dart';
 import '../../../data/providers/learning/hint_provider_optimized.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/constants.dart';
-import '../../../shared/utils/haptic_feedback.dart';
 import '../../../shared/widgets/animations/fade_in_widget.dart';
+import '../logic/hint_unlock_handler.dart';
 import 'hint/widgets.dart';
 
 /// 힌트 섹션 위젯 - 대폭 개편된 UX
@@ -100,198 +100,19 @@ class _HintSectionState extends ConsumerState<HintSection>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 헤더 (클릭 가능) - 대폭 개선
-            InkWell(
-              onTap: () async {
-                await AppHapticFeedback.selectionClick();
+            // 헤더 (클릭 가능)
+            HintHeader(
+              pulseAnimation: _pulseAnimation,
+              glowAnimation: _glowAnimation,
+              unlockedCount: unlockedCount,
+              totalHints: totalHints,
+              userXP: userXP,
+              isExpanded: _isExpanded,
+              onToggle: () {
                 setState(() {
                   _isExpanded = !_isExpanded;
                 });
               },
-              borderRadius: BorderRadius.circular(18),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // 펄스 애니메이션이 적용된 lightbulb 아이콘 - 적절한 크기로 조정
-                    AnimatedBuilder(
-                      animation: _pulseController,
-                      builder: (context, child) {
-                        return Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppColors.mathOrange.withValues(alpha: _glowAnimation.value),
-                                AppColors.mathOrange.withValues(alpha: _glowAnimation.value * 0.7),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.mathOrange.withValues(alpha: _glowAnimation.value),
-                                blurRadius: 20,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: Transform.scale(
-                            scale: _pulseAnimation.value,
-                            child: const Icon(
-                              Icons.lightbulb,
-                              color: AppColors.mathOrange,
-                              size: 28,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 16),
-                    // 힌트 정보
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                '💡 힌트',
-                                style: AppTextStyles.titleLarge.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              if (hasUnlockedHints)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.successGreen,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    '$unlockedCount개 사용중',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          // 진행률 바
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.borderLight.withValues(alpha: 0.3),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: FractionallySizedBox(
-                                    alignment: Alignment.centerLeft,
-                                    widthFactor: unlockedCount / totalHints,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppColors.mathOrange,
-                                            AppColors.mathOrange.withValues(alpha: 0.7),
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(3),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '$unlockedCount/$totalHints',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // XP 표시 - 더 크고 눈에 띄게
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.mathOrange.withValues(alpha: 0.15),
-                            AppColors.mathOrange.withValues(alpha: 0.08),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.mathOrange.withValues(alpha: 0.3),
-                          width: 2,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.diamond,
-                            color: AppColors.mathOrange,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '$userXP',
-                            style: AppTextStyles.titleMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.mathOrange,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // 펼침/접기 아이콘 - 더 크게
-                    AnimatedRotation(
-                      turns: _isExpanded ? 0.5 : 0,
-                      duration: const Duration(milliseconds: 300),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.mathOrange.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.keyboard_arrow_down,
-                          color: AppColors.mathOrange,
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
 
             // 힌트 리스트 (애니메이션)
@@ -323,7 +144,12 @@ class _HintSectionState extends ConsumerState<HintSection>
                                 isUnlocked: isUnlocked,
                                 canUnlock:
                                     userXP >= HintProviderOptimized.hintCost,
-                                onUnlock: () => _unlockHint(context, index),
+                                onUnlock: () => HintUnlockHandler.unlockHint(
+                                  context: context,
+                                  ref: ref,
+                                  problem: widget.problem,
+                                  hintIndex: index,
+                                ),
                               );
                             },
                           ),
@@ -348,115 +174,6 @@ class _HintSectionState extends ConsumerState<HintSection>
       }
     }
     return count;
-  }
-
-  Future<void> _unlockHint(
-    BuildContext context,
-    int hintIndex,
-  ) async {
-    final success = await ref
-        .read(hintProviderOptimized.notifier)
-        .unlockHint(widget.problem, hintIndex);
-
-    if (success) {
-      await AppHapticFeedback.success();
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.lightbulb,
-                  color: AppColors.surface,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '힌트 잠금 해제!',
-                        style: TextStyle(
-                          color: AppColors.surface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        '-${HintProviderOptimized.hintCost} XP',
-                        style: TextStyle(
-                          color: AppColors.surface.withValues(alpha: 0.9),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.successGreen,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            duration: const Duration(seconds: 2),
-            margin: const EdgeInsets.all(16),
-          ),
-        );
-      }
-    } else {
-      await AppHapticFeedback.error();
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: AppColors.surface,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'XP가 부족합니다',
-                        style: TextStyle(
-                          color: AppColors.surface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        '${HintProviderOptimized.hintCost} XP 필요',
-                        style: TextStyle(
-                          color: AppColors.surface.withValues(alpha: 0.9),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.errorRed,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            duration: const Duration(seconds: 2),
-            margin: const EdgeInsets.all(16),
-          ),
-        );
-      }
-    }
   }
 }
 

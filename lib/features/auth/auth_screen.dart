@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_durations.dart';
-import '../../data/providers/auth/auth_provider.dart';
-import '../../data/services/temp_profile_storage.dart';
-import '../profile/onboarding_profile_setup_screen.dart';
 import 'email_login_screen.dart';
+import 'logic/auth_handler.dart';
+import 'widgets/widgets.dart';
 
 /// 피그마 "00 홈1" 디자인 기반 로그인 화면
 /// 다크 퍼플 배경 + Chatbot 캐릭터 + 로그인 버튼들
@@ -64,121 +63,37 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Future<void> _handleGuestStart() async {
     if (_isLoading) return;
-
     setState(() => _isLoading = true);
 
-    try {
-      // 게스트 계정 생성
-      final success = await ref.read(authProvider.notifier).signInAsGuest();
+    final success = await AuthHandler.handleGuestStart(
+      context: context,
+      ref: ref,
+      mounted: mounted,
+    );
 
-      if (!mounted) return;
-
+    if (mounted) {
+      setState(() => _isLoading = false);
       if (success) {
-        // 기본 프로필로 시작
-        final defaultProfile = TempProfileData(
-          name: '테스터',
-          birthDate: DateTime.now().subtract(const Duration(days: 365 * 15)),
-          gender: null,
-          currentGrade: '중1',
-          schoolName: null,
-          bio: null,
-        );
-
-        await ref
-            .read(authProvider.notifier)
-            .applyTempProfileToAccount(defaultProfile);
-
-        // Success feedback
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text('${defaultProfile.name}님, 환영합니다! 🎉'),
-                ],
-              ),
-              backgroundColor: AppColors.mathGreen,
-              behavior: SnackBarBehavior.floating,
-              duration: AppDurations.snackBarShort,
-            ),
-          );
-        }
-
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/home');
-        }
-      } else {
-        _showError('게스트 계정 생성에 실패했습니다. 다시 시도해주세요.');
+        Navigator.of(context).pushReplacementNamed('/home');
       }
-    } catch (e) {
-      if (mounted) _showError('예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _handleGoogleLogin() async {
     if (_isLoading) return;
+    setState(() => _isLoading = true);
 
-    try {
-      setState(() => _isLoading = true);
+    final success = await AuthHandler.handleGoogleLogin(
+      context: context,
+      ref: ref,
+      mounted: mounted,
+    );
 
-      // 1. 구글 로그인 먼저 실행
-      final success = await ref.read(authProvider.notifier).signInWithGoogle();
-
-      if (!mounted) return;
-
+    if (mounted) {
+      setState(() => _isLoading = false);
       if (success) {
-        // 2. 로그인 성공 후 프로필 설정 화면으로 이동
-        final profileResult = await Navigator.of(context).push<TempProfileData>(
-          MaterialPageRoute(
-            builder: (context) => const OnboardingProfileSetupScreen(),
-          ),
-        );
-
-        if (profileResult == null || !mounted) return;
-
-        // 3. 프로필 정보를 사용자 계정에 업데이트
-        await ref.read(authProvider.notifier).applyTempProfileToAccount(
-              profileResult,
-            );
-
-        if (!mounted) return;
-
-        // 4. 임시 프로필 정보 삭제
-        final tempStorage = ref.read(tempProfileStorageProvider);
-        await tempStorage.clearTempProfile();
-
-        // Success feedback
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text('${profileResult.name}님, 환영합니다! 🎉'),
-                ],
-              ),
-              backgroundColor: AppColors.mathGreen,
-              behavior: SnackBarBehavior.floating,
-              duration: AppDurations.snackBarShort,
-            ),
-          );
-        }
-
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/home');
-        }
-      } else {
-        _showError('Google 로그인에 실패했습니다. 다시 시도해주세요.');
+        Navigator.of(context).pushReplacementNamed('/home');
       }
-    } catch (e) {
-      if (mounted) _showError('Google 로그인 중 문제가 발생했습니다. 네트워크를 확인해주세요.');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -186,19 +101,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
-    try {
-      final success = await ref.read(authProvider.notifier).signInWithKakao();
-      if (!mounted) return;
+    final success = await AuthHandler.handleKakaoLogin(
+      context: context,
+      ref: ref,
+      mounted: mounted,
+    );
 
+    if (mounted) {
+      setState(() => _isLoading = false);
       if (success) {
         Navigator.of(context).pushReplacementNamed('/home');
-      } else {
-        _showError('Kakao 로그인에 실패했습니다');
       }
-    } catch (e) {
-      if (mounted) _showError('Kakao 로그인 실패: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -212,16 +125,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (result == true && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.mathRed,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   @override
@@ -318,7 +221,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         child: Column(
                           children: [
                             // 시작하기 버튼 (메인) - 더 크고 눈에 띄게
-                            _buildMainButton(
+                            AuthMainButton(
                               text: '시작하기',
                               onPressed: _handleGuestStart,
                               gradient: const LinearGradient(
@@ -367,7 +270,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 height: AppDimensions.authDividerButtonSpacing),
 
                             // Google 로그인
-                            _buildSocialButton(
+                            AuthSocialButton(
                               text: 'Google로 계속하기',
                               icon: Icons.g_mobiledata,
                               backgroundColor: Colors.white,
@@ -379,7 +282,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 height: AppDimensions.authButtonSmallSpacing),
 
                             // Kakao 로그인
-                            _buildSocialButton(
+                            AuthSocialButton(
                               text: 'Kakao로 계속하기',
                               icon: Icons.chat_bubble,
                               backgroundColor: AppColors.kakaoYellow,
@@ -391,7 +294,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 height: AppDimensions.authButtonSmallSpacing),
 
                             // Email 로그인
-                            _buildSocialButton(
+                            AuthSocialButton(
                               text: '이메일로 계속하기',
                               icon: Icons.email,
                               backgroundColor: const Color(0xFF2D2A4A),
@@ -434,113 +337,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 ),
               ),
           ],
-        ),
-      ),
-    );
-  }
-
-  /// 메인 버튼 (시작하기)
-  Widget _buildMainButton({
-    required String text,
-    required VoidCallback onPressed,
-    required Gradient gradient,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: AppDimensions.mainButtonHeight,
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF58CC02).withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(20),
-          child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                fontFamily: 'NexonGothic',
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 소셜 로그인 버튼
-  Widget _buildSocialButton({
-    required String text,
-    required IconData icon,
-    required Color backgroundColor,
-    required Color textColor,
-    required VoidCallback onPressed,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: double.infinity,
-          height: AppDimensions.socialButtonHeight,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: backgroundColor == Colors.white
-                  ? Colors.grey.withValues(alpha: 0.3)
-                  : backgroundColor,
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: backgroundColor.withValues(alpha: 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: textColor, size: 26),
-              const SizedBox(width: 12),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                  fontFamily: 'NexonGothic',
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
