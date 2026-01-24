@@ -39,7 +39,7 @@
 ❌ GOOGLE_WEB_CLIENT_ID=***REDACTED***
 ❌ FCM_WEB_PUSH_KEY=***REDACTED***
 ❌ FCM_SENDER_ID=***REDACTED***
-❌ OPENAI_API_KEY=sk-proj-***REDACTED***
+❌ OPENAI_API_KEY=sk-proj-***REDACTED******REDACTED***
 ```
 
 **Attack Vectors**:
