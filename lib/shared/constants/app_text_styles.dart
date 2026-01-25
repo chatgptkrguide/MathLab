@@ -31,6 +31,10 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
+  // Convenience aliases for common usage
+  static const heading1 = headlineLarge;
+  static const heading2 = headlineMedium;
+
   // Title 스타일
   static const titleMedium = TextStyle(
     fontSize: 16,
@@ -52,5 +56,19 @@ class AppTextStyles {
   static const bodySmall = TextStyle(
     fontSize: 12,
     color: AppColors.textSecondary,
+  );
+
+  // Caption style
+  static const caption = TextStyle(
+    fontSize: 12,
+    color: AppColors.textSecondary,
+    fontWeight: FontWeight.normal,
+  );
+
+  // Button style
+  static const button = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
   );
 }

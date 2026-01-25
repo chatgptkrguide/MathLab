@@ -34,7 +34,7 @@ dependencies:
   # ========================================
   flutter_dotenv: ^5.2.1
   flutter_secure_storage: ^9.2.2
-  http_certificate_pinning: ^2.1.5
+  http_certificate_pinning: ^3.0.1
 
   # ========================================
   # 소셜 로그인
@@ -65,6 +65,12 @@ dependencies:
   google_fonts: ^6.2.1
   lottie: ^3.2.0
   shimmer: ^3.0.0
+
+  # ========================================
+  # 수학 수식 렌더링
+  # ========================================
+  flutter_math_fork: ^0.7.2
+  fl_chart: ^0.69.0
 
   # ========================================
   # 유틸리티
@@ -110,13 +116,13 @@ flutter:
   # ========================================
   # Fonts
   # ========================================
-  fonts:
-    - family: Pretendard
-      fonts:
-        - asset: assets/fonts/Pretendard-Regular.ttf
-        - asset: assets/fonts/Pretendard-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Pretendard-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Pretendard-Medium.ttf
-          weight: 500
+  # fonts:
+  #   - family: Pretendard
+  #     fonts:
+  #       - asset: assets/fonts/Pretendard-Regular.ttf
+  #       - asset: assets/fonts/Pretendard-Bold.ttf
+  #         weight: 700
+  #       - asset: assets/fonts/Pretendard-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Pretendard-Medium.ttf
+  #         weight: 500

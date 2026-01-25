@@ -6,6 +6,7 @@ class AppColors {
   static const mathBlue = Color(0xFF1CB0F6); // 수학 파랑 (듀오링고 스타일)
   static const mathGreen = Color(0xFF58CC02); // 듀오링고 녹색
   static const mathOrange = Color(0xFFFF9600); // 수학 주황
+  static const mathYellow = Color(0xFFFFC800); // 수학 노랑
   static const mathPurple = Color(0xFFCE82FF); // 수학 보라
   static const mathRed = Color(0xFFFF4B4B); // 수학 빨강
 
