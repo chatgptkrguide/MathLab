@@ -249,4 +249,72 @@ class LessonAPI {
 
     return response.data as List<dynamic>;
   }
+
+  /// Start practice session
+  Future<Map<String, dynamic>> startPracticeSession({
+    required String userId,
+    required String mode,
+    String? lessonId,
+    String? unitId,
+    int? problemCount,
+  }) async {
+    final response = await _client.post(
+      '/users/$userId/practice/start',
+      data: {
+        'mode': mode,
+        if (lessonId != null) 'lessonId': lessonId,
+        if (unitId != null) 'unitId': unitId,
+        if (problemCount != null) 'problemCount': problemCount,
+      },
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Submit practice answer
+  Future<Map<String, dynamic>> submitPracticeAnswer({
+    required String sessionId,
+    required String problemId,
+    required String answer,
+    required int timeTaken,
+    int hintUsed = 0,
+  }) async {
+    final response = await _client.post(
+      '/practice/sessions/$sessionId/submit',
+      data: {
+        'problemId': problemId,
+        'answer': answer,
+        'timeTaken': timeTaken,
+        'hintUsed': hintUsed,
+      },
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// End practice session
+  Future<Map<String, dynamic>> endPracticeSession({
+    required String sessionId,
+  }) async {
+    final response = await _client.post(
+      '/practice/sessions/$sessionId/end',
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Get practice history
+  Future<List<dynamic>> getPracticeHistory({
+    required String userId,
+    int? limit,
+  }) async {
+    final response = await _client.get(
+      '/users/$userId/practice/history',
+      queryParameters: {
+        if (limit != null) 'limit': limit,
+      },
+    );
+
+    return response.data as List<dynamic>;
+  }
 }
