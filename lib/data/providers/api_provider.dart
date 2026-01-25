@@ -32,3 +32,8 @@ final lessonAPIProvider = Provider((ref) {
 final leagueAPIProvider = Provider((ref) {
   return ref.watch(apiClientProvider).league;
 });
+
+/// Achievement API Provider
+final achievementAPIProvider = Provider((ref) {
+  return ref.watch(apiClientProvider).achievement;
+});

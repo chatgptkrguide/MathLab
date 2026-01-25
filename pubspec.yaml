@@ -65,6 +65,7 @@ dependencies:
   google_fonts: ^6.2.1
   lottie: ^3.2.0
   shimmer: ^3.0.0
+  confetti: ^0.7.0
 
   # ========================================
   # 수학 수식 렌더링

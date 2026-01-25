@@ -1,441 +1,773 @@
-# Flutter MathLab - 코드 리뷰 보고서
+# 📊 MathLab 종합 코드 리뷰 보고서
 
-**날짜**: 2025-12-29
-**검토 대상**: Flutter MathLab 프로젝트 전체
-**검토자**: Claude Code
-
----
-
-## 📊 요약
-
-### 발견된 문제점
-- **총 에러**: 24개
-- **경고**: 6개 (naming conventions)
-- **주요 문제**: BaseRepository 통합 불완전, SyncManager 메서드 미구현
-
-### 주요 카테고리
-1. ✅ **해결 완료**: UserRepository, firebase_providers, User model BaseModel 구현
-2. 🔄 **진행 중**: SyncManager 리팩토링 필요
-3. ⏳ **대기 중**: Naming conventions 수정
+**작성일**: 2026-01-25
+**작성자**: Claude Code (Comprehensive Analysis)
+**프로젝트**: MathLab - 게이미피케이션 기반 수학 학습 앱
 
 ---
 
-## 1. 구조적 문제점 분석
+## 📋 Executive Summary
 
-### 1.1 UserRepository & BaseRepository 통합 ⚠️ FIXED
+MathLab 프로젝트의 현재 상태를 **기능적**, **UI/UX적**, **디자인적** 측면에서 종합 분석한 결과, 프로젝트는 **초기 MVP 단계**로 핵심 구조는 잘 구축되어 있으나, **기능 완성도와 사용자 경험 개선이 필요**한 상태입니다.
 
-**문제**:
-- `UserRepository`가 `BaseRepository<User>`를 상속했으나 User가 BaseModel을 구현하지 않음
-- `UserProvider`가 Repository의 `get()`/`save()` 메서드를 호출하지만 BaseRepository에 정의되지 않음
+### 주요 발견사항
 
-**원인**:
+| 영역 | 점수 | 상태 |
+|------|------|------|
+| **보안** | 8.5/10 | ✅ 우수 (최근 개선됨) |
+| **기능 완성도** | 4.5/10 | ⚠️ 개선 필요 |
+| **UI/UX** | 6.5/10 | ⚠️ 보통 |
+| **코드 품질** | 7.0/10 | ✅ 양호 |
+| **디자인 시스템** | 5.0/10 | ⚠️ 개선 필요 |
+
+**전체 평가**: **6.1/10** (보통~양호)
+
+---
+
+## 1️⃣ 기능적 측면 (Functional Aspects)
+
+### ✅ 완성된 기능
+
+#### 1.1 인증 시스템
+- **위치**: `lib/features/auth/`
+- **구현 상태**: ✅ 완료 (90%)
+- **지원 방식**:
+  - ✅ Google 로그인
+  - ✅ Kakao 로그인
+  - ✅ Email 로그인
+  - ✅ Guest 모드
+- **보안 강화**: SSL Pinning, Rate Limiting, Session Management 완료
+
+**강점**:
 ```dart
-// 문제가 있던 코드
-class UserRepository extends BaseRepository<User> {
-  // User가 BaseModel을 구현하지 않아 타입 에러 발생
-}
-
-// UserProvider에서 호출
-await _userRepository.get(storageKey);  // 메서드 미정의
-await _userRepository.save(storageKey, state!);  // 메서드 미정의
-```
-
-**해결책** ✅:
-```dart
-// 1. User 모델이 BaseModel 구현
-class User implements BaseModel {
-  @override
-  final String id;
-
-  @override
-  Map<String, dynamic> toJson() { ... }
-
-  @override
-  Map<String, dynamic> toFirestore() { ... }
-}
-
-// 2. UserRepository에 get/save 메서드 추가
-class UserRepository extends BaseRepository<User> {
-  Future<User?> get(String storageKey) async {
-    final result = await getById(storageKey);
-    return result.isSuccess ? result.data : null;
-  }
-
-  Future<void> save(String storageKey, User user) async {
-    final exists = await this.exists(user.id);
-    if (exists) {
-      await update(user);
-    } else {
-      await create(user);
-    }
-  }
+// lib/features/auth/logic/auth_handler.dart
+// ✅ 우수: 에러 메시지 보안 처리
+} catch (e, stackTrace) {
+  AppLogger.error('Kakao Sign-In failed', error: e, stackTrace: stackTrace);
+  _showErrorSnackBar(
+    context: context,
+    message: 'Kakao 로그인에 실패했습니다. 다시 시도해주세요.',
+  );
 }
 ```
 
-**영향도**: 🔴 높음 - 전체 사용자 시스템에 영향
+**개선 필요**:
+- ❌ 비밀번호 재설정 기능 미구현 (auth_handler.dart:335)
+- ❌ 이메일 인증 플로우 불완전
+- ❌ 소셜 로그인 계정 연동 기능 없음
 
----
+#### 1.2 홈 화면
+- **위치**: `lib/features/home/home_screen_figma.dart`
+- **구현 상태**: ✅ 완료 (85%)
+- **주요 기능**:
+  - ✅ 실시간 진행률 표시 (일일 XP)
+  - ✅ 로봇 캐릭터 + 원형 진행률 링
+  - ✅ 동기부여 메시지 시스템
+  - ✅ 스탯 카드 (XP, 레벨, 연속 학습)
 
-### 1.2 Firebase Providers 구성 ⚠️ FIXED
-
-**문제**:
+**강점**:
 ```dart
-// 잘못된 구성
-return UserRepository(
-  firestoreService: firestoreService,  // 정의되지 않은 매개변수
-  localStorageService: localStorageService,  // 정의되지 않은 매개변수
-);
-```
-
-**해결책** ✅:
-```dart
-// UserRepository는 BaseRepository를 통해 FirebaseFirestore에 직접 접근
-return UserRepository();  // 매개변수 불필요
-```
-
-**영향도**: 🟡 중간 - Provider 초기화에만 영향
-
----
-
-### 1.3 SyncManager 메서드 미구현 ⚠️ PENDING
-
-**문제**:
-SyncManager가 Repository에 정의되지 않은 메서드들을 호출:
-- `saveToFirebase()`
-- `getFromFirebase()`
-- `saveToLocal()`
-- `getFromLocal()`
-- `mergeData()`
-- `watchUserProfile()`
-
-**위치**: `/lib/data/services/sync_manager.dart`
-
-**총 호출 횟수**: 36회
-
-**예시**:
-```dart
-// 존재하지 않는 메서드 호출
-await _userRepository.saveToFirebase(userId, user);
-final user = await _userRepository.getFromFirebase(userId);
-final merged = await _userRepository.mergeData(localUser, remoteUser);
-```
-
-**해결 방안**:
-
-**옵션 1: BaseRepository 확장 (권장)**
-```dart
-abstract class BaseRepository<T extends BaseModel> {
-  // 기존 메서드...
-
-  // 로컬 스토리지 메서드 추가
-  Future<T?> getFromLocal(String key);
-  Future<void> saveToLocal(String key, T data);
-
-  // Firebase 동기화 메서드 추가
-  Future<T?> getFromFirebase(String key);
-  Future<void> saveToFirebase(String key, T data);
-
-  // 데이터 병합 메서드
-  Future<T?> mergeData(T local, T remote);
-}
-```
-
-**옵션 2: SyncManager 리팩토링**
-```dart
-// BaseRepository의 기존 메서드 사용
-class SyncManager {
-  Future<void> _uploadUserProfile(String userId, User user) async {
-    // saveToFirebase 대신 create/update 사용
-    final exists = await _userRepository.exists(userId);
-    if (exists) {
-      await _userRepository.update(user);
-    } else {
-      await _userRepository.create(user);
-    }
-  }
-
-  Future<User?> _downloadUserProfile(String userId) async {
-    // getFromFirebase 대신 getById 사용
-    final result = await _userRepository.getById(userId);
-    return result.isSuccess ? result.data : null;
-  }
-}
-```
-
-**권장 조치**: 옵션 2 (기존 BaseRepository 메서드 활용)
-
-**영향도**: 🔴 높음 - 데이터 동기화 기능 전체에 영향
-
----
-
-## 2. 성능 문제점
-
-### 2.1 Provider 리빌드 최적화 ✅ GOOD
-
-**분석**:
-- `ConsumerWidget`과 `ConsumerStatefulWidget` 적절히 사용
-- `ref.watch()`와 `ref.read()` 구분 명확
-- Provider 의존성 최소화
-
-**예시**:
-```dart
-// ✅ Good - 필요한 데이터만 watch
-final user = ref.watch(userProvider);
-final lessons = ref.watch(lessonProvider);
-
-// ✅ Good - 액션은 read 사용
-onPressed: () => ref.read(userProvider.notifier).addXP(10)
-```
-
-### 2.2 불필요한 재구성 방지 ✅ GOOD
-
-**분석**:
-- `const` 생성자 적절히 사용
-- 위젯 분리가 잘 되어 있음
-- 애니메이션 컨트롤러 dispose 처리 완료
-
----
-
-## 3. 보안 및 안정성
-
-### 3.1 Null Safety ✅ GOOD
-
-**분석**:
-- 모든 파일이 null safety 적용
-- Nullable 타입과 Non-nullable 타입 명확히 구분
-- `?.` 연산자와 `??` 연산자 적절히 사용
-
-**예시**:
-```dart
-// ✅ Good
-final user = ref.watch(userProvider);
-if (user == null) return const CircularProgressIndicator();
-
-// ✅ Good
+// lib/features/home/widgets/home_robot_section.dart:18-24
+// ✅ 우수: 실시간 데이터 연동 + 동적 크기 조절
 final dailyXP = user?.dailyXP ?? 0;
+final dailyGoal = GameConstants.dailyGoalXP;
+final progress = (dailyXP / dailyGoal).clamp(0.0, 1.0);
+
+// 화면 크기에 따라 동적 조절
+final screenWidth = MediaQuery.of(context).size.width;
+final containerSize = maxWidth > 300 ? 300.0 : maxWidth;
 ```
 
-### 3.2 예외 처리 ✅ GOOD
+**개선 필요**:
+- ⚠️ 언어 선택 카드 기능 미연결
+- ⚠️ 데일리 챌린지 기능 미구현
 
-**분석**:
-- `executeWithErrorHandling` 헬퍼 사용으로 일관된 에러 처리
-- BaseNotifier의 try-catch 자동화
-- 에러 로깅 체계적
+#### 1.3 프로필 화면
+- **위치**: `lib/features/profile/figma/profile_detail_screen.dart`
+- **구현 상태**: ✅ 완료 (80%)
+- **주요 기능**:
+  - ✅ 사용자 정보 표시
+  - ✅ 로그인 상태 배지
+  - ✅ 학습 통계 (레벨, 연속 학습, 젬)
+  - ✅ 로그아웃 기능
 
-**예시**:
+**강점**:
 ```dart
-await executeWithErrorHandling(
-  () async {
-    // 작업 수행
-  },
-  errorMessage: '사용자 정보 로드 실패',
-  fallback: () {
-    state = _dataService.getSampleUser();
-  },
-);
-```
-
----
-
-## 4. Flutter 베스트 프랙티스
-
-### 4.1 const 생성자 사용 ✅ GOOD
-
-**분석**:
-- 대부분의 Stateless 위젯이 const 생성자 사용
-- 불변 위젯 최대한 활용
-
-**예시**:
-```dart
-// ✅ Good
-const HomeHeader()
-const ProblemQuestion(problem: problem)
-const SizedBox(height: 16)
-```
-
-### 4.2 Keys 사용 ✅ GOOD
-
-**분석**:
-- GlobalKey 사용으로 스크롤 제어
-- 리스트 아이템에 ValueKey 사용
-
-**예시**:
-```dart
-final GlobalKey _hintSectionKey = GlobalKey();
-
-ListView.builder(
-  itemBuilder: (context, index) => Card(
-    key: ValueKey(items[index].id),
-    // ...
-  ),
-)
-```
-
-### 4.3 dispose 메서드 ✅ GOOD
-
-**분석**:
-- 모든 컨트롤러 및 리소스 정리
-- 메모리 누수 방지
-
-**예시**:
-```dart
-@override
-void dispose() {
-  _transitionController.dispose();
-  _scrollController.dispose();
-  _answerController.dispose();
-  _answerFocusNode.dispose();
-  super.dispose();
+// ✅ 우수: 명확한 로그인 상태 표시
+Widget _buildLoginStatusBadge(AuthProvider provider) {
+  return Container(
+    decoration: BoxDecoration(
+      color: info.color.withOpacity(0.1),
+      border: Border.all(color: info.color, width: 2),
+    ),
+    child: Row(
+      children: [
+        Icon(info.icon, color: info.color),
+        Text(info.label),
+        Container(child: Text('로그인됨')),
+      ],
+    ),
+  );
 }
 ```
 
+### ❌ 미완성 기능
+
+#### 1.4 학습 화면 (Critical)
+- **위치**: `lib/features/lessons/figma/lessons_screen_figma.dart:1-14`
+- **구현 상태**: ❌ 0% (Placeholder만 존재)
+- **영향도**: 🚨 **CRITICAL** - 앱의 핵심 기능
+
+```dart
+// ❌ 심각: 완전히 비어있는 화면
+class LessonsScreenFigma extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('학습')),
+      body: const Center(child: Text('학습 화면')),  // ← 구현 필요!
+    );
+  }
+}
+```
+
+**필수 구현 항목**:
+1. 커리큘럼 트리 구조
+2. 레슨 단계 표시
+3. 잠금/잠금해제 상태
+4. 진행률 표시
+5. 문제 풀이 화면 연결
+
+#### 1.5 리그/리더보드 (High Priority)
+- **위치**: `lib/features/league/league_screen.dart:1-14`
+- **구현 상태**: ❌ 0% (Placeholder만 존재)
+- **영향도**: 🔴 **HIGH** - 게이미피케이션 핵심
+
+```dart
+// ❌ 심각: 완전히 비어있는 화면
+class LeagueScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('리그')),
+      body: const Center(child: Text('리그 화면')),  // ← 구현 필요!
+    );
+  }
+}
+```
+
+**필수 구현 항목**:
+1. 주간 리그 시스템
+2. 리더보드 랭킹
+3. 승급/강등 로직
+4. 경쟁자 프로필 표시
+
+#### 1.6 문제 풀이 시스템
+- **위치**: `lib/features/problem/`
+- **구현 상태**: ⚠️ 30% (힌트 시스템만 부분 구현)
+- **영향도**: 🚨 **CRITICAL** - 앱의 핵심 기능
+
+**미구현 항목**:
+- ❌ 문제 렌더링 엔진
+- ❌ 답안 입력 UI
+- ❌ 채점 로직
+- ❌ 피드백 시스템
+- ⚠️ 힌트 시스템 (30% 구현)
+
+#### 1.7 백엔드 연동
+- **구현 상태**: ❌ 0%
+- **영향도**: 🚨 **CRITICAL** - 실제 사용 불가
+
+**미구현 항목**:
+- ❌ API 클라이언트
+- ❌ 문제 데이터 로딩
+- ❌ 진행률 동기화
+- ❌ 리더보드 데이터
+- ❌ Token Refresh 로직 (auth_provider.dart:292)
+
+### 📊 기능 완성도 요약
+
+| 기능 | 완성도 | 우선순위 | 예상 작업량 |
+|------|--------|----------|-------------|
+| 인증 시스템 | 90% | LOW | 1-2일 |
+| 홈 화면 | 85% | LOW | 1일 |
+| 프로필 화면 | 80% | LOW | 1일 |
+| **학습 화면** | **0%** | **CRITICAL** | **5-7일** |
+| **문제 풀이** | **30%** | **CRITICAL** | **7-10일** |
+| **리그 시스템** | **0%** | **HIGH** | **3-5일** |
+| 오답 노트 | 0% | MEDIUM | 2-3일 |
+| **백엔드 연동** | **0%** | **CRITICAL** | **10-14일** |
+
+**전체 기능 완성도**: **4.5/10** (45%)
+
 ---
 
-## 5. 코드 품질
+## 2️⃣ UI/UX 측면 (UI/UX Aspects)
 
-### 5.1 네이밍 컨벤션 ⚠️ MINOR ISSUES
+### ✅ 우수한 점
 
-**문제**:
+#### 2.1 애니메이션 및 피드백
 ```dart
-// ❌ Bad - 상수는 lowerCamelCase 사용
-const DEFAULT_HEARTS = 5;
-const MAX_HEARTS = 5;
-const HEART_REGEN_MINUTES = 30;
-const XP_PER_LEVEL = 100;
-const TRIAL_DAYS = 7;
+// lib/features/auth/auth_screen.dart:32-56
+// ✅ 우수: 부드러운 진입 애니메이션
+_fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+  CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+);
+
+_slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero).animate(
+  CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+);
 ```
 
-**해결책**:
 ```dart
-// ✅ Good
-const defaultHearts = 5;
-const maxHearts = 5;
-const heartRegenMinutes = 30;
-const xpPerLevel = 100;
-const trialDays = 7;
+// lib/app/main_navigation.dart:110-116
+// ✅ 우수: 햅틱 피드백 제공
+void _provideFeedback() {
+  HapticFeedback.lightImpact();
+}
 ```
 
-**위치**: `/lib/data/models/user/user_refactored.dart:37-41`
-
-**영향도**: 🟢 낮음 - 경고 수준
-
-### 5.2 주석 및 문서화 ✅ EXCELLENT
-
-**분석**:
-- 모든 주요 메서드에 문서 주석
-- 복잡한 로직에 설명 주석
-- 한국어 주석으로 가독성 향상
-
-**예시**:
+#### 2.2 사용자 동기부여
 ```dart
-/// 사용자 정보 상태 관리 (Firestore 연동 버전)
-///
-/// **개선사항:**
-/// - BaseNotifier 상속으로 중복 로깅 제거
-/// - executeWithErrorHandling로 try-catch 자동화
-/// - Firestore XP 동기화 (League와 연동)
-class UserNotifier extends BaseNotifier<User?> {
+// lib/features/home/widgets/home_robot_section.dart:92-129
+// ✅ 우수: 진행률에 따른 차별화된 메시지
+if (progress >= 1.0) {
+  message = '오늘의 목표를 달성했어요! 정말 대단해요! 🎉';
+  emoji = '🏆';
+  backgroundColor = Color(0xFF58CC02);
+} else if (progress >= 0.75) {
+  message = '거의 다 왔어요! 조금만 더 힘내요! 💪';
   // ...
 }
 ```
 
-### 5.3 복잡도 관리 ✅ GOOD
+#### 2.3 반응형 디자인
+```dart
+// lib/features/home/widgets/home_robot_section.dart:30-39
+// ✅ 우수: 화면 크기에 따른 동적 조절
+return LayoutBuilder(
+  builder: (context, constraints) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerSize = maxWidth > 300 ? 300.0 : maxWidth;
+    final ringSize = containerSize * 0.93;
+    // ...
+  },
+);
+```
 
-**분석**:
-- 대부분의 메서드가 적절한 길이 (< 50 lines)
-- 위젯 분리로 복잡도 낮춤
-- 헬퍼 메서드 활용
+### ⚠️ 개선 필요
+
+#### 2.4 네비게이션 혼란
+**문제**: 하단 네비게이션 바의 탭 순서와 기능이 혼란스러움
+
+```dart
+// lib/shared/widgets/layout/custom_bottom_nav.dart:48-76
+// ⚠️ 개선 필요: 5개 탭 중 리그 탭이 중앙에 위치
+// 새로운 순서: 홈, 학습, 리그(가운데), 오답, 프로필
+_buildNavItem(index: 0, icon: Icons.home, label: '홈'),
+_buildNavItem(index: 1, icon: Icons.school, label: '학습'),
+_buildNavItem(index: 2, icon: Icons.emoji_events, label: '리그', isSpecial: true),
+_buildNavItem(index: 3, icon: Icons.error_outline, label: '오답'),
+_buildNavItem(index: 4, icon: Icons.person, label: '프로필'),
+```
+
+**추천 개선**:
+- 리그를 우측으로 이동 (`홈 → 학습 → 오답 → 리그 → 프로필`)
+- 또는 학습 탭을 중앙에 배치 (`홈 → 오답 → 학습(중앙) → 리그 → 프로필`)
+- 사용 빈도가 높은 순서로 재배치
+
+#### 2.5 로딩 상태 처리
+**문제**: 여러 화면에서 로딩 상태가 일관되지 않음
+
+```dart
+// ❌ 문제: 프로필 화면
+body: user == null
+  ? const Center(child: CircularProgressIndicator())  // 너무 단순
+  : SingleChildScrollView(...)
+
+// ✅ 개선안: 통일된 로딩 컴포넌트 사용
+body: user == null
+  ? const LoadingOverlay()  // 일관된 로딩 UI
+  : SingleChildScrollView(...)
+```
+
+#### 2.6 에러 상태 표시
+**문제**: 에러 발생 시 사용자에게 명확한 안내 부족
+
+```dart
+// ❌ 문제: 이미지 로드 실패 시 폴백이 복잡함
+Image.asset('assets/icons/robot_character.png',
+  errorBuilder: (context, error, stackTrace) {
+    return Image.asset('assets/icons/character_design.png',
+      errorBuilder: (context, error, stackTrace) {
+        return Text('🤖', style: TextStyle(fontSize: 100));
+      },
+    );
+  },
+);
+
+// ✅ 개선안: 명확한 에러 메시지 + 재시도 옵션
+return ErrorPlaceholder(
+  icon: Icons.error_outline,
+  message: '이미지를 불러올 수 없습니다',
+  onRetry: () => setState(() {}),
+);
+```
+
+#### 2.7 접근성 (Accessibility)
+**문제**: 접근성 지원이 매우 부족
+
+```dart
+// ⚠️ 부족: Semantics 사용이 거의 없음
+// lib/shared/widgets/layout/custom_bottom_nav.dart:18-20
+Semantics(
+  container: true,
+  label: '하단 네비게이션',  // ✅ 양호
+  child: Container(...),
+)
+
+// ❌ 문제: 대부분의 위젯에 Semantics 없음
+GestureDetector(
+  onTap: () => Navigator.push(...),  // ← 스크린리더 지원 없음
+  child: DailyGoalCard(...),
+)
+
+// ✅ 개선안:
+Semantics(
+  button: true,
+  label: '오늘의 목표 카드, 진행률 ${progressPercent}%',
+  hint: '탭하여 학습 시작',
+  child: GestureDetector(...),
+)
+```
+
+**필요한 개선**:
+1. 모든 인터랙티브 요소에 Semantics 추가
+2. 이미지에 alt 텍스트 제공
+3. 색상 대비 개선 (WCAG 2.1 AA 기준)
+4. 키보드 네비게이션 지원 (웹 버전)
+
+#### 2.8 빈 상태 처리
+**문제**: 데이터가 없을 때의 UI 부족
+
+```dart
+// ❌ 문제: 학습 화면과 리그 화면이 완전히 비어있음
+body: const Center(child: Text('학습 화면'))  // 너무 단순
+
+// ✅ 개선안: 의미 있는 빈 상태 UI
+body: EmptyStateWidget(
+  icon: Icons.school,
+  title: '아직 학습을 시작하지 않았어요',
+  description: '첫 번째 레슨을 시작해보세요!',
+  actionButton: ElevatedButton(
+    onPressed: () => _startFirstLesson(),
+    child: Text('시작하기'),
+  ),
+)
+```
+
+### 📊 UI/UX 점수
+
+| 영역 | 점수 | 평가 |
+|------|------|------|
+| 시각적 디자인 | 7.5/10 | ✅ 양호 |
+| 애니메이션 | 8.0/10 | ✅ 우수 |
+| 네비게이션 | 5.0/10 | ⚠️ 개선 필요 |
+| 피드백 | 7.0/10 | ✅ 양호 |
+| 접근성 | 3.0/10 | ❌ 매우 부족 |
+| 에러 처리 | 5.5/10 | ⚠️ 개선 필요 |
+| 빈 상태 | 2.0/10 | ❌ 매우 부족 |
+
+**전체 UI/UX 점수**: **6.5/10** (보통)
 
 ---
 
-## 6. UI/UX 문제
+## 3️⃣ 디자인 측면 (Design & Architecture)
 
-### 6.1 반응형 레이아웃 ✅ GOOD
+### ✅ 우수한 점
 
-**분석**:
-- `ResponsiveWrapper` 사용
-- SafeArea 적절히 활용
-- 다양한 화면 크기 고려
+#### 3.1 프로젝트 구조
+```
+lib/
+├── app/                    # ✅ 앱 설정
+├── core/                   # ✅ 핵심 유틸리티
+│   ├── config/            # ✅ 환경 설정
+│   ├── security/          # ✅ 보안 서비스
+│   └── utils/             # ✅ 유틸리티
+├── data/                   # ✅ 데이터 계층
+│   ├── models/            # ✅ 데이터 모델
+│   ├── providers/         # ✅ 상태 관리
+│   └── services/          # ✅ 서비스
+├── features/              # ✅ 기능별 모듈화
+│   ├── auth/
+│   ├── home/
+│   ├── profile/
+│   └── ...
+└── shared/                # ✅ 공통 컴포넌트
+    ├── constants/
+    └── widgets/
+```
 
-### 6.2 접근성 ✅ GOOD
+**강점**: Clean Architecture 원칙 준수, 명확한 책임 분리
 
-**분석**:
-- Semantic widgets 사용
-- 적절한 터치 타겟 크기
-- 색상 대비 고려
+#### 3.2 상태 관리 (Riverpod)
+```dart
+// 타입 안전한 상태 관리
+final userProvider = StateNotifierProvider<UserNotifier, UserModel?>((ref) {
+  return UserNotifier();
+});
 
-### 6.3 에러 상태 처리 ✅ GOOD
+class UserNotifier extends StateNotifier<UserModel?> {
+  UserNotifier() : super(null);
+  void updateUser(UserModel user) => state = user;
+}
+```
 
-**분석**:
-- 로딩 상태 표시
-- 에러 다이얼로그
-- 사용자 친화적 메시지
+**강점**: 타입 안전, 테스트 가능, 의존성 주입 용이
+
+#### 3.3 보안 서비스 모듈화
+```dart
+// lib/core/security/
+// ✅ 우수: 각 보안 기능이 독립적인 서비스로 분리
+ssl_pinning_service.dart      // SSL 인증서 검증
+rate_limiter.dart              // Rate Limiting
+session_manager.dart           // 세션 관리
+input_validator.dart           // 입력 검증
+secure_storage_service.dart    // 암호화 저장소
+```
+
+**강점**: 단일 책임 원칙, 재사용 가능, 테스트 용이
+
+### ⚠️ 개선 필요
+
+#### 3.4 디자인 시스템 불일치
+**문제**: 여러 색상 정의 파일이 중복 및 충돌
+
+```dart
+// ❌ 문제 1: app_colors.dart vs figma_colors.dart 중복
+// lib/shared/constants/app_colors.dart:6-11
+static const mathBlue = Color(0xFF1CB0F6);
+static const mathGreen = Color(0xFF58CC02);
+
+// lib/shared/constants/figma_colors.dart (별도 파일 존재 가능)
+static const homeGradient = LinearGradient(...);
+
+// ❌ 문제 2: 인라인 색상 하드코딩 (main.dart:136)
+backgroundColor: const Color(0xFF211E41),
+
+// ❌ 문제 3: 테마와 별도로 색상 관리
+// lib/main.dart:150
+colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1CB0F6)),
+```
+
+**추천 개선**:
+```dart
+// ✅ 개선안: 단일 색상 시스템
+class AppColors {
+  // Primary colors
+  static const primary = Color(0xFF1CB0F6);
+  static const secondary = Color(0xFF58CC02);
+
+  // Background
+  static const backgroundAuth = Color(0xFF211E41);
+  static const backgroundHome = Colors.white;
+
+  // Gradients
+  static const homeGradient = LinearGradient(
+    colors: [Color(0xFFF5F5F5), Colors.white],
+  );
+}
+
+// Material Theme에서 참조
+theme: ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+  scaffoldBackgroundColor: AppColors.backgroundHome,
+),
+```
+
+#### 3.5 텍스트 스타일 불일치
+**문제**: 텍스트 스타일이 여러 곳에 분산되어 관리
+
+```dart
+// ❌ 문제: 인라인 스타일 하드코딩
+Text('오늘의 목표',
+  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+)
+
+// lib/shared/constants/app_text_styles.dart:35-40
+// 정의는 되어 있으나 사용 안 함
+static const titleMedium = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.w600,
+  color: AppColors.textPrimary,
+);
+```
+
+**추천 개선**:
+```dart
+// ✅ 개선안: 일관된 스타일 사용
+Text('오늘의 목표', style: AppTextStyles.titleMedium)
+
+// 또는 Theme 활용
+Text('오늘의 목표', style: Theme.of(context).textTheme.titleMedium)
+```
+
+#### 3.6 위젯 재사용성 부족
+**문제**: 유사한 UI 패턴이 반복되지만 재사용 가능한 컴포넌트로 추출되지 않음
+
+```dart
+// ❌ 문제: 카드 위젯 패턴 반복
+Card(
+  elevation: 2,
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  child: Padding(
+    padding: const EdgeInsets.all(20.0),
+    child: Column(...),
+  ),
+)
+
+// ✅ 개선안: 재사용 가능한 컴포넌트
+class InfoCard extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### 3.7 에러 처리 일관성 부족
+**문제**: 에러 처리 방식이 파일마다 다름
+
+```dart
+// auth_handler.dart: AppLogger + SnackBar
+} catch (e, stackTrace) {
+  AppLogger.error('Kakao Sign-In failed', error: e, stackTrace: stackTrace);
+  _showErrorSnackBar(context: context, message: '로그인에 실패했습니다.');
+}
+
+// main_navigation.dart: Logger 직접 사용
+} catch (e) {
+  Logger.info('백그라운드 메시지 오픈: ${message.data}', tag: 'DeepLink');
+}
+```
+
+**추천 개선**:
+```dart
+// ✅ 개선안: 통일된 에러 처리 유틸리티
+class ErrorHandler {
+  static void handle(
+    BuildContext context, {
+    required dynamic error,
+    StackTrace? stackTrace,
+    String? userMessage,
+    String? tag,
+  }) {
+    // 1. 로깅
+    AppLogger.error(userMessage ?? 'Error occurred',
+      error: error, stackTrace: stackTrace, tag: tag);
+
+    // 2. 사용자 피드백
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(userMessage ?? '오류가 발생했습니다.')),
+    );
+  }
+}
+```
+
+#### 3.8 하드코딩된 문자열
+**문제**: UI 텍스트가 코드에 직접 하드코딩됨 (다국어 지원 불가)
+
+```dart
+// ❌ 문제: 하드코딩된 한글 문자열
+const Text('오늘의 목표')
+const Text('학습 화면')
+const Text('로그아웃')
+```
+
+**추천 개선**:
+```dart
+// ✅ 개선안: 다국어 지원 시스템 구축
+class AppStrings {
+  static const todayGoal = '오늘의 목표';
+  static const learningScreen = '학습 화면';
+  static const logout = '로그아웃';
+}
+
+// 또는 flutter_localizations 사용
+Text(AppLocalizations.of(context)!.todayGoal)
+```
+
+#### 3.9 TODO 항목 관리
+**발견된 TODO**: 18개
+
+**주요 TODO 목록**:
+1. `main.dart:18` - Firebase Options 설정 필요
+2. `main.dart:52` - Firebase 초기화 완료 필요
+3. `auth_provider.dart:292` - Token Refresh 로직 구현 필요
+4. `auth_handler.dart:335` - 비밀번호 재설정 이메일 발송 구현
+5. `app_logger.dart:93` - Crashlytics 연동 완료 (✅ 완료됨)
+6. `deep_link_service.dart` - Deep Link 처리 완성 필요
+7. `fcm_provider.dart` - FCM 서비스 완성 필요
+
+**추천**: TODO를 Issue Tracker로 이동하여 체계적 관리
+
+### 📊 디자인 & 아키텍처 점수
+
+| 영역 | 점수 | 평가 |
+|------|------|------|
+| 프로젝트 구조 | 8.5/10 | ✅ 우수 |
+| 상태 관리 | 8.0/10 | ✅ 우수 |
+| 모듈화 | 7.5/10 | ✅ 양호 |
+| 디자인 시스템 | 5.0/10 | ⚠️ 개선 필요 |
+| 재사용성 | 5.5/10 | ⚠️ 개선 필요 |
+| 에러 처리 | 6.0/10 | ⚠️ 개선 필요 |
+| 코드 일관성 | 6.5/10 | ⚠️ 개선 필요 |
+| 문서화 | 7.0/10 | ✅ 양호 |
+
+**전체 디자인 점수**: **7.0/10** (양호)
 
 ---
 
-## 7. 수정 권장사항
+## 4️⃣ 종합 평가 및 우선순위
 
-### 즉시 수정 필요 (P0)
-1. ✅ **UserRepository get/save 메서드 추가** - 완료
-2. ✅ **User 모델 BaseModel 구현** - 완료
-3. ✅ **firebase_providers 매개변수 제거** - 완료
-4. ⏳ **SyncManager 리팩토링** - BaseRepository 메서드 사용
+### 🚨 Critical (즉시 해결 필요)
 
-### 단기 수정 (P1)
-1. 네이밍 컨벤션 수정 (constant_identifier_names)
-2. SyncManager 메서드 구현 완료
-3. 사용하지 않는 import 정리
+1. **학습 화면 구현** (예상: 5-7일)
+   - 커리큘럼 트리
+   - 레슨 진행 시스템
+   - 문제 풀이 연동
 
-### 중기 개선 (P2)
-1. 테스트 코드 작성
-2. CI/CD 파이프라인 구축
-3. 성능 모니터링 도구 추가
+2. **문제 풀이 시스템 완성** (예상: 7-10일)
+   - 문제 렌더링 엔진
+   - 답안 입력 UI
+   - 채점 로직
+
+3. **백엔드 API 연동** (예상: 10-14일)
+   - API 클라이언트 구현
+   - 데이터 동기화
+   - Token Refresh 로직
+
+### 🔴 High Priority (1-2주 내)
+
+4. **리그/리더보드 시스템** (예상: 3-5일)
+   - 주간 리그 구현
+   - 랭킹 시스템
+   - 승급/강등 로직
+
+5. **디자인 시스템 통일** (예상: 2-3일)
+   - 색상 시스템 단일화
+   - 재사용 컴포넌트 라이브러리
+   - 텍스트 스타일 일관성
+
+6. **접근성 개선** (예상: 3-4일)
+   - Semantics 추가
+   - 키보드 네비게이션
+   - 색상 대비 개선
+
+### 🟡 Medium Priority (2-4주 내)
+
+7. **에러 처리 표준화** (예상: 1-2일)
+8. **빈 상태 UI 개선** (예상: 1-2일)
+9. **다국어 지원 준비** (예상: 2-3일)
+
+### 🟢 Low Priority (1-2개월 내)
+
+10. **오답 노트 기능** (예상: 2-3일)
+11. **Deep Link 완성** (예상: 1-2일)
+12. **FCM 푸시 알림** (예상: 2-3일)
 
 ---
 
-## 8. 최종 평가
+## 5️⃣ 권장 사항
+
+### 즉시 조치 사항
+
+1. **핵심 기능 우선 구현**
+   ```
+   학습 화면 → 문제 풀이 → 백엔드 연동
+   ```
+
+2. **디자인 시스템 정리**
+   - `figma_colors.dart` + `app_colors.dart` 통합
+   - 인라인 스타일 제거
+   - Theme 적극 활용
+
+3. **접근성 개선 착수**
+   - 주요 화면부터 Semantics 추가
+   - 색상 대비 검증 (WCAG 2.1 AA)
+
+### 중기 개선 사항
+
+4. **재사용 컴포넌트 라이브러리 구축**
+5. **에러 처리 표준화**
+6. **다국어 지원 인프라**
+
+### 장기 개선 사항
+
+7. **테스트 커버리지 확보**
+8. **성능 최적화**
+9. **CI/CD 파이프라인 구축**
+
+---
+
+## 6️⃣ 결론
+
+### 프로젝트 현황
+
+MathLab은 **초기 MVP 단계**로, 보안과 기본 구조는 탄탄하게 구축되어 있으나 **핵심 학습 기능의 완성도가 매우 낮은 상태**입니다.
 
 ### 강점
-- ✅ 깔끔한 아키텍처 (Riverpod + Repository 패턴)
-- ✅ 체계적인 에러 처리
-- ✅ 우수한 코드 문서화
-- ✅ Null safety 완전 적용
-- ✅ Flutter 베스트 프랙티스 준수
+- ✅ 우수한 보안 시스템
+- ✅ 명확한 프로젝트 구조
+- ✅ 효과적인 상태 관리
+- ✅ 부드러운 애니메이션
 
 ### 약점
-- ⚠️ SyncManager 메서드 미구현 (24개 에러)
-- ⚠️ 일부 네이밍 컨벤션 위반 (6개 경고)
+- ❌ 핵심 기능 미완성
+- ❌ 백엔드 연동 전무
+- ❌ 접근성 매우 부족
+- ❌ 디자인 시스템 불일치
 
-### 전체 점수: **85/100**
+### 다음 단계
 
-**평가 기준**:
-- 아키텍처: 90/100
-- 코드 품질: 85/100
-- 성능: 90/100
-- 보안: 95/100
-- 유지보수성: 80/100
+**Phase 1 (1-2개월)**: MVP 완성
+1. 학습 화면 구현
+2. 문제 풀이 시스템
+3. 백엔드 API 연동
+4. 리그 시스템
 
----
+**Phase 2 (2-3개월)**: 품질 개선
+1. 디자인 시스템 통일
+2. 접근성 개선
+3. 테스트 커버리지
+4. 성능 최적화
 
-## 9. 다음 단계
-
-### 1단계: 즉시 수정 (완료)
-- [x] UserRepository 메서드 추가
-- [x] User 모델 BaseModel 구현
-- [x] firebase_providers 수정
-
-### 2단계: SyncManager 리팩토링 (진행 중)
-- [ ] BaseRepository 메서드 사용으로 변경
-- [ ] 테스트 코드 작성
-- [ ] 동기화 로직 검증
-
-### 3단계: 최종 정리 (대기)
-- [ ] Naming conventions 수정
-- [ ] Flutter analyze 완전 클린
-- [ ] 성능 테스트
+**Phase 3 (3-4개월)**: 확장 기능
+1. 다국어 지원
+2. 소셜 기능
+3. 고급 분석
+4. 프리미엄 기능
 
 ---
 
-**작성자**: Claude Code
-**검토 완료일**: 2025-12-29
-**다음 검토 예정일**: 2026-01-05
+**현재 전체 점수**: **6.1/10** (보통~양호)
+**MVP 완성 후 예상 점수**: **8.0/10** (우수)
+
+**추정 MVP 완성 시간**: **6-8주** (집중 개발 시)

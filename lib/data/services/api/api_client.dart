@@ -8,6 +8,7 @@ import 'endpoints/auth_api.dart';
 import 'endpoints/user_api.dart';
 import 'endpoints/lesson_api.dart';
 import 'endpoints/league_api.dart';
+import 'endpoints/achievement_api.dart';
 
 class ApiClient {
   late final DioClient _dioClient;
@@ -15,6 +16,7 @@ class ApiClient {
   late final UserAPI user;
   late final LessonAPI lesson;
   late final LeagueAPI league;
+  late final AchievementAPI achievement;
 
   ApiClient({
     required String baseUrl,
@@ -30,6 +32,7 @@ class ApiClient {
     user = UserAPI(client: _dioClient);
     lesson = LessonAPI(client: _dioClient);
     league = LeagueAPI(client: _dioClient);
+    achievement = AchievementAPI(client: _dioClient);
   }
 
   /// Factory for production environment
