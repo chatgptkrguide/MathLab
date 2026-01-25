@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/auth/auth_provider.dart';
+import '../../../data/providers/user/user_provider.dart';
 import '../../../data/services/temp_profile_storage.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_durations.dart';
+import '../../../shared/widgets/loading_overlay.dart';
+import '../../../shared/widgets/welcome_dialog.dart';
 import '../../profile/onboarding_profile_setup_screen.dart';
 
 /// 인증 관련 로직 핸들러
@@ -14,6 +17,11 @@ class AuthHandler {
     required WidgetRef ref,
     required bool mounted,
   }) async {
+    // Show loading overlay
+    if (mounted) {
+      LoadingOverlay.show(context, message: '게스트 계정 생성 중...');
+    }
+
     try {
       // 게스트 계정 생성
       final success = await ref.read(authProvider.notifier).signInAsGuest();
@@ -35,16 +43,28 @@ class AuthHandler {
             .read(authProvider.notifier)
             .applyTempProfileToAccount(defaultProfile);
 
-        // Success feedback
+        // Hide loading overlay
         if (mounted) {
-          _showSuccessSnackBar(
-            context: context,
-            message: '${defaultProfile.name}님, 환영합니다! 🎉',
+          LoadingOverlay.hide(context);
+        }
+
+        // Show welcome dialog
+        final user = ref.read(userProvider);
+        if (mounted && user != null) {
+          await WelcomeDialog.show(
+            context,
+            user: user,
+            authMethod: 'guest',
           );
         }
 
         return true;
       } else {
+        // Hide loading overlay on error
+        if (mounted) {
+          LoadingOverlay.hide(context);
+        }
+
         if (mounted) {
           _showErrorSnackBar(
             context: context,
@@ -54,6 +74,11 @@ class AuthHandler {
         return false;
       }
     } catch (e) {
+      // Hide loading overlay on error
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
       if (mounted) {
         _showErrorSnackBar(
           context: context,
@@ -70,9 +95,19 @@ class AuthHandler {
     required WidgetRef ref,
     required bool mounted,
   }) async {
+    // Show loading overlay
+    if (mounted) {
+      LoadingOverlay.show(context, message: LoadingMessages.googleSignIn);
+    }
+
     try {
       // 1. 구글 로그인 먼저 실행
       final success = await ref.read(authProvider.notifier).signInWithGoogle();
+
+      // Hide loading overlay
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
 
       if (!mounted) return false;
 
@@ -86,6 +121,11 @@ class AuthHandler {
 
         if (profileResult == null || !mounted) return false;
 
+        // Show saving profile overlay
+        if (mounted) {
+          LoadingOverlay.show(context, message: LoadingMessages.savingProfile);
+        }
+
         // 3. 프로필 정보를 사용자 계정에 업데이트
         await ref.read(authProvider.notifier).applyTempProfileToAccount(
               profileResult,
@@ -97,11 +137,18 @@ class AuthHandler {
         final tempStorage = ref.read(tempProfileStorageProvider);
         await tempStorage.clearTempProfile();
 
-        // Success feedback
+        // Hide saving overlay
         if (mounted) {
-          _showSuccessSnackBar(
-            context: context,
-            message: '${profileResult.name}님, 환영합니다! 🎉',
+          LoadingOverlay.hide(context);
+        }
+
+        // 5. Show welcome dialog
+        final user = ref.read(userProvider);
+        if (mounted && user != null) {
+          await WelcomeDialog.show(
+            context,
+            user: user,
+            authMethod: 'google',
           );
         }
 
@@ -116,6 +163,11 @@ class AuthHandler {
         return false;
       }
     } catch (e) {
+      // Hide loading overlay on error
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
       if (mounted) {
         _showErrorSnackBar(
           context: context,
@@ -153,6 +205,138 @@ class AuthHandler {
       }
       return false;
     }
+  }
+
+  /// 이메일 로그인
+  static Future<bool> handleEmailLogin({
+    required String email,
+    required String password,
+    required BuildContext context,
+    required WidgetRef ref,
+    required bool mounted,
+  }) async {
+    // Show loading overlay
+    if (mounted) {
+      LoadingOverlay.show(context, message: LoadingMessages.emailSignIn);
+    }
+
+    try {
+      final success = await ref.read(authProvider.notifier).signInWithEmail(
+            email,
+            password,
+          );
+
+      // Hide loading overlay
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (!mounted) return false;
+
+      if (success) {
+        // Show welcome dialog
+        final user = ref.read(userProvider);
+        if (mounted && user != null) {
+          await WelcomeDialog.show(
+            context,
+            user: user,
+            authMethod: 'email',
+          );
+        }
+        return true;
+      } else {
+        if (mounted) {
+          _showErrorSnackBar(
+            context: context,
+            message: '이메일 또는 비밀번호를 확인해주세요.',
+          );
+        }
+        return false;
+      }
+    } catch (e) {
+      // Hide loading overlay on error
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (mounted) {
+        _showErrorSnackBar(
+          context: context,
+          message: '로그인 중 문제가 발생했습니다. 다시 시도해주세요.',
+        );
+      }
+      return false;
+    }
+  }
+
+  /// 이메일 회원가입
+  static Future<bool> handleEmailSignup({
+    required String email,
+    required String password,
+    required BuildContext context,
+    required WidgetRef ref,
+    required bool mounted,
+  }) async {
+    // Show loading overlay
+    if (mounted) {
+      LoadingOverlay.show(context, message: LoadingMessages.emailSignUp);
+    }
+
+    try {
+      final success = await ref.read(authProvider.notifier).signUpWithEmail(
+            email,
+            password,
+          );
+
+      // Hide loading overlay
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (!mounted) return false;
+
+      if (success) {
+        if (mounted) {
+          _showSuccessSnackBar(
+            context: context,
+            message: '회원가입이 완료되었습니다! 이메일을 확인해주세요. 📧',
+          );
+        }
+        return true;
+      } else {
+        if (mounted) {
+          _showErrorSnackBar(
+            context: context,
+            message: '회원가입에 실패했습니다. 다시 시도해주세요.',
+          );
+        }
+        return false;
+      }
+    } catch (e) {
+      // Hide loading overlay on error
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (mounted) {
+        _showErrorSnackBar(
+          context: context,
+          message: '회원가입 중 문제가 발생했습니다. 네트워크를 확인해주세요.',
+        );
+      }
+      return false;
+    }
+  }
+
+  /// 비밀번호 재설정 이메일 전송
+  static Future<void> sendPasswordResetEmail({
+    required String email,
+  }) async {
+    // TODO: Implement password reset email sending
+    // This requires Firebase Auth integration
+    // Example:
+    // await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    throw UnimplementedError('비밀번호 재설정 기능은 아직 구현되지 않았습니다');
   }
 
   /// 성공 스낵바 표시

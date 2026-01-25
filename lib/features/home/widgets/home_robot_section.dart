@@ -1,48 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/widgets/indicators/circular_progress_ring.dart';
+import '../../../data/providers/user/user_provider.dart';
+import '../../../shared/constants/game_constants.dart';
 
-/// 홈 화면 로봇 섹션 (2026-01-23 업데이트)
+/// 홈 화면 로봇 섹션 (2026-01-25 업데이트 - 실시간 데이터 연동)
 ///
 /// 포함 내용:
 /// - 로봇 캐릭터 이미지
-/// - 원형 진행률 링 (Figma 디자인)
-/// - 탭하면 응원 메시지 표시
-class HomeRobotSection extends StatelessWidget {
+/// - 원형 진행률 링 (실제 일일 XP 진행률 표시)
+/// - 탭하면 동기부여 메시지 표시
+class HomeRobotSection extends ConsumerWidget {
   const HomeRobotSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
+
+    // 일일 XP 진행률 계산
+    final dailyXP = user?.dailyXP ?? 0;
+    final dailyGoal = GameConstants.dailyGoalXP;
+    final progress = (dailyXP / dailyGoal).clamp(0.0, 1.0);
+    final progressPercent = (progress * 100).toInt();
+
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Image.asset(
-                  'assets/icons/robot_character.png',
-                  width: 32,
-                  height: 32,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Text('🤖', style: TextStyle(fontSize: 24));
-                  },
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Text(
-                    '안녕! 나는 MathLab 로봇이야. 오늘도 열심히 공부하자! 💪',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: const Color(0xFF4A90E2),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            duration: const Duration(seconds: 3),
-          ),
-        );
+        _showMotivationalMessage(context, progress, dailyXP, dailyGoal);
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -60,11 +43,11 @@ class HomeRobotSection extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Figma 원형 진행률 링
+                // Figma 원형 진행률 링 (실시간 데이터)
                 CircularProgressRing(
-                  progress: 0.8,
-                  centerText: '80%',
-                  subtitle: '완료',
+                  progress: progress,
+                  centerText: '$progressPercent%',
+                  subtitle: progressPercent >= 100 ? '목표 달성!' : '진행 중',
                   size: ringSize,
                   strokeWidth: 16,
                 ),
@@ -102,6 +85,82 @@ class HomeRobotSection extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// 진행률에 따른 동기부여 메시지 표시
+  void _showMotivationalMessage(
+    BuildContext context,
+    double progress,
+    int dailyXP,
+    int dailyGoal,
+  ) {
+    String message;
+    String emoji;
+    Color backgroundColor;
+
+    if (progress >= 1.0) {
+      message = '오늘의 목표를 달성했어요! 정말 대단해요! 🎉';
+      emoji = '🏆';
+      backgroundColor = const Color(0xFF58CC02); // 녹색
+    } else if (progress >= 0.75) {
+      message = '거의 다 왔어요! 조금만 더 힘내요! 💪';
+      emoji = '⭐';
+      backgroundColor = const Color(0xFFFF9600); // 주황
+    } else if (progress >= 0.5) {
+      message = '벌써 반이나 했어요! 잘하고 있어요! 😊';
+      emoji = '🌟';
+      backgroundColor = const Color(0xFF1CB0F6); // 파랑
+    } else if (progress >= 0.25) {
+      message = '좋은 시작이에요! 계속 해봐요! 🚀';
+      emoji = '✨';
+      backgroundColor = const Color(0xFF1CB0F6);
+    } else {
+      message = '오늘도 수학 공부 시작해볼까요? 💫';
+      emoji = '🤖';
+      backgroundColor = const Color(0xFF4A90E2);
+    }
+
+    final remaining = (dailyGoal - dailyXP).clamp(0, dailyGoal);
+    final detail = progress >= 1.0
+        ? '목표 ${dailyGoal}XP 달성 완료!'
+        : '목표까지 ${remaining}XP 남았어요!';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    detail,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        duration: const Duration(seconds: 4),
       ),
     );
   }

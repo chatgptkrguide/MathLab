@@ -14,6 +14,10 @@ class AppDimensions {
   static const double marginLarge = 24.0;
   static const double marginXLarge = 32.0;
 
+  // 간격 (Spacing)
+  static const double spacingS = 8.0;
+  static const double spacingXXL = 48.0;
+
   // 보더 라디우스
   static const double radiusSmall = 8.0;
   static const double radiusMedium = 12.0;

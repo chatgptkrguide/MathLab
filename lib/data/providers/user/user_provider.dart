@@ -1,0 +1,516 @@
+/// 👤 User Provider
+///
+/// Manages user data operations with Firestore integration.
+/// Handles user CRUD operations, profile updates, and gamification data.
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
+import '../../models/user/user_model.dart';
+
+part 'user_provider.g.dart';
+
+@riverpod
+class User extends _$User {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  UserModel? build() {
+    return null;
+  }
+
+  // ========================================
+  // User CRUD Operations
+  // ========================================
+
+  /// Load user from Firestore
+  Future<void> loadUser(String uid) async {
+    try {
+      AppLogger.info('Loading user data', tag: 'User', data: {'uid': uid});
+
+      final doc = await _firestore.collection('users').doc(uid).get();
+
+      if (!doc.exists) {
+        AppLogger.warning('User document not found, creating new user', tag: 'User');
+        // Create new user document if it doesn't exist
+        await createUser(uid);
+        return;
+      }
+
+      state = UserModel.fromFirestore(doc);
+      AppLogger.info('User data loaded successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to load user', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '사용자 정보를 불러오는데 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  /// Create new user in Firestore
+  Future<void> createUser(
+    String uid, {
+    String? email,
+    String? displayName,
+    String? photoUrl,
+    AuthProvider provider = AuthProvider.email,
+    bool isEmailVerified = false,
+  }) async {
+    try {
+      AppLogger.info('Creating new user', tag: 'User', data: {'uid': uid});
+
+      final user = UserModel.fromFirebase(
+        uid: uid,
+        provider: provider,
+        email: email,
+        displayName: displayName,
+        photoUrl: photoUrl,
+        isEmailVerified: isEmailVerified,
+      );
+
+      await _firestore.collection('users').doc(uid).set(user.toFirestore());
+
+      state = user;
+      AppLogger.info('User created successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to create user', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '사용자 정보를 생성하는데 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  /// Create guest user
+  Future<void> createGuestUser(String uid) async {
+    try {
+      AppLogger.info('Creating guest user', tag: 'User', data: {'uid': uid});
+
+      final user = UserModel.guest(uid);
+
+      await _firestore.collection('users').doc(uid).set(user.toFirestore());
+
+      state = user;
+      AppLogger.info('Guest user created successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to create guest user', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '게스트 사용자 생성에 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  /// Update user profile
+  Future<void> updateProfile({
+    String? displayName,
+    String? photoUrl,
+    String? phoneNumber,
+  }) async {
+    if (state == null) {
+      throw const DataException(message: '사용자 정보가 없습니다');
+    }
+
+    try {
+      AppLogger.info('Updating user profile', tag: 'User');
+
+      final updatedUser = state!.copyWith(
+        displayName: displayName,
+        photoUrl: photoUrl,
+        phoneNumber: phoneNumber,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update(updatedUser.toFirestore());
+
+      state = updatedUser;
+      AppLogger.info('User profile updated successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to update profile', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '프로필 업데이트에 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  /// Delete user data from Firestore
+  Future<void> deleteUser(String uid) async {
+    try {
+      AppLogger.info('Deleting user data', tag: 'User', data: {'uid': uid});
+
+      await _firestore.collection('users').doc(uid).delete();
+
+      state = null;
+      AppLogger.info('User data deleted successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to delete user', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '사용자 데이터 삭제에 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  /// Clear user state
+  void clearUser() {
+    state = null;
+    AppLogger.info('User state cleared', tag: 'User');
+  }
+
+  // ========================================
+  // Learning Progress
+  // ========================================
+
+  /// Add XP to user
+  Future<void> addXp(int amount) async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Adding XP', tag: 'User', data: {'amount': amount});
+
+      int newXp = state!.xp + amount;
+      int newTotalXp = state!.totalXp + amount;
+      int newLevel = state!.level;
+
+      // Check for level up
+      while (newXp >= state!.xpNeededForNextLevel) {
+        newXp -= state!.xpNeededForNextLevel;
+        newLevel++;
+        AppLogger.info('Level up!', tag: 'User', data: {'newLevel': newLevel});
+      }
+
+      final updatedUser = state!.copyWith(
+        xp: newXp,
+        totalXp: newTotalXp,
+        level: newLevel,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'xp': newXp,
+        'totalXp': newTotalXp,
+        'level': newLevel,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to add XP', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  /// Update streak
+  Future<void> updateStreak() async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Updating streak', tag: 'User');
+
+      final now = DateTime.now();
+      int newStreak = state!.streak;
+      int newLongestStreak = state!.longestStreak;
+
+      if (state!.shouldBreakStreak) {
+        // Break streak
+        newStreak = 1;
+        AppLogger.info('Streak broken, starting new streak', tag: 'User');
+      } else if (state!.shouldUpdateStreak) {
+        // Continue streak
+        newStreak = state!.streak + 1;
+        if (newStreak > newLongestStreak) {
+          newLongestStreak = newStreak;
+        }
+        AppLogger.info('Streak continued', tag: 'User', data: {'streak': newStreak});
+      }
+
+      final updatedUser = state!.copyWith(
+        streak: newStreak,
+        longestStreak: newLongestStreak,
+        lastStudyDate: now,
+        updatedAt: now,
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'streak': newStreak,
+        'longestStreak': newLongestStreak,
+        'lastStudyDate': Timestamp.fromDate(now),
+        'updatedAt': Timestamp.fromDate(now),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to update streak', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  // ========================================
+  // Gamification
+  // ========================================
+
+  /// Use a heart
+  Future<bool> useHeart() async {
+    if (state == null || !state!.hasHearts) return false;
+
+    try {
+      AppLogger.info('Using heart', tag: 'User');
+
+      final newHearts = state!.hearts - 1;
+
+      final updatedUser = state!.copyWith(
+        hearts: newHearts,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'hearts': newHearts,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+      return true;
+    } catch (e, st) {
+      AppLogger.error('Failed to use heart', tag: 'User', error: e, stackTrace: st);
+      return false;
+    }
+  }
+
+  /// Refill hearts
+  Future<void> refillHearts() async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Refilling hearts', tag: 'User');
+
+      final updatedUser = state!.copyWith(
+        hearts: state!.maxHearts,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'hearts': state!.maxHearts,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to refill hearts', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  /// Add gems
+  Future<void> addGems(int amount) async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Adding gems', tag: 'User', data: {'amount': amount});
+
+      final newGems = state!.gems + amount;
+
+      final updatedUser = state!.copyWith(
+        gems: newGems,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'gems': newGems,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to add gems', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  /// Spend gems
+  Future<bool> spendGems(int amount) async {
+    if (state == null || state!.gems < amount) return false;
+
+    try {
+      AppLogger.info('Spending gems', tag: 'User', data: {'amount': amount});
+
+      final newGems = state!.gems - amount;
+
+      final updatedUser = state!.copyWith(
+        gems: newGems,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'gems': newGems,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+      return true;
+    } catch (e, st) {
+      AppLogger.error('Failed to spend gems', tag: 'User', error: e, stackTrace: st);
+      return false;
+    }
+  }
+
+  /// Add achievement
+  Future<void> addAchievement(String achievementId) async {
+    if (state == null || state!.achievements.contains(achievementId)) return;
+
+    try {
+      AppLogger.info('Adding achievement', tag: 'User', data: {'achievementId': achievementId});
+
+      final newAchievements = [...state!.achievements, achievementId];
+
+      final updatedUser = state!.copyWith(
+        achievements: newAchievements,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'achievements': newAchievements,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to add achievement', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  /// Update league
+  Future<void> updateLeague(String newLeague) async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Updating league', tag: 'User', data: {'newLeague': newLeague});
+
+      final updatedUser = state!.copyWith(
+        league: newLeague,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'league': newLeague,
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to update league', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  // ========================================
+  // Settings
+  // ========================================
+
+  /// Update user settings
+  Future<void> updateSettings({
+    String? preferredLanguage,
+    bool? notificationsEnabled,
+    bool? soundEnabled,
+    int? dailyGoalMinutes,
+  }) async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Updating user settings', tag: 'User');
+
+      final updatedUser = state!.copyWith(
+        preferredLanguage: preferredLanguage,
+        notificationsEnabled: notificationsEnabled,
+        soundEnabled: soundEnabled,
+        dailyGoalMinutes: dailyGoalMinutes,
+        updatedAt: DateTime.now(),
+      );
+
+      final updates = <String, dynamic>{
+        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+      };
+
+      if (preferredLanguage != null) updates['preferredLanguage'] = preferredLanguage;
+      if (notificationsEnabled != null) updates['notificationsEnabled'] = notificationsEnabled;
+      if (soundEnabled != null) updates['soundEnabled'] = soundEnabled;
+      if (dailyGoalMinutes != null) updates['dailyGoalMinutes'] = dailyGoalMinutes;
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update(updates);
+
+      state = updatedUser;
+      AppLogger.info('User settings updated successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to update settings', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '설정 업데이트에 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  // ========================================
+  // Last Login Tracking
+  // ========================================
+
+  /// Update last login timestamp
+  Future<void> updateLastLogin() async {
+    if (state == null) return;
+
+    try {
+      final now = DateTime.now();
+
+      final updatedUser = state!.copyWith(
+        lastLoginAt: now,
+        updatedAt: now,
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update({
+        'lastLoginAt': Timestamp.fromDate(now),
+        'updatedAt': Timestamp.fromDate(now),
+      });
+
+      state = updatedUser;
+    } catch (e, st) {
+      AppLogger.error('Failed to update last login', tag: 'User', error: e, stackTrace: st);
+      // Don't throw - this is a non-critical operation
+    }
+  }
+}

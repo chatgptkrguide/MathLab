@@ -29,7 +29,7 @@ class InputValidator {
     }
 
     final emailRegex = RegExp(
-      r'^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$',
+      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
     );
 
     return emailRegex.hasMatch(email);
@@ -72,8 +72,10 @@ class InputValidator {
 
     // Allow letters, spaces, hyphens, apostrophes
     // Support Korean, English, Japanese, Chinese characters
+    // Unicode ranges: Korean (AC00-D7AF), Japanese Hiragana/Katakana (3040-30FF),
+    // Chinese (4E00-9FFF), Latin (0041-007A, 0061-007A)
     final nameRegex = RegExp(
-      r'^[\p{L}\p{M}\s\'-]+$',
+      "^[a-zA-Z\\u3040-\\u30FF\\u4E00-\\u9FFF\\uAC00-\\uD7AF\\s'-]+\$",
       unicode: true,
     );
 
@@ -144,8 +146,9 @@ class InputValidator {
     }
 
     // Allow letters, numbers, spaces, basic punctuation
+    // Unicode ranges: Korean, Japanese, Chinese, Latin, digits
     final schoolRegex = RegExp(
-      r'^[\p{L}\p{M}\p{N}\s\'-\.]+$',
+      "^[a-zA-Z0-9\\u3040-\\u30FF\\u4E00-\\u9FFF\\uAC00-\\uD7AF\\s'-.]+\$",
       unicode: true,
     );
 

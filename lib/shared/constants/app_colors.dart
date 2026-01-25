@@ -7,6 +7,20 @@ class AppColors {
   static const mathGreen = Color(0xFF58CC02); // 듀오링고 녹색
   static const mathOrange = Color(0xFFFF9600); // 수학 주황
   static const mathPurple = Color(0xFFCE82FF); // 수학 보라
+  static const mathRed = Color(0xFFFF4B4B); // 수학 빨강
+
+  // 버튼 컬러
+  static const mathButtonBlue = Color(0xFF1899D6); // 버튼 파랑
+
+  // 그라디언트
+  static const mathBlueGradient = LinearGradient(
+    colors: [Color(0xFF1CB0F6), Color(0xFF1899D6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Surface (배경)
+  static const surface = Colors.white;
 
   // 텍스트 컬러
   static const textPrimary = Color(0xFF3C3C3C); // 주요 텍스트
