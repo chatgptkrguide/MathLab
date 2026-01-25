@@ -11,6 +11,8 @@
 /// ```
 
 import 'package:flutter/foundation.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import '../config/env_config.dart';
 
@@ -129,17 +131,43 @@ class AppLogger {
   }
 
   /// Report to crash reporting service (Firebase Crashlytics)
-  static void _reportToCrashlytics(
+  static Future<void> _reportToCrashlytics(
     String message,
     dynamic error,
     StackTrace? stackTrace,
     Map<String, dynamic>? data,
-  ) {
-    // TODO: Implement Firebase Crashlytics reporting
-    // FirebaseCrashlytics.instance.recordError(error, stackTrace,
-    //   reason: message,
-    //   information: data?.entries.map((e) => '${e.key}: ${e.value}').toList() ?? [],
-    // );
+  ) async {
+    // Skip in debug mode to avoid polluting crashlytics with dev errors
+    if (kDebugMode) {
+      return;
+    }
+
+    try {
+      final crashlytics = FirebaseCrashlytics.instance;
+
+      // Set custom keys for additional context
+      if (data != null) {
+        for (final entry in data.entries) {
+          await crashlytics.setCustomKey(entry.key, entry.value.toString());
+        }
+      }
+
+      // Log the message
+      await crashlytics.log(message);
+
+      // Record the error if present
+      if (error != null) {
+        await crashlytics.recordError(
+          error,
+          stackTrace,
+          reason: message,
+          fatal: false,
+        );
+      }
+    } catch (e) {
+      // Silently fail if crashlytics fails (avoid infinite loop)
+      debugPrint('Failed to report to Crashlytics: $e');
+    }
   }
 
   /// Log network request

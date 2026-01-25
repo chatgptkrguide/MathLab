@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../data/services/temp_profile_storage.dart';
@@ -73,12 +74,20 @@ class AuthHandler {
         }
         return false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log detailed error information for debugging
+      AppLogger.error(
+        'Guest account creation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
       // Hide loading overlay on error
       if (mounted) {
         LoadingOverlay.hide(context);
       }
 
+      // Show user-friendly error message (no sensitive info)
       if (mounted) {
         _showErrorSnackBar(
           context: context,
@@ -162,12 +171,20 @@ class AuthHandler {
         }
         return false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log detailed error for debugging (server-side only)
+      AppLogger.error(
+        'Google Sign-In failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
       // Hide loading overlay on error
       if (mounted) {
         LoadingOverlay.hide(context);
       }
 
+      // Show generic user-friendly message
       if (mounted) {
         _showErrorSnackBar(
           context: context,
@@ -196,11 +213,19 @@ class AuthHandler {
       }
 
       return success;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log detailed error (never expose to user)
+      AppLogger.error(
+        'Kakao Sign-In failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      // Show safe error message to user
       if (mounted) {
         _showErrorSnackBar(
           context: context,
-          message: 'Kakao 로그인 실패: $e',
+          message: 'Kakao 로그인에 실패했습니다. 다시 시도해주세요.',
         );
       }
       return false;
@@ -253,12 +278,20 @@ class AuthHandler {
         }
         return false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log error for debugging
+      AppLogger.error(
+        'Email Sign-In failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
       // Hide loading overlay on error
       if (mounted) {
         LoadingOverlay.hide(context);
       }
 
+      // Show generic message (no error details)
       if (mounted) {
         _showErrorSnackBar(
           context: context,
@@ -312,12 +345,20 @@ class AuthHandler {
         }
         return false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log error for debugging
+      AppLogger.error(
+        'Email Sign-Up failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
       // Hide loading overlay on error
       if (mounted) {
         LoadingOverlay.hide(context);
       }
 
+      // Show safe error message
       if (mounted) {
         _showErrorSnackBar(
           context: context,
