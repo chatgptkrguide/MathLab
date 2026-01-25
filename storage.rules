@@ -1,0 +1,119 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidFileSize(maxSizeInMB) {
+      return request.resource.size <= maxSizeInMB * 1024 * 1024;
+    }
+
+    function isImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isValidImageType() {
+      return request.resource.contentType in [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp',
+        'image/gif'
+      ];
+    }
+
+    // User Profile Images
+    match /users/{userId}/profile/{fileName} {
+      // Read: Anyone can read profile images
+      allow read: if true;
+
+      // Write: Only owner can upload, max 5MB, images only
+      allow write: if isOwner(userId) &&
+                     isValidImageType() &&
+                     isValidFileSize(5);
+
+      // Delete: Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // User Wrong Answer Images
+    match /users/{userId}/wrongAnswers/{fileName} {
+      // Read: Only owner can read
+      allow read: if isOwner(userId);
+
+      // Write: Only owner can upload, max 10MB, images only
+      allow write: if isOwner(userId) &&
+                     isValidImageType() &&
+                     isValidFileSize(10);
+
+      // Delete: Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // User Message Attachments
+    match /users/{userId}/messages/{fileName} {
+      // Read: Only owner can read
+      allow read: if isOwner(userId);
+
+      // Write: Only owner can upload, max 10MB, images only
+      allow write: if isOwner(userId) &&
+                     isValidImageType() &&
+                     isValidFileSize(10);
+
+      // Delete: Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // User Academic Records Documents
+    match /users/{userId}/academic/{fileName} {
+      // Read: Only owner can read
+      allow read: if isOwner(userId);
+
+      // Write: Only owner can upload, max 20MB
+      allow write: if isOwner(userId) &&
+                     (isValidImageType() ||
+                      request.resource.contentType == 'application/pdf') &&
+                     isValidFileSize(20);
+
+      // Delete: Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // Problem Images (Read-only for authenticated users)
+    match /problems/{problemId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
+    }
+
+    // Lesson Images (Read-only for authenticated users)
+    match /lessons/{lessonId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
+    }
+
+    // Achievement Badge Images (Read-only for all)
+    match /achievements/{achievementId}/{fileName} {
+      allow read: if true; // Public access for achievement badges
+      allow write: if false; // Only admins via backend
+    }
+
+    // App Assets (Read-only for all)
+    match /assets/{assetPath=**} {
+      allow read: if true; // Public access for app assets
+      allow write: if false; // Only admins via backend
+    }
+
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

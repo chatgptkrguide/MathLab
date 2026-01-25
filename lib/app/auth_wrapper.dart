@@ -50,37 +50,35 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       ref.read(problemProvider);
       Logger.info('문제 데이터 로드 시작', tag: 'AuthWrapper');
 
-      // 3. SyncManager 초기화 확인 및 실시간 동기화 시작 (임시 비활성화 - Firebase 권한 문제)
-      // TODO: Firebase Security Rules 설정 후 활성화
-      // final syncManagerInitialized = await ref.read(syncManagerInitializedProvider.future);
-      // if (syncManagerInitialized) {
-      //   final syncActions = ref.read(syncActionsProvider);
-      //   try {
-      //     await syncActions.startRealtimeSync();
-      //     Logger.info('실시간 동기화 시작 완료: $currentAccountId', tag: 'AuthWrapper');
-      //     await syncActions.initialSync();
-      //     Logger.info('초기 동기화 완료: $currentAccountId', tag: 'AuthWrapper');
-      //   } catch (e) {
-      //     Logger.error('동기화 실패', error: e, tag: 'AuthWrapper');
-      //   }
-      // }
+      // 3. SyncManager 초기화 확인 및 실시간 동기화 시작
+      final syncManagerInitialized = await ref.read(syncManagerInitializedProvider.future);
+      if (syncManagerInitialized) {
+        final syncActions = ref.read(syncActionsProvider);
+        try {
+          await syncActions.startRealtimeSync();
+          Logger.info('실시간 동기화 시작 완료: $currentAccountId', tag: 'AuthWrapper');
+          await syncActions.initialSync();
+          Logger.info('초기 동기화 완료: $currentAccountId', tag: 'AuthWrapper');
+        } catch (e) {
+          Logger.error('동기화 실패', error: e, tag: 'AuthWrapper');
+        }
+      }
 
-      // 3. FCM 서비스 초기화 확인 및 토픽 구독 (임시 비활성화)
-      // TODO: Firebase Security Rules 설정 후 활성화
-      // final fcmServiceInitialized = await ref.read(fcmServiceInitializedProvider.future);
-      // if (fcmServiceInitialized) {
-      //   final fcmService = ref.read(fcmServiceProvider);
-      //   try {
-      //     await fcmService.subscribeToTopic('user_$currentAccountId');
-      //     Logger.info('사용자 토픽 구독 완료: user_$currentAccountId', tag: 'AuthWrapper');
-      //     await fcmService.subscribeToTopic('all_users');
-      //     Logger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
-      //   } catch (e) {
-      //     Logger.error('FCM 토픽 구독 실패', error: e, tag: 'AuthWrapper');
-      //   }
-      // }
+      // 4. FCM 서비스 초기화 확인 및 토픽 구독
+      final fcmServiceInitialized = await ref.read(fcmServiceInitializedProvider.future);
+      if (fcmServiceInitialized) {
+        final fcmService = ref.read(fcmServiceProvider);
+        try {
+          await fcmService.subscribeToTopic('user_$currentAccountId');
+          Logger.info('사용자 토픽 구독 완료: user_$currentAccountId', tag: 'AuthWrapper');
+          await fcmService.subscribeToTopic('all_users');
+          Logger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
+        } catch (e) {
+          Logger.error('FCM 토픽 구독 실패', error: e, tag: 'AuthWrapper');
+        }
+      }
 
-      Logger.info('로컬 전용 모드로 실행 중 (Firebase 동기화 비활성화)', tag: 'AuthWrapper');
+      Logger.info('Firebase 동기화 활성화됨', tag: 'AuthWrapper');
     } catch (e) {
       Logger.error('초기화 실패', error: e, tag: 'AuthWrapper');
     } finally {

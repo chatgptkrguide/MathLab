@@ -1,0 +1,195 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidString(value, minLen, maxLen) {
+      return value is string &&
+             value.size() >= minLen &&
+             value.size() <= maxLen;
+    }
+
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      // Read: Owner can read their own data
+      allow read: if isOwner(userId);
+
+      // Create: Only during sign up with valid data
+      allow create: if isOwner(userId) &&
+                      isValidString(request.resource.data.name, 1, 50) &&
+                      isValidEmail(request.resource.data.email) &&
+                      request.resource.data.createdAt == request.time &&
+                      request.resource.data.hearts >= 0 &&
+                      request.resource.data.hearts <= 5 &&
+                      request.resource.data.streak >= 0 &&
+                      request.resource.data.xp >= 0;
+
+      // Update: Owner can update their own data with validation
+      allow update: if isOwner(userId) &&
+                      // Cannot change critical fields
+                      request.resource.data.id == resource.data.id &&
+                      request.resource.data.email == resource.data.email &&
+                      request.resource.data.createdAt == resource.data.createdAt &&
+                      // Hearts validation (0-5)
+                      request.resource.data.hearts >= 0 &&
+                      request.resource.data.hearts <= 5 &&
+                      // Streak validation (non-negative)
+                      request.resource.data.streak >= 0 &&
+                      // XP validation (non-negative, reasonable increment)
+                      request.resource.data.xp >= resource.data.xp &&
+                      request.resource.data.xp <= resource.data.xp + 1000;
+
+      // Delete: Owner can delete their own account
+      allow delete: if isOwner(userId);
+
+      // User's sub-collections
+      match /progress/{progressId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /achievements/{achievementId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) &&
+                       request.resource.data.unlockedAt is timestamp &&
+                       request.resource.data.unlockedAt <= request.time;
+      }
+
+      match /wrongAnswers/{answerId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /subscriptions/{subscriptionId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) &&
+                       request.resource.data.startDate is timestamp &&
+                       request.resource.data.endDate is timestamp &&
+                       request.resource.data.endDate > request.resource.data.startDate;
+      }
+    }
+
+    // Problems Collection (Read-only for all authenticated users)
+    match /problems/{problemId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
+    }
+
+    // Lessons Collection (Read-only for all authenticated users)
+    match /lessons/{lessonId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
+    }
+
+    // Achievements Collection (Read-only for all authenticated users)
+    match /achievements/{achievementId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
+    }
+
+    // Leagues Collection
+    match /leagues/{leagueId} {
+      // Read: All authenticated users can read league data
+      allow read: if isSignedIn();
+
+      // Write: Only backend
+      allow write: if false;
+
+      // Leaderboard sub-collection
+      match /leaderboard/{entryId} {
+        allow read: if isSignedIn();
+        allow write: if false; // Only backend updates leaderboard
+      }
+    }
+
+    // Friends Collection
+    match /friends/{friendshipId} {
+      // Read: Users can read their own friendships
+      allow read: if isSignedIn() &&
+                    (resource.data.fromUserId == request.auth.uid ||
+                     resource.data.toUserId == request.auth.uid);
+
+      // Create: Users can send friend requests
+      allow create: if isSignedIn() &&
+                      request.resource.data.fromUserId == request.auth.uid &&
+                      request.resource.data.status == 'pending' &&
+                      request.resource.data.createdAt == request.time;
+
+      // Update: Users can accept/reject requests sent to them
+      allow update: if isSignedIn() &&
+                      resource.data.toUserId == request.auth.uid &&
+                      resource.data.status == 'pending' &&
+                      (request.resource.data.status == 'accepted' ||
+                       request.resource.data.status == 'rejected');
+
+      // Delete: Users can delete their own friendships
+      allow delete: if isSignedIn() &&
+                      (resource.data.fromUserId == request.auth.uid ||
+                       resource.data.toUserId == request.auth.uid);
+    }
+
+    // Messages Collection
+    match /messages/{messageId} {
+      // Read: Users can read messages sent to them or by them
+      allow read: if isSignedIn() &&
+                    (resource.data.fromUserId == request.auth.uid ||
+                     resource.data.toUserId == request.auth.uid);
+
+      // Create: Users can send messages
+      allow create: if isSignedIn() &&
+                      request.resource.data.fromUserId == request.auth.uid &&
+                      isValidString(request.resource.data.content, 1, 1000) &&
+                      request.resource.data.timestamp == request.time;
+
+      // Update: Users can mark messages as read
+      allow update: if isSignedIn() &&
+                      resource.data.toUserId == request.auth.uid &&
+                      request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['isRead', 'readAt']) &&
+                      request.resource.data.isRead == true &&
+                      request.resource.data.readAt == request.time;
+
+      // Delete: Users can delete their own sent messages
+      allow delete: if isSignedIn() &&
+                      resource.data.fromUserId == request.auth.uid;
+    }
+
+    // Daily Rewards Collection
+    match /dailyRewards/{rewardId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only backend manages rewards
+    }
+
+    // User Daily Rewards Sub-collection
+    match /users/{userId}/dailyRewards/{rewardId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) &&
+                      request.resource.data.claimedAt == request.time &&
+                      request.resource.data.day >= 1 &&
+                      request.resource.data.day <= 30;
+      allow update, delete: if false; // Cannot update/delete claimed rewards
+    }
+
+    // App Configuration (Read-only)
+    match /config/{configId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
