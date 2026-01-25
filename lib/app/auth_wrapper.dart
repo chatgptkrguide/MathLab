@@ -4,7 +4,7 @@ import '../features/auth/auth_screen.dart';
 import '../features/profile/onboarding_profile_setup_screen.dart';
 import '../data/providers/auth/auth_provider.dart';
 import '../data/providers/user/user_provider.dart';
-import '../data/providers/infrastructure/sync_manager_provider.dart';
+// import '../data/providers/infrastructure/sync_manager_provider.dart'; // TODO: Create provider file
 import '../data/providers/communication/fcm_provider.dart';
 import '../shared/utils/logger.dart';
 import 'main_navigation.dart';
@@ -45,23 +45,23 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       await ref.read(userProvider.notifier).loadUserByAccount(currentAccountId);
       Logger.info('사용자 정보 로드 완료: $currentAccountId', tag: 'AuthWrapper');
 
-      // 2. ProblemProvider 초기화 (문제 데이터 로드)
-      ref.read(problemProvider);
-      Logger.info('문제 데이터 로드 시작', tag: 'AuthWrapper');
+      // 2. TODO: ProblemProvider 초기화 (문제 데이터 로드) - Provider 파일 생성 필요
+      // ref.read(problemProvider);
+      // Logger.info('문제 데이터 로드 시작', tag: 'AuthWrapper');
 
-      // 3. SyncManager 초기화 확인 및 실시간 동기화 시작
-      final syncManagerInitialized = await ref.read(syncManagerInitializedProvider.future);
-      if (syncManagerInitialized) {
-        final syncActions = ref.read(syncActionsProvider);
-        try {
-          await syncActions.startRealtimeSync();
-          Logger.info('실시간 동기화 시작 완료: $currentAccountId', tag: 'AuthWrapper');
-          await syncActions.initialSync();
-          Logger.info('초기 동기화 완료: $currentAccountId', tag: 'AuthWrapper');
-        } catch (e) {
-          Logger.error('동기화 실패', error: e, tag: 'AuthWrapper');
-        }
-      }
+      // 3. TODO: SyncManager 초기화 - Provider 파일 생성 필요
+      // final syncManagerInitialized = await ref.read(syncManagerInitializedProvider.future);
+      // if (syncManagerInitialized) {
+      //   final syncActions = ref.read(syncActionsProvider);
+      //   try {
+      //     await syncActions.startRealtimeSync();
+      //     Logger.info('실시간 동기화 시작 완료: $currentAccountId', tag: 'AuthWrapper');
+      //     await syncActions.initialSync();
+      //     Logger.info('초기 동기화 완료: $currentAccountId', tag: 'AuthWrapper');
+      //   } catch (e) {
+      //     Logger.error('동기화 실패', error: e, tag: 'AuthWrapper');
+      //   }
+      // }
 
       // 4. FCM 서비스 초기화 확인 및 토픽 구독
       final fcmServiceInitialized = await ref.read(fcmServiceInitializedProvider.future);
@@ -77,7 +77,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
         }
       }
 
-      Logger.info('Firebase 동기화 활성화됨', tag: 'AuthWrapper');
+      Logger.info('FCM 푸시 알림 서비스 활성화됨', tag: 'AuthWrapper');
     } catch (e) {
       Logger.error('초기화 실패', error: e, tag: 'AuthWrapper');
     } finally {
