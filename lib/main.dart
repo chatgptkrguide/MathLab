@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'core/config/env_config.dart';
@@ -14,6 +15,7 @@ import 'core/utils/app_logger.dart';
 import 'app/main_navigation.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/home/screens/home_screen_figma.dart';
+import 'data/providers/communication/fcm_provider.dart';
 
 // TODO: Add firebase_options.dart file
 // Generate with: flutterfire configure
@@ -58,6 +60,10 @@ void main() async {
     try {
       await Firebase.initializeApp();
       AppLogger.info('Firebase initialized successfully', tag: 'App');
+
+      // Register FCM background message handler
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      AppLogger.info('FCM background handler registered', tag: 'App');
     } catch (e) {
       AppLogger.error(
         'Firebase initialization failed - run "flutterfire configure" first',

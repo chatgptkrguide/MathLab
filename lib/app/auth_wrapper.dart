@@ -4,9 +4,8 @@ import '../features/auth/auth_screen.dart';
 import '../features/profile/onboarding_profile_setup_screen.dart';
 import '../data/providers/auth/auth_provider.dart';
 import '../data/providers/user/user_provider.dart';
-import '../data/providers/learning/problem_provider.dart';
-// import '../data/providers/infrastructure/sync_manager_provider.dart'; // 주석 처리: 현재 미사용 (Firebase 권한 문제로 임시 비활성화)
-// import '../data/providers/communication/fcm_provider.dart'; // 주석 처리: 현재 미사용 (Firebase 권한 문제로 임시 비활성화)
+import '../data/providers/infrastructure/sync_manager_provider.dart';
+import '../data/providers/communication/fcm_provider.dart';
 import '../shared/utils/logger.dart';
 import 'main_navigation.dart';
 
