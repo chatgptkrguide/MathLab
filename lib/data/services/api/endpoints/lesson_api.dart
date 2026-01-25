@@ -154,4 +154,43 @@ class LessonAPI {
 
     return response.data as Map<String, dynamic>;
   }
+
+  /// Get hints for a problem
+  Future<List<dynamic>> getHints({
+    required String problemId,
+  }) async {
+    final response = await _client.get(
+      '/problems/$problemId/hints',
+    );
+
+    return response.data as List<dynamic>;
+  }
+
+  /// Unlock a hint
+  Future<Map<String, dynamic>> unlockHint({
+    required String userId,
+    required String problemId,
+    required String hintId,
+  }) async {
+    final response = await _client.post(
+      '/users/$userId/problems/$problemId/hints/$hintId/unlock',
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Get hint usage history
+  Future<List<dynamic>> getHintUsageHistory({
+    required String userId,
+    int? limit,
+  }) async {
+    final response = await _client.get(
+      '/users/$userId/hints/history',
+      queryParameters: {
+        if (limit != null) 'limit': limit,
+      },
+    );
+
+    return response.data as List<dynamic>;
+  }
 }
