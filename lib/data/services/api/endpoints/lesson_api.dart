@@ -130,4 +130,28 @@ class LessonAPI {
 
     return response.data as List<dynamic>;
   }
+
+  /// Retry wrong answer
+  Future<Map<String, dynamic>> retryWrongAnswer({
+    required String userId,
+    required String wrongAnswerId,
+  }) async {
+    final response = await _client.post(
+      '/users/$userId/wrong-answers/$wrongAnswerId/retry',
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Mark wrong answer as resolved
+  Future<Map<String, dynamic>> resolveWrongAnswer({
+    required String userId,
+    required String wrongAnswerId,
+  }) async {
+    final response = await _client.post(
+      '/users/$userId/wrong-answers/$wrongAnswerId/resolve',
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
 }
