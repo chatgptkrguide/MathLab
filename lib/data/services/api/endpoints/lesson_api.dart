@@ -193,4 +193,60 @@ class LessonAPI {
 
     return response.data as List<dynamic>;
   }
+
+  /// Get all concept cards
+  Future<List<dynamic>> getConceptCards() async {
+    final response = await _client.get('/concept-cards');
+    return response.data as List<dynamic>;
+  }
+
+  /// Get user's concept card progress
+  Future<List<dynamic>> getConceptCardProgress({
+    required String userId,
+  }) async {
+    final response = await _client.get(
+      '/users/$userId/concept-cards/progress',
+    );
+
+    return response.data as List<dynamic>;
+  }
+
+  /// Mark concept card as viewed
+  Future<Map<String, dynamic>> markConceptCardViewed({
+    required String userId,
+    required String conceptCardId,
+  }) async {
+    final response = await _client.post(
+      '/users/$userId/concept-cards/$conceptCardId/view',
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Toggle concept card bookmark
+  Future<Map<String, dynamic>> toggleConceptCardBookmark({
+    required String userId,
+    required String conceptCardId,
+    required bool isBookmarked,
+  }) async {
+    final response = await _client.post(
+      '/users/$userId/concept-cards/$conceptCardId/bookmark',
+      data: {
+        'isBookmarked': isBookmarked,
+      },
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Get related concepts
+  Future<List<dynamic>> getRelatedConcepts({
+    required String conceptCardId,
+  }) async {
+    final response = await _client.get(
+      '/concept-cards/$conceptCardId/related',
+    );
+
+    return response.data as List<dynamic>;
+  }
 }
