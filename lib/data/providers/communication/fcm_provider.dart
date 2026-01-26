@@ -188,6 +188,21 @@ class FCMService {
     debugPrint('📬 네비게이션 데이터: $data');
   }
 
+  /// Process pending deep link
+  /// This method is called when the app is opened and needs to process
+  /// any pending deep links from notifications
+  void processPendingDeepLink(dynamic context) {
+    // TODO: Implement pending deep link processing
+    // For now, just log that the method was called
+    Logger.info('대기 중인 딥링크 처리 요청됨', tag: 'FCM');
+
+    // This would typically:
+    // 1. Check if there's a pending deep link stored
+    // 2. Process the deep link data
+    // 3. Navigate to the appropriate screen
+    // 4. Clear the pending deep link
+  }
+
   /// Cleanup resources
   void dispose() {
     Logger.info('FCM 서비스 정리됨', tag: 'FCM');

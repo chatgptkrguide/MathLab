@@ -23,7 +23,13 @@ class MainNavigation extends ConsumerStatefulWidget {
 }
 
 class _MainNavigationState extends ConsumerState<MainNavigation> {
-  final DeepLinkService _deepLinkService = DeepLinkService();
+
+  DeepLinkService? _deepLinkServiceInstance;
+
+  DeepLinkService get _deepLinkService {
+    _deepLinkServiceInstance ??= DeepLinkService(ref);
+    return _deepLinkServiceInstance!;
+  }
 
   @override
   void initState() {

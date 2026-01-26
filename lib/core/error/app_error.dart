@@ -302,11 +302,11 @@ class AppErrorHandler {
     }
 
     // Generic app exception
-    return AppException(
+    return DataException(
       message: error.toString(),
       originalError: error,
       stackTrace: stackTrace,
-    ) as AppException;
+    );
   }
 
   /// Log error with appropriate level

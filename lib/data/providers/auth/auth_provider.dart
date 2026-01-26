@@ -3,7 +3,7 @@
 /// Manages authentication state and operations using Firebase Auth, Google Sign-In, and Kakao SDK.
 /// Integrates with SecureStorage for token management and UserProvider for user data.
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,7 +19,7 @@ part 'auth_provider.g.dart';
 
 /// Authentication state model
 class AuthState {
-  final User? firebaseUser;
+  final auth.User? firebaseUser;
   final UserModel? user;
   final bool isLoading;
   final String? error;
@@ -34,7 +34,7 @@ class AuthState {
   });
 
   AuthState copyWith({
-    User? firebaseUser,
+    auth.User? firebaseUser,
     UserModel? user,
     bool? isLoading,
     String? error,
@@ -52,7 +52,7 @@ class AuthState {
 
 @riverpod
 class Auth extends _$Auth {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final SecureStorageService _storage = SecureStorageService();
 
@@ -94,7 +94,7 @@ class Auth extends _$Auth {
       if (credential.user == null) {
         throw const AuthException(
           message: '계정 생성에 실패했습니다',
-          code: AuthErrorCode.accountCreationFailed,
+          type: AuthErrorType.unknown,
         );
       }
 
@@ -117,7 +117,7 @@ class Auth extends _$Auth {
 
       AppLogger.info('Email signup successful', tag: 'Auth');
       return true;
-    } on FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e) {
       AppLogger.error('Email signup failed', tag: 'Auth', error: e);
       state = state.copyWith(
         isLoading: false,
@@ -149,7 +149,7 @@ class Auth extends _$Auth {
       if (credential.user == null) {
         throw const AuthException(
           message: '로그인에 실패했습니다',
-          code: AuthErrorCode.loginFailed,
+          type: AuthErrorType.unknown,
         );
       }
 
@@ -171,7 +171,7 @@ class Auth extends _$Auth {
 
       AppLogger.info('Email signin successful', tag: 'Auth');
       return true;
-    } on FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e) {
       AppLogger.error('Email signin failed', tag: 'Auth', error: e);
       state = state.copyWith(
         isLoading: false,
@@ -213,7 +213,7 @@ class Auth extends _$Auth {
       final googleAuth = await googleUser.authentication;
 
       // Create a new credential
-      final credential = GoogleAuthProvider.credential(
+      final credential = auth.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
@@ -224,7 +224,7 @@ class Auth extends _$Auth {
       if (userCredential.user == null) {
         throw const AuthException(
           message: 'Google 로그인에 실패했습니다',
-          code: AuthErrorCode.loginFailed,
+          type: AuthErrorType.unknown,
         );
       }
 
@@ -246,7 +246,7 @@ class Auth extends _$Auth {
 
       AppLogger.info('Google signin successful', tag: 'Auth');
       return true;
-    } on FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e) {
       AppLogger.error('Google signin failed', tag: 'Auth', error: e);
       state = state.copyWith(
         isLoading: false,
@@ -307,7 +307,7 @@ class Auth extends _$Auth {
       // For now, throw an error to indicate backend integration is needed
       throw const AuthException(
         message: 'Kakao 로그인은 백엔드 연동이 필요합니다',
-        code: AuthErrorCode.notImplemented,
+        type: AuthErrorType.unknown,
       );
 
       // Once backend is ready, uncomment and use this code:
@@ -367,7 +367,7 @@ class Auth extends _$Auth {
       if (credential.user == null) {
         throw const AuthException(
           message: '게스트 로그인에 실패했습니다',
-          code: AuthErrorCode.loginFailed,
+          type: AuthErrorType.unknown,
         );
       }
 
@@ -383,7 +383,7 @@ class Auth extends _$Auth {
 
       AppLogger.info('Guest signin successful', tag: 'Auth');
       return true;
-    } on FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e) {
       AppLogger.error('Guest signin failed', tag: 'Auth', error: e);
       state = state.copyWith(
         isLoading: false,
@@ -430,7 +430,7 @@ class Auth extends _$Auth {
       AppLogger.error('Signout failed', tag: 'Auth', error: e, stackTrace: st);
       throw AuthException(
         message: '로그아웃 중 오류가 발생했습니다',
-        code: AuthErrorCode.logoutFailed,
+        type: AuthErrorType.unknown,
         originalError: e,
         stackTrace: st,
       );
@@ -448,7 +448,7 @@ class Auth extends _$Auth {
       if (user == null) {
         throw const AuthException(
           message: '로그인된 사용자가 없습니다',
-          code: AuthErrorCode.notAuthenticated,
+          type: AuthErrorType.unknown,
         );
       }
 
@@ -466,7 +466,7 @@ class Auth extends _$Auth {
 
       AppLogger.info('Account deletion successful', tag: 'Auth');
       return true;
-    } on FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e) {
       AppLogger.error('Account deletion failed', tag: 'Auth', error: e);
 
       if (e.code == 'requires-recent-login') {
