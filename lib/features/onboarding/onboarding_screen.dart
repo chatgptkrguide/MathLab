@@ -55,7 +55,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       icon: Icons.menu_book,
       title: 'MathLab에 오신 것을\n환영합니다!',
       description: '매일 5분, 수학이 쉬워지는\n게임처럼 즐거운 학습 여정',
-      gradient: AppColors.mathBlueGradient,
+      gradient: [Color(0xFF1CB0F6), Color(0xFF1899D6)],
       features: [
         '듀오링고 스타일 게임 학습',
         '단계별 맞춤 커리큘럼',
@@ -83,7 +83,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       icon: Icons.flag,
       title: '지금 바로\n시작하세요!',
       description: '3분이면 설정 완료!\n오늘부터 수학 실력을 쌓아가요',
-      gradient: AppColors.mathBlueGradient,
+      gradient: [Color(0xFF1CB0F6), Color(0xFF1899D6)],
       isLast: true,
     ),
   ];
