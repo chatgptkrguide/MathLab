@@ -32,18 +32,18 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     if (_isInitializing) return;
 
     final authState = ref.read(authProvider);
-    if (authState.currentAccount == null) return;
+    if (authState.firebaseUser == null) return;
 
-    final currentAccountId = authState.currentAccount!.id;
-    if (currentAccountId == _lastAccountId) return;
+    final currentUserId = authState.firebaseUser!.uid;
+    if (currentUserId == _lastAccountId) return;
 
     _isInitializing = true;
-    _lastAccountId = currentAccountId;
+    _lastAccountId = currentUserId;
 
     try {
       // 1. UserProvider 로드
-      await ref.read(userProvider.notifier).loadUserByAccount(currentAccountId);
-      Logger.info('사용자 정보 로드 완료: $currentAccountId', tag: 'AuthWrapper');
+      await ref.read(userProvider.notifier).loadUser(currentUserId);
+      Logger.info('사용자 정보 로드 완료: $currentUserId', tag: 'AuthWrapper');
 
       // 2. TODO: ProblemProvider 초기화 (문제 데이터 로드) - Provider 파일 생성 필요
       // ref.read(problemProvider);
@@ -68,8 +68,8 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       if (fcmServiceInitialized) {
         final fcmService = ref.read(fcmServiceProvider);
         try {
-          await fcmService.subscribeToTopic('user_$currentAccountId');
-          Logger.info('사용자 토픽 구독 완료: user_$currentAccountId', tag: 'AuthWrapper');
+          await fcmService.subscribeToTopic('user_$currentUserId');
+          Logger.info('사용자 토픽 구독 완료: user_$currentUserId', tag: 'AuthWrapper');
           await fcmService.subscribeToTopic('all_users');
           Logger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
         } catch (e) {
@@ -91,8 +91,8 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     final user = ref.watch(userProvider);
 
     // 계정이 변경되었는지 확인
-    if (authState.currentAccount != null &&
-        authState.currentAccount!.id != _lastAccountId &&
+    if (authState.firebaseUser != null &&
+        authState.firebaseUser!.uid != _lastAccountId &&
         !_isInitializing) {
       Future.microtask(() => _checkAndInitialize());
     }
@@ -100,7 +100,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     // 로딩 중이거나 인증되지 않은 상태
     if (authState.isLoading ||
         !authState.isAuthenticated ||
-        authState.currentAccount == null) {
+        authState.firebaseUser == null) {
       return const AuthScreen();
     }
 

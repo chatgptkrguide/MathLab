@@ -18,8 +18,8 @@ class MathLabApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // 테마 설정
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light, // 현재는 라이트 모드만 지원
 
       // 시스템 UI 설정

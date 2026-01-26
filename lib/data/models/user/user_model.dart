@@ -354,6 +354,12 @@ class UserModel {
     return 'UserModel(uid: $uid, displayName: $displayName, level: $level, xp: $xp, streak: $streak)';
   }
 
+  /// Check if user profile is complete
+  /// Profile is considered complete if user has a display name
+  bool get isProfileComplete {
+    return displayName != null && displayName!.isNotEmpty;
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
