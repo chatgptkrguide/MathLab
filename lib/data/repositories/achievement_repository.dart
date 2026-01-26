@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/gamification/achievement.dart';
+import '../models/achievement_model.dart';
 
 /// 업적(Achievement) 데이터 저장소
 class AchievementRepository {
@@ -9,12 +9,12 @@ class AchievementRepository {
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
   /// 모든 업적 목록 가져오기
-  Future<List<Achievement>> getAllAchievements() async {
+  Future<List<AchievementModel>> getAllAchievements() async {
     try {
       final snapshot = await _firestore.collection('achievements').get();
 
       return snapshot.docs
-          .map((doc) => Achievement.fromFirestore(doc))
+          .map((doc) => AchievementModel.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
       throw Exception('업적 목록을 가져오는데 실패했습니다: $e');
@@ -22,21 +22,21 @@ class AchievementRepository {
   }
 
   /// 특정 업적 가져오기
-  Future<Achievement?> getAchievement(String achievementId) async {
+  Future<AchievementModel?> getAchievement(String achievementId) async {
     try {
       final doc =
           await _firestore.collection('achievements').doc(achievementId).get();
 
       if (!doc.exists) return null;
 
-      return Achievement.fromFirestore(doc);
+      return AchievementModel.fromJson({...doc.data()!, 'id': doc.id});
     } catch (e) {
       throw Exception('업적을 가져오는데 실패했습니다: $e');
     }
   }
 
   /// 사용자의 언락된 업적 목록 가져오기
-  Future<List<Achievement>> getUserAchievements(String userId) async {
+  Future<List<AchievementModel>> getUserAchievements(String userId) async {
     try {
       final snapshot = await _firestore
           .collection('users')
@@ -45,7 +45,7 @@ class AchievementRepository {
           .get();
 
       return snapshot.docs
-          .map((doc) => Achievement.fromFirestore(doc))
+          .map((doc) => AchievementModel.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
       throw Exception('사용자 업적을 가져오는데 실패했습니다: $e');
@@ -110,7 +110,7 @@ class AchievementRepository {
   }
 
   /// 카테고리별 업적 가져오기
-  Future<List<Achievement>> getAchievementsByCategory(
+  Future<List<AchievementModel>> getAchievementsByCategory(
       String category) async {
     try {
       final snapshot = await _firestore
@@ -119,7 +119,7 @@ class AchievementRepository {
           .get();
 
       return snapshot.docs
-          .map((doc) => Achievement.fromFirestore(doc))
+          .map((doc) => AchievementModel.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
       throw Exception('카테고리별 업적을 가져오는데 실패했습니다: $e');

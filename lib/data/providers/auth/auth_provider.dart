@@ -5,7 +5,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
+// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/config/env_config.dart';
@@ -272,22 +272,18 @@ class Auth extends _$Auth {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      AppLogger.info('Starting Kakao signin', tag: 'Auth');
+      AppLogger.info('Kakao signin temporarily disabled', tag: 'Auth');
 
-      // Check if Kakao Talk is installed and use it for login
-      bool isKakaoTalkAvailable = await kakao.isKakaoTalkInstalled();
-
-      kakao.OAuthToken token;
-      if (isKakaoTalkAvailable) {
-        token = await kakao.UserApi.instance.loginWithKakaoTalk();
-      } else {
-        token = await kakao.UserApi.instance.loginWithKakaoAccount();
-      }
-
-      AppLogger.info('Kakao OAuth token obtained', tag: 'Auth');
-
-      // Get Kakao user info
-      final kakaoUser = await kakao.UserApi.instance.me();
+      // Temporarily disabled due to SDK compatibility issues
+      // TODO: Re-enable when SDK is updated
+      // bool isKakaoTalkAvailable = await kakao.isKakaoTalkInstalled();
+      // kakao.OAuthToken token;
+      // if (isKakaoTalkAvailable) {
+      //   token = await kakao.UserApi.instance.loginWithKakaoTalk();
+      // } else {
+      //   token = await kakao.UserApi.instance.loginWithKakaoAccount();
+      // }
+      // final kakaoUser = await kakao.UserApi.instance.me();
 
       // TODO: Backend Integration Required
       // You need to implement a backend endpoint that:

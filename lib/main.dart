@@ -2,19 +2,21 @@
 ///
 /// Gamification-based math learning app powered by Flutter and Firebase.
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+// Temporarily disabled due to compatibility issues
+// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'core/config/env_config.dart';
 import 'core/utils/app_logger.dart';
 import 'app/main_navigation.dart';
 import 'features/auth/auth_screen.dart';
-import 'features/home/screens/home_screen_figma.dart';
+import 'features/home/home_screen_figma.dart';
 import 'data/providers/communication/fcm_provider.dart';
 
 // TODO: Add firebase_options.dart file
@@ -73,16 +75,17 @@ void main() async {
     }
 
     // 4. Initialize Kakao SDK
-    try {
-      KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
-      AppLogger.info('Kakao SDK initialized', tag: 'App');
-    } catch (e) {
-      AppLogger.warning(
-        'Kakao SDK initialization failed (non-critical)',
-        tag: 'App',
-        error: e,
-      );
-    }
+    // Temporarily disabled due to compatibility issues
+    // try {
+    //   KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
+    //   AppLogger.info('Kakao SDK initialized', tag: 'App');
+    // } catch (e) {
+    //   AppLogger.warning(
+    //     'Kakao SDK initialization failed (non-critical)',
+    //     tag: 'App',
+    //     error: e,
+    //   );
+    // }
 
     // 5. Setup Crashlytics (Production only)
     if (EnvConfig.isProduction) {

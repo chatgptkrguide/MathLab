@@ -16,13 +16,19 @@ class AppDimensions {
 
   // 간격 (Spacing)
   static const double spacingS = 8.0;
+  static const double spacingM = 16.0;
   static const double spacingXXL = 48.0;
 
   // 보더 라디우스
+  static const double radiusS = 8.0;
   static const double radiusSmall = 8.0;
+  static const double radiusM = 12.0;
   static const double radiusMedium = 12.0;
   static const double radiusLarge = 16.0;
   static const double radiusXLarge = 24.0;
+
+  // 패딩 단축형
+  static const double paddingM = paddingMedium;
 
   // 아이콘 크기
   static const double iconSmall = 16.0;

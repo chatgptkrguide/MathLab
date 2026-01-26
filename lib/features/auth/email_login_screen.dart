@@ -126,7 +126,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                       return '이메일을 입력해주세요';
                     }
 
-                    final sanitized = InputValidator.sanitizeInput(value.trim());
+                    final sanitized = value.trim();
                     if (!InputValidator.isValidEmail(sanitized)) {
                       return '유효한 이메일 주소를 입력해주세요';
                     }

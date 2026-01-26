@@ -14,7 +14,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../config/env_config.dart';
 import '../error/app_error.dart';
-import '../utils/app_logger.dart';
 import '../security/secure_storage_service.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';

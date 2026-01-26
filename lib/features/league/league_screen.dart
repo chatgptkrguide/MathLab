@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/auth/auth_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/league/league_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
@@ -31,14 +32,14 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
   }
 
   void _loadLeague() {
-    final user = ref.read(authStateProvider).value;
+    final user = ref.read(userProvider);
     if (user != null) {
       ref.read(leagueProvider(user.uid).notifier).loadUserLeague();
     }
   }
 
   Future<void> _onRefresh() async {
-    final user = ref.read(authStateProvider).value;
+    final user = ref.read(userProvider);
     if (user != null) {
       await ref.read(leagueProvider(user.uid).notifier).loadUserLeague();
     }
@@ -46,7 +47,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authStateProvider).value;
+    final user = ref.watch(userProvider);
 
     if (user == null) {
       return Scaffold(
@@ -232,7 +233,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
   }
 
   void _showLeagueInfo(BuildContext context) {
-    final user = ref.read(authStateProvider).value;
+    final user = ref.read(userProvider);
     if (user == null) return;
     
     final status = ref.read(leagueProvider(user.uid)).userLeagueStatus;

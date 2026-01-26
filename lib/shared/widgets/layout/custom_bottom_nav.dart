@@ -103,7 +103,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isSelected
-                      ? AppColors.mathButtonGradient
+                      ? const [Color(0xFF58CC02), Color(0xFF4CAF02)]
                       : [
                           AppColors.mathButtonBlue.withValues(alpha: 0.75),
                           AppColors.mathButtonBlue.withValues(alpha: 0.65),

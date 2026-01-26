@@ -36,8 +36,20 @@ class AppTextStyles {
   static const heading2 = headlineMedium;
 
   // Title 스타일
+  static const titleLarge = TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+  );
+
   static const titleMedium = TextStyle(
     fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static const titleSmall = TextStyle(
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );

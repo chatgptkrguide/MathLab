@@ -46,10 +46,27 @@ class HomeRobotSection extends ConsumerWidget {
                 // Figma 원형 진행률 링 (실시간 데이터)
                 CircularProgressRing(
                   progress: progress,
-                  centerText: '$progressPercent%',
-                  subtitle: progressPercent >= 100 ? '목표 달성!' : '진행 중',
                   size: ringSize,
                   strokeWidth: 16,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$progressPercent%',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        progressPercent >= 100 ? '목표 달성!' : '진행 중',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 // 로봇 캐릭터 (중앙에 오버레이)

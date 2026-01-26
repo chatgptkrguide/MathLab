@@ -4,7 +4,6 @@
 /// Provides a smooth onboarding experience and confirms login success.
 
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 
 import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';

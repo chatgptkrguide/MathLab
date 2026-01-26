@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // 브랜드 컬러
   static const mathBlue = Color(0xFF1CB0F6); // 수학 파랑 (듀오링고 스타일)
+  static const primary = mathBlue; // Primary color (alias for mathBlue)
   static const mathGreen = Color(0xFF58CC02); // 듀오링고 녹색
   static const mathOrange = Color(0xFFFF9600); // 수학 주황
   static const mathYellow = Color(0xFFFFC800); // 수학 노랑
@@ -16,6 +17,12 @@ class AppColors {
   // 그라디언트
   static const mathBlueGradient = LinearGradient(
     colors: [Color(0xFF1CB0F6), Color(0xFF1899D6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const mathButtonGradient = LinearGradient(
+    colors: [Color(0xFF58CC02), Color(0xFF4CAF02)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

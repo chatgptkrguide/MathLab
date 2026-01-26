@@ -42,7 +42,8 @@ dependencies:
   # 소셜 로그인
   # ========================================
   google_sign_in: ^6.2.2
-  kakao_flutter_sdk: ^1.10.0
+  # Temporarily disabled due to compatibility issues
+  # kakao_flutter_sdk: ^1.10.0
 
   # ========================================
   # 네트워킹

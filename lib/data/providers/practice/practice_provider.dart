@@ -5,7 +5,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../../models/practice_session_model.dart';
-import '../../models/problem_model.dart';
+import '../../models/problem/problem_model.dart';
 import '../api_provider.dart';
 
 final logger = Logger();

@@ -38,9 +38,9 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
   Future<void> _onRefresh() async {
     final userState = ref.read(userProvider);
-    if (userState.user != null) {
+    if (userState != null) {
       await ref
-          .read(wrongAnswerProvider(userState.user!.id).notifier)
+          .read(wrongAnswerProvider(userState.uid).notifier)
           .loadWrongAnswers();
     }
   }
@@ -48,8 +48,9 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(userProvider);
+    final user = userState;
 
-    if (userState.user == null) {
+    if (user == null) {
       return Scaffold(
         appBar: AppBar(
           title: const Text('오답 노트'),
@@ -60,7 +61,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
       );
     }
 
-    final state = ref.watch(wrongAnswerProvider(userState.user!.id));
+    final state = ref.watch(wrongAnswerProvider(user.uid));
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -133,7 +134,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                         currentFilter: state.currentFilter,
                         onFilterChanged: (filter) {
                           ref
-                              .read(wrongAnswerProvider(userState.user!.id)
+                              .read(wrongAnswerProvider(user.uid)
                                   .notifier)
                               .setFilter(filter);
                         },
@@ -147,9 +148,9 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                                 controller: _tabController,
                                 children: [
                                   _buildLessonGroupView(
-                                      userState.user!.id, state),
+                                      user.uid, state),
                                   _buildUnitGroupView(
-                                      userState.user!.id, state),
+                                      user.uid, state),
                                 ],
                               ),
                       ),

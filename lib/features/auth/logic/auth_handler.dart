@@ -40,9 +40,10 @@ class AuthHandler {
           bio: null,
         );
 
-        await ref
-            .read(authProvider.notifier)
-            .applyTempProfileToAccount(defaultProfile);
+        // TODO: Implement applyTempProfileToAccount
+        // await ref
+        //     .read(authProvider.notifier)
+        //     .applyTempProfileToAccount(defaultProfile);
 
         // Hide loading overlay
         if (mounted) {
@@ -136,15 +137,17 @@ class AuthHandler {
         }
 
         // 3. 프로필 정보를 사용자 계정에 업데이트
-        await ref.read(authProvider.notifier).applyTempProfileToAccount(
-              profileResult,
-            );
+        // TODO: Implement applyTempProfileToAccount
+        // await ref.read(authProvider.notifier).applyTempProfileToAccount(
+        //       profileResult,
+        //     );
 
         if (!mounted) return false;
 
         // 4. 임시 프로필 정보 삭제
-        final tempStorage = ref.read(tempProfileStorageProvider);
-        await tempStorage.clearTempProfile();
+        // TODO: Implement tempProfileStorageProvider
+        // final tempStorage = ref.read(tempProfileStorageProvider);
+        // await tempStorage.clearTempProfile();
 
         // Hide saving overlay
         if (mounted) {

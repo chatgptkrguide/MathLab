@@ -98,11 +98,8 @@ class HomeScreenFigma extends ConsumerWidget {
           );
         },
         child: DailyGoalCard(
-          icon: '📚',
-          title: '오늘의 목표',
-          progress: progress.clamp(0.0, 1.0),
-          current: dailyXP,
-          total: dailyGoal,
+          currentXP: dailyXP,
+          goalXP: dailyGoal,
         ),
       ),
     );

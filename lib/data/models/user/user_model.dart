@@ -23,6 +23,7 @@ class UserModel {
   final int level;
   final int xp;
   final int totalXp;
+  final int dailyXP; // XP earned today
   final int streak;
   final int longestStreak;
   final DateTime? lastStudyDate;
@@ -55,6 +56,7 @@ class UserModel {
     this.level = 1,
     this.xp = 0,
     this.totalXp = 0,
+    this.dailyXP = 0,
     this.streak = 0,
     this.longestStreak = 0,
     this.lastStudyDate,
@@ -134,6 +136,7 @@ class UserModel {
       level: data['level'] ?? 1,
       xp: data['xp'] ?? 0,
       totalXp: data['totalXp'] ?? 0,
+      dailyXP: data['dailyXP'] ?? 0,
       streak: data['streak'] ?? 0,
       longestStreak: data['longestStreak'] ?? 0,
       lastStudyDate: data['lastStudyDate'] != null
@@ -171,6 +174,7 @@ class UserModel {
       'level': level,
       'xp': xp,
       'totalXp': totalXp,
+      'dailyXP': dailyXP,
       'streak': streak,
       'longestStreak': longestStreak,
       'lastStudyDate': lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
@@ -203,6 +207,7 @@ class UserModel {
       'level': level,
       'xp': xp,
       'totalXp': totalXp,
+      'dailyXP': dailyXP,
       'streak': streak,
       'longestStreak': longestStreak,
       'lastStudyDate': lastStudyDate?.toIso8601String(),
@@ -237,6 +242,7 @@ class UserModel {
     int? level,
     int? xp,
     int? totalXp,
+    int? dailyXP,
     int? streak,
     int? longestStreak,
     DateTime? lastStudyDate,
@@ -265,6 +271,7 @@ class UserModel {
       level: level ?? this.level,
       xp: xp ?? this.xp,
       totalXp: totalXp ?? this.totalXp,
+      dailyXP: dailyXP ?? this.dailyXP,
       streak: streak ?? this.streak,
       longestStreak: longestStreak ?? this.longestStreak,
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
@@ -353,6 +360,9 @@ class UserModel {
   String toString() {
     return 'UserModel(uid: $uid, displayName: $displayName, level: $level, xp: $xp, streak: $streak)';
   }
+
+  /// Get user instance (for compatibility with nullable UserModel?)
+  UserModel get user => this;
 
   /// Check if user profile is complete
   /// Profile is considered complete if user has a display name
