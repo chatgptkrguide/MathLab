@@ -1,31 +1,37 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 네비게이션 탭 인덱스 관리
+/// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
 class NavigationNotifier extends StateNotifier<int> {
-  NavigationNotifier() : super(0); // 초기값: 홈(0) - 새로운 순서
+  NavigationNotifier() : super(2); // 초기값: Home(2) - 가운데 탭
 
   void setTab(int index) {
     state = index;
   }
 
   void goToLessons() {
-    state = 1; // 학습 탭으로 이동 (새로운 위치)
-  }
-
-  void goToHome() {
-    state = 0; // 홈 탭으로 이동 (새로운 위치)
-  }
-
-  void goToProfile() {
-    state = 4; // 프로필 탭으로 이동 (새로운 위치)
-  }
-
-  void goToLeague() {
-    state = 2; // 리그 탭으로 이동 (가운데 위치)
+    state = 0; // 학습 탭
   }
 
   void goToWrongAnswer() {
-    state = 3; // 오답 탭으로 이동 (새로운 위치)
+    state = 1; // 오답 탭
+  }
+
+  void goToHome() {
+    state = 2; // Home 탭 (가운데)
+  }
+
+  void goToProfile() {
+    state = 3; // 프로필 탭
+  }
+
+  void goToHistory() {
+    state = 4; // 학습이력 탭
+  }
+
+  // Legacy compatibility
+  void goToLeague() {
+    state = 2; // Home으로 리디렉트
   }
 }
 

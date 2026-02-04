@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/figma_colors.dart';
 
 /// 피그마 디자인 하단 네비게이션 바
-/// 5탭: 학습, 오답, Home(가운데 강조), 프로필, 학습이력
+/// 5탭: 학습(0), 오답(1), Home(2, 가운데 강조), 프로필(3), 학습이력(4)
 class CustomBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -48,29 +48,29 @@ class CustomBottomNavigation extends StatelessWidget {
           children: [
             _buildNavItem(
               index: 0,
-              icon: Icons.home_rounded,
-              label: '홈',
-            ),
-            _buildNavItem(
-              index: 1,
               icon: Icons.school_rounded,
               label: '학습',
             ),
             _buildNavItem(
-              index: 2,
-              icon: Icons.emoji_events_rounded,
-              label: '리그',
-              isSpecial: true,
-            ),
-            _buildNavItem(
-              index: 3,
+              index: 1,
               icon: Icons.error_outline_rounded,
               label: '오답',
             ),
             _buildNavItem(
-              index: 4,
+              index: 2,
+              icon: Icons.home_rounded,
+              label: 'Home',
+              isSpecial: true,
+            ),
+            _buildNavItem(
+              index: 3,
               icon: Icons.person_rounded,
               label: '프로필',
+            ),
+            _buildNavItem(
+              index: 4,
+              icon: Icons.history_rounded,
+              label: '학습이력',
             ),
           ],
         ),

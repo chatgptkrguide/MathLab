@@ -1,8 +1,3 @@
-/// 📚 Lessons Screen (Figma Design - Duolingo Style)
-///
-/// 듀오링고 스타일 S자 곡선 학습 경로 화면.
-/// 스카이블루 배경 + 헤더 + 휘어지는 경로 맵.
-
 import 'package:flutter/material.dart';
 import '../../../data/models/lesson/curriculum_data.dart';
 import '../../../data/models/lesson/lesson_model.dart';
@@ -21,6 +16,10 @@ class LessonsScreenFigma extends StatefulWidget {
 class _LessonsScreenFigmaState extends State<LessonsScreenFigma> {
   final units = CurriculumData.getSampleUnits();
   late Map<String, LessonProgressModel> progressMap;
+
+  // 과목 선택 상태
+  int _selectedSubjectIndex = 0;
+  final List<String> _subjects = ['공통수학 1', '공통수학 2'];
 
   @override
   void initState() {
@@ -60,21 +59,17 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma> {
 
   @override
   Widget build(BuildContext context) {
-    // 모든 유닛의 레슨을 하나의 리스트로 합침
-    final allLessons = <LessonModel>[];
-    for (final unit in units) {
-      allLessons.addAll(unit.lessons);
-    }
-
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: FigmaColors.skyBlueGradient,
+        decoration: BoxDecoration(
+          gradient: _selectedSubjectIndex == 0
+              ? FigmaColors.skyBlueGradient
+              : FigmaColors.tealGradient,
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // 헤더 영역
+              // 헤더: 과목 선택기 + 스트릭/XP/레벨
               _buildHeader(),
 
               // 스크롤 가능한 학습 경로
@@ -84,18 +79,13 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma> {
                   padding: const EdgeInsets.only(bottom: 40),
                   child: Column(
                     children: [
-                      // 유닛별로 학습 경로 표시
                       for (int i = 0; i < units.length; i++) ...[
-                        // 유닛 제목 배너
                         _buildUnitBanner(units[i].emoji, units[i].title, units[i].description),
-
-                        // 해당 유닛의 학습 경로
                         LessonPathWidget(
                           lessons: units[i].lessons,
                           progressMap: progressMap,
                           onLessonTap: _handleLessonTap,
                         ),
-
                         if (i < units.length - 1)
                           const SizedBox(height: 16),
                       ],
@@ -113,70 +103,85 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      child: Row(
+      child: Column(
         children: [
-          // 뒤로가기
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+          // 상단: 과목 선택 탭 + 정보 배지
+          Row(
+            children: [
+              // 과목 선택 탭
+              Expanded(
+                child: Row(
+                  children: List.generate(_subjects.length, (index) {
+                    final isSelected = _selectedSubjectIndex == index;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() => _selectedSubjectIndex = index);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            _subjects[index],
+                            style: TextStyle(
+                              color: isSelected
+                                  ? (_selectedSubjectIndex == 0
+                                      ? FigmaColors.skyBlue
+                                      : FigmaColors.tealGreen)
+                                  : Colors.white,
+                              fontSize: 13,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
               ),
-              child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
-            ),
-          ),
 
-          const SizedBox(width: 12),
-
-          // 과목명
-          const Expanded(
-            child: Text(
-              '수학 기초',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+              // 스트릭
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF9600), size: 18),
+                    SizedBox(width: 4),
+                    Text('3', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  ],
+                ),
               ),
-            ),
-          ),
 
-          // 스트릭
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF9600), size: 18),
-                SizedBox(width: 4),
-                Text('3', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-              ],
-            ),
-          ),
+              const SizedBox(width: 8),
 
-          const SizedBox(width: 8),
-
-          // XP
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.star_rounded, color: Color(0xFFFFC800), size: 18),
-                SizedBox(width: 4),
-                Text('120', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-              ],
-            ),
+              // XP
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.star_rounded, color: Color(0xFFFFC800), size: 18),
+                    SizedBox(width: 4),
+                    Text('120', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -7,14 +7,14 @@ import '../features/home/home_screen_figma.dart';
 import '../features/lessons/figma/lessons_screen_figma.dart';
 import '../features/wrong_answer/wrong_answer_screen.dart';
 import '../features/profile/figma/profile_detail_screen.dart';
-import '../features/league/league_screen.dart';
+import '../features/challenges/challenge_history_screen.dart';
 import '../data/providers/infrastructure/navigation_provider.dart';
 import '../data/providers/communication/fcm_provider.dart';
 import '../data/services/deep_link_service.dart';
 import '../shared/utils/logger.dart';
 
 /// 메인 네비게이션 위젯
-/// 하단 네비게이션 바와 각 화면들을 관리
+/// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
 class MainNavigation extends ConsumerStatefulWidget {
   const MainNavigation({super.key});
 
@@ -71,12 +71,13 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(navigationProvider);
 
+    // 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
     final List<Widget> screens = [
-      const HomeScreenFigma(), // 0: 홈
-      const LessonsScreenFigma(), // 1: 학습 (주요 기능)
-      const LeagueScreen(), // 2: 리그 (가운데 - 게이미피케이션)
-      const WrongAnswerScreen(), // 3: 오답
-      const ProfileDetailScreen(), // 4: 프로필
+      const LessonsScreenFigma(),         // 0: 학습
+      const WrongAnswerScreen(),          // 1: 오답
+      const HomeScreenFigma(),            // 2: Home (가운데)
+      const ProfileDetailScreen(),        // 3: 프로필
+      const ChallengeHistoryScreen(),     // 4: 학습이력
     ];
 
     return PopScope(
@@ -84,14 +85,14 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        // 홈 탭이 아닌 경우 홈으로 돌아가기
-        if (currentIndex != 0) {
+        // Home 탭이 아닌 경우 Home으로 돌아가기
+        if (currentIndex != 2) {
           ref.read(navigationProvider.notifier).goToHome();
           _provideFeedback();
           return;
         }
 
-        // 홈 탭인 경우 종료 확인 다이얼로그 표시
+        // Home 탭인 경우 종료 확인 다이얼로그 표시
         final shouldExit = await _showExitDialog(context);
         if (shouldExit && context.mounted) {
           SystemNavigator.pop();

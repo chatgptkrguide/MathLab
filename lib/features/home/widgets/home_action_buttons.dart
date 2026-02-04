@@ -14,7 +14,8 @@ class HomeActionButtons extends StatelessWidget {
           Expanded(
             child: _ActionButton(
               icon: Icons.assignment_rounded,
-              label: '과제 확인',
+              label: '과제 및\n주간테스트',
+              sublabel: '확인 & 제출',
               color: FigmaColors.tealGreen,
               onTap: () {},
             ),
@@ -23,7 +24,8 @@ class HomeActionButtons extends StatelessWidget {
           Expanded(
             child: _ActionButton(
               icon: Icons.smart_toy_rounded,
-              label: 'AI 튜터',
+              label: 'AI 튜터에게',
+              sublabel: '물어보세요',
               color: FigmaColors.royalBlue,
               onTap: () {},
             ),
@@ -32,7 +34,8 @@ class HomeActionButtons extends StatelessWidget {
           Expanded(
             child: _ActionButton(
               icon: Icons.chat_rounded,
-              label: '멤버 채팅',
+              label: '멤버들',
+              sublabel: '채팅하기',
               color: FigmaColors.nodePurple,
               onTap: () {},
             ),
@@ -46,12 +49,14 @@ class HomeActionButtons extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String? sublabel;
   final Color color;
   final VoidCallback onTap;
 
   const _ActionButton({
     required this.icon,
     required this.label,
+    this.sublabel,
     required this.color,
     required this.onTap,
   });
@@ -61,7 +66,7 @@ class _ActionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -87,12 +92,26 @@ class _ActionButton extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               label,
+              textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF3C3C3C),
+                height: 1.3,
               ),
             ),
+            if (sublabel != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                sublabel!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ],
           ],
         ),
       ),

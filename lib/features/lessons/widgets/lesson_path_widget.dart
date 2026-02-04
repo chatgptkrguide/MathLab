@@ -163,22 +163,22 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
   Widget _buildStartBadge() {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: FigmaColors.deepBlueCTA,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: FigmaColors.deepBlue.withOpacity(0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: const Text(
-        'START',
+        'START!',
         style: TextStyle(
-          color: Color(0xFF58CC02),
+          color: Colors.white,
           fontWeight: FontWeight.w900,
           fontSize: 13,
           letterSpacing: 1,
@@ -191,6 +191,9 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
     final isCompleted = status == LessonStatus.completed;
     final isLocked = status == LessonStatus.locked;
     final nodeColor = _getNodeColor(status, lesson.type);
+
+    // 노드 이미지 에셋 경로 (피그마 디자인 기반)
+    final nodeImagePath = _getNodeImagePath(lesson.type, status);
 
     return Stack(
       alignment: Alignment.center,
@@ -213,40 +216,50 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
             ),
           ),
 
-        // 3D 효과 바닥 원
+        // 3D 효과 바닥 원 (그림자)
+        Positioned(
+          top: 4,
+          child: Container(
+            width: _nodeSize,
+            height: _nodeSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isLocked
+                  ? const Color(0xFF8A8A8A)
+                  : HSLColor.fromColor(nodeColor)
+                      .withLightness(
+                          (HSLColor.fromColor(nodeColor).lightness - 0.15)
+                              .clamp(0.0, 1.0))
+                      .toColor(),
+            ),
+          ),
+        ),
+
+        // 메인 원 - 이미지 기반 또는 아이콘 폴백
         Container(
           width: _nodeSize,
           height: _nodeSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isLocked
-                ? const Color(0xFF8A8A8A)
-                : HSLColor.fromColor(nodeColor)
-                    .withLightness(
-                        (HSLColor.fromColor(nodeColor).lightness - 0.15)
-                            .clamp(0.0, 1.0))
-                    .toColor(),
-          ),
-        ),
-
-        // 메인 원
-        Container(
-          width: _nodeSize - 4,
-          height: _nodeSize - 4,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: nodeColor,
+            color: isLocked ? FigmaColors.nodeLockedBg : nodeColor,
             border: Border.all(
               color: isCompleted
-                  ? Colors.white.withOpacity(0.5)
+                  ? Colors.white.withOpacity(0.6)
                   : isLocked
-                      ? const Color(0xFF9A9A9A)
-                      : Colors.white.withOpacity(0.3),
-              width: 3,
+                      ? const Color(0xFFD0D0D0)
+                      : Colors.white.withOpacity(0.4),
+              width: 4,
             ),
+            boxShadow: isLocked ? null : [
+              BoxShadow(
+                color: nodeColor.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: Center(
-            child: _buildNodeIcon(status, lesson.type),
+          child: ClipOval(
+            child: _buildNodeContent(nodeImagePath, status, lesson.type),
           ),
         ),
 
@@ -258,6 +271,26 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
           ),
       ],
     );
+  }
+
+  /// 노드 이미지 에셋 경로 (이미지가 없으면 null)
+  String? _getNodeImagePath(LessonType type, LessonStatus status) {
+    if (status == LessonStatus.locked) return null;
+    // 피그마 디자인의 노드 이미지 경로
+    // 실제 에셋이 추가되면 여기서 반환
+    return null; // 아직 이미지 에셋 없음 → 아이콘 폴백 사용
+  }
+
+  /// 노드 콘텐츠: 이미지 에셋이 있으면 이미지, 없으면 아이콘
+  Widget _buildNodeContent(String? imagePath, LessonStatus status, LessonType type) {
+    if (imagePath != null) {
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildNodeIcon(status, type),
+      );
+    }
+    return _buildNodeIcon(status, type);
   }
 
   Widget _buildNodeIcon(LessonStatus status, LessonType type) {
