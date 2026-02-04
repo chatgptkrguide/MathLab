@@ -318,13 +318,22 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 10,
-              backgroundColor: Colors.white.withOpacity(0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+          Container(
+            height: 14,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 14,
+                backgroundColor: Colors.transparent,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  FigmaColors.tealGreen,
+                ),
+              ),
             ),
           ),
         ],
@@ -429,79 +438,44 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
   }
 
   Widget _buildAnswerOptions(ProblemModel problem) {
-    return Column(
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
       children: problem.options.map((option) {
         final isSelected = selectedAnswer == option;
         final isThisCorrect = option == problem.correctAnswer;
 
-        Color borderColor = const Color(0xFFE0E0E0);
         Color backgroundColor = const Color(0xFFE6EEEB);
+        Color textColor = FigmaColors.textDark;
 
         if (isAnswerChecked) {
           if (isThisCorrect) {
-            borderColor = AppColors.mathGreen;
-            backgroundColor = AppColors.mathGreen.withOpacity(0.15);
+            backgroundColor = AppColors.mathGreen;
+            textColor = Colors.white;
           } else if (isSelected && !isCorrect) {
-            borderColor = AppColors.mathRed;
-            backgroundColor = AppColors.mathRed.withOpacity(0.1);
+            backgroundColor = AppColors.mathRed;
+            textColor = Colors.white;
           }
         } else if (isSelected) {
-          borderColor = FigmaColors.skyBlue;
-          backgroundColor = FigmaColors.skyBlue.withOpacity(0.12);
+          backgroundColor = FigmaColors.skyBlue;
+          textColor = Colors.white;
         }
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: InkWell(
-            onTap: () => _selectAnswer(option),
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                border: Border.all(
-                  color: borderColor,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: borderColor,
-                        width: 2,
-                      ),
-                      color: isSelected ? borderColor : Colors.transparent,
-                    ),
-                    child: isSelected
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      option,
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                  if (isAnswerChecked && isThisCorrect)
-                    const Icon(
-                      Icons.check_circle,
-                      color: AppColors.mathGreen,
-                    ),
-                  if (isAnswerChecked && isSelected && !isCorrect)
-                    const Icon(
-                      Icons.cancel,
-                      color: AppColors.mathRed,
-                    ),
-                ],
+        return GestureDetector(
+          onTap: () => _selectAnswer(option),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Text(
+              option,
+              style: AppTextStyles.bodyLarge.copyWith(
+                fontWeight: isSelected || (isAnswerChecked && isThisCorrect)
+                    ? FontWeight.w600
+                    : FontWeight.normal,
+                color: textColor,
               ),
             ),
           ),
@@ -639,28 +613,52 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
       child: SizedBox(
         width: double.infinity,
         height: 56,
-        child: ElevatedButton(
-          onPressed: canCheck
-              ? _checkAnswer
-              : canContinue
-                  ? _nextProblem
-                  : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: canCheck || canContinue
-                ? AppColors.mathGreen
-                : AppColors.borderLight,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 0,
-          ),
-          child: Text(
-            canContinue ? '계속' : buttonText,
-            style: AppTextStyles.button.copyWith(
-              color: canCheck || canContinue ? Colors.white : AppColors.textSecondary,
-            ),
-          ),
-        ),
+        child: canCheck || canContinue
+            ? DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: FigmaColors.deepBlueCTA,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ElevatedButton(
+                  onPressed: canCheck
+                      ? _checkAnswer
+                      : canContinue
+                          ? _nextProblem
+                          : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    canContinue ? '계속' : '정답 확인',
+                    style: AppTextStyles.button.copyWith(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              )
+            : ElevatedButton(
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.borderLight,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  buttonText,
+                  style: AppTextStyles.button.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
       ),
     );
   }
