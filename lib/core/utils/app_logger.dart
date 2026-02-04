@@ -19,24 +19,33 @@ import '../config/env_config.dart';
 class AppLogger {
   AppLogger._();
 
-  static final Logger _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 5,
-      lineLength: 80,
-      colors: true,
-      printEmojis: true,
-      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
-    ),
-    level: _getLogLevel(),
-  );
+  static Logger? _loggerInstance;
+
+  static Logger get _logger {
+    _loggerInstance ??= Logger(
+      printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 5,
+        lineLength: 80,
+        colors: true,
+        printEmojis: true,
+        dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
+      ),
+      level: _getLogLevel(),
+    );
+    return _loggerInstance!;
+  }
 
   /// Get log level based on environment
   static Level _getLogLevel() {
-    if (kReleaseMode && EnvConfig.isProduction) {
-      return Level.error; // Only errors in production
-    } else if (EnvConfig.isProduction) {
-      return Level.warning; // Warnings and errors in production debug
+    try {
+      if (kReleaseMode && EnvConfig.isProduction) {
+        return Level.error; // Only errors in production
+      } else if (EnvConfig.isProduction) {
+        return Level.warning; // Warnings and errors in production debug
+      }
+    } catch (_) {
+      // EnvConfig not yet initialized, use default
     }
     return Level.debug; // All logs in development
   }
@@ -49,7 +58,7 @@ class AppLogger {
     StackTrace? stackTrace,
     Map<String, dynamic>? data,
   }) {
-    if (!EnvConfig.enableLogging) return;
+    try { if (!EnvConfig.enableLogging) return; } catch (_) {}
 
     final formattedMessage = _formatMessage(message, tag, data);
     _logger.d(formattedMessage, error: error, stackTrace: stackTrace);
@@ -61,7 +70,7 @@ class AppLogger {
     String? tag,
     Map<String, dynamic>? data,
   }) {
-    if (!EnvConfig.enableLogging) return;
+    try { if (!EnvConfig.enableLogging) return; } catch (_) {}
 
     final formattedMessage = _formatMessage(message, tag, data);
     _logger.i(formattedMessage);
@@ -177,7 +186,7 @@ class AppLogger {
     Map<String, dynamic>? headers,
     dynamic body,
   }) {
-    if (!EnvConfig.enableLogging || !kDebugMode) return;
+    try { if (!EnvConfig.enableLogging || !kDebugMode) return; } catch (_) {}
 
     debug(
       'HTTP Request',
@@ -199,7 +208,7 @@ class AppLogger {
     dynamic body,
     Duration? duration,
   }) {
-    if (!EnvConfig.enableLogging || !kDebugMode) return;
+    try { if (!EnvConfig.enableLogging || !kDebugMode) return; } catch (_) {}
 
     debug(
       'HTTP Response',

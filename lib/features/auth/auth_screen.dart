@@ -127,6 +127,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
   }
 
+  Widget _buildAssetImageOrFallback(
+    String assetPath, {
+    double? width,
+    double? height,
+    String? fallbackText,
+    TextStyle? style,
+    Widget? fallbackWidget,
+  }) {
+    return Image.asset(
+      assetPath,
+      width: width,
+      height: height,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        if (fallbackWidget != null) return fallbackWidget;
+        return Text(
+          fallbackText ?? '',
+          style: style,
+          textAlign: TextAlign.center,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -162,9 +186,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               angle: -0.0098, // -0.56도를 라디안으로: -0.56 * pi/180
                               child: FadeTransition(
                                 opacity: _fadeAnimation,
-                                child: Image.asset(
+                                child: _buildAssetImageOrFallback(
                                   'assets/images/login/math_is_text.png',
-                                  fit: BoxFit.contain,
+                                  fallbackText: 'Math is',
+                                  style: const TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -174,9 +203,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             // "Fun!!!"
                             FadeTransition(
                               opacity: _fadeAnimation,
-                              child: Image.asset(
+                              child: _buildAssetImageOrFallback(
                                 'assets/images/login/fun_text.png',
-                                fit: BoxFit.contain,
+                                fallbackText: 'Fun!!!',
+                                style: const TextStyle(
+                                  fontSize: 56,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF58CC02),
+                                ),
                               ),
                             ),
                           ],
@@ -187,11 +221,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               .authChatbotTopPosition, // Chatbot 위치
                           child: FadeTransition(
                             opacity: _fadeAnimation,
-                            child: Image.asset(
+                            child: _buildAssetImageOrFallback(
                               'assets/images/login/chatbot.png',
                               width: AppDimensions.chatbotImageSize,
                               height: AppDimensions.chatbotImageSize,
-                              fit: BoxFit.contain,
+                              fallbackWidget: Icon(
+                                Icons.smart_toy_rounded,
+                                size: AppDimensions.chatbotImageSize * 0.6,
+                                color: const Color(0xFF58CC02),
+                              ),
                             ),
                           ),
                         ),
@@ -203,9 +241,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     // "GoMath Lab" 텍스트 (Chatbot 바로 아래)
                     FadeTransition(
                       opacity: _fadeAnimation,
-                      child: Image.asset(
+                      child: _buildAssetImageOrFallback(
                         'assets/images/login/gomath_lab_text.png',
-                        fit: BoxFit.contain,
+                        fallbackText: 'GoMath Lab',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.2,
+                        ),
                       ),
                     ),
 
@@ -312,11 +356,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     // 로고 (맨 아래)
                     FadeTransition(
                       opacity: _fadeAnimation,
-                      child: Image.asset(
+                      child: _buildAssetImageOrFallback(
                         'assets/images/login/logo.png',
                         width: AppDimensions.logoWidth,
                         height: AppDimensions.logoHeight,
-                        fit: BoxFit.contain,
+                        fallbackWidget: Icon(
+                          Icons.calculate_rounded,
+                          size: AppDimensions.logoHeight,
+                          color: Colors.white54,
+                        ),
                       ),
                     ),
 

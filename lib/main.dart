@@ -34,10 +34,13 @@ void main() async {
   ]);
 
   try {
-    // 1. Initialize environment variables
-    await EnvConfig.initialize(
-      fileName: EnvConfig.isProduction ? '.env.production' : '.env',
-    );
+    // 1. Initialize environment variables (default .env first)
+    await EnvConfig.initialize(fileName: '.env');
+
+    // Reload with production config if needed
+    if (EnvConfig.isProduction) {
+      await EnvConfig.initialize(fileName: '.env.production');
+    }
     AppLogger.info('Environment variables loaded', tag: 'App');
 
     // 2. Validate environment variables
@@ -274,7 +277,7 @@ class MathLabApp extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      EnvConfig.isProduction
+                      (() { try { return EnvConfig.isProduction; } catch (_) { return false; } })()
                           ? '문제가 지속되면 고객센터로 문의해주세요.'
                           : details.exception.toString(),
                       textAlign: TextAlign.center,

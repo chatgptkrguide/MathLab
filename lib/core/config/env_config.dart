@@ -21,6 +21,11 @@ class EnvConfig {
     try {
       await dotenv.load(fileName: fileName);
     } catch (e) {
+      if (e.toString().contains('EmptyEnvFileError') ||
+          e.toString().contains('FileNotFoundError')) {
+        // Use defaults silently for empty/missing env files
+        return;
+      }
       throw Exception('Failed to load environment file: $fileName. Error: $e');
     }
   }
