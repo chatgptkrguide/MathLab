@@ -1,6 +1,7 @@
-/// 👤 Profile Detail Screen (Figma "05" Design)
+/// Profile Detail Screen (Figma "05" Design)
 ///
-/// 프로필 카드 + 통계 카드 3개 + 연속 학습 이력 + 과목별 진행률 + 뱃지 컬렉션
+/// Profile header with follower/following + 6 stat grid (2x3)
+/// + Premium card + Subject cards + Badge collection + Weekly streak + Logout
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,22 +24,25 @@ class ProfileDetailScreen extends ConsumerWidget {
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
               slivers: [
-                // 상단 프로필 헤더
+                // Profile header with avatar, name, level, follower/following
                 SliverToBoxAdapter(child: _buildProfileHeader(context, user)),
 
-                // 통계 카드 3개
-                SliverToBoxAdapter(child: _buildStatsRow(user)),
+                // 6 stat boxes in 2 rows of 3
+                SliverToBoxAdapter(child: _buildStatsGrid(user)),
 
-                // 연속 학습 이력 그래프
+                // Premium card
+                SliverToBoxAdapter(child: _buildPremiumCard()),
+
+                // Subject cards
+                SliverToBoxAdapter(child: _buildSubjectCards()),
+
+                // Weekly streak history
                 SliverToBoxAdapter(child: _buildStreakHistory()),
 
-                // 과목별 진행률
-                SliverToBoxAdapter(child: _buildSubjectProgress()),
-
-                // 뱃지 컬렉션
+                // Badge collection
                 SliverToBoxAdapter(child: _buildBadgeCollection()),
 
-                // 로그아웃
+                // Logout
                 if (!user.isGuest)
                   SliverToBoxAdapter(
                     child: Padding(
@@ -63,6 +67,10 @@ class ProfileDetailScreen extends ConsumerWidget {
     );
   }
 
+  // ──────────────────────────────────────────────
+  // Profile Header
+  // ──────────────────────────────────────────────
+
   Widget _buildProfileHeader(BuildContext context, UserModel user) {
     return Container(
       padding: EdgeInsets.only(
@@ -80,7 +88,7 @@ class ProfileDetailScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // 아바타
+          // Avatar
           Container(
             width: 90,
             height: 90,
@@ -104,7 +112,8 @@ class ProfileDetailScreen extends ConsumerWidget {
                 : const Icon(Icons.person_rounded, size: 48, color: Colors.white),
           ),
           const SizedBox(height: 12),
-          // 이름
+
+          // Name
           Text(
             user.displayName ?? '사용자',
             style: const TextStyle(
@@ -114,7 +123,8 @@ class ProfileDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 4),
-          // 레벨
+
+          // Level badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
@@ -130,49 +140,356 @@ class ProfileDetailScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+
+          // Follower / Following counts
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildFollowStat('팔로워', '0'),
+              Container(
+                width: 1,
+                height: 20,
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                color: Colors.white.withOpacity(0.4),
+              ),
+              _buildFollowStat('팔로잉', '0'),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsRow(UserModel user) {
+  Widget _buildFollowStat(String label, String count) {
+    return Column(
+      children: [
+        Text(
+          count,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ──────────────────────────────────────────────
+  // 6 Stats Grid (2 rows x 3 columns)
+  // ──────────────────────────────────────────────
+
+  Widget _buildStatsGrid(UserModel user) {
+    // Calculate study days from createdAt
+    final studyDays = DateTime.now().difference(user.createdAt).inDays + 1;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _StatBox(
-              icon: Icons.bolt_rounded,
-              iconColor: const Color(0xFFFFC800),
-              label: 'XP',
-              value: '${user.xp}',
-            ),
+          // Row 1: 학습일, XP, 연속학습
+          Row(
+            children: [
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.calendar_today_rounded,
+                  iconColor: FigmaColors.royalBlue,
+                  label: '학습일',
+                  value: '$studyDays일',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.bolt_rounded,
+                  iconColor: FigmaColors.streakGold,
+                  label: 'XP',
+                  value: '${user.xp}',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.local_fire_department_rounded,
+                  iconColor: FigmaColors.badgeOrange,
+                  label: '연속학습',
+                  value: '${user.streak}일',
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _StatBox(
-              icon: Icons.check_circle_rounded,
-              iconColor: FigmaColors.nodeGreen,
-              label: '총 XP',
-              value: '${user.totalXp}',
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _StatBox(
-              icon: Icons.diamond_rounded,
-              iconColor: FigmaColors.royalBlue,
-              label: '포인트',
-              value: '${user.gems}',
-            ),
+          const SizedBox(height: 10),
+          // Row 2: 랭크, 문제 수, 포인트
+          Row(
+            children: [
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.emoji_events_rounded,
+                  iconColor: FigmaColors.tealGreen,
+                  label: '랭크',
+                  value: 'H Lv${user.level}',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.check_circle_rounded,
+                  iconColor: FigmaColors.nodeGreen,
+                  label: '문제 수',
+                  value: '${user.totalXp ~/ 10}',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.diamond_rounded,
+                  iconColor: FigmaColors.royalBlue,
+                  label: '포인트',
+                  value: '${user.gems}',
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
+  // ──────────────────────────────────────────────
+  // Premium Card
+  // ──────────────────────────────────────────────
+
+  Widget _buildPremiumCard() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: FigmaColors.premiumBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: FigmaColors.premiumBlue.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: FigmaColors.premiumBlue.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.workspace_premium_rounded,
+                color: FigmaColors.premiumBlue,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Text content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: FigmaColors.premiumBlue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Premium',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    '광고 없이 무제한 학습을 시작하세요',
+                    style: TextStyle(
+                      color: FigmaColors.textDark,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: FigmaColors.premiumBlue,
+              size: 24,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ──────────────────────────────────────────────
+  // Subject Cards
+  // ──────────────────────────────────────────────
+
+  Widget _buildSubjectCards() {
+    final subjects = [
+      _SubjectCardData(
+        name: '공통수학 1',
+        subtitle: '기초 산술 / 대수',
+        progress: 0.65,
+        completedLessons: 13,
+        totalLessons: 20,
+        color: FigmaColors.royalBlue,
+        icon: Icons.functions_rounded,
+      ),
+      _SubjectCardData(
+        name: '공통수학 2',
+        subtitle: '기하학 / 통계',
+        progress: 0.25,
+        completedLessons: 5,
+        totalLessons: 20,
+        color: FigmaColors.tealGreen,
+        icon: Icons.auto_graph_rounded,
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '학습 과목',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: FigmaColors.textDark,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...subjects.map((subject) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildSubjectCard(subject),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubjectCard(_SubjectCardData subject) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Subject icon
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: subject.color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              subject.icon,
+              color: subject.color,
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 14),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  subject.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: FigmaColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subject.subtitle,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: FigmaColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Progress bar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: subject.progress,
+                    minHeight: 6,
+                    backgroundColor: const Color(0xFFF0F0F0),
+                    valueColor: AlwaysStoppedAnimation<Color>(subject.color),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Progress text
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${(subject.progress * 100).toInt()}%',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: subject.color,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${subject.completedLessons}/${subject.totalLessons}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: FigmaColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ──────────────────────────────────────────────
+  // Weekly Streak History
+  // ──────────────────────────────────────────────
+
   Widget _buildStreakHistory() {
-    // 최근 7일 학습 이력 (샘플 데이터)
     final days = ['월', '화', '수', '목', '금', '토', '일'];
     final studied = [true, true, true, false, true, true, false];
 
@@ -199,7 +516,7 @@ class ProfileDetailScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF3C3C3C),
+                color: FigmaColors.textDark,
               ),
             ),
             const SizedBox(height: 16),
@@ -221,9 +538,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                         studied[i]
                             ? Icons.check_rounded
                             : Icons.remove_rounded,
-                        color: studied[i]
-                            ? Colors.white
-                            : Colors.grey[400],
+                        color: studied[i] ? Colors.white : Colors.grey[400],
                         size: 18,
                       ),
                     ),
@@ -234,7 +549,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: studied[i]
-                            ? const Color(0xFF3C3C3C)
+                            ? FigmaColors.textDark
                             : Colors.grey[400],
                       ),
                     ),
@@ -248,91 +563,15 @@ class ProfileDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSubjectProgress() {
-    final subjects = [
-      _SubjectData('기초 산술', 0.85, FigmaColors.royalBlue),
-      _SubjectData('분수와 소수', 0.40, FigmaColors.tealGreen),
-      _SubjectData('방정식', 0.15, FigmaColors.nodeOrange),
-      _SubjectData('기하학', 0.0, FigmaColors.nodePurple),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '과목별 진행률',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3C3C3C),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ...subjects.map((s) => Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            s.name,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF3C3C3C),
-                            ),
-                          ),
-                          Text(
-                            '${(s.progress * 100).toInt()}%',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: s.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: s.progress,
-                          minHeight: 8,
-                          backgroundColor: const Color(0xFFF0F0F0),
-                          valueColor: AlwaysStoppedAnimation<Color>(s.color),
-                        ),
-                      ),
-                    ],
-                  ),
-                )),
-          ],
-        ),
-      ),
-    );
-  }
+  // ──────────────────────────────────────────────
+  // Badge Collection
+  // ──────────────────────────────────────────────
 
   Widget _buildBadgeCollection() {
     final badges = [
       _BadgeData('첫 레슨', Icons.star_rounded, FigmaColors.gold, true),
-      _BadgeData('3일 연속', Icons.local_fire_department_rounded, const Color(0xFFFF6B35), true),
-      _BadgeData('100 XP', Icons.bolt_rounded, const Color(0xFFFFC800), true),
+      _BadgeData('3일 연속', Icons.local_fire_department_rounded, FigmaColors.badgeOrange, true),
+      _BadgeData('100 XP', Icons.bolt_rounded, FigmaColors.streakGold, true),
       _BadgeData('완벽한 점수', Icons.emoji_events_rounded, FigmaColors.nodeGreen, false),
       _BadgeData('7일 연속', Icons.calendar_month_rounded, FigmaColors.royalBlue, false),
       _BadgeData('산술 마스터', Icons.calculate_rounded, FigmaColors.nodePurple, false),
@@ -361,7 +600,7 @@ class ProfileDetailScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF3C3C3C),
+                color: FigmaColors.textDark,
               ),
             ),
             const SizedBox(height: 16),
@@ -397,7 +636,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: badge.unlocked
-                              ? const Color(0xFF3C3C3C)
+                              ? FigmaColors.textDark
                               : Colors.grey[400],
                         ),
                         textAlign: TextAlign.center,
@@ -412,6 +651,10 @@ class ProfileDetailScreen extends ConsumerWidget {
       ),
     );
   }
+
+  // ──────────────────────────────────────────────
+  // Logout
+  // ──────────────────────────────────────────────
 
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
@@ -446,6 +689,10 @@ class ProfileDetailScreen extends ConsumerWidget {
   }
 }
 
+// ──────────────────────────────────────────────
+// Private Widget: Stat Box
+// ──────────────────────────────────────────────
+
 class _StatBox extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -462,10 +709,10 @@ class _StatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -476,20 +723,23 @@ class _StatBox extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 28),
-          const SizedBox(height: 8),
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF3C3C3C),
+              color: FigmaColors.textDark,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            style: const TextStyle(
+              fontSize: 11,
+              color: FigmaColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -497,11 +747,28 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-class _SubjectData {
+// ──────────────────────────────────────────────
+// Data Classes
+// ──────────────────────────────────────────────
+
+class _SubjectCardData {
   final String name;
+  final String subtitle;
   final double progress;
+  final int completedLessons;
+  final int totalLessons;
   final Color color;
-  _SubjectData(this.name, this.progress, this.color);
+  final IconData icon;
+
+  _SubjectCardData({
+    required this.name,
+    required this.subtitle,
+    required this.progress,
+    required this.completedLessons,
+    required this.totalLessons,
+    required this.color,
+    required this.icon,
+  });
 }
 
 class _BadgeData {
