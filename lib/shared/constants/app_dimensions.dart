@@ -17,6 +17,8 @@ class AppDimensions {
   // 간격 (Spacing)
   static const double spacingS = 8.0;
   static const double spacingM = 16.0;
+  static const double spacingL = 24.0;
+  static const double spacingXL = 32.0;
   static const double spacingXXL = 48.0;
 
   // 보더 라디우스
@@ -24,11 +26,17 @@ class AppDimensions {
   static const double radiusSmall = 8.0;
   static const double radiusM = 12.0;
   static const double radiusMedium = 12.0;
+  static const double radiusL = 16.0;
   static const double radiusLarge = 16.0;
+  static const double radiusXL = 24.0;
   static const double radiusXLarge = 24.0;
 
   // 패딩 단축형
+  static const double paddingXS = paddingXSmall;
+  static const double paddingS = paddingSmall;
   static const double paddingM = paddingMedium;
+  static const double paddingL = paddingLarge;
+  static const double paddingXL = paddingXLarge;
 
   // 아이콘 크기
   static const double iconSmall = 16.0;

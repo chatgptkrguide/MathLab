@@ -33,6 +33,12 @@ class AuthState {
     this.isAuthenticated = false,
   });
 
+  /// 현재 계정 (Firebase User)
+  auth.User? get currentAccount => firebaseUser;
+
+  /// 게스트 여부
+  bool get isGuest => user?.isGuest ?? (firebaseUser?.isAnonymous ?? false);
+
   AuthState copyWith({
     auth.User? firebaseUser,
     UserModel? user,

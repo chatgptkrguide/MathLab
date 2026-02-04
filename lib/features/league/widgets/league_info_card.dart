@@ -1,4 +1,4 @@
-/// 9 League Info Card Widget
+/// League Info Card Widget
 ///
 /// Shows user's status in the league (promotion/safe/relegation zone)
 
@@ -32,10 +32,10 @@ class LeagueInfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _getStatusColor().withOpacity(0.1),
+        color: _getStatusColor().withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: _getStatusColor().withOpacity(0.3),
+          color: _getStatusColor().withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -75,7 +75,7 @@ class LeagueInfoCard extends StatelessWidget {
               children: [
                 // XP to Next Rank
                 _buildInfoRow(
-                  '�L L�',
+                  '다음 순위까지',
                   '${status.xpToNextRank} XP',
                   Icons.arrow_upward,
                 ),
@@ -87,13 +87,13 @@ class LeagueInfoCard extends StatelessWidget {
                 // XP to Promotion
                 if (status.isPromotionZone)
                   _buildInfoRow(
-                    '�	  �',
-                    'č x%X8�!',
+                    '승급권 유지 중',
+                    '축하합니다!',
                     Icons.star,
                   )
                 else
                   _buildInfoRow(
-                    '�	L�',
+                    '승급까지',
                     '${status.xpToPromotion} XP',
                     Icons.star,
                   ),
@@ -107,8 +107,8 @@ class LeagueInfoCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildStatColumn(
-                      '8 �t',
-                      '${status.userEntry.problemsSolved}',
+                      '풀은 문제',
+                      '${status.userEntry.problemsSolved}',
                       Icons.edit,
                     ),
                     Container(
@@ -117,7 +117,7 @@ class LeagueInfoCard extends StatelessWidget {
                       color: Colors.grey[300],
                     ),
                     _buildStatColumn(
-                      'U�',
+                      '정확도',
                       '${(status.userEntry.accuracy * 100).toStringAsFixed(1)}%',
                       Icons.check_circle,
                     ),

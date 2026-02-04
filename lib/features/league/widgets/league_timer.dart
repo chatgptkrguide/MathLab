@@ -1,4 +1,4 @@
-/// ð League Timer Widget
+/// League Timer Widget
 ///
 /// Displays countdown timer for current league
 
@@ -54,13 +54,13 @@ class _LeagueTimerState extends State<LeagueTimer> {
     final seconds = duration.inSeconds % 60;
 
     if (days > 0) {
-      return '$days| $hoursÜ';
+      return '${days}ì¼ ${hours}ì‹œê°„';
     } else if (hours > 0) {
-      return '$hoursÜ $minutes„';
+      return '${hours}ì‹œê°„ ${minutes}ë¶„';
     } else if (minutes > 0) {
-      return '$minutes„ $seconds';
+      return '${minutes}ë¶„ ${seconds}ì´ˆ';
     } else {
-      return '$seconds';
+      return '${seconds}ì´ˆ';
     }
   }
 
@@ -73,7 +73,7 @@ class _LeagueTimerState extends State<LeagueTimer> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -91,7 +91,7 @@ class _LeagueTimerState extends State<LeagueTimer> {
               ),
               const SizedBox(width: 12),
               Text(
-                '¬ø …ÌLÀ',
+                'ë¦¬ê·¸ ì¢…ë£Œê¹Œì§€',
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: Colors.grey[700],
                 ),

@@ -158,8 +158,9 @@ class SSLPinningService {
         return false;
       }
 
-      // Get certificate SHA256 fingerprint
-      final certSHA256 = cert.sha256.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join(':').toUpperCase();
+      // Get certificate SHA256 fingerprint from DER encoding
+      final certBytes = cert.der;
+      final certSHA256 = certBytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join(':').toUpperCase();
 
       // Check if certificate matches any allowed fingerprint
       final isValid = fingerprints.contains(certSHA256);

@@ -11,6 +11,13 @@ class AppTextStyles {
     height: 1.1,
   );
 
+  static const displaySmall = TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
   // Headline 스타일
   static const headlineLarge = TextStyle(
     fontSize: 32,
@@ -75,6 +82,19 @@ class AppTextStyles {
     fontSize: 12,
     color: AppColors.textSecondary,
     fontWeight: FontWeight.normal,
+  );
+
+  // Label 스타일
+  static const labelLarge = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static const labelSmall = TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
   );
 
   // Button style

@@ -124,6 +124,10 @@ class LeaderboardEntry {
   final String tier;
   final bool isCurrentUser;
   final int? rankChange; // Positive for up, negative for down
+  final int level;
+  final String userName;
+  final String grade;
+  final int streakDays;
 
   const LeaderboardEntry({
     required this.userId,
@@ -136,7 +140,11 @@ class LeaderboardEntry {
     required this.tier,
     this.isCurrentUser = false,
     this.rankChange,
-  });
+    this.level = 1,
+    String? userName,
+    this.grade = '',
+    this.streakDays = 0,
+  }) : userName = userName ?? username;
 
   factory LeaderboardEntry.fromJson(Map<String, dynamic> json) {
     return LeaderboardEntry(
@@ -150,6 +158,10 @@ class LeaderboardEntry {
       tier: json['tier'] as String,
       isCurrentUser: json['isCurrentUser'] as bool? ?? false,
       rankChange: json['rankChange'] as int?,
+      level: json['level'] as int? ?? 1,
+      userName: json['userName'] as String?,
+      grade: json['grade'] as String? ?? '',
+      streakDays: json['streakDays'] as int? ?? 0,
     );
   }
 
@@ -164,6 +176,10 @@ class LeaderboardEntry {
         'tier': tier,
         'isCurrentUser': isCurrentUser,
         'rankChange': rankChange,
+        'level': level,
+        'userName': userName,
+        'grade': grade,
+        'streakDays': streakDays,
       };
 
   bool get isPromotion => rankChange != null && rankChange! > 0;
@@ -171,6 +187,19 @@ class LeaderboardEntry {
 
   String get displayTier => LeagueTier.getDisplayName(tier);
   String get tierIcon => LeagueTier.getIcon(tier);
+
+  String get medalEmoji {
+    switch (rank) {
+      case 1:
+        return '🥇';
+      case 2:
+        return '🥈';
+      case 3:
+        return '🥉';
+      default:
+        return '';
+    }
+  }
 }
 
 class UserLeagueStatus {

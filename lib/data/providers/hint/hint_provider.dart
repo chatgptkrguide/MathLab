@@ -103,8 +103,8 @@ class HintNotifier extends StateNotifier<HintState> {
 
   /// Unlock a hint
   Future<bool> unlockHint(HintModel hint) async {
-    final userState = _ref.read(userProvider);
-    if (userState.user == null) {
+    final user = _ref.read(userProvider);
+    if (user == null) {
       state = state.copyWith(error: 'User not found');
       return false;
     }
@@ -113,7 +113,6 @@ class HintNotifier extends StateNotifier<HintState> {
       final lessonAPI = _ref.read(lessonAPIProvider);
 
       // Check if user has enough XP or gems
-      final user = userState.user!;
       if (hint.requiresGems) {
         if (user.gems < hint.gemCost!) {
           state = state.copyWith(error: '젬이 부족합니다');
@@ -143,9 +142,9 @@ class HintNotifier extends StateNotifier<HintState> {
 
       // Update user's XP or gems
       if (hint.requiresGems) {
-        _ref.read(userProvider.notifier).updateGems(user.gems - hint.gemCost!);
+        await _ref.read(userProvider.notifier).spendGems(hint.gemCost!);
       } else {
-        _ref.read(userProvider.notifier).updateXP(user.xp - hint.xpCost);
+        await _ref.read(userProvider.notifier).addXp(-hint.xpCost);
       }
 
       logger.i('Unlocked hint: ${hint.id}');

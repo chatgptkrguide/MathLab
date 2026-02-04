@@ -33,10 +33,10 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
 
     // Mark as viewed when dialog opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userState = ref.read(userProvider);
-      if (userState.user != null) {
+      final user = ref.read(userProvider);
+      if (user != null) {
         ref
-            .read(conceptCardProvider(userState.user!.id).notifier)
+            .read(conceptCardProvider(user.id).notifier)
             .markAsViewed(widget.conceptCard.id);
       }
     });
@@ -50,9 +50,9 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
 
   @override
   Widget build(BuildContext context) {
-    final userState = ref.watch(userProvider);
-    final conceptState = userState.user != null
-        ? ref.watch(conceptCardProvider(userState.user!.id))
+    final user = ref.watch(userProvider);
+    final conceptState = user != null
+        ? ref.watch(conceptCardProvider(user.id))
         : null;
 
     final isBookmarked = conceptState?.isBookmarked(widget.conceptCard.id) ?? false;
@@ -108,10 +108,10 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                         ),
                       ),
                       IconButton(
-                        onPressed: userState.user != null
+                        onPressed: user != null
                             ? () {
                                 ref
-                                    .read(conceptCardProvider(userState.user!.id)
+                                    .read(conceptCardProvider(user.id)
                                         .notifier)
                                     .toggleBookmark(widget.conceptCard.id);
                               }

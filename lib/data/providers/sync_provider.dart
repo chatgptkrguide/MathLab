@@ -168,10 +168,10 @@ class SyncNotifier extends StateNotifier<SyncState> {
         break;
 
       case SyncOperationType.updateProgress:
-        await userAPI.updateProgress(
+        await userAPI.addXP(
           userId: operation.data['userId'] as String,
-          xp: operation.data['xp'] as int,
-          streak: operation.data['streak'] as int,
+          amount: operation.data['xp'] as int,
+          source: 'sync',
         );
         break;
 

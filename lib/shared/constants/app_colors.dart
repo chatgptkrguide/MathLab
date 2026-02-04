@@ -55,6 +55,33 @@ class AppColors {
   static const beigGreen = Color(0xFFECFDF5); // 녹색 베이지
   static const beigPurple = Color(0xFFF3E8FF); // 보라 베이지
 
+  // 추가 상태 색상
+  static const successGreen = Color(0xFF58CC02); // 성공 녹색
+  static const errorRed = Color(0xFFFF4B4B); // 에러 빨강
+  static const warningOrange = Color(0xFFFF9600); // 경고 주황
+  static const disabled = Color(0xFFAFAFAF); // 비활성
+
+  // 프리미엄 색상
+  static const premiumGold = Color(0xFFFFD700); // 프리미엄 골드
+  static const premiumPurple = Color(0xFFCE82FF); // 프리미엄 보라
+  static const premiumGradient = [Color(0xFFFFD700), Color(0xFFFFA500)]; // 프리미엄 그라디언트
+
+  // 헤더 색상
+  static const headerText = Colors.white; // 헤더 텍스트
+  static const headerBlueGradient = [Color(0xFF1CB0F6), Color(0xFF1899D6)]; // 헤더 블루 그라디언트
+
+  // 레벨 색상
+  static const levelBronze = Color(0xFFCD7F32); // 브론즈
+  static const levelSilver = Color(0xFFC0C0C0); // 실버
+  static const levelGold = Color(0xFFFFD700); // 골드
+  static const levelBronzeDark = Color(0xFFA0622E); // 브론즈 다크
+  static const levelSilverDark = Color(0xFF909090); // 실버 다크
+  static const levelGoldDark = Color(0xFFDAA520); // 골드 다크
+
+  // 다크 변형 색상
+  static const mathOrangeDark = Color(0xFFE08600); // 주황 다크
+  static const mathGreenDark = Color(0xFF4CAF02); // 녹색 다크
+
   // 소셜 로그인 색상
   static const kakaoYellow = Color(0xFFFEE500); // 카카오 노랑
   static const kakaoBrown = Color(0xFF3C1E1E); // 카카오 브라운

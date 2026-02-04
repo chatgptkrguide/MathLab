@@ -142,8 +142,8 @@ class HintDialog extends ConsumerWidget {
                                     ref,
                                     hint,
                                     isUnlocked,
-                                    userState.user?.xp ?? 0,
-                                    userState.user?.gems ?? 0,
+                                    userState?.xp ?? 0,
+                                    userState?.gems ?? 0,
                                   ),
                                 );
                               },

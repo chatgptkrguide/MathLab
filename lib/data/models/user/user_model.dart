@@ -361,6 +361,9 @@ class UserModel {
     return 'UserModel(uid: $uid, displayName: $displayName, level: $level, xp: $xp, streak: $streak)';
   }
 
+  /// Get user id (alias for uid)
+  String get id => uid;
+
   /// Get user instance (for compatibility with nullable UserModel?)
   UserModel get user => this;
 
