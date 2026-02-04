@@ -13,6 +13,7 @@ import '../../data/models/problem/sample_problems.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
+import '../../shared/constants/figma_colors.dart';
 import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/widgets/input/math_input_field.dart';
 import '../../shared/widgets/input/drag_and_drop_widget.dart';
@@ -280,35 +281,50 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
         horizontal: AppDimensions.paddingMedium,
         vertical: 12,
       ),
+      decoration: BoxDecoration(
+        color: FigmaColors.skyBlue,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+      ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.lessonTitle,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    widget.lessonTitle,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
               Text(
                 '${session.currentProblemIndex + 1}/${session.totalProblems}',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: progress,
-              minHeight: 8,
-              backgroundColor: AppColors.borderLight,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.mathGreen,
-              ),
+              minHeight: 10,
+              backgroundColor: Colors.white.withOpacity(0.3),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           ),
         ],
@@ -418,27 +434,27 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
         final isSelected = selectedAnswer == option;
         final isThisCorrect = option == problem.correctAnswer;
 
-        Color borderColor = AppColors.borderLight;
-        Color backgroundColor = Colors.white;
+        Color borderColor = const Color(0xFFE0E0E0);
+        Color backgroundColor = const Color(0xFFE6EEEB);
 
         if (isAnswerChecked) {
           if (isThisCorrect) {
             borderColor = AppColors.mathGreen;
-            backgroundColor = AppColors.mathGreen.withOpacity(0.1);
+            backgroundColor = AppColors.mathGreen.withOpacity(0.15);
           } else if (isSelected && !isCorrect) {
             borderColor = AppColors.mathRed;
             backgroundColor = AppColors.mathRed.withOpacity(0.1);
           }
         } else if (isSelected) {
-          borderColor = AppColors.mathBlue;
-          backgroundColor = AppColors.mathBlue.withOpacity(0.05);
+          borderColor = FigmaColors.skyBlue;
+          backgroundColor = FigmaColors.skyBlue.withOpacity(0.12);
         }
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: InkWell(
             onTap: () => _selectAnswer(option),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -447,7 +463,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
                   color: borderColor,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [

@@ -1,7 +1,6 @@
-/// 👤 Profile Detail Screen
+/// 👤 Profile Detail Screen (Figma "05" Design)
 ///
-/// Displays user profile information with clear login status indication.
-/// Shows account type, user data, and provides profile management options.
+/// 프로필 카드 + 통계 카드 3개 + 연속 학습 이력 + 과목별 진행률 + 뱃지 컬렉션
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,65 +8,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../data/models/user/user_model.dart';
-import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/figma_colors.dart';
 
 class ProfileDetailScreen extends ConsumerWidget {
   const ProfileDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
     final user = ref.watch(userProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('프로필'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
+      backgroundColor: const Color(0xFFF5F7FA),
       body: user == null
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Profile Photo
-                  _buildProfilePhoto(user),
+          : CustomScrollView(
+              slivers: [
+                // 상단 프로필 헤더
+                SliverToBoxAdapter(child: _buildProfileHeader(context, user)),
 
-                  const SizedBox(height: 16),
+                // 통계 카드 3개
+                SliverToBoxAdapter(child: _buildStatsRow(user)),
 
-                  // User Name
-                  Text(
-                    user.displayName ?? '사용자',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
+                // 연속 학습 이력 그래프
+                SliverToBoxAdapter(child: _buildStreakHistory()),
 
-                  const SizedBox(height: 8),
+                // 과목별 진행률
+                SliverToBoxAdapter(child: _buildSubjectProgress()),
 
-                  // Login Status Badge - VERY CLEAR
-                  _buildLoginStatusBadge(user.authProvider),
+                // 뱃지 컬렉션
+                SliverToBoxAdapter(child: _buildBadgeCollection()),
 
-                  const SizedBox(height: 24),
-
-                  // Account Information Card
-                  _buildAccountInfoCard(context, user, authState),
-
-                  const SizedBox(height: 16),
-
-                  // Stats Card
-                  _buildStatsCard(context, user),
-
-                  const SizedBox(height: 24),
-
-                  // Logout Button
-                  if (!user.isGuest)
-                    SizedBox(
-                      width: double.infinity,
+                // 로그아웃
+                if (!user.isGuest)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                       child: OutlinedButton.icon(
                         onPressed: () => _handleLogout(context, ref),
                         icon: const Icon(Icons.logout),
@@ -80,90 +55,78 @@ class ProfileDetailScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                ],
-              ),
+                  ),
+
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
             ),
     );
   }
 
-  Widget _buildProfilePhoto(UserModel user) {
+  Widget _buildProfileHeader(BuildContext context, UserModel user) {
     return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.mathBlue.withOpacity(0.1),
-        border: Border.all(
-          color: AppColors.mathBlue.withOpacity(0.3),
-          width: 3,
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 20,
+        bottom: 24,
+        left: 24,
+        right: 24,
+      ),
+      decoration: const BoxDecoration(
+        gradient: FigmaColors.skyBlueGradient,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
         ),
       ),
-      child: user.photoUrl != null
-          ? ClipOval(
-              child: Image.network(
-                user.photoUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildDefaultAvatar(user);
-                },
-              ),
-            )
-          : _buildDefaultAvatar(user),
-    );
-  }
-
-  Widget _buildDefaultAvatar(UserModel user) {
-    return Icon(
-      Icons.person,
-      size: 50,
-      color: AppColors.mathBlue,
-    );
-  }
-
-  /// 🎯 Login Status Badge - Prominently displays auth method
-  Widget _buildLoginStatusBadge(AuthProvider provider) {
-    final info = _getAuthProviderInfo(provider);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: info.color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: info.color,
-          width: 2,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
         children: [
-          Icon(
-            info.icon,
-            color: info.color,
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            info.label,
-            style: TextStyle(
-              color: info.color,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(width: 4),
+          // 아바타
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            width: 90,
+            height: 90,
             decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(10),
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.2),
+              border: Border.all(color: Colors.white, width: 3),
             ),
-            child: const Text(
-              '로그인됨',
-              style: TextStyle(
+            child: user.photoUrl != null
+                ? ClipOval(
+                    child: Image.network(
+                      user.photoUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person_rounded,
+                        size: 48,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                : const Icon(Icons.person_rounded, size: 48, color: Colors.white),
+          ),
+          const SizedBox(height: 12),
+          // 이름
+          Text(
+            user.displayName ?? '사용자',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          // 레벨
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'Level ${user.level}',
+              style: const TextStyle(
                 color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -172,225 +135,282 @@ class ProfileDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAccountInfoCard(
-    BuildContext context,
-    UserModel user,
-    AuthState authState,
-  ) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+  Widget _buildStatsRow(UserModel user) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: _StatBox(
+              icon: Icons.bolt_rounded,
+              iconColor: const Color(0xFFFFC800),
+              label: 'XP',
+              value: '${user.xp}',
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _StatBox(
+              icon: Icons.check_circle_rounded,
+              iconColor: FigmaColors.nodeGreen,
+              label: '총 XP',
+              value: '${user.totalXp}',
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _StatBox(
+              icon: Icons.diamond_rounded,
+              iconColor: FigmaColors.royalBlue,
+              label: '포인트',
+              value: '${user.gems}',
+            ),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
+    );
+  }
+
+  Widget _buildStreakHistory() {
+    // 최근 7일 학습 이력 (샘플 데이터)
+    final days = ['월', '화', '수', '목', '금', '토', '일'];
+    final studied = [true, true, true, false, true, true, false];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '계정 정보',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            const Text(
+              '이번 주 학습',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3C3C3C),
+              ),
             ),
             const SizedBox(height: 16),
-
-            if (user.email != null) ...[
-              _buildInfoRow(
-                icon: Icons.email_outlined,
-                label: '이메일',
-                value: user.email!,
-              ),
-              const SizedBox(height: 12),
-            ],
-
-            _buildInfoRow(
-              icon: Icons.account_circle_outlined,
-              label: '계정 유형',
-              value: _getAuthProviderInfo(user.authProvider).fullLabel,
-            ),
-
-            if (authState.firebaseUser?.emailVerified == false) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange),
-                ),
-                child: Row(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(7, (i) {
+                return Column(
                   children: [
-                    const Icon(Icons.warning_amber, color: Colors.orange, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '이메일 인증이 필요합니다',
-                        style: TextStyle(
-                          color: Colors.orange[800],
-                          fontSize: 12,
-                        ),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: studied[i]
+                            ? FigmaColors.nodeGreen
+                            : const Color(0xFFF0F0F0),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        studied[i]
+                            ? Icons.check_rounded
+                            : Icons.remove_rounded,
+                        color: studied[i]
+                            ? Colors.white
+                            : Colors.grey[400],
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      days[i],
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: studied[i]
+                            ? const Color(0xFF3C3C3C)
+                            : Colors.grey[400],
                       ),
                     ),
                   ],
-                ),
-              ),
-            ],
+                );
+              }),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatsCard(BuildContext context, UserModel user) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
+  Widget _buildSubjectProgress() {
+    final subjects = [
+      _SubjectData('기초 산술', 0.85, FigmaColors.royalBlue),
+      _SubjectData('분수와 소수', 0.40, FigmaColors.tealGreen),
+      _SubjectData('방정식', 0.15, FigmaColors.nodeOrange),
+      _SubjectData('기하학', 0.0, FigmaColors.nodePurple),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '학습 현황',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            const Text(
+              '과목별 진행률',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3C3C3C),
+              ),
             ),
             const SizedBox(height: 16),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  icon: Icons.stars,
-                  label: '레벨',
-                  value: '${user.level}',
-                  color: AppColors.mathOrange,
-                ),
-                _buildStatItem(
-                  icon: Icons.local_fire_department,
-                  label: '연속 학습',
-                  value: '${user.streak}일',
-                  color: AppColors.mathRed,
-                ),
-                _buildStatItem(
-                  icon: Icons.diamond,
-                  label: '젬',
-                  value: '${user.gems}',
-                  color: AppColors.mathBlue,
-                ),
-              ],
-            ),
+            ...subjects.map((s) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            s.name,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF3C3C3C),
+                            ),
+                          ),
+                          Text(
+                            '${(s.progress * 100).toInt()}%',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: s.color,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: s.progress,
+                          minHeight: 8,
+                          backgroundColor: const Color(0xFFF0F0F0),
+                          valueColor: AlwaysStoppedAnimation<Color>(s.color),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+  Widget _buildBadgeCollection() {
+    final badges = [
+      _BadgeData('첫 레슨', Icons.star_rounded, FigmaColors.gold, true),
+      _BadgeData('3일 연속', Icons.local_fire_department_rounded, const Color(0xFFFF6B35), true),
+      _BadgeData('100 XP', Icons.bolt_rounded, const Color(0xFFFFC800), true),
+      _BadgeData('완벽한 점수', Icons.emoji_events_rounded, FigmaColors.nodeGreen, false),
+      _BadgeData('7일 연속', Icons.calendar_month_rounded, FigmaColors.royalBlue, false),
+      _BadgeData('산술 마스터', Icons.calculate_rounded, FigmaColors.nodePurple, false),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-      ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '뱃지 컬렉션',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3C3C3C),
+              ),
+            ),
+            const SizedBox(height: 16),
+            GridView.count(
+              crossAxisCount: 3,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: badges.map((badge) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: badge.unlocked
+                        ? badge.color.withOpacity(0.1)
+                        : const Color(0xFFF0F0F0),
+                    borderRadius: BorderRadius.circular(16),
+                    border: badge.unlocked
+                        ? Border.all(color: badge.color.withOpacity(0.3))
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        badge.icon,
+                        color: badge.unlocked ? badge.color : Colors.grey[400],
+                        size: 32,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        badge.name,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: badge.unlocked
+                              ? const Color(0xFF3C3C3C)
+                              : Colors.grey[400],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
     );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 28),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
-
-  AuthProviderInfo _getAuthProviderInfo(AuthProvider provider) {
-    switch (provider) {
-      case AuthProvider.google:
-        return AuthProviderInfo(
-          icon: Icons.g_mobiledata,
-          label: 'Google',
-          fullLabel: 'Google 계정',
-          color: const Color(0xFF4285F4),
-        );
-      case AuthProvider.kakao:
-        return AuthProviderInfo(
-          icon: Icons.chat_bubble,
-          label: 'Kakao',
-          fullLabel: 'Kakao 계정',
-          color: const Color(0xFFFEE500),
-        );
-      case AuthProvider.email:
-        return AuthProviderInfo(
-          icon: Icons.email,
-          label: '이메일',
-          fullLabel: '이메일 계정',
-          color: AppColors.mathBlue,
-        );
-      case AuthProvider.guest:
-        return AuthProviderInfo(
-          icon: Icons.person_outline,
-          label: '게스트',
-          fullLabel: '게스트 계정',
-          color: Colors.grey,
-        );
-    }
   }
 
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
@@ -399,9 +419,7 @@ class ProfileDetailScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('로그아웃'),
         content: const Text('정말 로그아웃하시겠습니까?'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -428,16 +446,68 @@ class ProfileDetailScreen extends ConsumerWidget {
   }
 }
 
-class AuthProviderInfo {
+class _StatBox extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String label;
-  final String fullLabel;
-  final Color color;
+  final String value;
 
-  AuthProviderInfo({
+  const _StatBox({
     required this.icon,
+    required this.iconColor,
     required this.label,
-    required this.fullLabel,
-    required this.color,
+    required this.value,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF3C3C3C),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubjectData {
+  final String name;
+  final double progress;
+  final Color color;
+  _SubjectData(this.name, this.progress, this.color);
+}
+
+class _BadgeData {
+  final String name;
+  final IconData icon;
+  final Color color;
+  final bool unlocked;
+  _BadgeData(this.name, this.icon, this.color, this.unlocked);
 }

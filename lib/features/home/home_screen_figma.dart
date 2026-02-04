@@ -13,6 +13,7 @@ import 'widgets/home_stats_cards.dart';
 import 'widgets/home_friends_activity.dart';
 import 'widgets/home_language_cards.dart';
 import 'widgets/home_daily_challenge.dart';
+import 'widgets/home_action_buttons.dart';
 
 /// Figma 디자인 "00 home" 화면 100% 재현
 /// 레퍼런스: assets/images/figma_home_reference.png
@@ -70,6 +71,11 @@ class HomeScreenFigma extends ConsumerWidget {
 
               // 7. Figma: 데일리 챌린지 카드
               const HomeDailyChallenge(),
+
+              const SizedBox(height: 24),
+
+              // 8. Figma: 하단 CTA 3개 (과제 확인, AI 튜터, 멤버 채팅)
+              const HomeActionButtons(),
 
               const SizedBox(height: 40),
             ],

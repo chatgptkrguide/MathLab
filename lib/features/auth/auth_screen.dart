@@ -180,36 +180,51 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         Column(
                           children: [
                             SizedBox(
-                                height: AppDimensions.authMathIsTopSpacing), // Math is를 아래로 이동
+                                height: AppDimensions.authMathIsTopSpacing),
                             // "Math is" (회전됨, 약간 기울어짐)
                             Transform.rotate(
-                              angle: -0.0098, // -0.56도를 라디안으로: -0.56 * pi/180
+                              angle: -0.0098,
                               child: FadeTransition(
                                 opacity: _fadeAnimation,
                                 child: _buildAssetImageOrFallback(
                                   'assets/images/login/math_is_text.png',
-                                  fallbackText: 'Math is',
-                                  style: const TextStyle(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                  fallbackWidget: ShaderMask(
+                                    shaderCallback: (bounds) => const LinearGradient(
+                                      colors: [Colors.white, Color(0xFFB8C4FF)],
+                                    ).createShader(bounds),
+                                    child: const Text(
+                                      'Math is',
+                                      style: TextStyle(
+                                        fontSize: 48,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 2,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                             SizedBox(
-                                height: AppDimensions
-                                    .authMathIsFunSpacing), // Math is → Fun 간격
+                                height: AppDimensions.authMathIsFunSpacing),
                             // "Fun!!!"
                             FadeTransition(
                               opacity: _fadeAnimation,
                               child: _buildAssetImageOrFallback(
                                 'assets/images/login/fun_text.png',
-                                fallbackText: 'Fun!!!',
-                                style: const TextStyle(
-                                  fontSize: 56,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color(0xFF58CC02),
+                                fallbackWidget: ShaderMask(
+                                  shaderCallback: (bounds) => const LinearGradient(
+                                    colors: [Color(0xFF58CC02), Color(0xFF7BE834)],
+                                  ).createShader(bounds),
+                                  child: const Text(
+                                    'Fun!!!',
+                                    style: TextStyle(
+                                      fontSize: 56,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: 3,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -217,18 +232,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         ),
                         // Chatbot 캐릭터 (앞쪽 레이어, 텍스트 위에)
                         Positioned(
-                          top: AppDimensions
-                              .authChatbotTopPosition, // Chatbot 위치
+                          top: AppDimensions.authChatbotTopPosition,
                           child: FadeTransition(
                             opacity: _fadeAnimation,
                             child: _buildAssetImageOrFallback(
                               'assets/images/login/chatbot.png',
                               width: AppDimensions.chatbotImageSize,
                               height: AppDimensions.chatbotImageSize,
-                              fallbackWidget: Icon(
-                                Icons.smart_toy_rounded,
-                                size: AppDimensions.chatbotImageSize * 0.6,
-                                color: const Color(0xFF58CC02),
+                              fallbackWidget: Container(
+                                width: AppDimensions.chatbotImageSize * 0.7,
+                                height: AppDimensions.chatbotImageSize * 0.7,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [Color(0xFF58CC02), Color(0xFF7BE834)],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF58CC02).withOpacity(0.4),
+                                      blurRadius: 24,
+                                      spreadRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.smart_toy_rounded,
+                                  size: AppDimensions.chatbotImageSize * 0.35,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -243,12 +276,32 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       opacity: _fadeAnimation,
                       child: _buildAssetImageOrFallback(
                         'assets/images/login/gomath_lab_text.png',
-                        fallbackText: 'GoMath Lab',
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
+                        fallbackWidget: Column(
+                          children: [
+                            ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: [Colors.white, Color(0xFFD0D8FF)],
+                              ).createShader(bounds),
+                              child: const Text(
+                                'GoMath Lab',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              '수학을 재미있게, 매일 조금씩',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.6),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
