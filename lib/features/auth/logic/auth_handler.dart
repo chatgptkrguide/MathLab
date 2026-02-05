@@ -30,35 +30,13 @@ class AuthHandler {
       if (!mounted) return false;
 
       if (success) {
-        // 기본 프로필로 시작
-        final defaultProfile = TempProfileData(
-          name: '테스터',
-          birthDate: DateTime.now().subtract(const Duration(days: 365 * 15)),
-          gender: null,
-          currentGrade: '중1',
-          schoolName: null,
-          bio: null,
-        );
-
-        await ref
-            .read(authProvider.notifier)
-            .applyTempProfileToAccount(defaultProfile);
-
-        // Hide loading overlay
+        // Hide loading overlay - guest user already created with displayName='게스트'
+        // by createGuestUser() in signInAsGuest(), no need to update profile separately
         if (mounted) {
           LoadingOverlay.hide(context);
         }
 
-        // Show welcome dialog
-        final user = ref.read(userProvider);
-        if (mounted && user != null) {
-          await WelcomeDialog.show(
-            context,
-            user: user,
-            authMethod: 'guest',
-          );
-        }
-
+        // AuthWrapper will detect auth state change and navigate to MainNavigation
         return true;
       } else {
         // Hide loading overlay on error

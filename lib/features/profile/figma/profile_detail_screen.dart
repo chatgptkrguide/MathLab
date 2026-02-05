@@ -43,23 +43,22 @@ class ProfileDetailScreen extends ConsumerWidget {
                 SliverToBoxAdapter(child: _buildBadgeCollection()),
 
                 // Logout
-                if (!user.isGuest)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      child: OutlinedButton.icon(
-                        onPressed: () => _handleLogout(context, ref),
-                        icon: const Icon(Icons.logout),
-                        label: const Text('로그아웃'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    child: OutlinedButton.icon(
+                      onPressed: () => _handleLogout(context, ref),
+                      icon: const Icon(Icons.logout),
+                      label: const Text('로그아웃'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
                   ),
+                ),
 
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
@@ -682,9 +681,7 @@ class ProfileDetailScreen extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       await ref.read(authProvider.notifier).signOut();
-      if (context.mounted) {
-        Navigator.of(context).pushReplacementNamed('/auth');
-      }
+      // AuthWrapper will automatically show AuthScreen when auth state changes
     }
   }
 }

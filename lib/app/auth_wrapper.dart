@@ -7,6 +7,7 @@ import '../data/providers/user/user_provider.dart';
 // import '../data/providers/infrastructure/sync_manager_provider.dart'; // TODO: Create provider file
 import '../data/providers/communication/fcm_provider.dart';
 import '../shared/utils/logger.dart';
+import '../shared/widgets/welcome_dialog.dart';
 import 'main_navigation.dart';
 
 /// 인증 상태에 따라 적절한 화면을 보여주는 래퍼
@@ -20,6 +21,7 @@ class AuthWrapper extends ConsumerStatefulWidget {
 class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   String? _lastAccountId;
   bool _isInitializing = false;
+  bool _shouldShowWelcome = false;
 
   @override
   void initState() {
@@ -38,12 +40,18 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     if (currentUserId == _lastAccountId) return;
 
     _isInitializing = true;
+    final isNewLogin = _lastAccountId != null && _lastAccountId != currentUserId;
     _lastAccountId = currentUserId;
 
     try {
       // 1. UserProvider 로드
       await ref.read(userProvider.notifier).loadUser(currentUserId);
       Logger.info('사용자 정보 로드 완료: $currentUserId', tag: 'AuthWrapper');
+
+      // Mark to show welcome dialog for new logins (not initial app launch with existing session)
+      if (isNewLogin) {
+        _shouldShowWelcome = true;
+      }
 
       // 2. TODO: ProblemProvider 초기화 (문제 데이터 로드) - Provider 파일 생성 필요
       // ref.read(problemProvider);
@@ -101,6 +109,11 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     if (authState.isLoading ||
         !authState.isAuthenticated ||
         authState.firebaseUser == null) {
+      // Reset tracking on logout so next login triggers initialization
+      if (!authState.isLoading && _lastAccountId != null) {
+        _lastAccountId = null;
+        _shouldShowWelcome = false;
+      }
       return const AuthScreen();
     }
 
@@ -118,8 +131,21 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       Logger.info('프로필 미완성, 프로필 설정 화면으로 이동', tag: 'AuthWrapper');
       return const OnboardingProfileSetupScreen();
     }
-
     // 인증된 상태이고 프로필도 완성된 경우 - 메인 앱으로
+    // Show welcome dialog after login transition completes
+    if (_shouldShowWelcome) {
+      _shouldShowWelcome = false;
+      final authMethod = (authState.isGuest) ? 'guest' : 'email';
+      Future.microtask(() {
+        if (mounted) {
+          WelcomeDialog.show(
+            context,
+            user: user,
+            authMethod: authMethod,
+          );
+        }
+      });
+    }
     return const MainNavigation();
   }
 }
