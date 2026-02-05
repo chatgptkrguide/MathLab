@@ -328,8 +328,45 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
     final progress = progressState.progressMap[lessonId];
 
+    // 레슨 모델 찾기 및 인덱스 확인
+    LessonModel? lesson;
+    int lessonIndex = -1;
+    List<LessonModel>? parentLessons;
+
+    for (final unit in units) {
+      for (int i = 0; i < unit.lessons.length; i++) {
+        if (unit.lessons[i].id == lessonId) {
+          lesson = unit.lessons[i];
+          lessonIndex = i;
+          parentLessons = unit.lessons;
+          break;
+        }
+      }
+      if (lesson != null) break;
+    }
+
+    if (lesson == null) return;
+
+    // 첫 번째 레슨인지 또는 이전 레슨이 완료되었는지 확인
+    bool isAccessible = false;
+
+    if (lessonIndex == 0) {
+      // 첫 번째 레슨은 항상 접근 가능
+      isAccessible = true;
+    } else if (progress != null && progress.status != LessonStatus.locked) {
+      // 이미 잠금 해제된 경우
+      isAccessible = true;
+    } else if (parentLessons != null && lessonIndex > 0) {
+      // 이전 레슨이 완료되었는지 확인
+      final prevLessonId = parentLessons[lessonIndex - 1].id;
+      final prevProgress = progressState.progressMap[prevLessonId];
+      if (prevProgress?.status == LessonStatus.completed) {
+        isAccessible = true;
+      }
+    }
+
     // 잠긴 레슨인 경우
-    if (progress == null || progress.status == LessonStatus.locked) {
+    if (!isAccessible) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('이전 레슨을 먼저 완료해주세요!'),
@@ -341,20 +378,6 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       );
       return;
     }
-
-    // 레슨 모델 찾기
-    LessonModel? lesson;
-    for (final unit in units) {
-      for (final l in unit.lessons) {
-        if (l.id == lessonId) {
-          lesson = l;
-          break;
-        }
-      }
-      if (lesson != null) break;
-    }
-
-    if (lesson == null) return;
 
     // 레슨 시작 기록
     ref.read(lessonProgressProvider(user.id).notifier).startLesson(lessonId);
