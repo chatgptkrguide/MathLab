@@ -30,7 +30,11 @@ class SampleProblems {
         options: ['3', '4', '5', '6'],
         correctAnswer: '5',
         explanation: r'$2 + 3 = 5$입니다. 2개에 3개를 더하면 5개가 됩니다.',
-        hint: '손가락으로 세어보세요!',
+        hints: [
+          '손가락을 사용해서 세어보세요!',
+          r'먼저 손가락 2개를 펴고, 그 다음 3개를 더 펴보세요.',
+          r'$2 + 3$은 2에서 시작해서 3을 세면 됩니다: 3, 4, 5',
+        ],
         points: 10,
       ),
       ProblemModel(
@@ -42,7 +46,11 @@ class SampleProblems {
         options: ['7', '8', '9', '10'],
         correctAnswer: '9',
         explanation: r'$5 + 4 = 9$입니다.',
-        hint: r'5에서 시작해서 4개를 더 세어보세요: $5, 6, 7, 8, 9$',
+        hints: [
+          '5에서 시작해서 세어보세요.',
+          r'5 다음에 4개를 더 세어보세요: 6, 7, 8, 9',
+          r'또는 $5 + 5 = 10$이니까, $5 + 4$는 10보다 1 작아요!',
+        ],
         points: 10,
       ),
       ProblemModel(
@@ -54,6 +62,11 @@ class SampleProblems {
         options: ['8', '9', '10', '11'],
         correctAnswer: '9',
         explanation: r'$7 + 2 = 9$입니다. 7에 2를 더하면 9가 됩니다.',
+        hints: [
+          '7 다음 숫자부터 2개를 세어보세요.',
+          r'$7 + 1 = 8$, 그러면 $7 + 2 = ?$',
+          '7에서 2만 더하면 되니까: 8, 9!',
+        ],
         points: 10,
       ),
       ProblemModel(
@@ -65,7 +78,11 @@ class SampleProblems {
         options: ['7', '8', '9', '10'],
         correctAnswer: '9',
         explanation: r'$3 + 6 = 9$입니다. 이는 $3 + 3 + 3$과 같습니다.',
-        hint: r'$3 + 6$은 $3$을 두 번 더한 것과 같아요!',
+        hints: [
+          '더 큰 수에서 시작하면 더 쉬워요!',
+          r'$3 + 6 = 6 + 3$과 같아요 (교환 법칙)',
+          r'6에서 3을 더해보세요: 7, 8, 9',
+        ],
         points: 15,
       ),
       ProblemModel(
@@ -77,6 +94,11 @@ class SampleProblems {
         options: ['7', '8', '9', '10'],
         correctAnswer: '9',
         explanation: r'$8 + 1 = 9$입니다. 8에 1을 더하면 9가 됩니다.',
+        hints: [
+          '1을 더하면 바로 다음 숫자가 돼요!',
+          r'$8 + 1$은 8 바로 다음 숫자예요.',
+          '8 다음 숫자는? 9!',
+        ],
         points: 10,
       ),
     ];

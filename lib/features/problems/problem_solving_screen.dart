@@ -23,6 +23,8 @@ import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/widgets/input/math_input_field.dart';
 import '../../shared/widgets/input/drag_and_drop_widget.dart';
 import '../../shared/utils/answer_validator.dart';
+import 'widgets/hint_button.dart';
+import 'widgets/hint_popup.dart';
 
 class ProblemSolvingScreen extends ConsumerStatefulWidget {
   final String lessonId;
@@ -50,6 +52,10 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
 
   // For dragAndDrop type
   Map<String, String> _dragDropPlacements = {};
+
+  // 힌트 시스템
+  final Map<String, Set<int>> _unlockedHints = {}; // problemId -> Set of unlocked hint indices
+  static const int _hintXpCost = 10;
 
   @override
   void initState() {
@@ -295,9 +301,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Hint (if available and not answered correctly)
-                    if (currentProblem.hint != null && !isCorrect)
-                      _buildHintCard(currentProblem.hint!),
+                    // 잠금 해제된 힌트 표시
+                    _buildUnlockedHintsSection(currentProblem),
                   ],
                 ),
               ),
@@ -383,28 +388,108 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   Widget _buildHeartsIndicator() {
+    final currentProblem = session.currentProblem;
+    final hints = currentProblem?.allHints ?? [];
+    final user = ref.watch(userProvider);
+    final userXp = user?.xp ?? 0;
+    final problemId = currentProblem?.id ?? '';
+    final unlockedCount = _unlockedHints[problemId]?.length ?? 0;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingMedium,
         vertical: 8,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(
-          5,
-          (index) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Icon(
-              index < session.hearts ? Icons.favorite : Icons.favorite_border,
-              color: index < session.hearts
-                  ? AppColors.mathRed
-                  : AppColors.borderDark,
-              size: 24,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // 힌트 버튼 (힌트가 있을 때만 표시)
+          if (hints.isNotEmpty)
+            HintButton(
+              unlockedCount: unlockedCount,
+              totalHints: hints.length,
+              xpCost: _hintXpCost,
+              isEnabled: !isAnswerChecked,
+              onTap: () => _showHintPopup(currentProblem!, userXp),
+            )
+          else
+            const SizedBox(width: 80),
+          // 하트 표시
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              5,
+              (index) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Icon(
+                  index < session.hearts ? Icons.favorite : Icons.favorite_border,
+                  color: index < session.hearts
+                      ? AppColors.mathRed
+                      : AppColors.borderDark,
+                  size: 24,
+                ),
+              ),
             ),
           ),
-        ),
+          // 균형 유지용 공간
+          const SizedBox(width: 80),
+        ],
       ),
     );
+  }
+
+  /// 힌트 팝업 표시
+  void _showHintPopup(ProblemModel problem, int userXp) {
+    final hints = problem.allHints;
+    if (hints.isEmpty) return;
+
+    final problemId = problem.id;
+    final unlockedSet = _unlockedHints[problemId] ?? <int>{};
+
+    HintPopup.show(
+      context: context,
+      hints: hints,
+      unlockedHints: unlockedSet,
+      userXp: userXp,
+      xpCost: _hintXpCost,
+      onUnlockHint: (index) => _unlockHint(problem, index),
+    );
+  }
+
+  /// 힌트 잠금 해제
+  Future<void> _unlockHint(ProblemModel problem, int hintIndex) async {
+    final user = ref.read(userProvider);
+    if (user == null) return;
+
+    // XP 부족 확인
+    if (user.xp < _hintXpCost) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('XP가 부족합니다. (필요: $_hintXpCost XP)'),
+          backgroundColor: Colors.red[400],
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // XP 차감
+    await ref.read(userProvider.notifier).addXp(-_hintXpCost);
+
+    // 힌트 잠금 해제 상태 업데이트
+    setState(() {
+      if (_unlockedHints[problem.id] == null) {
+        _unlockedHints[problem.id] = <int>{};
+      }
+      _unlockedHints[problem.id]!.add(hintIndex);
+    });
+
+    // 팝업 닫고 다시 열기 (업데이트된 상태 반영)
+    if (mounted) {
+      Navigator.of(context).pop();
+      final updatedUser = ref.read(userProvider);
+      _showHintPopup(problem, updatedUser?.xp ?? 0);
+    }
   }
 
   Widget _buildQuestionCard(ProblemModel problem) {
@@ -585,23 +670,109 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     );
   }
 
-  Widget _buildHintCard(String hint) {
+  /// 잠금 해제된 힌트들 표시
+  Widget _buildUnlockedHintsSection(ProblemModel problem) {
+    final hints = problem.allHints;
+    final unlockedSet = _unlockedHints[problem.id] ?? <int>{};
+
+    if (hints.isEmpty || unlockedSet.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // 잠금 해제된 힌트만 정렬하여 표시
+    final sortedUnlocked = unlockedSet.toList()..sort();
+
+    return Column(
+      children: sortedUnlocked.map((index) {
+        if (index >= hints.length) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _buildHintCard(hints[index], index + 1),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildHintCard(String hint, int hintNumber) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.mathYellow.withValues(alpha: 0.1),
-        border: Border.all(color: AppColors.mathYellow),
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.mathOrange.withValues(alpha: 0.12),
+            AppColors.mathOrange.withValues(alpha: 0.06),
+          ],
+        ),
+        border: Border.all(
+          color: AppColors.mathOrange.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mathOrange.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.lightbulb, color: AppColors.mathYellow),
+          // 힌트 번호 배지
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.mathOrange, Color(0xFFE67E22)],
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.mathOrange.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '$hintNumber',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
-            child: MathRichText(
-              text: hint,
-              textStyle: AppTextStyles.bodyMedium,
-              mathFontSize: 16.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '힌트 $hintNumber',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.mathOrange,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                MathRichText(
+                  text: hint,
+                  textStyle: AppTextStyles.bodyMedium.copyWith(
+                    height: 1.5,
+                  ),
+                  mathFontSize: 16.0,
+                ),
+              ],
             ),
           ),
         ],

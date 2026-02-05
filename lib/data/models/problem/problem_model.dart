@@ -11,7 +11,8 @@ class ProblemModel {
   final List<String> options; // For multiple choice
   final String correctAnswer;
   final String? explanation; // Explanation for the answer
-  final String? hint; // Hint for the problem
+  final String? hint; // Hint for the problem (legacy, use hints instead)
+  final List<String> hints; // Step-by-step hints (단계별 힌트)
   final int points; // Points awarded for correct answer
   final String? imageUrl; // Optional image for the problem
 
@@ -25,9 +26,17 @@ class ProblemModel {
     required this.correctAnswer,
     this.explanation,
     this.hint,
+    this.hints = const [],
     this.points = 10,
     this.imageUrl,
   });
+
+  /// 모든 힌트 가져오기 (hints 리스트 또는 레거시 hint)
+  List<String> get allHints {
+    if (hints.isNotEmpty) return hints;
+    if (hint != null) return [hint!];
+    return [];
+  }
 
   factory ProblemModel.fromJson(Map<String, dynamic> json) {
     return ProblemModel(
@@ -46,6 +55,7 @@ class ProblemModel {
       correctAnswer: json['correctAnswer'] as String,
       explanation: json['explanation'] as String?,
       hint: json['hint'] as String?,
+      hints: List<String>.from(json['hints'] ?? []),
       points: json['points'] as int? ?? 10,
       imageUrl: json['imageUrl'] as String?,
     );
@@ -62,6 +72,7 @@ class ProblemModel {
       'correctAnswer': correctAnswer,
       'explanation': explanation,
       'hint': hint,
+      'hints': hints,
       'points': points,
       'imageUrl': imageUrl,
     };
