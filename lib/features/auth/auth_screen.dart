@@ -5,10 +5,9 @@ import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_durations.dart';
 import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
-import 'widgets/widgets.dart';
 
-/// 피그마 "00 홈1" 디자인 기반 로그인 화면
-/// 다크 퍼플 배경 + Chatbot 캐릭터 + 로그인 버튼들
+/// 피그마 디자인 기반 로그인 화면
+/// 파란 배경 + 로봇 캐릭터 + 로그인 버튼들
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
@@ -71,7 +70,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       mounted: mounted,
     );
 
-    // AuthWrapper will handle navigation via state change
     if (mounted) {
       setState(() => _isLoading = false);
     }
@@ -87,7 +85,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       mounted: mounted,
     );
 
-    // AuthWrapper will handle navigation via state change
     if (mounted) {
       setState(() => _isLoading = false);
     }
@@ -103,7 +100,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       mounted: mounted,
     );
 
-    // AuthWrapper will handle navigation via state change
     if (mounted) {
       setState(() => _isLoading = false);
     }
@@ -115,32 +111,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         builder: (context) => const EmailLoginScreen(),
       ),
     );
-
-    // AuthWrapper will handle navigation via state change
-  }
-
-  Widget _buildAssetImageOrFallback(
-    String assetPath, {
-    double? width,
-    double? height,
-    String? fallbackText,
-    TextStyle? style,
-    Widget? fallbackWidget,
-  }) {
-    return Image.asset(
-      assetPath,
-      width: width,
-      height: height,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        if (fallbackWidget != null) return fallbackWidget;
-        return Text(
-          fallbackText ?? '',
-          style: style,
-          textAlign: TextAlign.center,
-        );
-      },
-    );
   }
 
   @override
@@ -148,8 +118,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      // 피그마 디자인의 다크 퍼플 배경색 (#211E41)
-      backgroundColor: const Color(0xFF211E41),
+      // 피그마 디자인의 파란 배경색 (figma_home_reference.png 참고)
+      backgroundColor: const Color(0xFF5BA4E6),
       body: SafeArea(
         child: Stack(
           children: [
@@ -157,140 +127,114 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             SingleChildScrollView(
               child: Container(
                 constraints: BoxConstraints(
-                    minHeight:
-                        size.height - MediaQuery.of(context).padding.top),
+                  minHeight: size.height - MediaQuery.of(context).padding.top,
+                ),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.screenHorizontalPadding),
+                  horizontal: AppDimensions.screenHorizontalPadding,
+                ),
                 child: Column(
                   children: [
-                    // 상단 영역: Math is + Fun!!! + Chatbot (겹침)
-                    Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
-                      children: [
-                        // 배경 텍스트들 (뒤쪽 레이어)
-                        Column(
-                          children: [
-                            SizedBox(
-                                height: AppDimensions.authMathIsTopSpacing),
-                            // "Math is" (회전됨, 약간 기울어짐)
-                            Transform.rotate(
-                              angle: -0.0098,
-                              child: FadeTransition(
-                                opacity: _fadeAnimation,
-                                child: _buildAssetImageOrFallback(
-                                  'assets/images/login/math_is_text.png',
-                                  fallbackWidget: ShaderMask(
-                                    shaderCallback: (bounds) => const LinearGradient(
-                                      colors: [Colors.white, Color(0xFFB8C4FF)],
-                                    ).createShader(bounds),
-                                    child: const Text(
-                                      'Math is',
-                                      style: TextStyle(
-                                        fontSize: 48,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        letterSpacing: 2,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                    const SizedBox(height: 40),
+
+                    // 로봇 캐릭터 (피그마 디자인)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Image.asset(
+                        'assets/images/login/chatbot.png',
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 180,
+                            height: 180,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.2),
                             ),
-                            SizedBox(
-                                height: AppDimensions.authMathIsFunSpacing),
-                            // "Fun!!!"
-                            FadeTransition(
-                              opacity: _fadeAnimation,
-                              child: _buildAssetImageOrFallback(
-                                'assets/images/login/fun_text.png',
-                                fallbackWidget: ShaderMask(
-                                  shaderCallback: (bounds) => const LinearGradient(
-                                    colors: [Color(0xFF58CC02), Color(0xFF7BE834)],
-                                  ).createShader(bounds),
-                                  child: const Text(
-                                    'Fun!!!',
-                                    style: TextStyle(
-                                      fontSize: 56,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
-                                      letterSpacing: 3,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            child: const Icon(
+                              Icons.smart_toy_rounded,
+                              size: 100,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // "오늘의 목표" 카드 (피그마 스타일)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        // Chatbot 캐릭터 (앞쪽 레이어, 텍스트 위에)
-                        Positioned(
-                          top: AppDimensions.authChatbotTopPosition,
-                          child: FadeTransition(
-                            opacity: _fadeAnimation,
-                            child: _buildAssetImageOrFallback(
-                              'assets/images/login/chatbot.png',
-                              width: AppDimensions.chatbotImageSize,
-                              height: AppDimensions.chatbotImageSize,
-                              fallbackWidget: Container(
-                                width: AppDimensions.chatbotImageSize * 0.7,
-                                height: AppDimensions.chatbotImageSize * 0.7,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [Color(0xFF58CC02), Color(0xFF7BE834)],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF58CC02).withOpacity(0.4),
-                                      blurRadius: 24,
-                                      spreadRadius: 4,
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.smart_toy_rounded,
-                                  size: AppDimensions.chatbotImageSize * 0.35,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20), // Stack과 GoMath Lab 사이 간격
-
-                    // "GoMath Lab" 텍스트 (Chatbot 바로 아래)
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: _buildAssetImageOrFallback(
-                        'assets/images/login/gomath_lab_text.png',
-                        fallbackWidget: Column(
+                        child: Column(
                           children: [
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [Colors.white, Color(0xFFD0D8FF)],
-                              ).createShader(bounds),
-                              child: const Text(
-                                'GoMath Lab',
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 2,
+                            Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF5BA4E6).withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.flag_rounded,
+                                    color: Color(0xFF5BA4E6),
+                                    size: 28,
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        '수학 학습을 시작하세요!',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF1A1A2E),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '매일 조금씩, 재미있게 배워요',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '수학을 재미있게, 매일 조금씩',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.6),
-                                letterSpacing: 0.5,
+                            const SizedBox(height: 16),
+                            // 진행바
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: LinearProgressIndicator(
+                                value: 0.0,
+                                backgroundColor: Colors.grey[200],
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF58CC02),
+                                ),
+                                minHeight: 8,
                               ),
                             ),
                           ],
@@ -298,9 +242,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       ),
                     ),
 
-                    SizedBox(
-                        height: AppDimensions
-                            .authGomathButtonSpacing), // GoMath Lab과 버튼 사이 간격
+                    const SizedBox(height: 32),
 
                     // 버튼들 (애니메이션)
                     SlideTransition(
@@ -309,21 +251,32 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         opacity: _fadeAnimation,
                         child: Column(
                           children: [
-                            // 시작하기 버튼 (메인) - 더 크고 눈에 띄게
-                            AuthMainButton(
-                              text: '시작하기',
-                              onPressed: _handleGuestStart,
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF58CC02),
-                                  Color(0xFF46A302),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
+                            // 시작하기 버튼 (메인 - 초록색)
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: _handleGuestStart,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF58CC02),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shadowColor: const Color(0xFF58CC02).withOpacity(0.4),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text(
+                                  '학습 시작하기',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
 
-                            SizedBox(height: AppDimensions.authButtonSpacing),
+                            const SizedBox(height: 16),
 
                             // 구분선
                             Row(
@@ -331,62 +284,61 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withValues(alpha: 0.2),
+                                    color: Colors.white.withOpacity(0.4),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
                                     '또는',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.6),
+                                      color: Colors.white.withOpacity(0.9),
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withValues(alpha: 0.2),
+                                    color: Colors.white.withOpacity(0.4),
                                   ),
                                 ),
                               ],
                             ),
 
-                            SizedBox(
-                                height: AppDimensions.authDividerButtonSpacing),
+                            const SizedBox(height: 16),
 
                             // Google 로그인
-                            AuthSocialButton(
+                            _buildSocialButton(
                               text: 'Google로 계속하기',
-                              icon: Icons.g_mobiledata,
+                              icon: 'assets/icons/google_icon.png',
+                              fallbackIcon: Icons.g_mobiledata,
                               backgroundColor: Colors.white,
-                              textColor: const Color(0xFF211E41),
+                              textColor: const Color(0xFF1A1A2E),
                               onPressed: _handleGoogleLogin,
                             ),
 
-                            SizedBox(
-                                height: AppDimensions.authButtonSmallSpacing),
+                            const SizedBox(height: 12),
 
                             // Kakao 로그인
-                            AuthSocialButton(
+                            _buildSocialButton(
                               text: 'Kakao로 계속하기',
-                              icon: Icons.chat_bubble,
+                              icon: 'assets/icons/kakao_icon.png',
+                              fallbackIcon: Icons.chat_bubble,
                               backgroundColor: AppColors.kakaoYellow,
                               textColor: AppColors.kakaoBrown,
                               onPressed: _handleKakaoLogin,
                             ),
 
-                            SizedBox(
-                                height: AppDimensions.authButtonSmallSpacing),
+                            const SizedBox(height: 12),
 
                             // Email 로그인
-                            AuthSocialButton(
+                            _buildSocialButton(
                               text: '이메일로 계속하기',
-                              icon: Icons.email,
-                              backgroundColor: const Color(0xFF2D2A4A),
+                              icon: null,
+                              fallbackIcon: Icons.email_outlined,
+                              backgroundColor: Colors.white.withOpacity(0.2),
                               textColor: Colors.white,
                               onPressed: _handleEmailLogin,
                             ),
@@ -395,25 +347,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       ),
                     ),
 
-                    // 버튼 아래 공간 (로고까지)
-                    SizedBox(height: size.height * 0.06),
+                    const SizedBox(height: 40),
 
-                    // 로고 (맨 아래)
+                    // 하단 로고
                     FadeTransition(
                       opacity: _fadeAnimation,
-                      child: _buildAssetImageOrFallback(
+                      child: Image.asset(
                         'assets/images/login/logo.png',
-                        width: AppDimensions.logoWidth,
-                        height: AppDimensions.logoHeight,
-                        fallbackWidget: Icon(
-                          Icons.calculate_rounded,
-                          size: AppDimensions.logoHeight,
-                          color: Colors.white54,
-                        ),
+                        height: 40,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Text(
+                            'GoMath',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
                       ),
                     ),
 
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -429,6 +385,56 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({
+    required String text,
+    required String? icon,
+    required IconData fallbackIcon,
+    required Color backgroundColor,
+    required Color textColor,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Image.asset(
+                icon,
+                width: 24,
+                height: 24,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(fallbackIcon, size: 24, color: textColor);
+                },
+              )
+            else
+              Icon(fallbackIcon, size: 24, color: textColor),
+            const SizedBox(width: 12),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
+            ),
           ],
         ),
       ),

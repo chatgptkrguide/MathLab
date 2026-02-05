@@ -99,6 +99,7 @@ app.*.map.json
 # Exceptions for small icons
 !**/assets/icons/*.png
 !**/assets/images/*.png
+!**/assets/images/**/*.png
 !web/icons/*.png
 !web/favicon.png
 .vercel
