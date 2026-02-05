@@ -2,6 +2,8 @@
 ///
 /// Represents a problem that was answered incorrectly
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class WrongAnswerModel {
   final String id;
   final String userId;
@@ -58,6 +60,51 @@ class WrongAnswerModel {
           : null,
     );
   }
+
+  /// Firestore에서 문서 변환
+  factory WrongAnswerModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return WrongAnswerModel(
+      id: doc.id,
+      userId: data['userId'] as String? ?? '',
+      problemId: data['problemId'] as String? ?? '',
+      lessonId: data['lessonId'] as String? ?? '',
+      lessonName: data['lessonName'] as String? ?? '',
+      unitName: data['unitName'] as String? ?? '',
+      problemText: data['problemText'] as String? ?? '',
+      userAnswer: data['userAnswer'] as String? ?? '',
+      correctAnswer: data['correctAnswer'] as String? ?? '',
+      explanation: data['explanation'] as String?,
+      attemptDate: data['attemptDate'] != null
+          ? (data['attemptDate'] as Timestamp).toDate()
+          : DateTime.now(),
+      attemptCount: data['attemptCount'] as int? ?? 1,
+      isRetried: data['isRetried'] as bool? ?? false,
+      isResolved: data['isResolved'] as bool? ?? false,
+      resolvedDate: data['resolvedDate'] != null
+          ? (data['resolvedDate'] as Timestamp).toDate()
+          : null,
+    );
+  }
+
+  /// Firestore 저장용 맵 변환
+  Map<String, dynamic> toFirestore() => {
+        'userId': userId,
+        'problemId': problemId,
+        'lessonId': lessonId,
+        'lessonName': lessonName,
+        'unitName': unitName,
+        'problemText': problemText,
+        'userAnswer': userAnswer,
+        'correctAnswer': correctAnswer,
+        'explanation': explanation,
+        'attemptDate': Timestamp.fromDate(attemptDate),
+        'attemptCount': attemptCount,
+        'isRetried': isRetried,
+        'isResolved': isResolved,
+        'resolvedDate':
+            resolvedDate != null ? Timestamp.fromDate(resolvedDate!) : null,
+      };
 
   Map<String, dynamic> toJson() => {
         'id': id,

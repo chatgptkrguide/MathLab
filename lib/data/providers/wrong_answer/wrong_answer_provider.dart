@@ -1,11 +1,11 @@
 /// 📝 Wrong Answer Provider
 ///
-/// Manages wrong answer state and operations
+/// Manages wrong answer state and operations with Firestore
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../../models/wrong_answer_model.dart';
-import '../api_provider.dart';
 
 final logger = Logger();
 
@@ -60,31 +60,31 @@ enum WrongAnswerFilter {
   resolved,
 }
 
-/// Wrong Answer Notifier
+/// Wrong Answer Notifier - Firestore 직접 연동
 class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
-  final Ref _ref;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String userId;
 
-  WrongAnswerNotifier(this._ref, this.userId)
-      : super(const WrongAnswerState()) {
+  WrongAnswerNotifier(this.userId) : super(const WrongAnswerState()) {
     loadWrongAnswers();
   }
+
+  /// Firestore 컬렉션 참조
+  CollectionReference<Map<String, dynamic>> get _collection =>
+      _firestore.collection('users').doc(userId).collection('wrongAnswers');
 
   /// Load all wrong answers for the user
   Future<void> loadWrongAnswers() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final lessonAPI = _ref.read(lessonAPIProvider);
+      final snapshot = await _collection
+          .orderBy('attemptDate', descending: true)
+          .get();
 
-      final wrongAnswersData = await lessonAPI.getWrongAnswers(userId: userId);
-
-      final wrongAnswers = (wrongAnswersData as List)
-          .map((data) => WrongAnswerModel.fromJson(data))
+      final wrongAnswers = snapshot.docs
+          .map((doc) => WrongAnswerModel.fromFirestore(doc))
           .toList();
-
-      // Sort by date (most recent first)
-      wrongAnswers.sort((a, b) => b.attemptDate.compareTo(a.attemptDate));
 
       state = state.copyWith(
         wrongAnswers: wrongAnswers,
@@ -92,7 +92,7 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
         isLoading: false,
       );
 
-      logger.i('Loaded ${wrongAnswers.length} wrong answers');
+      logger.i('Loaded ${wrongAnswers.length} wrong answers from Firestore');
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -127,20 +127,41 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
     );
   }
 
+  /// Add a wrong answer to Firestore
+  Future<void> addWrongAnswer(WrongAnswerModel wrongAnswer) async {
+    try {
+      final docRef = await _collection.add(wrongAnswer.toFirestore());
+
+      final newWrongAnswer = wrongAnswer.copyWith(id: docRef.id);
+      final updatedAnswers = [newWrongAnswer, ...state.wrongAnswers];
+
+      state = state.copyWith(
+        wrongAnswers: updatedAnswers,
+        filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
+      );
+
+      logger.i('Added wrong answer: ${docRef.id}');
+    } catch (e) {
+      logger.e('Failed to add wrong answer: $e');
+      state = state.copyWith(error: e.toString());
+    }
+  }
+
   /// Retry a wrong answer
   Future<void> retryWrongAnswer(String wrongAnswerId) async {
     try {
-      final lessonAPI = _ref.read(lessonAPIProvider);
-
-      await lessonAPI.retryWrongAnswer(
-        userId: userId,
-        wrongAnswerId: wrongAnswerId,
-      );
+      await _collection.doc(wrongAnswerId).update({
+        'isRetried': true,
+        'attemptCount': FieldValue.increment(1),
+      });
 
       // Update local state
       final updatedAnswers = state.wrongAnswers.map((w) {
         if (w.id == wrongAnswerId) {
-          return w.copyWith(isRetried: true);
+          return w.copyWith(
+            isRetried: true,
+            attemptCount: w.attemptCount + 1,
+          );
         }
         return w;
       }).toList();
@@ -160,12 +181,10 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
   /// Mark wrong answer as resolved
   Future<void> markAsResolved(String wrongAnswerId) async {
     try {
-      final lessonAPI = _ref.read(lessonAPIProvider);
-
-      await lessonAPI.resolveWrongAnswer(
-        userId: userId,
-        wrongAnswerId: wrongAnswerId,
-      );
+      await _collection.doc(wrongAnswerId).update({
+        'isResolved': true,
+        'resolvedDate': Timestamp.now(),
+      });
 
       // Update local state
       final updatedAnswers = state.wrongAnswers.map((w) {
@@ -186,6 +205,26 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
       logger.i('Marked wrong answer as resolved: $wrongAnswerId');
     } catch (e) {
       logger.e('Failed to mark as resolved: $e');
+      state = state.copyWith(error: e.toString());
+    }
+  }
+
+  /// Delete a wrong answer
+  Future<void> deleteWrongAnswer(String wrongAnswerId) async {
+    try {
+      await _collection.doc(wrongAnswerId).delete();
+
+      final updatedAnswers =
+          state.wrongAnswers.where((w) => w.id != wrongAnswerId).toList();
+
+      state = state.copyWith(
+        wrongAnswers: updatedAnswers,
+        filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
+      );
+
+      logger.i('Deleted wrong answer: $wrongAnswerId');
+    } catch (e) {
+      logger.e('Failed to delete wrong answer: $e');
       state = state.copyWith(error: e.toString());
     }
   }
@@ -219,10 +258,10 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
   }
 }
 
-/// Wrong Answer Provider
+/// Wrong Answer Provider - Firestore 직접 연동
 final wrongAnswerProvider = StateNotifierProvider.family<
     WrongAnswerNotifier,
     WrongAnswerState,
     String>(
-  (ref, userId) => WrongAnswerNotifier(ref, userId),
+  (ref, userId) => WrongAnswerNotifier(userId),
 );
