@@ -168,7 +168,11 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
                 final progress = widget.progressMap[lesson.id];
                 final position = nodePositions[index];
                 final isCurrent = index == _currentLessonIndex;
-                final status = progress?.status ?? LessonStatus.locked;
+                // 첫 번째 레슨은 항상 잠금 해제, 또는 이전 레슨이 완료된 경우
+                final isFirstOrPreviousCompleted = index == 0 ||
+                    (index > 0 && widget.progressMap[widget.lessons[index - 1].id]?.status == LessonStatus.completed);
+                final status = progress?.status ??
+                    (isFirstOrPreviousCompleted ? LessonStatus.unlocked : LessonStatus.locked);
                 final isUnlocked = status != LessonStatus.locked;
 
                 // 스태거드 입장 progress (0~1)

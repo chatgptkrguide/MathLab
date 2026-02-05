@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/figma_colors.dart';
+import '../../lessons/figma/lessons_screen_figma.dart';
 
 /// 피그마 "00 home" 딥블루(#0014F7) CTA 버튼 + 재생 아이콘
 class HomeStartButton extends StatelessWidget {
@@ -10,7 +11,14 @@ class HomeStartButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LessonsScreenFigma(),
+            ),
+          );
+        },
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 18),
