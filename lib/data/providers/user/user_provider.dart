@@ -12,7 +12,7 @@ import '../../models/user/user_model.dart';
 
 part 'user_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class User extends _$User {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 

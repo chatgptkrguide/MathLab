@@ -67,8 +67,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       }
 
       if (mounted && success) {
-        // Navigate to home screen
-        Navigator.of(context).pushReplacementNamed('/home');
+        // Pop back - AuthWrapper will handle navigation via state change
+        Navigator.of(context).pop(true);
       }
     } finally {
       if (mounted) {
@@ -289,7 +289,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                           );
 
                           if (mounted && success) {
-                            Navigator.of(context).pushReplacementNamed('/home');
+                            Navigator.of(context).pop(true);
                           }
                         },
                   icon: Image.asset(
@@ -322,7 +322,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                           );
 
                           if (mounted && success) {
-                            Navigator.of(context).pushReplacementNamed('/home');
+                            Navigator.of(context).pop(true);
                           }
                         },
                   icon: Image.asset(

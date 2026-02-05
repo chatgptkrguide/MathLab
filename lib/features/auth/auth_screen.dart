@@ -65,17 +65,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
-    final success = await AuthHandler.handleGuestStart(
+    await AuthHandler.handleGuestStart(
       context: context,
       ref: ref,
       mounted: mounted,
     );
 
+    // AuthWrapper will handle navigation via state change
     if (mounted) {
       setState(() => _isLoading = false);
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
     }
   }
 
@@ -83,17 +81,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
-    final success = await AuthHandler.handleGoogleLogin(
+    await AuthHandler.handleGoogleLogin(
       context: context,
       ref: ref,
       mounted: mounted,
     );
 
+    // AuthWrapper will handle navigation via state change
     if (mounted) {
       setState(() => _isLoading = false);
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
     }
   }
 
@@ -101,30 +97,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
-    final success = await AuthHandler.handleKakaoLogin(
+    await AuthHandler.handleKakaoLogin(
       context: context,
       ref: ref,
       mounted: mounted,
     );
 
+    // AuthWrapper will handle navigation via state change
     if (mounted) {
       setState(() => _isLoading = false);
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
     }
   }
 
   Future<void> _handleEmailLogin() async {
-    final result = await Navigator.of(context).push<bool>(
+    await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => const EmailLoginScreen(),
       ),
     );
 
-    if (result == true && mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
-    }
+    // AuthWrapper will handle navigation via state change
   }
 
   Widget _buildAssetImageOrFallback(

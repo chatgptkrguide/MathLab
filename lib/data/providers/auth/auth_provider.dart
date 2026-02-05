@@ -13,6 +13,7 @@ import '../../../core/error/app_error.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../models/user/user_model.dart';
+import '../../services/temp_profile_storage.dart';
 import '../user/user_provider.dart';
 
 part 'auth_provider.g.dart';
@@ -56,7 +57,7 @@ class AuthState {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Auth extends _$Auth {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -399,6 +400,25 @@ class Auth extends _$Auth {
         error: '게스트 로그인 중 오류가 발생했습니다',
       );
       return false;
+    }
+  }
+
+  // ========================================
+  // Profile Management
+  // ========================================
+
+  /// Apply temporary profile data to the user account in Firestore
+  Future<void> applyTempProfileToAccount(TempProfileData profileData) async {
+    try {
+      AppLogger.info('Applying temp profile to account', tag: 'Auth');
+
+      await ref.read(userProvider.notifier).updateProfile(
+            displayName: profileData.name,
+          );
+
+      AppLogger.info('Temp profile applied successfully', tag: 'Auth');
+    } catch (e, st) {
+      AppLogger.error('Failed to apply temp profile', tag: 'Auth', error: e, stackTrace: st);
     }
   }
 

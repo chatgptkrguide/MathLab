@@ -14,6 +14,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'core/config/env_config.dart';
 import 'core/utils/app_logger.dart';
+import 'app/auth_wrapper.dart';
 import 'app/main_navigation.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/home/home_screen_figma.dart';
@@ -243,8 +244,8 @@ class MathLabApp extends StatelessWidget {
         ),
       ),
 
-      // Routes
-      initialRoute: '/auth',
+      // Routes - AuthWrapper handles auth state and shows appropriate screen
+      home: const AuthWrapper(),
       routes: {
         '/auth': (context) => const AuthScreen(),
         '/home': (context) => const MainNavigation(),
