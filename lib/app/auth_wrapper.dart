@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/auth/auth_screen.dart';
@@ -136,10 +138,11 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     if (_shouldShowWelcome) {
       _shouldShowWelcome = false;
       final authMethod = (authState.isGuest) ? 'guest' : 'email';
+      final currentContext = context;
       Future.microtask(() {
         if (mounted) {
           WelcomeDialog.show(
-            context,
+            currentContext,
             user: user,
             authMethod: authMethod,
           );

@@ -287,7 +287,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             mounted: mounted,
                           );
 
-                          if (mounted && success) {
+                          if (mounted && success && context.mounted) {
                             Navigator.of(context).pop(true);
                           }
                         },
@@ -320,7 +320,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             mounted: mounted,
                           );
 
-                          if (mounted && success) {
+                          if (mounted && success && context.mounted) {
                             Navigator.of(context).pop(true);
                           }
                         },

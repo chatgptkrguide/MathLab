@@ -9,6 +9,7 @@
 // final kakaoKey = EnvConfig.kakaoNativeAppKey;
 // ```
 
+import 'dart:developer' as developer;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EnvConfig {
@@ -188,14 +189,14 @@ class EnvConfig {
       throw UnsupportedError('Cannot print config in production environment');
     }
 
-    print('=== Environment Configuration ===');
-    print('Environment: $appEnv');
-    print('API Base URL: $apiBaseUrl');
-    print('Logging Enabled: $enableLogging');
-    print('Kakao Key: ${_maskSecret(kakaoNativeAppKey)}');
-    print('Google Client ID: ${_maskSecret(googleWebClientId)}');
-    print('FCM Sender ID: ${_maskSecret(fcmSenderId)}');
-    print('================================');
+    developer.log('=== Environment Configuration ===');
+    developer.log('Environment: $appEnv');
+    developer.log('API Base URL: $apiBaseUrl');
+    developer.log('Logging Enabled: $enableLogging');
+    developer.log('Kakao Key: ${_maskSecret(kakaoNativeAppKey)}');
+    developer.log('Google Client ID: ${_maskSecret(googleWebClientId)}');
+    developer.log('FCM Sender ID: ${_maskSecret(fcmSenderId)}');
+    developer.log('================================');
   }
 
   /// Mask secret values for safe logging

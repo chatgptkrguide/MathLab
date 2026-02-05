@@ -277,6 +277,7 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
   }
 
   /// Show the achievement unlock dialog
+  // ignore: unused_element
   static void show(BuildContext context, AchievementModel achievement) {
     showDialog(
       context: context,
