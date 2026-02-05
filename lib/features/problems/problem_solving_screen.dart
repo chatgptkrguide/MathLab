@@ -401,7 +401,6 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
         vertical: 8,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 힌트 버튼 (힌트가 있을 때만 표시)
           if (hints.isNotEmpty)
@@ -413,26 +412,26 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
               onTap: () => _showHintPopup(currentProblem!, userXp),
             )
           else
-            const SizedBox(width: 80),
-          // 하트 표시
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(
-              5,
-              (index) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Icon(
-                  index < session.hearts ? Icons.favorite : Icons.favorite_border,
-                  color: index < session.hearts
-                      ? AppColors.mathRed
-                      : AppColors.borderDark,
-                  size: 24,
+            const SizedBox(width: 16),
+          // 하트 표시 (가운데 정렬)
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                5,
+                (index) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: Icon(
+                    index < session.hearts ? Icons.favorite : Icons.favorite_border,
+                    color: index < session.hearts
+                        ? AppColors.mathRed
+                        : AppColors.borderDark,
+                    size: 22,
+                  ),
                 ),
               ),
             ),
           ),
-          // 균형 유지용 공간
-          const SizedBox(width: 80),
         ],
       ),
     );
