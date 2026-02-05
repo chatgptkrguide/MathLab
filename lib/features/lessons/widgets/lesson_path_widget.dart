@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/models/lesson/lesson_progress_model.dart';
 import '../../../shared/constants/figma_colors.dart';
@@ -7,6 +9,7 @@ import 'curved_path_painter.dart';
 /// 듀오링고 스타일 학습 경로 위젯
 ///
 /// S자 곡선 경로 위에 레슨 노드를 배치하는 스크롤 가능한 위젯.
+/// 스태거드 입장, 탭 스프링, 경로 진행 애니메이션 포함.
 class LessonPathWidget extends StatefulWidget {
   final List<LessonModel> lessons;
   final Map<String, LessonProgressModel> progressMap;
@@ -25,16 +28,30 @@ class LessonPathWidget extends StatefulWidget {
 
 class _LessonPathWidgetState extends State<LessonPathWidget>
     with TickerProviderStateMixin {
+  // 기존 pulse 애니메이션
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+
+  // 스태거드 입장 애니메이션
+  late AnimationController _entranceController;
+
+  // 경로 진행 애니메이션
+  late AnimationController _pathProgressController;
+  late Animation<double> _pathProgressAnimation;
+
+  // 탭 스프링 상태 (인덱스별)
+  final Map<int, AnimationController> _tapControllers = {};
 
   static const double _nodeSize = 80.0;
   static const double _verticalSpacing = 140.0;
   static const double _startY = 60.0;
 
+
   @override
   void initState() {
     super.initState();
+
+    // Pulse (현재 노드 숨쉬기)
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -42,11 +59,50 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+
+    // 스태거드 입장
+    _entranceController = AnimationController(
+      duration: Duration(
+        milliseconds: 500 + (widget.lessons.length * 80),
+      ),
+      vsync: this,
+    )..forward();
+
+    // 경로 진행 애니메이션
+    _pathProgressController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    _pathProgressAnimation = CurvedAnimation(
+      parent: _pathProgressController,
+      curve: Curves.easeInOut,
+    );
+    // 약간 딜레이 후 경로 그리기 시작
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _pathProgressController.forward();
+    });
+  }
+
+  AnimationController _getTapController(int index) {
+    if (!_tapControllers.containsKey(index)) {
+      _tapControllers[index] = AnimationController(
+        duration: const Duration(milliseconds: 200),
+        vsync: this,
+        lowerBound: 0.0,
+        upperBound: 1.0,
+      );
+    }
+    return _tapControllers[index]!;
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
+    _entranceController.dispose();
+    _pathProgressController.dispose();
+    for (final c in _tapControllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -63,7 +119,6 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
     return count;
   }
 
-  /// 현재 활성 레슨의 인덱스 (START 배지 표시할 곳)
   int get _currentLessonIndex {
     for (int i = 0; i < widget.lessons.length; i++) {
       final progress = widget.progressMap[widget.lessons[i].id];
@@ -92,71 +147,134 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
 
     return SizedBox(
       height: totalHeight,
-      child: Stack(
-        children: [
-          // 배경 곡선 경로
-          CustomPaint(
-            size: Size(screenWidth, totalHeight),
-            painter: CurvedPathPainter(
-              nodePositions: nodePositions,
-              completedCount: _completedCount,
-            ),
-          ),
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_entranceController, _pathProgressAnimation]),
+        builder: (context, _) {
+          return Stack(
+            children: [
+              // 배경 곡선 경로 (애니메이션 진행)
+              CustomPaint(
+                size: Size(screenWidth, totalHeight),
+                painter: CurvedPathPainter(
+                  nodePositions: nodePositions,
+                  completedCount: _completedCount,
+                  pathProgress: _pathProgressAnimation.value,
+                ),
+              ),
 
-          // 레슨 노드들
-          ...List.generate(widget.lessons.length, (index) {
-            final lesson = widget.lessons[index];
-            final progress = widget.progressMap[lesson.id];
-            final position = nodePositions[index];
-            final isCurrent = index == _currentLessonIndex;
-            final status = progress?.status ?? LessonStatus.locked;
-            final isUnlocked = status != LessonStatus.locked;
+              // 레슨 노드들 (스태거드 입장)
+              ...List.generate(widget.lessons.length, (index) {
+                final lesson = widget.lessons[index];
+                final progress = widget.progressMap[lesson.id];
+                final position = nodePositions[index];
+                final isCurrent = index == _currentLessonIndex;
+                final status = progress?.status ?? LessonStatus.locked;
+                final isUnlocked = status != LessonStatus.locked;
 
-            return Positioned(
-              left: position.dx - (_nodeSize / 2),
-              top: position.dy - (_nodeSize / 2),
-              child: Column(
-                children: [
-                  // START 배지 (현재 레슨에만)
-                  if (isCurrent && isUnlocked && status != LessonStatus.completed)
-                    _buildStartBadge(),
+                // 스태거드 입장 progress (0~1)
+                final staggerStart = (index * 80) /
+                    (500 + widget.lessons.length * 80).toDouble();
+                final staggerEnd = ((index * 80) + 500) /
+                    (500 + widget.lessons.length * 80).toDouble();
+                final entranceProgress = Curves.elasticOut.transform(
+                  ((_entranceController.value - staggerStart) /
+                          (staggerEnd - staggerStart))
+                      .clamp(0.0, 1.0),
+                );
 
-                  // 레슨 노드
-                  GestureDetector(
-                    onTap: isUnlocked
-                        ? () => widget.onLessonTap(lesson.id)
-                        : null,
-                    child: isCurrent && isUnlocked && status != LessonStatus.completed
-                        ? ScaleTransition(
-                            scale: _pulseAnimation,
-                            child: _buildNode(lesson, status, progress?.stars ?? 0),
-                          )
-                        : _buildNode(lesson, status, progress?.stars ?? 0),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // 레슨 제목
-                  SizedBox(
-                    width: 100,
-                    child: Text(
-                      lesson.title,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: isUnlocked ? FontWeight.w600 : FontWeight.normal,
-                        color: isUnlocked ? Colors.white : Colors.white54,
+                return Positioned(
+                  left: position.dx - (_nodeSize / 2),
+                  top: position.dy - (_nodeSize / 2),
+                  child: Transform.scale(
+                    scale: entranceProgress,
+                    child: Opacity(
+                      opacity: entranceProgress.clamp(0.0, 1.0),
+                      child: _buildNodeColumn(
+                        index: index,
+                        lesson: lesson,
+                        status: status,
+                        stars: progress?.stars ?? 0,
+                        isCurrent: isCurrent,
+                        isUnlocked: isUnlocked,
                       ),
                     ),
                   ),
-                ],
-              ),
-            );
-          }),
-        ],
+                );
+              }),
+            ],
+          );
+        },
       ),
+    );
+  }
+
+  Widget _buildNodeColumn({
+    required int index,
+    required LessonModel lesson,
+    required LessonStatus status,
+    required int stars,
+    required bool isCurrent,
+    required bool isUnlocked,
+  }) {
+    final tapCtrl = _getTapController(index);
+
+    return Column(
+      children: [
+        // START 배지 (현재 레슨에만)
+        if (isCurrent && isUnlocked && status != LessonStatus.completed)
+          _buildStartBadge(),
+
+        // 레슨 노드 + 탭 스프링
+        GestureDetector(
+          onTapDown: isUnlocked
+              ? (_) {
+                  HapticFeedback.lightImpact();
+                  tapCtrl.forward();
+                }
+              : null,
+          onTapUp: isUnlocked
+              ? (_) {
+                  tapCtrl.reverse();
+                  widget.onLessonTap(lesson.id);
+                }
+              : null,
+          onTapCancel: isUnlocked ? () => tapCtrl.reverse() : null,
+          child: AnimatedBuilder(
+            animation: tapCtrl,
+            builder: (context, child) {
+              final scale = 1.0 - (tapCtrl.value * 0.1); // 1.0 → 0.9
+              return Transform.scale(
+                scale: scale,
+                child: child,
+              );
+            },
+            child: isCurrent && isUnlocked && status != LessonStatus.completed
+                ? ScaleTransition(
+                    scale: _pulseAnimation,
+                    child: _buildNode(lesson, status, stars, isCurrent: true),
+                  )
+                : _buildNode(lesson, status, stars, isCurrent: false),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // 레슨 제목
+        SizedBox(
+          width: 100,
+          child: Text(
+            lesson.title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isUnlocked ? FontWeight.w600 : FontWeight.normal,
+              color: isUnlocked ? Colors.white : Colors.white54,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -187,19 +305,22 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
     );
   }
 
-  Widget _buildNode(LessonModel lesson, LessonStatus status, int stars) {
+  Widget _buildNode(
+    LessonModel lesson,
+    LessonStatus status,
+    int stars, {
+    required bool isCurrent,
+  }) {
     final isCompleted = status == LessonStatus.completed;
     final isLocked = status == LessonStatus.locked;
     final nodeColor = _getNodeColor(status, lesson.type);
-
-    // 노드 이미지 에셋 경로 (피그마 디자인 기반)
     final nodeImagePath = _getNodeImagePath(lesson.type, status);
 
-    return Stack(
+    Widget nodeWidget = Stack(
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        // 외곽 글로우 (활성 노드만)
+        // 외곽 글로우 (활성 노드)
         if (!isLocked)
           Container(
             width: _nodeSize + 12,
@@ -208,15 +329,15 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: nodeColor.withOpacity(0.4),
-                  blurRadius: 16,
-                  spreadRadius: 2,
+                  color: nodeColor.withOpacity(isCurrent ? 0.6 : 0.35),
+                  blurRadius: isCurrent ? 22 : 14,
+                  spreadRadius: isCurrent ? 4 : 2,
                 ),
               ],
             ),
           ),
 
-        // 3D 효과 바닥 원 (그림자)
+        // 3D 바닥 그림자
         Positioned(
           top: 4,
           child: Container(
@@ -235,13 +356,25 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
           ),
         ),
 
-        // 메인 원 - 이미지 기반 또는 아이콘 폴백
+        // 메인 원 + RadialGradient 오버레이
         Container(
           width: _nodeSize,
           height: _nodeSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isLocked ? FigmaColors.nodeLockedBg : nodeColor,
+            gradient: isLocked
+                ? null
+                : RadialGradient(
+                    center: const Alignment(-0.3, -0.4),
+                    radius: 1.0,
+                    colors: [
+                      Color.lerp(nodeColor, Colors.white, 0.2)!,
+                      nodeColor,
+                      Color.lerp(nodeColor, Colors.black, 0.15)!,
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+            color: isLocked ? FigmaColors.nodeLockedBg : null,
             border: Border.all(
               color: isCompleted
                   ? Colors.white.withOpacity(0.6)
@@ -250,16 +383,46 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
                       : Colors.white.withOpacity(0.4),
               width: 4,
             ),
-            boxShadow: isLocked ? null : [
-              BoxShadow(
-                color: nodeColor.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: isLocked
+                ? null
+                : [
+                    BoxShadow(
+                      color: nodeColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
           child: ClipOval(
-            child: _buildNodeContent(nodeImagePath, status, lesson.type),
+            child: Stack(
+              children: [
+                // 아이콘/이미지 콘텐츠
+                Center(
+                  child: _buildNodeContent(nodeImagePath, status, lesson.type),
+                ),
+                // 글로시 하이라이트
+                if (!isLocked)
+                  Positioned(
+                    top: 2,
+                    left: 8,
+                    right: 8,
+                    child: Container(
+                      height: _nodeSize * 0.35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(_nodeSize),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            FigmaColors.glossyHighlight,
+                            Colors.white.withOpacity(0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
 
@@ -271,17 +434,43 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
           ),
       ],
     );
+
+    // 현재 노드에 shimmer 글로우 효과
+    if (isCurrent && !isLocked && !isCompleted) {
+      nodeWidget = Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // shimmer 글로우 배경 링
+          Shimmer.fromColors(
+            baseColor: nodeColor.withOpacity(0.3),
+            highlightColor: nodeColor.withOpacity(0.7),
+            period: const Duration(milliseconds: 2000),
+            child: Container(
+              width: _nodeSize + 20,
+              height: _nodeSize + 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 3,
+                ),
+              ),
+            ),
+          ),
+          nodeWidget,
+        ],
+      );
+    }
+
+    return nodeWidget;
   }
 
-  /// 노드 이미지 에셋 경로 (이미지가 없으면 null)
   String? _getNodeImagePath(LessonType type, LessonStatus status) {
     if (status == LessonStatus.locked) return null;
-    // 피그마 디자인의 노드 이미지 경로
-    // 실제 에셋이 추가되면 여기서 반환
-    return null; // 아직 이미지 에셋 없음 → 아이콘 폴백 사용
+    return null; // 아직 이미지 에셋 없음 → 아이콘 폴백
   }
 
-  /// 노드 콘텐츠: 이미지 에셋이 있으면 이미지, 없으면 아이콘
   Widget _buildNodeContent(String? imagePath, LessonStatus status, LessonType type) {
     if (imagePath != null) {
       return Image.asset(
@@ -295,24 +484,12 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
 
   Widget _buildNodeIcon(LessonStatus status, LessonType type) {
     if (status == LessonStatus.locked) {
-      return const Icon(
-        Icons.lock_rounded,
-        color: Colors.white60,
-        size: 32,
-      );
+      return const Icon(Icons.lock_rounded, color: Colors.white60, size: 32);
     }
     if (status == LessonStatus.completed) {
-      return const Icon(
-        Icons.check_rounded,
-        color: Colors.white,
-        size: 40,
-      );
+      return const Icon(Icons.check_rounded, color: Colors.white, size: 40);
     }
-    return Icon(
-      _getTypeIcon(type),
-      color: Colors.white,
-      size: 34,
-    );
+    return Icon(_getTypeIcon(type), color: Colors.white, size: 34);
   }
 
   Widget _buildStars(int stars) {

@@ -76,4 +76,11 @@ class FigmaColors {
     end: Alignment.bottomRight,
     colors: [Color(0xFFF3C283), Color(0xFFE8A85C)],
   );
+
+  // === 글래스모피즘 & Shimmer ===
+  static const Color glassBg = Color(0x26FFFFFF);         // 15% white
+  static const Color glassBorder = Color(0x33FFFFFF);     // 20% white
+  static const Color shimmerBase = Color(0x33FFFFFF);     // shimmer 기본
+  static const Color shimmerHighlight = Color(0x80FFFFFF); // shimmer 하이라이트
+  static const Color glossyHighlight = Color(0x4DFFFFFF); // 노드 글로시 하이라이트
 }

@@ -1,20 +1,22 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../../../shared/constants/figma_colors.dart';
 
 /// 듀오링고 스타일 S자 곡선 학습 경로 CustomPainter
 ///
 /// 노드가 좌→우→좌로 지그재그 배치되며
 /// QuadraticBezier 곡선으로 부드럽게 연결됨.
+/// [pathProgress] 0.0~1.0 으로 완료 경로가 점진적으로 그려짐.
 class CurvedPathPainter extends CustomPainter {
   final List<Offset> nodePositions;
   final int completedCount;
+  final double pathProgress;
   final Color completedColor;
   final Color lockedColor;
 
   CurvedPathPainter({
     required this.nodePositions,
     required this.completedCount,
+    this.pathProgress = 1.0,
     this.completedColor = const Color(0xFF58CC02),
     this.lockedColor = const Color(0xFFD0D0D0),
   });
@@ -23,7 +25,6 @@ class CurvedPathPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (nodePositions.length < 2) return;
 
-    // 완료된 경로 그리기
     _drawPath(
       canvas,
       nodePositions,
@@ -40,12 +41,13 @@ class CurvedPathPainter extends CustomPainter {
     Color activeColor,
     Color inactiveColor,
   ) {
+    // 미완료 경로를 먼저 (아래 레이어)
     for (int i = 0; i < positions.length - 1; i++) {
       final isCompleted = i < completed;
+      if (isCompleted) continue;
+
       final start = positions[i];
       final end = positions[i + 1];
-
-      // 곡선의 제어점 계산
       final controlPoint = Offset(
         (start.dx + end.dx) / 2,
         (start.dy + end.dy) / 2,
@@ -59,18 +61,68 @@ class CurvedPathPainter extends CustomPainter {
         end.dx,
         end.dy,
       );
+      _drawDashedPath(canvas, path, inactiveColor);
+    }
 
-      if (isCompleted) {
-        // 완료된 경로 - 실선
-        final paint = Paint()
-          ..color = activeColor
-          ..strokeWidth = 6
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-        canvas.drawPath(path, paint);
+    // 완료 경로 (위 레이어) - pathProgress 로 부분 렌더링
+    if (completed > 0) {
+      final completedPath = Path();
+      for (int i = 0; i < completed && i < positions.length - 1; i++) {
+        final start = positions[i];
+        final end = positions[i + 1];
+        final controlPoint = Offset(
+          (start.dx + end.dx) / 2,
+          (start.dy + end.dy) / 2,
+        );
+
+        if (i == 0) {
+          completedPath.moveTo(start.dx, start.dy);
+        }
+        completedPath.quadraticBezierTo(
+          controlPoint.dx + (end.dx - start.dx) * 0.1,
+          controlPoint.dy,
+          end.dx,
+          end.dy,
+        );
+      }
+
+      final paint = Paint()
+        ..color = activeColor
+        ..strokeWidth = 6
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      if (pathProgress >= 1.0) {
+        canvas.drawPath(completedPath, paint);
       } else {
-        // 미완료 경로 - 점선
-        _drawDashedPath(canvas, path, inactiveColor);
+        // 부분 경로 렌더링
+        for (final metric in completedPath.computeMetrics()) {
+          final extractLen = metric.length * pathProgress.clamp(0.0, 1.0);
+          if (extractLen > 0) {
+            final partial = metric.extractPath(0, extractLen);
+            canvas.drawPath(partial, paint);
+          }
+        }
+      }
+
+      // 완료 경로 글로우
+      final glowPaint = Paint()
+        ..color = activeColor.withOpacity(0.25)
+        ..strokeWidth = 14
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+
+      if (pathProgress >= 1.0) {
+        canvas.drawPath(completedPath, glowPaint);
+      } else {
+        for (final metric in completedPath.computeMetrics()) {
+          final extractLen = metric.length * pathProgress.clamp(0.0, 1.0);
+          if (extractLen > 0) {
+            final partial = metric.extractPath(0, extractLen);
+            canvas.drawPath(partial, glowPaint);
+          }
+        }
       }
     }
   }
@@ -96,7 +148,8 @@ class CurvedPathPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CurvedPathPainter oldDelegate) {
     return oldDelegate.completedCount != completedCount ||
-        oldDelegate.nodePositions != nodePositions;
+        oldDelegate.nodePositions != nodePositions ||
+        oldDelegate.pathProgress != pathProgress;
   }
 }
 
