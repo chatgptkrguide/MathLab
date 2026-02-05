@@ -1,19 +1,19 @@
-/// 📝 Wrong Answer Model
-///
-/// Represents a problem that was answered incorrectly
+// 📝 Wrong Answer Model
+//
+// Represents a problem that was answered incorrectly
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class WrongAnswerModel {
   final String id;
-  final String userId;
-  final String problemId;
   final String lessonId;
-  final String lessonName;
-  final String unitName;
-  final String problemText;
-  final String userAnswer;
+  final String lessonTitle;
+  final String problemId;
+  final String problemType;
+  final String question;
   final String correctAnswer;
+  final String userAnswer;
+  final String? hint;
   final String? explanation;
   final DateTime attemptDate;
   final int attemptCount;
@@ -23,14 +23,14 @@ class WrongAnswerModel {
 
   const WrongAnswerModel({
     required this.id,
-    required this.userId,
-    required this.problemId,
     required this.lessonId,
-    required this.lessonName,
-    required this.unitName,
-    required this.problemText,
-    required this.userAnswer,
+    required this.lessonTitle,
+    required this.problemId,
+    required this.problemType,
+    required this.question,
     required this.correctAnswer,
+    required this.userAnswer,
+    this.hint,
     this.explanation,
     required this.attemptDate,
     this.attemptCount = 1,
@@ -39,17 +39,22 @@ class WrongAnswerModel {
     this.resolvedDate,
   });
 
+  /// 레거시 필드 호환용 (기존 코드와 호환)
+  String get lessonName => lessonTitle;
+  String get unitName => lessonId.split('_').first;
+  String get problemText => question;
+
   factory WrongAnswerModel.fromJson(Map<String, dynamic> json) {
     return WrongAnswerModel(
       id: json['id'] as String,
-      userId: json['userId'] as String,
-      problemId: json['problemId'] as String,
       lessonId: json['lessonId'] as String,
-      lessonName: json['lessonName'] as String,
-      unitName: json['unitName'] as String,
-      problemText: json['problemText'] as String,
-      userAnswer: json['userAnswer'] as String,
+      lessonTitle: json['lessonTitle'] as String? ?? json['lessonName'] as String? ?? '',
+      problemId: json['problemId'] as String,
+      problemType: json['problemType'] as String? ?? 'multipleChoice',
+      question: json['question'] as String? ?? json['problemText'] as String? ?? '',
       correctAnswer: json['correctAnswer'] as String,
+      userAnswer: json['userAnswer'] as String,
+      hint: json['hint'] as String?,
       explanation: json['explanation'] as String?,
       attemptDate: DateTime.parse(json['attemptDate'] as String),
       attemptCount: json['attemptCount'] as int? ?? 1,
@@ -66,14 +71,14 @@ class WrongAnswerModel {
     final data = doc.data() as Map<String, dynamic>;
     return WrongAnswerModel(
       id: doc.id,
-      userId: data['userId'] as String? ?? '',
-      problemId: data['problemId'] as String? ?? '',
       lessonId: data['lessonId'] as String? ?? '',
-      lessonName: data['lessonName'] as String? ?? '',
-      unitName: data['unitName'] as String? ?? '',
-      problemText: data['problemText'] as String? ?? '',
-      userAnswer: data['userAnswer'] as String? ?? '',
+      lessonTitle: data['lessonTitle'] as String? ?? data['lessonName'] as String? ?? '',
+      problemId: data['problemId'] as String? ?? '',
+      problemType: data['problemType'] as String? ?? 'multipleChoice',
+      question: data['question'] as String? ?? data['problemText'] as String? ?? '',
       correctAnswer: data['correctAnswer'] as String? ?? '',
+      userAnswer: data['userAnswer'] as String? ?? '',
+      hint: data['hint'] as String?,
       explanation: data['explanation'] as String?,
       attemptDate: data['attemptDate'] != null
           ? (data['attemptDate'] as Timestamp).toDate()
@@ -89,14 +94,14 @@ class WrongAnswerModel {
 
   /// Firestore 저장용 맵 변환
   Map<String, dynamic> toFirestore() => {
-        'userId': userId,
-        'problemId': problemId,
         'lessonId': lessonId,
-        'lessonName': lessonName,
-        'unitName': unitName,
-        'problemText': problemText,
-        'userAnswer': userAnswer,
+        'lessonTitle': lessonTitle,
+        'problemId': problemId,
+        'problemType': problemType,
+        'question': question,
         'correctAnswer': correctAnswer,
+        'userAnswer': userAnswer,
+        'hint': hint,
         'explanation': explanation,
         'attemptDate': Timestamp.fromDate(attemptDate),
         'attemptCount': attemptCount,
@@ -108,14 +113,14 @@ class WrongAnswerModel {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'userId': userId,
-        'problemId': problemId,
         'lessonId': lessonId,
-        'lessonName': lessonName,
-        'unitName': unitName,
-        'problemText': problemText,
-        'userAnswer': userAnswer,
+        'lessonTitle': lessonTitle,
+        'problemId': problemId,
+        'problemType': problemType,
+        'question': question,
         'correctAnswer': correctAnswer,
+        'userAnswer': userAnswer,
+        'hint': hint,
         'explanation': explanation,
         'attemptDate': attemptDate.toIso8601String(),
         'attemptCount': attemptCount,
@@ -126,14 +131,14 @@ class WrongAnswerModel {
 
   WrongAnswerModel copyWith({
     String? id,
-    String? userId,
-    String? problemId,
     String? lessonId,
-    String? lessonName,
-    String? unitName,
-    String? problemText,
-    String? userAnswer,
+    String? lessonTitle,
+    String? problemId,
+    String? problemType,
+    String? question,
     String? correctAnswer,
+    String? userAnswer,
+    String? hint,
     String? explanation,
     DateTime? attemptDate,
     int? attemptCount,
@@ -143,14 +148,14 @@ class WrongAnswerModel {
   }) {
     return WrongAnswerModel(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
-      problemId: problemId ?? this.problemId,
       lessonId: lessonId ?? this.lessonId,
-      lessonName: lessonName ?? this.lessonName,
-      unitName: unitName ?? this.unitName,
-      problemText: problemText ?? this.problemText,
-      userAnswer: userAnswer ?? this.userAnswer,
+      lessonTitle: lessonTitle ?? this.lessonTitle,
+      problemId: problemId ?? this.problemId,
+      problemType: problemType ?? this.problemType,
+      question: question ?? this.question,
       correctAnswer: correctAnswer ?? this.correctAnswer,
+      userAnswer: userAnswer ?? this.userAnswer,
+      hint: hint ?? this.hint,
       explanation: explanation ?? this.explanation,
       attemptDate: attemptDate ?? this.attemptDate,
       attemptCount: attemptCount ?? this.attemptCount,

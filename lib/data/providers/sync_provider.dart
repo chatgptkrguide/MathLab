@@ -1,6 +1,6 @@
-/// 🔄 Sync Provider
-///
-/// Manages data synchronization and offline queue
+// 🔄 Sync Provider
+//
+// Manages data synchronization and offline queue
 
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

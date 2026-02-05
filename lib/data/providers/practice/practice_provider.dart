@@ -1,6 +1,6 @@
-/// 🎯 Practice Provider
-///
-/// Manages practice sessions and problem attempts
+// 🎯 Practice Provider
+//
+// Manages practice sessions and problem attempts
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -236,7 +236,7 @@ final practiceHistoryProvider =
       final historyData =
           await lessonAPI.getPracticeHistory(userId: userId);
 
-      return (historyData as List)
+      return historyData
           .map((data) => PracticeSessionModel.fromJson(data))
           .toList();
     } catch (e) {

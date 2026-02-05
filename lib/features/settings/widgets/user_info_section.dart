@@ -68,9 +68,9 @@ class UserInfoSection extends StatelessWidget {
       height: 56,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.mathBlue.withOpacity(0.1),
+        color: AppColors.mathBlue.withValues(alpha: 0.1),
         border: Border.all(
-          color: AppColors.mathBlue.withOpacity(0.3),
+          color: AppColors.mathBlue.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -100,7 +100,7 @@ class UserInfoSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.mathOrange.withOpacity(0.15),
+        color: AppColors.mathOrange.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(

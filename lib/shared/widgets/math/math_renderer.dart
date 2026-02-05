@@ -1,7 +1,7 @@
-/// 📐 Math Renderer Widget
-///
-/// Renders mathematical expressions and equations using LaTeX notation.
-/// Supports inline math, display math, and automatic size adjustment.
+// 📐 Math Renderer Widget
+//
+// Renders mathematical expressions and equations using LaTeX notation.
+// Supports inline math, display math, and automatic size adjustment.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';

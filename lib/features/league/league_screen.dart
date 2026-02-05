@@ -1,10 +1,9 @@
-/// 🏆 League Screen
-///
-/// Displays league standings and competition
+// 🏆 League Screen
+//
+// Displays league standings and competition
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/auth/auth_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/league/league_provider.dart';
 import '../../shared/constants/app_colors.dart';

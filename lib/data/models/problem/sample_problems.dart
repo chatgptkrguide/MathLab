@@ -1,6 +1,6 @@
-/// 📚 Sample Problems Data
-///
-/// Mock problem data for MVP demonstration.
+// 📚 Sample Problems Data
+//
+// Mock problem data for MVP demonstration.
 
 import 'problem_model.dart';
 

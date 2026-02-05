@@ -1,6 +1,6 @@
-/// 📝 Wrong Answer Provider
-///
-/// Manages wrong answer state and operations with Firestore
+// 📝 Wrong Answer Provider
+//
+// Manages wrong answer state and operations with Firestore
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

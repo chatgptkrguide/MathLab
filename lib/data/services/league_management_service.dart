@@ -1,8 +1,7 @@
-/// 🏆 League Management Service
-///
-/// Manages weekly league cycles, promotions, and relegations
+// 🏆 League Management Service
+//
+// Manages weekly league cycles, promotions, and relegations
 
-import 'package:logger/logger.dart';
 import '../models/league_model.dart';
 
 enum LeagueAction {
@@ -12,7 +11,6 @@ enum LeagueAction {
 }
 
 class LeagueManagementService {
-  final Logger _logger = Logger();
 
   /// Calculate league action based on rank and league settings
   LeagueAction calculateLeagueAction({

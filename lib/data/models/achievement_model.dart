@@ -1,6 +1,6 @@
-/// 🏅 Achievement Model
-///
-/// Represents an achievement badge and user progress
+// 🏅 Achievement Model
+//
+// Represents an achievement badge and user progress
 
 class AchievementModel {
   final String id;

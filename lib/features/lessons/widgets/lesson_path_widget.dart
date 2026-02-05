@@ -287,7 +287,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: FigmaColors.deepBlue.withOpacity(0.4),
+            color: FigmaColors.deepBlue.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -329,7 +329,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: nodeColor.withOpacity(isCurrent ? 0.6 : 0.35),
+                  color: nodeColor.withValues(alpha: isCurrent ? 0.6 : 0.35),
                   blurRadius: isCurrent ? 22 : 14,
                   spreadRadius: isCurrent ? 4 : 2,
                 ),
@@ -377,17 +377,17 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
             color: isLocked ? FigmaColors.nodeLockedBg : null,
             border: Border.all(
               color: isCompleted
-                  ? Colors.white.withOpacity(0.6)
+                  ? Colors.white.withValues(alpha: 0.6)
                   : isLocked
                       ? const Color(0xFFD0D0D0)
-                      : Colors.white.withOpacity(0.4),
+                      : Colors.white.withValues(alpha: 0.4),
               width: 4,
             ),
             boxShadow: isLocked
                 ? null
                 : [
                     BoxShadow(
-                      color: nodeColor.withOpacity(0.3),
+                      color: nodeColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -415,7 +415,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
                           end: Alignment.bottomCenter,
                           colors: [
                             FigmaColors.glossyHighlight,
-                            Colors.white.withOpacity(0.0),
+                            Colors.white.withValues(alpha: 0.0),
                           ],
                         ),
                       ),
@@ -443,8 +443,8 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
         children: [
           // shimmer 글로우 배경 링
           Shimmer.fromColors(
-            baseColor: nodeColor.withOpacity(0.3),
-            highlightColor: nodeColor.withOpacity(0.7),
+            baseColor: nodeColor.withValues(alpha: 0.3),
+            highlightColor: nodeColor.withValues(alpha: 0.7),
             period: const Duration(milliseconds: 2000),
             child: Container(
               width: _nodeSize + 20,
@@ -500,7 +500,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),

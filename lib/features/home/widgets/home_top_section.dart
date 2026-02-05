@@ -1,7 +1,7 @@
-/// 🏠 Home Top Section
-///
-/// Displays user welcome message with clear login status indication.
-/// Shows auth provider and makes it obvious the user is logged in.
+// 🏠 Home Top Section
+//
+// Displays user welcome message with clear login status indication.
+// Shows auth provider and makes it obvious the user is logged in.
 
 import 'package:flutter/material.dart';
 import '../../../data/models/user/user_model.dart';
@@ -33,7 +33,7 @@ class HomeTopSection extends StatelessWidget {
                     Text(
                       '안녕하세요,',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w400,
                           ),
                     ),
@@ -67,10 +67,10 @@ class HomeTopSection extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -109,11 +109,11 @@ class HomeTopSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: info.color.withOpacity(0.9),
+        color: info.color.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: info.color.withOpacity(0.3),
+            color: info.color.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

@@ -1,6 +1,6 @@
-/// 📝 Logging Interceptor
-///
-/// Logs all HTTP requests and responses for debugging
+// 📝 Logging Interceptor
+//
+// Logs all HTTP requests and responses for debugging
 
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
@@ -13,7 +13,7 @@ class LoggingInterceptor extends Interceptor {
       lineLength: 120,
       colors: true,
       printEmojis: true,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
   );
 

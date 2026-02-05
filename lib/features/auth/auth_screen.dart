@@ -150,7 +150,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             height: 180,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                             ),
                             child: const Icon(
                               Icons.smart_toy_rounded,
@@ -175,7 +175,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -189,7 +189,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF5BA4E6).withOpacity(0.15),
+                                    color: const Color(0xFF5BA4E6).withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Icon(
@@ -261,7 +261,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                   backgroundColor: const Color(0xFF58CC02),
                                   foregroundColor: Colors.white,
                                   elevation: 0,
-                                  shadowColor: const Color(0xFF58CC02).withOpacity(0.4),
+                                  shadowColor: const Color(0xFF58CC02).withValues(alpha: 0.4),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -284,7 +284,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withOpacity(0.4),
+                                    color: Colors.white.withValues(alpha: 0.4),
                                   ),
                                 ),
                                 Padding(
@@ -292,7 +292,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                   child: Text(
                                     '또는',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withValues(alpha: 0.9),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -301,7 +301,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 Expanded(
                                   child: Container(
                                     height: 1,
-                                    color: Colors.white.withOpacity(0.4),
+                                    color: Colors.white.withValues(alpha: 0.4),
                                   ),
                                 ),
                               ],
@@ -338,7 +338,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               text: '이메일로 계속하기',
                               icon: null,
                               fallbackIcon: Icons.email_outlined,
-                              backgroundColor: Colors.white.withOpacity(0.2),
+                              backgroundColor: Colors.white.withValues(alpha: 0.2),
                               textColor: Colors.white,
                               onPressed: _handleEmailLogin,
                             ),

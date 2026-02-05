@@ -1,6 +1,6 @@
-/// 🚀 MathLab - Main Entry Point
-///
-/// Gamification-based math learning app powered by Flutter and Firebase.
+// 🚀 MathLab - Main Entry Point
+//
+// Gamification-based math learning app powered by Flutter and Firebase.
 
 import 'dart:ui';
 import 'package:flutter/material.dart';

@@ -1,6 +1,6 @@
-/// 📦 Unit Card Widget
-///
-/// Visual card representing a unit with its lessons in a tree structure.
+// 📦 Unit Card Widget
+//
+// Visual card representing a unit with its lessons in a tree structure.
 
 import 'package:flutter/material.dart';
 import '../../../data/models/lesson/unit_model.dart';
@@ -14,11 +14,11 @@ class UnitCard extends StatelessWidget {
   final Function(String lessonId) onLessonTap;
 
   const UnitCard({
-    Key? key,
+    super.key,
     required this.unit,
     required this.progressMap,
     required this.onLessonTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class UnitCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -50,7 +50,7 @@ class UnitCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: _getUnitThemeColor().withOpacity(0.1),
+              color: _getUnitThemeColor().withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -66,7 +66,7 @@ class UnitCard extends StatelessWidget {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: _getUnitThemeColor().withOpacity(0.15),
+                        color: _getUnitThemeColor().withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
@@ -192,8 +192,8 @@ class UnitCard extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          _getUnitThemeColor().withOpacity(0.3),
-                          _getUnitThemeColor().withOpacity(0.1),
+                          _getUnitThemeColor().withValues(alpha: 0.3),
+                          _getUnitThemeColor().withValues(alpha: 0.1),
                         ],
                       ),
                     ),

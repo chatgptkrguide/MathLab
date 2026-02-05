@@ -1,6 +1,6 @@
-/// 🔐 Authentication Interceptor
-///
-/// Automatically adds authentication headers to requests
+// 🔐 Authentication Interceptor
+//
+// Automatically adds authentication headers to requests
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

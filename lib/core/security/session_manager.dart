@@ -1,39 +1,38 @@
-/// 🕐 Session Manager Service
-///
-/// Provides automatic session timeout and inactivity detection
-/// to enhance security by logging out inactive users.
-///
-/// Features:
-/// - Automatic logout after inactivity period
-/// - Session timeout configuration
-/// - Activity tracking across the app
-/// - Background/Foreground state handling
-/// - Manual session refresh
-///
-/// Usage:
-/// ```dart
-/// // Initialize in main app
-/// SessionManager.initialize(
-///   onSessionExpired: () {
-///     // Navigate to login screen
-///     Navigator.of(context).pushReplacementNamed('/login');
-///   },
-/// );
-///
-/// // Record user activity
-/// SessionManager.recordActivity(); // Call on user interactions
-///
-/// // Check session validity
-/// if (!SessionManager.isSessionValid()) {
-///   // Force logout
-/// }
-///
-/// // Stop monitoring (on logout)
-/// SessionManager.stopMonitoring();
-/// ```
+// 🕐 Session Manager Service
+//
+// Provides automatic session timeout and inactivity detection
+// to enhance security by logging out inactive users.
+//
+// Features:
+// - Automatic logout after inactivity period
+// - Session timeout configuration
+// - Activity tracking across the app
+// - Background/Foreground state handling
+// - Manual session refresh
+//
+// Usage:
+// ```dart
+// // Initialize in main app
+// SessionManager.initialize(
+//   onSessionExpired: () {
+//     // Navigate to login screen
+//     Navigator.of(context).pushReplacementNamed('/login');
+//   },
+// );
+//
+// // Record user activity
+// SessionManager.recordActivity(); // Call on user interactions
+//
+// // Check session validity
+// if (!SessionManager.isSessionValid()) {
+//   // Force logout
+// }
+//
+// // Stop monitoring (on logout)
+// SessionManager.stopMonitoring();
+// ```
 
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_logger.dart';
 import 'secure_storage_service.dart';
@@ -324,9 +323,9 @@ class SessionActivityTracker extends StatefulWidget {
   final Widget child;
 
   const SessionActivityTracker({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<SessionActivityTracker> createState() => _SessionActivityTrackerState();

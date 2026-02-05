@@ -1,10 +1,10 @@
-/// 🌐 Dio HTTP Client
-///
-/// Base HTTP client using Dio with:
-/// - Automatic authentication
-/// - Request/response logging
-/// - Error handling
-/// - Timeout configuration
+// 🌐 Dio HTTP Client
+//
+// Base HTTP client using Dio with:
+// - Automatic authentication
+// - Request/response logging
+// - Error handling
+// - Timeout configuration
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

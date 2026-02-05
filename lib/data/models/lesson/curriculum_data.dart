@@ -1,6 +1,6 @@
-/// 📚 Sample Curriculum Data
-///
-/// Mock data for curriculum (MVP version).
+// 📚 Sample Curriculum Data
+//
+// Mock data for curriculum (MVP version).
 
 import 'lesson_model.dart';
 import 'unit_model.dart';

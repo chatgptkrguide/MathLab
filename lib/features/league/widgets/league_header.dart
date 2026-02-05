@@ -1,6 +1,6 @@
-/// 🏆 League Header Widget
-///
-/// Displays tier badge, league name, and user rank
+// 🏆 League Header Widget
+//
+// Displays tier badge, league name, and user rank
 
 import 'package:flutter/material.dart';
 import '../../../data/models/league_model.dart';
@@ -23,7 +23,7 @@ class LeagueHeader extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -41,7 +41,7 @@ class LeagueHeader extends StatelessWidget {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
@@ -73,7 +73,7 @@ class LeagueHeader extends StatelessWidget {
           Text(
             status.league.displayTier,
             style: AppTextStyles.titleLarge.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
 
@@ -119,7 +119,7 @@ class LeagueHeader extends StatelessWidget {
           Text(
             '${status.userEntry.xp} XP',
             style: AppTextStyles.titleMedium.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],

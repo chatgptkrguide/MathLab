@@ -1,18 +1,17 @@
-/// 📝 Application Logging System
-///
-/// Centralized logging utility with multiple log levels, tags, and
-/// conditional logging based on environment.
-///
-/// Usage:
-/// ```dart
-/// AppLogger.debug('Debug message');
-/// AppLogger.info('User logged in', tag: 'Auth');
-/// AppLogger.error('Failed to load', error: e, stackTrace: st);
-/// ```
+// 📝 Application Logging System
+//
+// Centralized logging utility with multiple log levels, tags, and
+// conditional logging based on environment.
+//
+// Usage:
+// ```dart
+// AppLogger.debug('Debug message');
+// AppLogger.info('User logged in', tag: 'Auth');
+// AppLogger.error('Failed to load', error: e, stackTrace: st);
+// ```
 
 import 'package:flutter/foundation.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import '../config/env_config.dart';
 

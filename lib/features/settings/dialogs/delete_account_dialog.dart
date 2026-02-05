@@ -50,9 +50,9 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
             Container(
               padding: const EdgeInsets.all(AppDimensions.paddingMedium),
               decoration: BoxDecoration(
-                color: AppColors.mathRed.withOpacity(0.1),
+                color: AppColors.mathRed.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-                border: Border.all(color: AppColors.mathRed.withOpacity(0.3)),
+                border: Border.all(color: AppColors.mathRed.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +123,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.mathRed,
             foregroundColor: Colors.white,
-            disabledBackgroundColor: AppColors.mathRed.withOpacity(0.3),
+            disabledBackgroundColor: AppColors.mathRed.withValues(alpha: 0.3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
             ),

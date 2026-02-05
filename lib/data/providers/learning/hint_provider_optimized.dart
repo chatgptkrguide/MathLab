@@ -1,6 +1,6 @@
-/// 💡 Hint Provider Optimized
-///
-/// Optimized hint management with XP-based unlock system
+// 💡 Hint Provider Optimized
+//
+// Optimized hint management with XP-based unlock system
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/learning/problem.dart';

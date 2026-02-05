@@ -1,6 +1,6 @@
-/// 🎯 Practice Session Model
-///
-/// Represents a practice session without consequences
+// 🎯 Practice Session Model
+//
+// Represents a practice session without consequences
 
 class PracticeSessionModel {
   final String id;

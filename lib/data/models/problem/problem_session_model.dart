@@ -1,6 +1,6 @@
-/// 📊 Problem Session Model
-///
-/// Tracks a user's problem-solving session for a lesson.
+// 📊 Problem Session Model
+//
+// Tracks a user's problem-solving session for a lesson.
 
 import 'problem_model.dart';
 

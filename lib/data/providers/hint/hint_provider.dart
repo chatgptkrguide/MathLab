@@ -1,6 +1,6 @@
-/// 💡 Hint Provider
-///
-/// Manages hints and hint usage state
+// 💡 Hint Provider
+//
+// Manages hints and hint usage state
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -79,7 +79,7 @@ class HintNotifier extends StateNotifier<HintState> {
 
       final hintsData = await lessonAPI.getHints(problemId: problemId);
 
-      final hints = (hintsData as List)
+      final hints = hintsData
           .map((data) => HintModel.fromJson(data))
           .toList();
 
@@ -187,7 +187,7 @@ final hintUsageHistoryProvider =
     try {
       final historyData = await lessonAPI.getHintUsageHistory(userId: userId);
 
-      return (historyData as List)
+      return historyData
           .map((data) => HintUsageModel.fromJson(data))
           .toList();
     } catch (e) {

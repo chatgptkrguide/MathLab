@@ -1,14 +1,13 @@
-/// 🔐 Authentication Provider
-///
-/// Manages authentication state and operations using Firebase Auth, Google Sign-In, and Kakao SDK.
-/// Integrates with SecureStorage for token management and UserProvider for user data.
+// 🔐 Authentication Provider
+//
+// Manages authentication state and operations using Firebase Auth, Google Sign-In, and Kakao SDK.
+// Integrates with SecureStorage for token management and UserProvider for user data.
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/config/env_config.dart';
 import '../../../core/error/app_error.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/app_logger.dart';

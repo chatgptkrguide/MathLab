@@ -1,6 +1,6 @@
-/// 📚 Concept Card Dialog
-///
-/// Shows detailed concept explanation with examples
+// 📚 Concept Card Dialog
+//
+// Shows detailed concept explanation with examples
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,7 +72,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                 gradient: LinearGradient(
                   colors: [
                     AppColors.primary,
-                    AppColors.primary.withOpacity(0.8),
+                    AppColors.primary.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -93,7 +93,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                             Text(
                               widget.conceptCard.category,
                               style: AppTextStyles.bodySmall.copyWith(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -137,7 +137,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -168,7 +168,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -240,7 +240,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                                   concept,
                                   style: AppTextStyles.bodySmall,
                                 ),
-                                backgroundColor: AppColors.primary.withOpacity(0.1),
+                                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                               ))
                           .toList(),
                     ),

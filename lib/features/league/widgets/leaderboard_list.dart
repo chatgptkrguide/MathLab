@@ -1,6 +1,6 @@
-/// 📊 Leaderboard List Widget
-///
-/// Displays ranked list of users with promotion/relegation zones
+// 📊 Leaderboard List Widget
+//
+// Displays ranked list of users with promotion/relegation zones
 
 import 'package:flutter/material.dart';
 import '../../../data/models/league_model.dart';
@@ -21,9 +21,9 @@ class LeaderboardList extends StatelessWidget {
 
   Color _getZoneColor(int index) {
     if (index < promotionCount) {
-      return Colors.green.withOpacity(0.1);
+      return Colors.green.withValues(alpha: 0.1);
     } else if (index >= entries.length - relegationCount) {
-      return Colors.red.withOpacity(0.1);
+      return Colors.red.withValues(alpha: 0.1);
     }
     return Colors.transparent;
   }
@@ -64,7 +64,7 @@ class LeaderboardList extends StatelessWidget {
 
           return Container(
             color: entry.isCurrentUser 
-                ? AppColors.primary.withOpacity(0.1)
+                ? AppColors.primary.withValues(alpha: 0.1)
                 : zoneColor,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
             child: Row(
@@ -96,7 +96,7 @@ class LeaderboardList extends StatelessWidget {
                         // Profile Image
                         CircleAvatar(
                           radius: 20,
-                          backgroundColor: AppColors.primary.withOpacity(0.1),
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                           backgroundImage: entry.profileImageUrl != null
                               ? NetworkImage(entry.profileImageUrl!)
                               : null,

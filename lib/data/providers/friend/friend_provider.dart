@@ -1,6 +1,6 @@
-/// 👥 Friend Provider
-///
-/// Manages friend relationships and social features
+// 👥 Friend Provider
+//
+// Manages friend relationships and social features
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -90,7 +90,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
       final userAPI = _ref.read(userAPIProvider);
 
       final friendsData = await userAPI.getFriends(userId: userId);
-      final friends = (friendsData as List)
+      final friends = friendsData
           .map((data) => FriendModel.fromJson(data))
           .toList();
 
@@ -117,13 +117,13 @@ class FriendNotifier extends StateNotifier<FriendState> {
       // Load pending requests (received)
       final pendingData =
           await userAPI.getPendingFriendRequests(userId: userId);
-      final pendingRequests = (pendingData as List)
+      final pendingRequests = pendingData
           .map((data) => FriendRequestModel.fromJson(data))
           .toList();
 
       // Load sent requests
       final sentData = await userAPI.getSentFriendRequests(userId: userId);
-      final sentRequests = (sentData as List)
+      final sentRequests = sentData
           .map((data) => FriendRequestModel.fromJson(data))
           .toList();
 
@@ -145,7 +145,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
     try {
       final userAPI = _ref.read(userAPIProvider);
 
-      final result = await userAPI.sendFriendRequest(
+      await userAPI.sendFriendRequest(
         fromUserId: userId,
         toUserId: toUserId,
       );
@@ -263,7 +263,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
         limit: limit,
       );
 
-      final activities = (activitiesData as List)
+      final activities = activitiesData
           .map((data) => FriendActivityModel.fromJson(data))
           .toList();
 
@@ -286,7 +286,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
         excludeUserId: userId,
       );
 
-      return (results as List).cast<Map<String, dynamic>>();
+      return results.cast<Map<String, dynamic>>();
     } catch (e) {
       logger.e('Failed to search users: $e');
       return [];
@@ -312,7 +312,7 @@ final friendSuggestionsProvider =
         limit: 10,
       );
 
-      return (suggestions as List).cast<Map<String, dynamic>>();
+      return suggestions.cast<Map<String, dynamic>>();
     } catch (e) {
       logger.e('Failed to load friend suggestions: $e');
       return [];

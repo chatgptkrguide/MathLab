@@ -1,6 +1,6 @@
-/// 📦 Models Export File
-///
-/// Central export file for all data models
+// 📦 Models Export File
+//
+// Central export file for all data models
 
 // User Models
 export 'user/user_model.dart';

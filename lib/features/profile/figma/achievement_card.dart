@@ -1,6 +1,6 @@
-/// 🏅 Achievement Card Widget
-///
-/// Displays individual achievement with progress
+// 🏅 Achievement Card Widget
+//
+// Displays individual achievement with progress
 
 import 'package:flutter/material.dart';
 import '../../../data/models/achievement_model.dart';
@@ -130,7 +130,7 @@ class AchievementCard extends StatelessWidget {
       height: 60,
       decoration: BoxDecoration(
         color: isUnlocked
-            ? Color(achievement.rarityColor).withOpacity(0.2)
+            ? Color(achievement.rarityColor).withValues(alpha: 0.2)
             : Colors.grey[300],
         shape: BoxShape.circle,
       ),
@@ -154,7 +154,7 @@ class AchievementCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Color(achievement.rarityColor).withOpacity(0.2),
+        color: Color(achievement.rarityColor).withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -210,9 +210,9 @@ class AchievementCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         text,

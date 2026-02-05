@@ -1,6 +1,6 @@
-/// 🚀 API Client
-///
-/// Centralized API client with all service endpoints
+// 🚀 API Client
+//
+// Centralized API client with all service endpoints
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dio_client.dart';

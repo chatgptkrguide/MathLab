@@ -1,6 +1,6 @@
-/// ⚠️ Error Interceptor
-///
-/// Handles and transforms API errors into user-friendly messages
+// ⚠️ Error Interceptor
+//
+// Handles and transforms API errors into user-friendly messages
 
 import 'package:dio/dio.dart';
 
@@ -33,7 +33,6 @@ class ErrorInterceptor extends Interceptor {
         break;
 
       case DioExceptionType.unknown:
-      default:
         errorMessage = '알 수 없는 오류가 발생했습니다.';
         break;
     }

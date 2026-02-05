@@ -1,13 +1,13 @@
-/// 🌐 API Client
-///
-/// HTTP client with automatic error handling, logging, retry logic,
-/// and authentication token injection.
-///
-/// Usage:
-/// ```dart
-/// final client = ApiClient();
-/// final response = await client.get('/users/123');
-/// ```
+// 🌐 API Client
+//
+// HTTP client with automatic error handling, logging, retry logic,
+// and authentication token injection.
+//
+// Usage:
+// ```dart
+// final client = ApiClient();
+// final response = await client.get('/users/123');
+// ```
 
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -279,9 +279,9 @@ class ApiClient {
 
   /// Check network connectivity before making request
   Future<void> _checkConnectivity() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
+    final connectivityResults = await Connectivity().checkConnectivity();
 
-    if (connectivityResult == ConnectivityResult.none) {
+    if (connectivityResults.contains(ConnectivityResult.none) || connectivityResults.isEmpty) {
       throw const NetworkException(
         message: '인터넷 연결을 확인해주세요',
         code: 'NO_INTERNET',

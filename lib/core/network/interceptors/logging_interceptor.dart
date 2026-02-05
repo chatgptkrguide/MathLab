@@ -1,7 +1,7 @@
-/// 📝 Logging Interceptor
-///
-/// Logs all HTTP requests and responses for debugging purposes.
-/// Only active in development mode.
+// 📝 Logging Interceptor
+//
+// Logs all HTTP requests and responses for debugging purposes.
+// Only active in development mode.
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';

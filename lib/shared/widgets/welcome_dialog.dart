@@ -1,7 +1,7 @@
-/// 🎉 Welcome Dialog
-///
-/// Displays a welcoming message after successful login with user information.
-/// Provides a smooth onboarding experience and confirms login success.
+// 🎉 Welcome Dialog
+//
+// Displays a welcoming message after successful login with user information.
+// Provides a smooth onboarding experience and confirms login success.
 
 import 'package:flutter/material.dart';
 
@@ -34,7 +34,7 @@ class WelcomeDialog extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.mathGreen.withOpacity(0.1),
+                color: AppColors.mathGreen.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -73,10 +73,10 @@ class WelcomeDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: _getAuthMethodColor(authMethod).withOpacity(0.1),
+                color: _getAuthMethodColor(authMethod).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _getAuthMethodColor(authMethod).withOpacity(0.3),
+                  color: _getAuthMethodColor(authMethod).withValues(alpha: 0.3),
                 ),
               ),
               child: Text(

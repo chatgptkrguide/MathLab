@@ -1,7 +1,7 @@
-/// 🔄 Loading Overlay Widget
-///
-/// Full-screen loading overlay with customizable message and spinner.
-/// Used during authentication and other async operations to provide visual feedback.
+// 🔄 Loading Overlay Widget
+//
+// Full-screen loading overlay with customizable message and spinner.
+// Used during authentication and other async operations to provide visual feedback.
 
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ class LoadingOverlay extends StatelessWidget {
       children: [
         if (child != null) child!,
         Container(
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.black.withValues(alpha: 0.5),
           child: Center(
             child: Card(
               elevation: 8,

@@ -1,8 +1,7 @@
-/// 🔐 Authentication API
-///
-/// Handles all authentication-related API calls
+// 🔐 Authentication API
+//
+// Handles all authentication-related API calls
 
-import 'package:dio/dio.dart';
 import '../dio_client.dart';
 
 class AuthAPI {

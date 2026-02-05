@@ -1,6 +1,6 @@
-/// 💡 Hint Model
-///
-/// Represents a step-by-step hint for a problem
+// 💡 Hint Model
+//
+// Represents a step-by-step hint for a problem
 
 class HintModel {
   final String id;

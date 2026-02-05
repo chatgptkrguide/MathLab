@@ -1,6 +1,6 @@
-/// 🌐 API Provider
-///
-/// Provides API client instance throughout the app
+// 🌐 API Provider
+//
+// Provides API client instance throughout the app
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

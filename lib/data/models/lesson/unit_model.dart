@@ -1,6 +1,6 @@
-/// 📦 Unit Model
-///
-/// Represents a unit (collection of lessons) in the curriculum.
+// 📦 Unit Model
+//
+// Represents a unit (collection of lessons) in the curriculum.
 
 import 'lesson_model.dart';
 

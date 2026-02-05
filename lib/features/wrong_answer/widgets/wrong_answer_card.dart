@@ -1,6 +1,6 @@
-/// 📝 Wrong Answer Card
-///
-/// Displays a single wrong answer with details and action buttons
+// 📝 Wrong Answer Card
+//
+// Displays a single wrong answer with details and action buttons
 
 import 'package:flutter/material.dart';
 import '../../../data/models/wrong_answer_model.dart';

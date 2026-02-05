@@ -1,6 +1,6 @@
-/// 🏆 League Model
-///
-/// Represents a league/tier in the gamification system
+// 🏆 League Model
+//
+// Represents a league/tier in the gamification system
 
 class LeagueTier {
   static const String bronze = 'Bronze';

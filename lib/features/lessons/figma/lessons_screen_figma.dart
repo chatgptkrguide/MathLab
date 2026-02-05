@@ -1,24 +1,26 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/lesson/curriculum_data.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/models/lesson/lesson_progress_model.dart';
+import '../../../data/providers/lesson/lesson_progress_provider.dart';
+import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/figma_colors.dart';
 import '../widgets/lesson_path_widget.dart';
 import '../../problems/problem_solving_screen.dart';
 
-class LessonsScreenFigma extends StatefulWidget {
+class LessonsScreenFigma extends ConsumerStatefulWidget {
   const LessonsScreenFigma({super.key});
 
   @override
-  State<LessonsScreenFigma> createState() => _LessonsScreenFigmaState();
+  ConsumerState<LessonsScreenFigma> createState() => _LessonsScreenFigmaState();
 }
 
-class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
+class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     with SingleTickerProviderStateMixin {
   final units = CurriculumData.getSampleUnits();
-  late Map<String, LessonProgressModel> progressMap;
 
   // 과목 선택 상태
   int _selectedSubjectIndex = 0;
@@ -32,7 +34,6 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
   @override
   void initState() {
     super.initState();
-    _initializeProgress();
 
     _bannerController = AnimationController(
       duration: const Duration(milliseconds: 600),
@@ -53,42 +54,40 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) _bannerController.forward();
     });
+
+    // 첫 번째 레슨들 초기화 (신규 사용자용)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeFirstLessonsIfNeeded();
+    });
+  }
+
+  void _initializeFirstLessonsIfNeeded() {
+    final user = ref.read(userProvider);
+    if (user == null) return;
+
+    final progressState = ref.read(lessonProgressProvider(user.id));
+
+    // 진행 기록이 없으면 첫 레슨들 언락
+    if (progressState.progressMap.isEmpty) {
+      final firstLessonIds = <String>[];
+      for (final unit in units) {
+        if (unit.lessons.isNotEmpty) {
+          firstLessonIds.add(unit.lessons.first.id);
+        }
+      }
+
+      if (firstLessonIds.isNotEmpty) {
+        ref
+            .read(lessonProgressProvider(user.id).notifier)
+            .initializeFirstLessons(firstLessonIds);
+      }
+    }
   }
 
   @override
   void dispose() {
     _bannerController.dispose();
     super.dispose();
-  }
-
-  void _initializeProgress() {
-    progressMap = {
-      'lesson_1_1': LessonProgressModel(
-        lessonId: 'lesson_1_1',
-        userId: 'demo_user',
-        status: LessonStatus.completed,
-        stars: 3,
-        correctAnswers: 10,
-        totalQuestions: 10,
-        xpEarned: 10,
-        completedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      'lesson_1_2': LessonProgressModel(
-        lessonId: 'lesson_1_2',
-        userId: 'demo_user',
-        status: LessonStatus.completed,
-        stars: 2,
-        correctAnswers: 8,
-        totalQuestions: 10,
-        xpEarned: 10,
-        completedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      'lesson_1_3': LessonProgressModel(
-        lessonId: 'lesson_1_3',
-        userId: 'demo_user',
-        status: LessonStatus.unlocked,
-      ),
-    };
   }
 
   LinearGradient get _currentGradient {
@@ -99,6 +98,11 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
+    final progressState = user != null
+        ? ref.watch(lessonProgressProvider(user.id))
+        : const LessonProgressState();
+
     return Scaffold(
       body: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
@@ -110,39 +114,47 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
           child: Column(
             children: [
               // 헤더: 과목 선택기 + 스트릭/XP/레벨
-              _buildHeader(),
+              _buildHeader(user),
 
-              // 스크롤 가능한 학습 경로
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 40),
-                  child: Column(
-                    children: [
-                      for (int i = 0; i < units.length; i++) ...[
-                        SlideTransition(
-                          position: _bannerSlideAnimation,
-                          child: FadeTransition(
-                            opacity: _bannerFadeAnimation,
-                            child: _buildUnitBanner(
-                              units[i].emoji,
-                              units[i].title,
-                              units[i].description,
+              // 로딩 상태
+              if (progressState.isLoading)
+                const Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                )
+              else
+                // 스크롤 가능한 학습 경로
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 40),
+                    child: Column(
+                      children: [
+                        for (int i = 0; i < units.length; i++) ...[
+                          SlideTransition(
+                            position: _bannerSlideAnimation,
+                            child: FadeTransition(
+                              opacity: _bannerFadeAnimation,
+                              child: _buildUnitBanner(
+                                units[i].emoji,
+                                units[i].title,
+                                units[i].description,
+                              ),
                             ),
                           ),
-                        ),
-                        LessonPathWidget(
-                          lessons: units[i].lessons,
-                          progressMap: progressMap,
-                          onLessonTap: _handleLessonTap,
-                        ),
-                        if (i < units.length - 1)
-                          const SizedBox(height: 16),
+                          LessonPathWidget(
+                            lessons: units[i].lessons,
+                            progressMap: progressState.progressMap,
+                            onLessonTap: (lessonId) =>
+                                _handleLessonTap(lessonId, progressState),
+                          ),
+                          if (i < units.length - 1) const SizedBox(height: 16),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -150,7 +162,10 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(user) {
+    final streak = user?.streak ?? 0;
+    final xp = user?.xp ?? 0;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Column(
@@ -180,7 +195,7 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.2),
+                                : Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: AnimatedDefaultTextStyle(
@@ -204,22 +219,22 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
                 ),
               ),
 
-              // 스트릭
+              // 스트릭 (실제 데이터)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.local_fire_department_rounded,
+                    const Icon(Icons.local_fire_department_rounded,
                         color: Color(0xFFFF9600), size: 18),
-                    SizedBox(width: 4),
-                    Text('3',
-                        style: TextStyle(
+                    const SizedBox(width: 4),
+                    Text('$streak',
+                        style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14)),
@@ -229,22 +244,22 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
 
               const SizedBox(width: 8),
 
-              // XP
+              // XP (실제 데이터)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star_rounded,
+                    const Icon(Icons.star_rounded,
                         color: Color(0xFFFFC800), size: 18),
-                    SizedBox(width: 4),
-                    Text('120',
-                        style: TextStyle(
+                    const SizedBox(width: 4),
+                    Text('$xp',
+                        style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14)),
@@ -292,7 +307,7 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
                       Text(
                         description,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 13,
                         ),
                       ),
@@ -307,8 +322,13 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
     );
   }
 
-  void _handleLessonTap(String lessonId) {
-    final progress = progressMap[lessonId];
+  void _handleLessonTap(String lessonId, LessonProgressState progressState) {
+    final user = ref.read(userProvider);
+    if (user == null) return;
+
+    final progress = progressState.progressMap[lessonId];
+
+    // 잠긴 레슨인 경우
     if (progress == null || progress.status == LessonStatus.locked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -322,6 +342,7 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
       return;
     }
 
+    // 레슨 모델 찾기
     LessonModel? lesson;
     for (final unit in units) {
       for (final l in unit.lessons) {
@@ -335,6 +356,9 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
 
     if (lesson == null) return;
 
+    // 레슨 시작 기록
+    ref.read(lessonProgressProvider(user.id).notifier).startLesson(lessonId);
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ProblemSolvingScreen(
@@ -342,8 +366,6 @@ class _LessonsScreenFigmaState extends State<LessonsScreenFigma>
           lessonTitle: lesson!.title,
         ),
       ),
-    ).then((_) {
-      setState(() {});
-    });
+    );
   }
 }

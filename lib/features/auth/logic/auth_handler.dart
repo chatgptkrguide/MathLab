@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/app_logger.dart';
@@ -344,14 +345,61 @@ class AuthHandler {
   }
 
   /// 비밀번호 재설정 이메일 전송
-  static Future<void> sendPasswordResetEmail({
+  static Future<bool> sendPasswordResetEmail({
     required String email,
+    required BuildContext context,
+    required bool mounted,
   }) async {
-    // TODO: Implement password reset email sending
-    // This requires Firebase Auth integration
-    // Example:
-    // await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-    throw UnimplementedError('비밀번호 재설정 기능은 아직 구현되지 않았습니다');
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+      if (mounted) {
+        _showSuccessSnackBar(
+          context: context,
+          message: '비밀번호 재설정 이메일을 발송했습니다. 이메일을 확인해주세요.',
+        );
+      }
+      return true;
+    } on FirebaseAuthException catch (e) {
+      AppLogger.error(
+        'Password reset email failed',
+        error: e,
+      );
+
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = '등록되지 않은 이메일 주소입니다.';
+          break;
+        case 'invalid-email':
+          message = '올바른 이메일 주소를 입력해주세요.';
+          break;
+        case 'too-many-requests':
+          message = '너무 많은 요청이 있었습니다. 잠시 후 다시 시도해주세요.';
+          break;
+        default:
+          message = '비밀번호 재설정 이메일 발송에 실패했습니다.';
+      }
+
+      if (mounted) {
+        _showErrorSnackBar(context: context, message: message);
+      }
+      return false;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Password reset email failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      if (mounted) {
+        _showErrorSnackBar(
+          context: context,
+          message: '비밀번호 재설정 중 문제가 발생했습니다. 다시 시도해주세요.',
+        );
+      }
+      return false;
+    }
   }
 
   /// 성공 스낵바 표시

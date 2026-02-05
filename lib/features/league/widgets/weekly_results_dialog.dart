@@ -1,9 +1,8 @@
-/// 🎉 Weekly Results Dialog
-///
-/// Shows league end results with promotion/relegation status
+// 🎉 Weekly Results Dialog
+//
+// Shows league end results with promotion/relegation status
 
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import '../../../data/services/league_management_service.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
@@ -134,7 +133,7 @@ class WeeklyResultsDialog extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(

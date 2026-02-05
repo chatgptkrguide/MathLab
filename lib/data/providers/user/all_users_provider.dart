@@ -1,7 +1,7 @@
-/// 👥 All Users Provider
-///
-/// Provides access to the list of all users in the system.
-/// Used by the leaderboard to look up user details for friend requests.
+// 👥 All Users Provider
+//
+// Provides access to the list of all users in the system.
+// Used by the leaderboard to look up user details for friend requests.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

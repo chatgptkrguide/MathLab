@@ -1,6 +1,6 @@
-/// 👤 User Model
-///
-/// Represents a MathLab user with profile information, learning progress, and gamification data.
+// 👤 User Model
+//
+// Represents a MathLab user with profile information, learning progress, and gamification data.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 

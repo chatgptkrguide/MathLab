@@ -149,7 +149,7 @@ class AppTheme {
         activeTrackColor: AppColors.mathBlue,
         inactiveTrackColor: AppColors.borderLight,
         thumbColor: AppColors.mathBlue,
-        overlayColor: AppColors.mathBlue.withOpacity(0.2),
+        overlayColor: AppColors.mathBlue.withValues(alpha: 0.2),
       ),
 
       // Divider 테마

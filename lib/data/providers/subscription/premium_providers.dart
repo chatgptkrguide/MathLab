@@ -1,7 +1,7 @@
-/// 💎 Premium Subscription Providers
-///
-/// Providers for premium subscription state management,
-/// in-app purchases, and trial management.
+// 💎 Premium Subscription Providers
+//
+// Providers for premium subscription state management,
+// in-app purchases, and trial management.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/subscription/premium_tier.dart';

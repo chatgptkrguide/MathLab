@@ -1,8 +1,7 @@
-/// 🏅 Achievement API
-///
-/// Handles achievement and badge-related API calls
+// 🏅 Achievement API
+//
+// Handles achievement and badge-related API calls
 
-import 'package:dio/dio.dart';
 import '../dio_client.dart';
 
 class AchievementAPI {

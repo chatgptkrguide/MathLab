@@ -1,6 +1,6 @@
-/// 📝 Wrong Answer Screen
-///
-/// Displays wrong answers with filtering and retry functionality
+// 📝 Wrong Answer Screen
+//
+// Displays wrong answers with filtering and retry functionality
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -273,7 +273,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

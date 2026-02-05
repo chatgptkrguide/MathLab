@@ -1,6 +1,6 @@
-/// 🌐 Connectivity Service
-///
-/// Monitors network connectivity status
+// 🌐 Connectivity Service
+//
+// Monitors network connectivity status
 
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';

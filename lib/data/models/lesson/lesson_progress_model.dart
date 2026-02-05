@@ -1,6 +1,8 @@
-/// 📊 Lesson Progress Model
-///
-/// Tracks user's progress for a specific lesson.
+// 📊 Lesson Progress Model
+//
+// Tracks user's progress for a specific lesson.
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LessonProgressModel {
   final String lessonId;
@@ -63,6 +65,46 @@ class LessonProgressModel {
           : null,
     );
   }
+
+  /// Firestore에서 문서 변환
+  factory LessonProgressModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return LessonProgressModel(
+      lessonId: doc.id,
+      userId: data['userId'] as String? ?? '',
+      status: LessonStatus.values.firstWhere(
+        (e) => e.name == data['status'],
+        orElse: () => LessonStatus.locked,
+      ),
+      stars: data['stars'] as int? ?? 0,
+      attemptsCount: data['attemptsCount'] as int? ?? 0,
+      correctAnswers: data['correctAnswers'] as int? ?? 0,
+      totalQuestions: data['totalQuestions'] as int? ?? 0,
+      xpEarned: data['xpEarned'] as int? ?? 0,
+      completedAt: data['completedAt'] != null
+          ? (data['completedAt'] as Timestamp).toDate()
+          : null,
+      lastAttemptedAt: data['lastAttemptedAt'] != null
+          ? (data['lastAttemptedAt'] as Timestamp).toDate()
+          : null,
+    );
+  }
+
+  /// Firestore 저장용 맵 변환
+  Map<String, dynamic> toFirestore() => {
+        'userId': userId,
+        'status': status.name,
+        'stars': stars,
+        'attemptsCount': attemptsCount,
+        'correctAnswers': correctAnswers,
+        'totalQuestions': totalQuestions,
+        'xpEarned': xpEarned,
+        'completedAt':
+            completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+        'lastAttemptedAt': lastAttemptedAt != null
+            ? Timestamp.fromDate(lastAttemptedAt!)
+            : null,
+      };
 
   Map<String, dynamic> toJson() {
     return {

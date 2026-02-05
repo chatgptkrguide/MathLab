@@ -55,7 +55,7 @@ class LanguageSelectionDialog extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
             ),
-            selectedTileColor: AppColors.mathBlue.withOpacity(0.05),
+            selectedTileColor: AppColors.mathBlue.withValues(alpha: 0.05),
             selected: isSelected,
             onTap: () {
               onLanguageChanged(language.name);

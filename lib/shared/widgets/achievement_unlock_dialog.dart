@@ -1,6 +1,6 @@
-/// 🏅 Achievement Unlock Dialog
-///
-/// Dialog shown when a new achievement is unlocked
+// 🏅 Achievement Unlock Dialog
+//
+// Dialog shown when a new achievement is unlocked
 
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
@@ -103,14 +103,14 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(widget.achievement.rarityColor).withOpacity(0.9),
-                    Color(widget.achievement.rarityColor).withOpacity(0.7),
+                    Color(widget.achievement.rarityColor).withValues(alpha: 0.9),
+                    Color(widget.achievement.rarityColor).withValues(alpha: 0.7),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(widget.achievement.rarityColor).withOpacity(0.5),
+                    color: Color(widget.achievement.rarityColor).withValues(alpha: 0.5),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -129,7 +129,7 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 10,
                           spreadRadius: 2,
                         ),
@@ -180,7 +180,7 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -247,7 +247,7 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

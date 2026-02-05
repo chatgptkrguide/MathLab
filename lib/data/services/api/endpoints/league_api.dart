@@ -1,8 +1,7 @@
-/// 🏆 League API
-///
-/// Handles league and leaderboard API calls
+// 🏆 League API
+//
+// Handles league and leaderboard API calls
 
-import 'package:dio/dio.dart';
 import '../dio_client.dart';
 
 class LeagueAPI {

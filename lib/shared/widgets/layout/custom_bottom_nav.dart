@@ -30,13 +30,13 @@ class CustomBottomNavigation extends StatelessWidget {
           color: Colors.white,
           border: Border(
             top: BorderSide(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               width: 0.5,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 12,
               offset: const Offset(0, -3),
             ),
@@ -103,15 +103,15 @@ class CustomBottomNavigation extends StatelessWidget {
                   colors: isSelected
                       ? const [Color(0xFF58CC02), Color(0xFF4CAF02)]
                       : [
-                          FigmaColors.skyBlue.withOpacity(0.85),
-                          FigmaColors.skyBlue.withOpacity(0.7),
+                          FigmaColors.skyBlue.withValues(alpha: 0.85),
+                          FigmaColors.skyBlue.withValues(alpha: 0.7),
                         ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: FigmaColors.skyBlue
-                        .withOpacity(isSelected ? 0.35 : 0.2),
+                        .withValues(alpha: isSelected ? 0.35 : 0.2),
                     blurRadius: isSelected ? 10 : 6,
                     offset: Offset(0, isSelected ? 4 : 3),
                   ),
@@ -162,7 +162,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   icon,
                   color: isSelected
                       ? FigmaColors.skyBlue
-                      : Colors.grey.withOpacity(0.5),
+                      : Colors.grey.withValues(alpha: 0.5),
                   size: isSelected ? 25 : 23,
                 ),
               ),
@@ -173,7 +173,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   style: TextStyle(
                     color: isSelected
                         ? FigmaColors.skyBlue
-                        : Colors.grey.withOpacity(0.6),
+                        : Colors.grey.withValues(alpha: 0.6),
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.w600,
                     fontSize: isSelected ? 10.5 : 9.5,

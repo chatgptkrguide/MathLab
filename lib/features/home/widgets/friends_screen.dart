@@ -1,6 +1,6 @@
-/// 👥 Friends Screen
-///
-/// Main friends screen with tabs for friends list, requests, and activity feed
+// 👥 Friends Screen
+//
+// Main friends screen with tabs for friends list, requests, and activity feed
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

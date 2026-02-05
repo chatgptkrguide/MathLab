@@ -1,6 +1,6 @@
-/// 🎯 Lesson Node Widget
-///
-/// Visual node representing a lesson in the curriculum tree (Duolingo-style).
+// 🎯 Lesson Node Widget
+//
+// Visual node representing a lesson in the curriculum tree (Duolingo-style).
 
 import 'package:flutter/material.dart';
 import '../../../data/models/lesson/lesson_model.dart';
@@ -14,12 +14,12 @@ class LessonNode extends StatelessWidget {
   final bool isFirst; // First lesson in unit
 
   const LessonNode({
-    Key? key,
+    super.key,
     required this.lesson,
     this.progress,
     this.onTap,
     this.isFirst = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class LessonNode extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: _getNodeColor(status, lesson.type).withOpacity(0.3),
+                        color: _getNodeColor(status, lesson.type).withValues(alpha: 0.3),
                         blurRadius: 15,
                         spreadRadius: 2,
                       ),
@@ -104,7 +104,7 @@ class LessonNode extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: isUnlocked
-                  ? AppColors.mathOrange.withOpacity(0.15)
+                  ? AppColors.mathOrange.withValues(alpha: 0.15)
                   : AppColors.borderLight,
               borderRadius: BorderRadius.circular(12),
             ),
@@ -155,7 +155,7 @@ class LessonNode extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 4,
           ),
         ],

@@ -75,7 +75,7 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
@@ -96,7 +96,7 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -203,9 +203,8 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
           const SizedBox(height: 24),
 
           // 선택지 (chip 스타일)
-          if (problem.type == ProblemType.multipleChoice &&
-              problem.options != null)
-            ...problem.options!.map((option) {
+          if (problem.type == ProblemType.multipleChoice)
+            ...problem.options.map((option) {
               final isSelected = selectedAnswer == option;
               Color bgColor = FigmaColors.chipBg;
               Color textColor = FigmaColors.textDark;
@@ -213,16 +212,16 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
 
               if (isAnswerChecked && isSelected) {
                 if (isCorrect) {
-                  bgColor = const Color(0xFF58CC02).withOpacity(0.15);
+                  bgColor = const Color(0xFF58CC02).withValues(alpha: 0.15);
                   textColor = const Color(0xFF58CC02);
                   borderColor = const Color(0xFF58CC02);
                 } else {
-                  bgColor = Colors.red.withOpacity(0.1);
+                  bgColor = Colors.red.withValues(alpha: 0.1);
                   textColor = Colors.red;
                   borderColor = Colors.red;
                 }
               } else if (isSelected) {
-                bgColor = FigmaColors.skyBlue.withOpacity(0.12);
+                bgColor = FigmaColors.skyBlue.withValues(alpha: 0.12);
                 textColor = FigmaColors.skyBlue;
                 borderColor = FigmaColors.skyBlue;
               }
@@ -304,8 +303,8 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       decoration: BoxDecoration(
         color: isCorrect
-            ? const Color(0xFF58CC02).withOpacity(0.1)
-            : Colors.red.withOpacity(0.1),
+            ? const Color(0xFF58CC02).withValues(alpha: 0.1)
+            : Colors.red.withValues(alpha: 0.1),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(

@@ -1,7 +1,7 @@
-/// 🔥 Firebase Providers
-///
-/// Basic Firebase service providers for the application.
-/// Provides access to Firebase Auth, Firestore, and other Firebase services.
+// 🔥 Firebase Providers
+//
+// Basic Firebase service providers for the application.
+// Provides access to Firebase Auth, Firestore, and other Firebase services.
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';

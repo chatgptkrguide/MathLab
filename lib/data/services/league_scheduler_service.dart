@@ -1,6 +1,6 @@
-/// ⏰ League Scheduler Service
-///
-/// Handles weekly league cycle scheduling and notifications
+// ⏰ League Scheduler Service
+//
+// Handles weekly league cycle scheduling and notifications
 
 import 'dart:async';
 import 'package:flutter/material.dart';

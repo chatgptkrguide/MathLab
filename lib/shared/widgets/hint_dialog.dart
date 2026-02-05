@@ -1,6 +1,6 @@
-/// 💡 Hint Dialog
-///
-/// Shows available hints with unlock functionality
+// 💡 Hint Dialog
+//
+// Shows available hints with unlock functionality
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +39,7 @@ class HintDialog extends ConsumerWidget {
                 gradient: LinearGradient(
                   colors: [
                     AppColors.primary,
-                    AppColors.primary.withOpacity(0.8),
+                    AppColors.primary.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -72,7 +72,7 @@ class HintDialog extends ConsumerWidget {
                           Text(
                             '${hintState.unlockedHints.length}/${hintState.hints.length} 잠금 해제',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                           ),
                         ],
@@ -205,7 +205,7 @@ class HintDialog extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: hint.requiresGems
                           ? Colors.purple.shade100
-                          : AppColors.primary.withOpacity(0.1),
+                          : AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -337,7 +337,7 @@ class HintDialog extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   hint.requiresGems
-                      ? '젬이 부족합니다 (${userGems}/${hint.gemCost})'
+                      ? '젬이 부족합니다 ($userGems/${hint.gemCost})'
                       : 'XP가 부족합니다 ($userXP/${hint.xpCost})',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: Colors.red,

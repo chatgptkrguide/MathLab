@@ -1,6 +1,6 @@
-/// ❓ Problem Model
-///
-/// Represents a math problem with question, answers, and metadata.
+// ❓ Problem Model
+//
+// Represents a math problem with question, answers, and metadata.
 
 class ProblemModel {
   final String id;

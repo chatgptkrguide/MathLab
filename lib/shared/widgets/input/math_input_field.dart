@@ -1,7 +1,7 @@
-/// 🔢 Math Input Field
-///
-/// Custom text field for entering mathematical answers.
-/// Supports numbers, basic operators, and optional validation.
+// 🔢 Math Input Field
+//
+// Custom text field for entering mathematical answers.
+// Supports numbers, basic operators, and optional validation.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -182,7 +182,7 @@ class MathKeyboard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -312,7 +312,7 @@ class MathKeyboard extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () => _insertText(text),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.mathBlue.withOpacity(0.1),
+            backgroundColor: AppColors.mathBlue.withValues(alpha: 0.1),
             foregroundColor: AppColors.mathBlue,
             elevation: 0,
             shape: RoundedRectangleBorder(

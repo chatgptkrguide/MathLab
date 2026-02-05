@@ -1,6 +1,6 @@
-/// 📚 Lesson Model
-///
-/// Represents a single lesson with learning content and progress tracking.
+// 📚 Lesson Model
+//
+// Represents a single lesson with learning content and progress tracking.
 
 class LessonModel {
   final String id;

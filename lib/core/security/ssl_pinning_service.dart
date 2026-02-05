@@ -1,32 +1,32 @@
-/// 🔐 SSL Certificate Pinning Service
-///
-/// Provides SSL certificate pinning to prevent Man-in-the-Middle (MITM) attacks
-/// by validating server certificates against known SHA256 fingerprints.
-///
-/// Security Features:
-/// - Certificate pinning for API servers
-/// - SHA256 fingerprint validation
-/// - Multiple certificate support (for certificate rotation)
-/// - Timeout configuration
-///
-/// Usage:
-/// ```dart
-/// // Initialize SSL pinning before making API calls
-/// await SSLPinningService.checkCertificate(
-///   serverURL: 'https://api.mathlab.app',
-/// );
-///
-/// // Or use in Dio interceptor
-/// final dio = Dio();
-/// dio.interceptors.add(SSLPinningInterceptor());
-/// ```
-///
-/// How to get SHA256 fingerprint:
-/// ```bash
-/// # For your API server
-/// openssl s_client -connect api.mathlab.app:443 < /dev/null 2>/dev/null | \
-///   openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
-/// ```
+// 🔐 SSL Certificate Pinning Service
+//
+// Provides SSL certificate pinning to prevent Man-in-the-Middle (MITM) attacks
+// by validating server certificates against known SHA256 fingerprints.
+//
+// Security Features:
+// - Certificate pinning for API servers
+// - SHA256 fingerprint validation
+// - Multiple certificate support (for certificate rotation)
+// - Timeout configuration
+//
+// Usage:
+// ```dart
+// // Initialize SSL pinning before making API calls
+// await SSLPinningService.checkCertificate(
+//   serverURL: 'https://api.mathlab.app',
+// );
+//
+// // Or use in Dio interceptor
+// final dio = Dio();
+// dio.interceptors.add(SSLPinningInterceptor());
+// ```
+//
+// How to get SHA256 fingerprint:
+// ```bash
+// # For your API server
+// openssl s_client -connect api.mathlab.app:443 < /dev/null 2>/dev/null | \
+//   openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
+// ```
 
 import 'dart:io';
 import 'package:http_certificate_pinning/http_certificate_pinning.dart';

@@ -1,8 +1,7 @@
-/// 👤 User API
-///
-/// Handles user profile and progress API calls
+// 👤 User API
+//
+// Handles user profile and progress API calls
 
-import 'package:dio/dio.dart';
 import '../dio_client.dart';
 
 class UserAPI {

@@ -1,7 +1,7 @@
-/// 👤 User Provider
-///
-/// Manages user data operations with Firestore integration.
-/// Handles user CRUD operations, profile updates, and gamification data.
+// 👤 User Provider
+//
+// Manages user data operations with Firestore integration.
+// Handles user CRUD operations, profile updates, and gamification data.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

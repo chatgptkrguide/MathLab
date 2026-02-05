@@ -1,8 +1,8 @@
-/// 💎 Premium Tier Model
-///
-/// Defines the premium subscription tiers and their pricing.
+// 💎 Premium Tier Model
+//
+// Defines the premium subscription tiers and their pricing.
 
-/// 프리미엄 구독 티어
+// 프리미엄 구독 티어
 enum PremiumTier {
   /// 무료 플랜
   free,
@@ -49,9 +49,9 @@ enum PremiumTier {
       final man = priceInt ~/ 10000;
       final remainder = priceInt % 10000;
       if (remainder == 0) {
-        return '${man}만원';
+        return '$man만원';
       }
-      return '${man}만 ${_formatNumber(remainder)}원';
+      return '$man만 ${_formatNumber(remainder)}원';
     }
     return '${_formatNumber(priceInt)}원';
   }

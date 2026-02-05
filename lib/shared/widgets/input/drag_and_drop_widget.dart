@@ -1,7 +1,7 @@
-/// 🎯 Drag and Drop Widget
-///
-/// Interactive drag-and-drop interface for math problems.
-/// Supports equation assembly, matching, and ordering tasks.
+// 🎯 Drag and Drop Widget
+//
+// Interactive drag-and-drop interface for math problems.
+// Supports equation assembly, matching, and ordering tasks.
 
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
@@ -149,8 +149,8 @@ class _DragAndDropMathWidgetState extends State<DragAndDropMathWidget> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: DragTarget<String>(
-        onWillAccept: (data) => widget.isEnabled,
-        onAccept: (itemId) => _handleDrop(zone.id, itemId),
+        onWillAcceptWithDetails: (details) => widget.isEnabled,
+        onAcceptWithDetails: (details) => _handleDrop(zone.id, details.data),
         builder: (context, candidateData, rejectedData) {
           final isHovering = candidateData.isNotEmpty;
 
@@ -159,9 +159,9 @@ class _DragAndDropMathWidgetState extends State<DragAndDropMathWidget> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: placedItem != null
-                  ? AppColors.mathBlue.withOpacity(0.1)
+                  ? AppColors.mathBlue.withValues(alpha: 0.1)
                   : isHovering
-                      ? AppColors.mathGreen.withOpacity(0.1)
+                      ? AppColors.mathGreen.withValues(alpha: 0.1)
                       : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
@@ -240,7 +240,7 @@ class _DragAndDropMathWidgetState extends State<DragAndDropMathWidget> {
         boxShadow: isDragging
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -356,7 +356,7 @@ class _MatchingPairsWidgetState extends State<MatchingPairsWidget> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isMatched
-              ? AppColors.mathBlue.withOpacity(0.1)
+              ? AppColors.mathBlue.withValues(alpha: 0.1)
               : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -396,8 +396,8 @@ class _MatchingPairsWidgetState extends State<MatchingPairsWidget> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: DragTarget<String>(
-        onWillAccept: (leftId) => widget.isEnabled && leftId != null,
-        onAccept: (leftId) => _handleMatch(leftId, item.id),
+        onWillAcceptWithDetails: (details) => widget.isEnabled,
+        onAcceptWithDetails: (details) => _handleMatch(details.data, item.id),
         builder: (context, candidateData, rejectedData) {
           final isHovering = candidateData.isNotEmpty;
 
@@ -405,9 +405,9 @@ class _MatchingPairsWidgetState extends State<MatchingPairsWidget> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isMatched
-                  ? AppColors.mathBlue.withOpacity(0.1)
+                  ? AppColors.mathBlue.withValues(alpha: 0.1)
                   : isHovering
-                      ? AppColors.mathGreen.withOpacity(0.1)
+                      ? AppColors.mathGreen.withValues(alpha: 0.1)
                       : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(

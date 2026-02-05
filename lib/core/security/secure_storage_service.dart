@@ -1,23 +1,23 @@
-/// 🔐 Secure Storage Service
-///
-/// Provides encrypted storage for sensitive data like authentication tokens,
-/// user credentials, and other security-critical information.
-///
-/// Uses flutter_secure_storage with AES encryption on device.
-///
-/// Usage:
-/// ```dart
-/// final storage = SecureStorageService();
-///
-/// // Store token
-/// await storage.saveAuthToken('jwt_token_here');
-///
-/// // Retrieve token
-/// final token = await storage.getAuthToken();
-///
-/// // Delete token
-/// await storage.deleteAuthToken();
-/// ```
+// 🔐 Secure Storage Service
+//
+// Provides encrypted storage for sensitive data like authentication tokens,
+// user credentials, and other security-critical information.
+//
+// Uses flutter_secure_storage with AES encryption on device.
+//
+// Usage:
+// ```dart
+// final storage = SecureStorageService();
+//
+// // Store token
+// await storage.saveAuthToken('jwt_token_here');
+//
+// // Retrieve token
+// final token = await storage.getAuthToken();
+//
+// // Delete token
+// await storage.deleteAuthToken();
+// ```
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

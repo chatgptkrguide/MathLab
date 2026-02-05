@@ -1,6 +1,6 @@
-/// 👥 Friend List Tab
-///
-/// Shows the list of friends
+// 👥 Friend List Tab
+//
+// Shows the list of friends
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

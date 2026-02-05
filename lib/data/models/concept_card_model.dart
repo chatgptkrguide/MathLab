@@ -1,6 +1,6 @@
-/// 📚 Concept Card Model
-///
-/// Represents an educational concept explanation card
+// 📚 Concept Card Model
+//
+// Represents an educational concept explanation card
 
 class ConceptCardModel {
   final String id;

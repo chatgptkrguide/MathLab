@@ -135,7 +135,7 @@ class _NotificationSettingsScreenState
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.mathBlue.withOpacity(0.1),
+          color: AppColors.mathBlue.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         ),
         child: Icon(icon, color: AppColors.mathBlue, size: 22),
@@ -148,7 +148,7 @@ class _NotificationSettingsScreenState
       trailing: Switch.adaptive(
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.mathGreen,
+        activeTrackColor: AppColors.mathGreen,
       ),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingLarge,

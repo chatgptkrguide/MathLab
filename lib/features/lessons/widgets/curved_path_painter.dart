@@ -107,7 +107,7 @@ class CurvedPathPainter extends CustomPainter {
 
       // 완료 경로 글로우
       final glowPaint = Paint()
-        ..color = activeColor.withOpacity(0.25)
+        ..color = activeColor.withValues(alpha: 0.25)
         ..strokeWidth = 14
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round

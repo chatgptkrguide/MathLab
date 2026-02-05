@@ -1,7 +1,7 @@
-/// 🔐 Authentication Interceptor
-///
-/// Automatically injects authentication tokens into requests
-/// and handles token refresh when expired.
+// 🔐 Authentication Interceptor
+//
+// Automatically injects authentication tokens into requests
+// and handles token refresh when expired.
 
 import 'package:dio/dio.dart';
 import '../../security/secure_storage_service.dart';

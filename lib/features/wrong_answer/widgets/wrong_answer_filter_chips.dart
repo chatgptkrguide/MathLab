@@ -1,6 +1,6 @@
-/// 🔍 Wrong Answer Filter Chips
-///
-/// Filter chips for wrong answer list
+// 🔍 Wrong Answer Filter Chips
+//
+// Filter chips for wrong answer list
 
 import 'package:flutter/material.dart';
 import '../../../data/providers/wrong_answer/wrong_answer_provider.dart';
@@ -86,7 +86,7 @@ class WrongAnswerFilterChips extends StatelessWidget {
       selectedColor: AppColors.primary,
       checkmarkColor: Colors.white,
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.primary.withOpacity(0.3),
+        color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.3),
         width: isSelected ? 2 : 1,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

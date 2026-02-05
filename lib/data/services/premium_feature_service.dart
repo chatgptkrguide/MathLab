@@ -1,9 +1,9 @@
-/// 💎 Premium Feature Service
-///
-/// Service for managing premium feature comparisons
-/// between free and premium tiers.
+// 💎 Premium Feature Service
+//
+// Service for managing premium feature comparisons
+// between free and premium tiers.
 
-/// 기능 비교 항목 모델
+// 기능 비교 항목 모델
 class FeatureComparison {
   /// 기능 아이콘
   final String icon;

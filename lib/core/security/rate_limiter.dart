@@ -1,28 +1,28 @@
-/// 🚦 Rate Limiter Service
-///
-/// Provides rate limiting functionality to prevent brute force attacks,
-/// API abuse, and excessive resource consumption.
-///
-/// Features:
-/// - Sliding window rate limiting
-/// - Customizable time windows and attempt limits
-/// - IP-based and user-based limiting
-/// - Automatic cleanup of old attempts
-/// - Lock-out period after excessive attempts
-///
-/// Usage:
-/// ```dart
-/// // Check if user can attempt login
-/// if (!RateLimiter.isAllowed('user@example.com', context: RateLimitContext.login)) {
-///   throw Exception('Too many login attempts. Try again later.');
-/// }
-///
-/// // Record successful attempt
-/// RateLimiter.recordSuccess('user@example.com', context: RateLimitContext.login);
-///
-/// // Get remaining attempts
-/// final remaining = RateLimiter.getRemainingAttempts('user@example.com');
-/// ```
+// 🚦 Rate Limiter Service
+//
+// Provides rate limiting functionality to prevent brute force attacks,
+// API abuse, and excessive resource consumption.
+//
+// Features:
+// - Sliding window rate limiting
+// - Customizable time windows and attempt limits
+// - IP-based and user-based limiting
+// - Automatic cleanup of old attempts
+// - Lock-out period after excessive attempts
+//
+// Usage:
+// ```dart
+// // Check if user can attempt login
+// if (!RateLimiter.isAllowed('user@example.com', context: RateLimitContext.login)) {
+//   throw Exception('Too many login attempts. Try again later.');
+// }
+//
+// // Record successful attempt
+// RateLimiter.recordSuccess('user@example.com', context: RateLimitContext.login);
+//
+// // Get remaining attempts
+// final remaining = RateLimiter.getRemainingAttempts('user@example.com');
+// ```
 
 import 'package:flutter/foundation.dart';
 

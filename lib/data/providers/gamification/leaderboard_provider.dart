@@ -1,9 +1,13 @@
-/// 🏆 Leaderboard Provider
-///
-/// Manages leaderboard state across different time periods (weekly, monthly, all-time).
+// 🏆 Leaderboard Provider
+//
+// Manages leaderboard state across different time periods with Firestore.
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import '../../models/league_model.dart';
+
+final _logger = Logger();
 
 /// 리더보드 기간 enum
 enum LeaderboardPeriod {
@@ -57,174 +61,192 @@ class LeaderboardState {
   }
 }
 
-/// 리더보드 Notifier
+/// 리더보드 Notifier - Firestore 연동
 class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
-  LeaderboardNotifier() : super(const LeaderboardState()) {
-    _loadSampleData();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String? currentUserId;
+
+  LeaderboardNotifier(this.currentUserId) : super(const LeaderboardState()) {
+    loadLeaderboard();
   }
 
-  /// 샘플 데이터 로드 (MVP용)
-  void _loadSampleData() {
-    state = state.copyWith(isLoading: true);
+  /// users 컬렉션 참조
+  CollectionReference<Map<String, dynamic>> get _usersCollection =>
+      _firestore.collection('users');
 
-    final sampleEntries = _generateSampleEntries();
+  /// 리더보드 로드 (Firestore에서 사용자 데이터 가져오기)
+  Future<void> loadLeaderboard() async {
+    state = state.copyWith(isLoading: true, error: null);
 
-    state = state.copyWith(
-      weeklyEntries: sampleEntries,
-      monthlyEntries: _shuffleAndRerank(sampleEntries),
-      allTimeEntries: _shuffleAndRerank(sampleEntries),
-      isLoading: false,
-    );
-  }
+    try {
+      // 전체 기간 리더보드: XP 내림차순 정렬, 상위 50명
+      final allTimeSnapshot = await _usersCollection
+          .orderBy('xp', descending: true)
+          .limit(50)
+          .get();
 
-  /// 샘플 리더보드 엔트리 생성
-  List<LeaderboardEntry> _generateSampleEntries() {
-    return [
-      const LeaderboardEntry(
-        userId: 'user_1',
-        username: '수학천재',
-        rank: 1,
-        xp: 2850,
-        problemsSolved: 342,
-        accuracy: 0.95,
-        tier: 'Diamond',
-        level: 15,
-        userName: '수학천재',
-        grade: '중학교 2학년',
-        streakDays: 45,
-      ),
-      const LeaderboardEntry(
-        userId: 'user_2',
-        username: '공부왕',
-        rank: 2,
-        xp: 2340,
-        problemsSolved: 298,
-        accuracy: 0.91,
-        tier: 'Diamond',
-        level: 13,
-        userName: '공부왕',
-        grade: '고등학교 1학년',
-        streakDays: 30,
-      ),
-      const LeaderboardEntry(
-        userId: 'user_3',
-        username: '열공학생',
-        rank: 3,
-        xp: 2100,
-        problemsSolved: 267,
-        accuracy: 0.88,
-        tier: 'Gold',
-        level: 12,
-        userName: '열공학생',
-        grade: '중학교 3학년',
-        streakDays: 21,
-      ),
-      const LeaderboardEntry(
-        userId: 'current_user',
-        username: '나',
-        rank: 5,
-        xp: 1650,
-        problemsSolved: 189,
-        accuracy: 0.85,
-        tier: 'Gold',
-        isCurrentUser: true,
-        level: 10,
-        userName: '나',
-        grade: '중학교 1학년',
-        streakDays: 14,
-      ),
-      const LeaderboardEntry(
-        userId: 'user_4',
-        username: '수학러버',
-        rank: 4,
-        xp: 1800,
-        problemsSolved: 220,
-        accuracy: 0.87,
-        tier: 'Gold',
-        level: 11,
-        userName: '수학러버',
-        grade: '초등학교 6학년',
-        streakDays: 18,
-      ),
-      const LeaderboardEntry(
-        userId: 'user_5',
-        username: '풀이마스터',
-        rank: 6,
-        xp: 1500,
-        problemsSolved: 175,
-        accuracy: 0.82,
-        tier: 'Silver',
-        level: 9,
-        userName: '풀이마스터',
-        grade: '중학교 2학년',
-        streakDays: 10,
-      ),
-      const LeaderboardEntry(
-        userId: 'user_6',
-        username: '도전자',
-        rank: 7,
-        xp: 1200,
-        problemsSolved: 145,
-        accuracy: 0.80,
-        tier: 'Silver',
-        level: 8,
-        userName: '도전자',
-        grade: '초등학교 5학년',
-        streakDays: 7,
-      ),
-      const LeaderboardEntry(
-        userId: 'user_7',
-        username: '수학새싹',
-        rank: 8,
-        xp: 900,
-        problemsSolved: 110,
-        accuracy: 0.78,
-        tier: 'Bronze',
-        level: 6,
-        userName: '수학새싹',
-        grade: '초등학교 4학년',
-        streakDays: 5,
-      ),
-    ];
-  }
+      final allTimeEntries = _convertToEntries(allTimeSnapshot.docs);
 
-  /// 엔트리 재배치 (월간/전체 데이터 시뮬레이션)
-  List<LeaderboardEntry> _shuffleAndRerank(List<LeaderboardEntry> entries) {
-    final shuffled = List<LeaderboardEntry>.from(entries);
-    shuffled.sort((a, b) => (b.xp * 3 + b.problemsSolved)
-        .compareTo(a.xp * 3 + a.problemsSolved));
+      // 주간/월간은 별도 컬렉션이 없으면 전체 데이터 기반으로 계산
+      // MVP에서는 전체 데이터를 기간별로 다르게 정렬하여 표시
+      final weeklyEntries = _calculateWeeklyRanking(allTimeSnapshot.docs);
+      final monthlyEntries = _calculateMonthlyRanking(allTimeSnapshot.docs);
 
-    return shuffled.asMap().entries.map((entry) {
-      return LeaderboardEntry(
-        userId: entry.value.userId,
-        username: entry.value.username,
-        rank: entry.key + 1,
-        xp: entry.value.xp,
-        problemsSolved: entry.value.problemsSolved,
-        accuracy: entry.value.accuracy,
-        tier: entry.value.tier,
-        isCurrentUser: entry.value.isCurrentUser,
-        level: entry.value.level,
-        userName: entry.value.userName,
-        grade: entry.value.grade,
-        streakDays: entry.value.streakDays,
+      state = state.copyWith(
+        weeklyEntries: weeklyEntries,
+        monthlyEntries: monthlyEntries,
+        allTimeEntries: allTimeEntries,
+        isLoading: false,
       );
-    }).toList();
+
+      _logger.i('Loaded ${allTimeEntries.length} leaderboard entries');
+    } catch (e) {
+      _logger.e('Failed to load leaderboard: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
+  }
+
+  /// Firestore 문서를 LeaderboardEntry 리스트로 변환
+  List<LeaderboardEntry> _convertToEntries(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    final entries = <LeaderboardEntry>[];
+
+    for (var i = 0; i < docs.length; i++) {
+      final doc = docs[i];
+      final data = doc.data();
+
+      entries.add(LeaderboardEntry(
+        userId: doc.id,
+        username: data['displayName'] as String? ?? '익명',
+        profileImageUrl: data['profileImageUrl'] as String?,
+        rank: i + 1,
+        xp: data['xp'] as int? ?? 0,
+        problemsSolved: data['problemsSolved'] as int? ?? 0,
+        accuracy: (data['accuracy'] as num?)?.toDouble() ?? 0.0,
+        tier: _calculateTier(data['xp'] as int? ?? 0),
+        isCurrentUser: doc.id == currentUserId,
+        level: data['level'] as int? ?? 1,
+        userName: data['displayName'] as String? ?? '익명',
+        grade: data['grade'] as String? ?? '',
+        streakDays: data['streak'] as int? ?? 0,
+      ));
+    }
+
+    return entries;
+  }
+
+  /// 주간 랭킹 계산 (weeklyXp 기반)
+  List<LeaderboardEntry> _calculateWeeklyRanking(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    // 주간 XP 기준 정렬
+    final sortedDocs = List<QueryDocumentSnapshot<Map<String, dynamic>>>.from(docs);
+    sortedDocs.sort((a, b) {
+      final aWeeklyXp = a.data()['weeklyXp'] as int? ?? a.data()['xp'] as int? ?? 0;
+      final bWeeklyXp = b.data()['weeklyXp'] as int? ?? b.data()['xp'] as int? ?? 0;
+      return bWeeklyXp.compareTo(aWeeklyXp);
+    });
+
+    final entries = <LeaderboardEntry>[];
+    for (var i = 0; i < sortedDocs.length; i++) {
+      final doc = sortedDocs[i];
+      final data = doc.data();
+      final weeklyXp = data['weeklyXp'] as int? ?? data['xp'] as int? ?? 0;
+
+      entries.add(LeaderboardEntry(
+        userId: doc.id,
+        username: data['displayName'] as String? ?? '익명',
+        profileImageUrl: data['profileImageUrl'] as String?,
+        rank: i + 1,
+        xp: weeklyXp,
+        problemsSolved: data['weeklyProblemsSolved'] as int? ?? data['problemsSolved'] as int? ?? 0,
+        accuracy: (data['accuracy'] as num?)?.toDouble() ?? 0.0,
+        tier: _calculateTier(data['xp'] as int? ?? 0),
+        isCurrentUser: doc.id == currentUserId,
+        level: data['level'] as int? ?? 1,
+        userName: data['displayName'] as String? ?? '익명',
+        grade: data['grade'] as String? ?? '',
+        streakDays: data['streak'] as int? ?? 0,
+      ));
+    }
+
+    return entries;
+  }
+
+  /// 월간 랭킹 계산 (monthlyXp 기반)
+  List<LeaderboardEntry> _calculateMonthlyRanking(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    // 월간 XP 기준 정렬
+    final sortedDocs = List<QueryDocumentSnapshot<Map<String, dynamic>>>.from(docs);
+    sortedDocs.sort((a, b) {
+      final aMonthlyXp = a.data()['monthlyXp'] as int? ?? a.data()['xp'] as int? ?? 0;
+      final bMonthlyXp = b.data()['monthlyXp'] as int? ?? b.data()['xp'] as int? ?? 0;
+      return bMonthlyXp.compareTo(aMonthlyXp);
+    });
+
+    final entries = <LeaderboardEntry>[];
+    for (var i = 0; i < sortedDocs.length; i++) {
+      final doc = sortedDocs[i];
+      final data = doc.data();
+      final monthlyXp = data['monthlyXp'] as int? ?? data['xp'] as int? ?? 0;
+
+      entries.add(LeaderboardEntry(
+        userId: doc.id,
+        username: data['displayName'] as String? ?? '익명',
+        profileImageUrl: data['profileImageUrl'] as String?,
+        rank: i + 1,
+        xp: monthlyXp,
+        problemsSolved: data['monthlyProblemsSolved'] as int? ?? data['problemsSolved'] as int? ?? 0,
+        accuracy: (data['accuracy'] as num?)?.toDouble() ?? 0.0,
+        tier: _calculateTier(data['xp'] as int? ?? 0),
+        isCurrentUser: doc.id == currentUserId,
+        level: data['level'] as int? ?? 1,
+        userName: data['displayName'] as String? ?? '익명',
+        grade: data['grade'] as String? ?? '',
+        streakDays: data['streak'] as int? ?? 0,
+      ));
+    }
+
+    return entries;
+  }
+
+  /// XP 기반 티어 계산
+  String _calculateTier(int xp) {
+    if (xp >= 5000) return 'Master';
+    if (xp >= 3000) return 'Diamond';
+    if (xp >= 1500) return 'Gold';
+    if (xp >= 500) return 'Silver';
+    return 'Bronze';
   }
 
   /// 리더보드 새로고침
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true);
+    await loadLeaderboard();
+  }
 
-    // TODO: API 호출로 교체
-    await Future.delayed(const Duration(milliseconds: 500));
+  /// 현재 사용자의 랭킹 가져오기
+  LeaderboardEntry? getCurrentUserRank(LeaderboardPeriod period) {
+    final entries = switch (period) {
+      LeaderboardPeriod.weekly => state.weeklyEntries,
+      LeaderboardPeriod.monthly => state.monthlyEntries,
+      LeaderboardPeriod.allTime => state.allTimeEntries,
+    };
 
-    _loadSampleData();
+    try {
+      return entries.firstWhere((e) => e.isCurrentUser);
+    } catch (_) {
+      return null;
+    }
   }
 }
 
-/// 리더보드 Provider
+/// 리더보드 Provider - Firestore 연동
 final leaderboardProvider =
-    StateNotifierProvider<LeaderboardNotifier, LeaderboardState>(
-  (ref) => LeaderboardNotifier(),
+    StateNotifierProvider.family<LeaderboardNotifier, LeaderboardState, String?>(
+  (ref, currentUserId) => LeaderboardNotifier(currentUserId),
 );

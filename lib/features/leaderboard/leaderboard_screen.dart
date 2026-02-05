@@ -5,6 +5,7 @@ import '../../shared/constants/app_dimensions.dart';
 import '../../shared/widgets/layout/responsive_wrapper.dart';
 import '../../data/models/models.dart';
 import '../../data/providers/gamification/leaderboard_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import 'widgets/widgets.dart';
 
 /// 리더보드 화면
@@ -44,7 +45,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    final leaderboardState = ref.watch(leaderboardProvider);
+    final user = ref.watch(userProvider);
+    final leaderboardState = ref.watch(leaderboardProvider(user?.id));
 
     // 선택된 기간에 맞는 리더보드 데이터 가져오기
     final entries = _getEntriesForPeriod(leaderboardState, _selectedPeriod);

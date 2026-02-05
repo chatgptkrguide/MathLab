@@ -27,7 +27,7 @@ class SettingTile extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: (titleColor ?? AppColors.mathBlue).withOpacity(0.1),
+          color: (titleColor ?? AppColors.mathBlue).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         ),
         child: Icon(

@@ -27,7 +27,7 @@ class SettingSwitchTile extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.mathBlue.withOpacity(0.1),
+          color: AppColors.mathBlue.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         ),
         child: Icon(
@@ -51,7 +51,7 @@ class SettingSwitchTile extends StatelessWidget {
       trailing: Switch.adaptive(
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.mathGreen,
+        activeTrackColor: AppColors.mathGreen,
       ),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingLarge,

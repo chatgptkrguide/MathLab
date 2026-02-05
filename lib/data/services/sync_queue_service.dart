@@ -1,6 +1,6 @@
-/// 📦 Sync Queue Service
-///
-/// Manages offline operations queue and syncs when online
+// 📦 Sync Queue Service
+//
+// Manages offline operations queue and syncs when online
 
 import 'dart:async';
 import 'dart:convert';

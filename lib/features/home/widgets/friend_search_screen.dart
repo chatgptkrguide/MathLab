@@ -1,4 +1,4 @@
-/// 🔍 Friend Search Screen
+// 🔍 Friend Search Screen
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

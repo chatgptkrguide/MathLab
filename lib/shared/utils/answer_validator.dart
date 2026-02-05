@@ -1,10 +1,10 @@
-/// 🎯 Answer Validator
-///
-/// Provides sophisticated answer validation logic with:
-/// - Tolerance for numerical answers
-/// - Case-insensitive string comparison
-/// - Whitespace normalization
-/// - Partial credit support
+// 🎯 Answer Validator
+//
+// Provides sophisticated answer validation logic with:
+// - Tolerance for numerical answers
+// - Case-insensitive string comparison
+// - Whitespace normalization
+// - Partial credit support
 
 import 'dart:math';
 

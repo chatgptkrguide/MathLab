@@ -17,7 +17,7 @@ class HomeDailyChallenge extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: FigmaColors.gold.withOpacity(0.3),
+              color: FigmaColors.gold.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -30,7 +30,7 @@ class HomeDailyChallenge extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
@@ -59,7 +59,7 @@ class HomeDailyChallenge extends StatelessWidget {
                   Text(
                     '5문제 연속 정답 달성하기!',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 13,
                     ),
                   ),
@@ -70,7 +70,7 @@ class HomeDailyChallenge extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: 0.4,
                       minHeight: 6,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
@@ -78,7 +78,7 @@ class HomeDailyChallenge extends StatelessWidget {
                   Text(
                     '2/5 완료',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
@@ -93,7 +93,7 @@ class HomeDailyChallenge extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Column(

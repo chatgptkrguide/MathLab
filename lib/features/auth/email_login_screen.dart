@@ -1,12 +1,11 @@
-/// 📧 Email Login Screen
-///
-/// Provides email/password authentication with form validation and error handling.
+// 📧 Email Login Screen
+//
+// Provides email/password authentication with form validation and error handling.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/security/input_validator.dart';
-import '../../core/utils/app_logger.dart';
 import 'logic/auth_handler.dart';
 
 class EmailLoginScreen extends ConsumerStatefulWidget {
@@ -367,7 +366,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
     // Show dialog to enter email for password reset
     final emailController = TextEditingController();
 
-    final result = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('비밀번호 재설정'),
@@ -404,20 +403,14 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                 return;
               }
 
-              try {
-                await AuthHandler.sendPasswordResetEmail(email: email);
+              Navigator.of(context).pop(true);
 
-                if (context.mounted) {
-                  Navigator.of(context).pop(true);
-                }
-              } catch (e) {
-                AppLogger.error('Failed to send password reset email', error: e);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('비밀번호 재설정 이메일 전송에 실패했습니다')),
-                  );
-                }
-              }
+              // 다이얼로그 닫은 후 비밀번호 재설정 이메일 전송
+              await AuthHandler.sendPasswordResetEmail(
+                email: email,
+                context: this.context,
+                mounted: mounted,
+              );
             },
             child: const Text('전송'),
           ),
@@ -425,13 +418,6 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       ),
     );
 
-    if (result == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('비밀번호 재설정 링크가 이메일로 전송되었습니다'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-    }
+    // 스낵바는 AuthHandler.sendPasswordResetEmail 에서 처리됨
   }
 }

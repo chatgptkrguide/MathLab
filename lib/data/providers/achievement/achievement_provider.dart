@@ -1,6 +1,6 @@
-/// 🏅 Achievement Provider
-///
-/// Manages achievements and user progress
+// 🏅 Achievement Provider
+//
+// Manages achievements and user progress
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -90,14 +90,14 @@ class AchievementNotifier extends StateNotifier<AchievementState> {
 
       // Load all achievements
       final achievementsData = await achievementAPI.getAchievements();
-      final achievements = (achievementsData as List)
+      final achievements = achievementsData
           .map((data) => AchievementModel.fromJson(data))
           .toList();
 
       // Load user progress
       final progressData =
           await achievementAPI.getUserAchievementProgress(userId: userId);
-      final progressList = (progressData as List)
+      final progressList = progressData
           .map((data) => UserAchievementModel.fromJson(data))
           .toList();
 
@@ -146,7 +146,7 @@ class AchievementNotifier extends StateNotifier<AchievementState> {
       final newlyUnlockedData =
           await achievementAPI.checkAchievements(userId: userId);
 
-      final newlyUnlocked = (newlyUnlockedData as List)
+      final newlyUnlocked = newlyUnlockedData
           .map((data) => AchievementModel.fromJson(data))
           .toList();
 
@@ -237,7 +237,7 @@ final recentAchievementsProvider =
         limit: 5,
       );
 
-      return (recentData as List)
+      return recentData
           .map((data) => AchievementModel.fromJson(data))
           .toList();
     } catch (e) {

@@ -1,13 +1,13 @@
-/// 🔐 Secure Environment Configuration
-///
-/// This file provides type-safe access to environment variables
-/// with validation and fallback mechanisms.
-///
-/// Usage:
-/// ```dart
-/// final apiUrl = EnvConfig.apiBaseUrl;
-/// final kakaoKey = EnvConfig.kakaoNativeAppKey;
-/// ```
+// 🔐 Secure Environment Configuration
+//
+// This file provides type-safe access to environment variables
+// with validation and fallback mechanisms.
+//
+// Usage:
+// ```dart
+// final apiUrl = EnvConfig.apiBaseUrl;
+// final kakaoKey = EnvConfig.kakaoNativeAppKey;
+// ```
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

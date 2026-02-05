@@ -1,8 +1,7 @@
-/// 📚 Lesson API
-///
-/// Handles lesson and problem-related API calls
+// 📚 Lesson API
+//
+// Handles lesson and problem-related API calls
 
-import 'package:dio/dio.dart';
 import '../dio_client.dart';
 
 class LessonAPI {

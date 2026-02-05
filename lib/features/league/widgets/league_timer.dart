@@ -1,6 +1,6 @@
-/// League Timer Widget
-///
-/// Displays countdown timer for current league
+// League Timer Widget
+//
+// Displays countdown timer for current league
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -54,13 +54,13 @@ class _LeagueTimerState extends State<LeagueTimer> {
     final seconds = duration.inSeconds % 60;
 
     if (days > 0) {
-      return '${days}일 ${hours}시간';
+      return '$days일 $hours시간';
     } else if (hours > 0) {
-      return '${hours}시간 ${minutes}분';
+      return '$hours시간 $minutes분';
     } else if (minutes > 0) {
-      return '${minutes}분 ${seconds}초';
+      return '$minutes분 $seconds초';
     } else {
-      return '${seconds}초';
+      return '$seconds초';
     }
   }
 

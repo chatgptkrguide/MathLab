@@ -70,7 +70,6 @@ class _HintSectionState extends ConsumerState<HintSection>
     final userXP = user?.xp ?? 0;
     final unlockedCount = _getUnlockedCount();
     final totalHints = widget.problem.hints.length;
-    final hasUnlockedHints = unlockedCount > 0;
 
     return FadeInWidget(
       child: Container(

@@ -1,7 +1,7 @@
-/// Profile Detail Screen (Figma "05" Design)
-///
-/// Profile header with follower/following + 6 stat grid (2x3)
-/// + Premium card + Subject cards + Badge collection + Weekly streak + Logout
+// Profile Detail Screen (Figma "05" Design)
+//
+// Profile header with follower/following + 6 stat grid (2x3)
+// + Premium card + Subject cards + Badge collection + Weekly streak + Logout
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +93,7 @@ class ProfileDetailScreen extends ConsumerWidget {
             height: 90,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               border: Border.all(color: Colors.white, width: 3),
             ),
             child: user.photoUrl != null
@@ -127,7 +127,7 @@ class ProfileDetailScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -150,7 +150,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                 width: 1,
                 height: 20,
                 margin: const EdgeInsets.symmetric(horizontal: 24),
-                color: Colors.white.withOpacity(0.4),
+                color: Colors.white.withValues(alpha: 0.4),
               ),
               _buildFollowStat('팔로잉', '0'),
             ],
@@ -175,7 +175,7 @@ class ProfileDetailScreen extends ConsumerWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
@@ -277,7 +277,7 @@ class ProfileDetailScreen extends ConsumerWidget {
           color: FigmaColors.premiumBg,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: FigmaColors.premiumBlue.withOpacity(0.2),
+            color: FigmaColors.premiumBlue.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -288,7 +288,7 @@ class ProfileDetailScreen extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: FigmaColors.premiumBlue.withOpacity(0.15),
+                color: FigmaColors.premiumBlue.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -398,7 +398,7 @@ class ProfileDetailScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -411,7 +411,7 @@ class ProfileDetailScreen extends ConsumerWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: subject.color.withOpacity(0.1),
+              color: subject.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -501,7 +501,7 @@ class ProfileDetailScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -585,7 +585,7 @@ class ProfileDetailScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -613,11 +613,11 @@ class ProfileDetailScreen extends ConsumerWidget {
                 return Container(
                   decoration: BoxDecoration(
                     color: badge.unlocked
-                        ? badge.color.withOpacity(0.1)
+                        ? badge.color.withValues(alpha: 0.1)
                         : const Color(0xFFF0F0F0),
                     borderRadius: BorderRadius.circular(16),
                     border: badge.unlocked
-                        ? Border.all(color: badge.color.withOpacity(0.3))
+                        ? Border.all(color: badge.color.withValues(alpha: 0.3))
                         : null,
                   ),
                   child: Column(
@@ -712,7 +712,7 @@ class _StatBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

@@ -1,6 +1,6 @@
-/// 🔔 Firebase Cloud Messaging (FCM) Provider
-///
-/// Manages push notifications and FCM token
+// 🔔 Firebase Cloud Messaging (FCM) Provider
+//
+// Manages push notifications and FCM token
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

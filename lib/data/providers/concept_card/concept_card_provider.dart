@@ -1,6 +1,6 @@
-/// 📚 Concept Card Provider
-///
-/// Manages concept cards and user progress
+// 📚 Concept Card Provider
+//
+// Manages concept cards and user progress
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -80,14 +80,14 @@ class ConceptCardNotifier extends StateNotifier<ConceptCardState> {
 
       // Load concept cards
       final cardsData = await lessonAPI.getConceptCards();
-      final conceptCards = (cardsData as List)
+      final conceptCards = cardsData
           .map((data) => ConceptCardModel.fromJson(data))
           .toList();
 
       // Load user progress
       final progressData =
           await lessonAPI.getConceptCardProgress(userId: userId);
-      final progressList = (progressData as List)
+      final progressList = progressData
           .map((data) => ConceptCardProgressModel.fromJson(data))
           .toList();
 
@@ -260,7 +260,7 @@ final relatedConceptsProvider =
       final relatedData =
           await lessonAPI.getRelatedConcepts(conceptCardId: conceptCardId);
 
-      return (relatedData as List)
+      return relatedData
           .map((data) => ConceptCardModel.fromJson(data))
           .toList();
     } catch (e) {

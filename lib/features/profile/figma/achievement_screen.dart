@@ -1,6 +1,6 @@
-/// 🏅 Achievement Screen
-///
-/// Displays user's achievements and progress
+// 🏅 Achievement Screen
+//
+// Displays user's achievements and progress
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -160,7 +160,7 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
                 },
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

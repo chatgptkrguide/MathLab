@@ -1,6 +1,6 @@
-/// 👥 Friend Model
-///
-/// Represents friend relationships and social features
+// 👥 Friend Model
+//
+// Represents friend relationships and social features
 
 class FriendModel {
   final String id;

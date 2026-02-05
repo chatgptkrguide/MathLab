@@ -1,19 +1,19 @@
-/// 🛡️ Input Validation and Sanitization
-///
-/// Provides comprehensive input validation and sanitization to prevent
-/// injection attacks, XSS, and other security vulnerabilities.
-///
-/// Usage:
-/// ```dart
-/// // Validate user input
-/// final validator = InputValidator();
-///
-/// if (!validator.isValidEmail(email)) {
-///   throw ValidationException('Invalid email format');
-/// }
-///
-/// final sanitizedName = validator.sanitizeName(userInput);
-/// ```
+// 🛡️ Input Validation and Sanitization
+//
+// Provides comprehensive input validation and sanitization to prevent
+// injection attacks, XSS, and other security vulnerabilities.
+//
+// Usage:
+// ```dart
+// // Validate user input
+// final validator = InputValidator();
+//
+// if (!validator.isValidEmail(email)) {
+//   throw ValidationException('Invalid email format');
+// }
+//
+// final sanitizedName = validator.sanitizeName(userInput);
+// ```
 
 import 'dart:math';
 

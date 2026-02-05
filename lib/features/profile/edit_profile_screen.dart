@@ -138,9 +138,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.mathBlue.withOpacity(0.1),
+              color: AppColors.mathBlue.withValues(alpha: 0.1),
               border: Border.all(
-                color: AppColors.mathBlue.withOpacity(0.3),
+                color: AppColors.mathBlue.withValues(alpha: 0.3),
                 width: 3,
               ),
             ),
@@ -284,7 +284,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           '분',
                           style: AppTextStyles.caption.copyWith(
                             color: isSelected
-                                ? Colors.white.withOpacity(0.8)
+                                ? Colors.white.withValues(alpha: 0.8)
                                 : AppColors.textSecondary,
                           ),
                         ),

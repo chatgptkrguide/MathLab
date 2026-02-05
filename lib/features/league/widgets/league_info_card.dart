@@ -1,6 +1,6 @@
-/// League Info Card Widget
-///
-/// Shows user's status in the league (promotion/safe/relegation zone)
+// League Info Card Widget
+//
+// Shows user's status in the league (promotion/safe/relegation zone)
 
 import 'package:flutter/material.dart';
 import '../../../data/models/league_model.dart';

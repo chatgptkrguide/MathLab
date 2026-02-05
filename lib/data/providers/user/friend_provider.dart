@@ -1,7 +1,7 @@
-/// 👥 User Friend Provider
-///
-/// Provides friend-related state for the leaderboard and user features.
-/// This file bridges the friend system with the leaderboard UI.
+// 👥 User Friend Provider
+//
+// Provides friend-related state for the leaderboard and user features.
+// This file bridges the friend system with the leaderboard UI.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -34,10 +34,9 @@ class FriendInfo {
 
 /// 친구 목록 Notifier (리더보드용)
 class FriendsNotifier extends StateNotifier<List<FriendInfo>> {
-  final Ref _ref;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  FriendsNotifier(this._ref) : super(const []) {
+  FriendsNotifier(Ref ref) : super(const []) {
     _loadFriends();
   }
 

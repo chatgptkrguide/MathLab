@@ -1,6 +1,6 @@
-/// 📊 Wrong Answer Statistics
-///
-/// Displays statistics about wrong answers
+// 📊 Wrong Answer Statistics
+//
+// Displays statistics about wrong answers
 
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
@@ -29,7 +29,7 @@ class WrongAnswerStats extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -102,9 +102,9 @@ class WrongAnswerStats extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

@@ -1,6 +1,6 @@
-/// 🏆 League Provider
-///
-/// Manages league and leaderboard state
+// 🏆 League Provider
+//
+// Manages league and leaderboard state
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -68,7 +68,7 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
         leagueId: userLeagueStatus.league.id,
       );
 
-      final leaderboard = (leaderboardData as List)
+      final leaderboard = leaderboardData
           .map((entry) => LeaderboardEntry.fromJson(entry))
           .toList();
 
@@ -98,7 +98,7 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
         leagueId: state.userLeagueStatus!.league.id,
       );
 
-      final leaderboard = (leaderboardData as List)
+      final leaderboard = leaderboardData
           .map((entry) => LeaderboardEntry.fromJson(entry))
           .toList();
 
@@ -231,7 +231,7 @@ final leagueHistoryProvider = FutureProvider.family<List<LeagueModel>, String>(
     try {
       final historyData = await leagueAPI.getLeagueHistory(userId: userId);
 
-      return (historyData as List)
+      return historyData
           .map((league) => LeagueModel.fromJson(league))
           .toList();
     } catch (e) {
@@ -248,7 +248,7 @@ final leagueTiersProvider = FutureProvider<List<LeagueModel>>((ref) async {
   try {
     final tiersData = await leagueAPI.getLeagueTiers();
 
-    return (tiersData as List)
+    return tiersData
         .map((tier) => LeagueModel.fromJson(tier))
         .toList();
   } catch (e) {

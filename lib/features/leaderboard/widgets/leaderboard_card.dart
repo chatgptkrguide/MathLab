@@ -205,7 +205,7 @@ class _RankBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final medal = entry.medalEmoji;
 
-    if (medal != null) {
+    if (medal.isNotEmpty) {
       // Top 3는 메달 표시 with flat color and border
       return Container(
         width: 52,

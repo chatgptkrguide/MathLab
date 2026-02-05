@@ -1,13 +1,18 @@
-/// 🎯 Problem Solving Screen
-///
-/// Main screen for solving problems in a lesson with:
-/// - Progress tracking
-/// - Hearts system
-/// - Immediate feedback
-/// - Answer validation
+// 🎯 Problem Solving Screen
+//
+// Main screen for solving problems in a lesson with:
+// - Progress tracking
+// - Hearts system
+// - Immediate feedback
+// - Answer validation
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/problem/problem_model.dart';
+import '../../data/models/wrong_answer_model.dart';
+import '../../data/providers/lesson/lesson_progress_provider.dart';
+import '../../data/providers/user/user_provider.dart';
+import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/models/problem/problem_session_model.dart';
 import '../../data/models/problem/sample_problems.dart';
 import '../../shared/constants/app_colors.dart';
@@ -19,7 +24,7 @@ import '../../shared/widgets/input/math_input_field.dart';
 import '../../shared/widgets/input/drag_and_drop_widget.dart';
 import '../../shared/utils/answer_validator.dart';
 
-class ProblemSolvingScreen extends StatefulWidget {
+class ProblemSolvingScreen extends ConsumerStatefulWidget {
   final String lessonId;
   final String lessonTitle;
 
@@ -30,10 +35,10 @@ class ProblemSolvingScreen extends StatefulWidget {
   });
 
   @override
-  State<ProblemSolvingScreen> createState() => _ProblemSolvingScreenState();
+  ConsumerState<ProblemSolvingScreen> createState() => _ProblemSolvingScreenState();
 }
 
-class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
+class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   late ProblemSessionModel session;
   String? selectedAnswer;
   bool isAnswerChecked = false;
@@ -157,6 +162,41 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
         score: session.score + earnedPoints,
       );
     });
+
+    // 오답일 경우 자동 저장
+    if (!result.isCorrect) {
+      _saveWrongAnswer(currentProblem, userAnswer!);
+    }
+  }
+
+  /// 오답을 Firestore에 자동 저장
+  Future<void> _saveWrongAnswer(ProblemModel problem, String userAnswer) async {
+    final user = ref.read(userProvider);
+    if (user == null) return;
+
+    final wrongAnswer = WrongAnswerModel(
+      id: '', // Firestore에서 자동 생성
+      lessonId: widget.lessonId,
+      lessonTitle: widget.lessonTitle,
+      problemId: problem.id,
+      problemType: problem.type.name,
+      question: problem.question,
+      correctAnswer: problem.correctAnswer,
+      userAnswer: userAnswer,
+      hint: problem.hint,
+      explanation: problem.explanation,
+      attemptDate: DateTime.now(),
+      isResolved: false,
+    );
+
+    try {
+      await ref
+          .read(wrongAnswerProvider(user.id).notifier)
+          .addWrongAnswer(wrongAnswer);
+    } catch (e) {
+      // 저장 실패 시 무시 (UX에 영향을 주지 않음)
+      debugPrint('Failed to save wrong answer: $e');
+    }
   }
 
   void _nextProblem() {
@@ -192,6 +232,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
         builder: (context) => ProblemCompletionScreen(
           session: session,
           lessonTitle: widget.lessonTitle,
+          lessonId: widget.lessonId,
         ),
       ),
     );
@@ -312,7 +353,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
               Text(
                 '${session.currentProblemIndex + 1}/${session.totalProblems}',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -374,7 +415,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -548,7 +589,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.mathYellow.withOpacity(0.1),
+        color: AppColors.mathYellow.withValues(alpha: 0.1),
         border: Border.all(color: AppColors.mathYellow),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -604,7 +645,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -672,15 +713,15 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
     IconData icon;
 
     if (isCorrect) {
-      backgroundColor = AppColors.mathGreen.withOpacity(0.95);
+      backgroundColor = AppColors.mathGreen.withValues(alpha: 0.95);
       title = result?.feedback ?? '정답입니다!';
       icon = Icons.check_circle;
     } else if (isPartialCredit) {
-      backgroundColor = AppColors.mathYellow.withOpacity(0.95);
-      title = result?.feedback ?? '거의 맞았어요!';
+      backgroundColor = AppColors.mathYellow.withValues(alpha: 0.95);
+      title = result.feedback ?? '거의 맞았어요!';
       icon = Icons.star_half;
     } else {
-      backgroundColor = AppColors.mathRed.withOpacity(0.95);
+      backgroundColor = AppColors.mathRed.withValues(alpha: 0.95);
       title = result?.feedback ?? '틀렸습니다';
       icon = Icons.cancel;
     }
@@ -710,9 +751,9 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
                 if (isPartialCredit) ...[
                   const SizedBox(height: 12),
                   Text(
-                    '${(result!.score * 100).toStringAsFixed(0)}% 정확도',
+                    '${(result.score * 100).toStringAsFixed(0)}% 정확도',
                     style: AppTextStyles.bodyLarge.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -722,7 +763,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -752,7 +793,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -771,7 +812,7 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
                               child: Text(
                                 '• $hint',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                 ),
                               ),
                             )),
@@ -789,15 +830,65 @@ class _ProblemSolvingScreenState extends State<ProblemSolvingScreen> {
 }
 
 /// 🎉 Problem Completion Screen
-class ProblemCompletionScreen extends StatelessWidget {
+class ProblemCompletionScreen extends ConsumerStatefulWidget {
   final ProblemSessionModel session;
   final String lessonTitle;
+  final String lessonId;
 
   const ProblemCompletionScreen({
     super.key,
     required this.session,
     required this.lessonTitle,
+    required this.lessonId,
   });
+
+  @override
+  ConsumerState<ProblemCompletionScreen> createState() =>
+      _ProblemCompletionScreenState();
+}
+
+class _ProblemCompletionScreenState
+    extends ConsumerState<ProblemCompletionScreen> {
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 레슨 완료 시 자동 저장
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveProgress();
+    });
+  }
+
+  Future<void> _saveProgress() async {
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
+
+    try {
+      final user = ref.read(userProvider);
+      if (user == null) return;
+
+      // 1. 레슨 진행 상황 저장
+      await ref
+          .read(lessonProgressProvider(user.id).notifier)
+          .completeLesson(
+            lessonId: widget.lessonId,
+            correctAnswers: widget.session.correctCount,
+            totalQuestions: widget.session.problems.length,
+            xpEarned: widget.session.score,
+          );
+
+      // 2. 사용자 XP 추가
+      await ref.read(userProvider.notifier).addXp(widget.session.score);
+
+      // 3. 스트릭 업데이트
+      await ref.read(userProvider.notifier).updateStreak();
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -824,9 +915,9 @@ class ProblemCompletionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                lessonTitle,
+                widget.lessonTitle,
                 style: AppTextStyles.bodyLarge.copyWith(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                 ),
               ),
               const SizedBox(height: 48),
@@ -839,7 +930,7 @@ class ProblemCompletionScreen extends StatelessWidget {
                   (index) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Icon(
-                      index < session.starsEarned
+                      index < widget.session.starsEarned
                           ? Icons.star
                           : Icons.star_border,
                       size: 48,
@@ -852,11 +943,13 @@ class ProblemCompletionScreen extends StatelessWidget {
               const SizedBox(height: 48),
 
               // Stats
-              _buildStatCard('정답률', '${(session.accuracy * 100).toStringAsFixed(0)}%'),
+              _buildStatCard(
+                  '정답률',
+                  '${(widget.session.accuracy * 100).toStringAsFixed(0)}%'),
               const SizedBox(height: 16),
-              _buildStatCard('점수', '${session.score}점'),
+              _buildStatCard('점수', '${widget.session.score}점'),
               const SizedBox(height: 16),
-              _buildStatCard('남은 하트', '${session.hearts}/5'),
+              _buildStatCard('남은 하트', '${widget.session.hearts}/5'),
 
               const Spacer(),
 
@@ -865,10 +958,11 @@ class ProblemCompletionScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Update lesson progress in database
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: _isSaving
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -876,12 +970,22 @@ class ProblemCompletionScreen extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  child: Text(
-                    '계속하기',
-                    style: AppTextStyles.button.copyWith(
-                      color: AppColors.mathGreen,
-                    ),
-                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(AppColors.mathGreen),
+                          ),
+                        )
+                      : Text(
+                          '계속하기',
+                          style: AppTextStyles.button.copyWith(
+                            color: AppColors.mathGreen,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -895,7 +999,7 @@ class ProblemCompletionScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
