@@ -10,6 +10,7 @@ import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/figma_colors.dart';
+import '../edit_profile_screen.dart';
 
 class ProfileDetailScreen extends ConsumerWidget {
   const ProfileDetailScreen({super.key});
@@ -136,6 +137,31 @@ class ProfileDetailScreen extends ConsumerWidget {
                 color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Edit Profile button
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Edit Profile',
+                style: TextStyle(
+                  color: FigmaColors.royalBlue,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),

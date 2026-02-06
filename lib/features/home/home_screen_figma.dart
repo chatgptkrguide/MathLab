@@ -58,7 +58,12 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               // 1. 상단 인사 + 스트릭
               HomeTopSection(user: user),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+
+              // 1.5. 상태 바 (현재 레슨명 + 스트릭 + XP + 레벨)
+              _buildStatusBar(user),
+
+              const SizedBox(height: 24),
 
               // 2. 로봇 캐릭터 + 진행률 링
               const HomeRobotSection(),
@@ -101,6 +106,103 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               const SizedBox(height: 40),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 상태 바: 현재 레슨명 + 스트릭 + XP + 레벨
+  Widget _buildStatusBar(user) {
+    final streak = user?.streak ?? 0;
+    final xp = user?.xp ?? 0;
+    final level = user?.level ?? 1;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.25),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 현재 레슨명
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '소인수분해',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // 스트릭
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🔥', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 3),
+                Text(
+                  '$streak',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 10),
+            // XP
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.bolt_rounded, color: Colors.amber, size: 16),
+                const SizedBox(width: 2),
+                Text(
+                  '$xp',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 10),
+            // 레벨
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'HLv$level',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

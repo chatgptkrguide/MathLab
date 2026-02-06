@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../settings/settings_screen.dart';
 
 class HomeTopSection extends StatelessWidget {
   final UserModel? user;
@@ -22,6 +23,49 @@ class HomeTopSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // App bar: hamburger menu + "Home" + GoMath logo
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                  );
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.menu_rounded, color: Colors.white, size: 22),
+                ),
+              ),
+              const Text(
+                'Home',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const Text(
+                'GoMath',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
           // Welcome message with user name
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

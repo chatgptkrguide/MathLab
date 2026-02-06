@@ -371,11 +371,44 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
                   ),
                 ],
               ),
-              Text(
-                '${session!.currentProblemIndex + 1}/${session!.totalProblems}',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                ),
+              Row(
+                children: [
+                  // XP badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.bolt_rounded, color: Colors.amber, size: 14),
+                        const SizedBox(width: 2),
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final user = ref.watch(userProvider);
+                            return Text(
+                              '${user?.xp ?? 0}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${session!.currentProblemIndex + 1}/${session!.totalProblems}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
