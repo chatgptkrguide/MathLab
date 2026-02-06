@@ -17,7 +17,6 @@ build/windows/
 
 # 의존성
 .packages
-pubspec.lock
 
 # IDE
 .idea/
