@@ -255,9 +255,54 @@ class User extends _$User {
         'updatedAt': Timestamp.fromDate(now),
       });
 
+      // 학습 날짜 기록 (캘린더용)
+      await _recordStudyDate(state!.uid, now);
+
       state = updatedUser;
     } catch (e, st) {
       AppLogger.error('Failed to update streak', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  /// 학습 날짜를 Firestore에 기록
+  Future<void> _recordStudyDate(String uid, DateTime date) async {
+    try {
+      final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('studyDates')
+          .doc(dateKey)
+          .set({
+        'date': Timestamp.fromDate(date),
+        'year': date.year,
+        'month': date.month,
+        'day': date.day,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      AppLogger.error('Failed to record study date', tag: 'User', error: e);
+    }
+  }
+
+  /// 특정 월의 학습 날짜 목록 가져오기
+  Future<Set<int>> getStudyDatesForMonth(int year, int month) async {
+    if (state == null) return {};
+
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .collection('studyDates')
+          .where('year', isEqualTo: year)
+          .where('month', isEqualTo: month)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => doc.data()['day'] as int)
+          .toSet();
+    } catch (e) {
+      AppLogger.error('Failed to get study dates', tag: 'User', error: e);
+      return {};
     }
   }
 
@@ -511,6 +556,95 @@ class User extends _$User {
     } catch (e, st) {
       AppLogger.error('Failed to update last login', tag: 'User', error: e, stackTrace: st);
       // Don't throw - this is a non-critical operation
+    }
+  }
+
+  // ========================================
+  // Reset Progress
+  // ========================================
+
+  /// Reset all learning progress (XP, level, streak, achievements)
+  Future<void> resetProgress() async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Resetting user progress', tag: 'User');
+
+      final now = DateTime.now();
+      final uid = state!.uid;
+
+      // Reset user stats
+      final updatedUser = state!.copyWith(
+        xp: 0,
+        totalXp: 0,
+        level: 1,
+        streak: 0,
+        longestStreak: 0,
+        hearts: 5,
+        gems: 0,
+        achievements: [],
+        league: 'bronze',
+        lastStudyDate: null,
+        updatedAt: now,
+      );
+
+      // Update user document
+      await _firestore.collection('users').doc(uid).update({
+        'xp': 0,
+        'totalXp': 0,
+        'level': 1,
+        'streak': 0,
+        'longestStreak': 0,
+        'hearts': 5,
+        'gems': 0,
+        'achievements': [],
+        'league': 'bronze',
+        'lastStudyDate': null,
+        'updatedAt': Timestamp.fromDate(now),
+      });
+
+      // Delete all lesson progress
+      final lessonProgressRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('lessonProgress');
+      final lessonProgressDocs = await lessonProgressRef.get();
+      final batch = _firestore.batch();
+      for (final doc in lessonProgressDocs.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Delete all wrong answers
+      final wrongAnswersRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('wrongAnswers');
+      final wrongAnswersDocs = await wrongAnswersRef.get();
+      for (final doc in wrongAnswersDocs.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Delete all achievements
+      final achievementsRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('achievements');
+      final achievementsDocs = await achievementsRef.get();
+      for (final doc in achievementsDocs.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+
+      state = updatedUser;
+      AppLogger.info('User progress reset successfully', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to reset progress', tag: 'User', error: e, stackTrace: st);
+      throw DataException(
+        message: '학습 진행 상태 초기화에 실패했습니다',
+        originalError: e,
+        stackTrace: st,
+      );
     }
   }
 }

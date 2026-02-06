@@ -2,16 +2,90 @@
 //
 // Displays challenge progress, calendar view, and level info.
 // Teal-green header with learning path nodes + white card body.
+// All data is fetched from Firestore via providers.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import '../../data/models/lesson/curriculum_data.dart';
+import '../../data/models/lesson/lesson_progress_model.dart';
+import '../../data/providers/auth/auth_provider.dart';
+import '../../data/providers/lesson/lesson_progress_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/figma_colors.dart';
 
-class ChallengeHistoryScreen extends ConsumerWidget {
+class ChallengeHistoryScreen extends ConsumerStatefulWidget {
   const ChallengeHistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ChallengeHistoryScreen> createState() =>
+      _ChallengeHistoryScreenState();
+}
+
+class _ChallengeHistoryScreenState
+    extends ConsumerState<ChallengeHistoryScreen> {
+  Set<int> _studiedDays = {};
+  DateTime _displayMonth = DateTime.now();
+  bool _isLoadingCalendar = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStudyDates();
+  }
+
+  Future<void> _loadStudyDates() async {
+    final authState = ref.read(authProvider);
+    if (!authState.isAuthenticated) return;
+
+    final userNotifier = ref.read(userProvider.notifier);
+    final now = _displayMonth;
+    final dates = await userNotifier.getStudyDatesForMonth(now.year, now.month);
+
+    if (mounted) {
+      setState(() {
+        _studiedDays = dates;
+        _isLoadingCalendar = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final user = ref.watch(userProvider);
+    final uid = authState.firebaseUser?.uid;
+
+    if (uid == null || user == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final progressState = ref.watch(lessonProgressProvider(uid));
+    final allUnits = CurriculumData.getSampleUnits();
+    final totalLessons =
+        allUnits.fold<int>(0, (sum, u) => sum + u.lessonCount);
+    final completedLessons = progressState.completedCount;
+
+    // 현재 활성 유닛 찾기
+    String activeUnitTitle = allUnits.first.title;
+    int activeUnitOrder = 1;
+    for (final unit in allUnits) {
+      for (final lesson in unit.lessons) {
+        final lp = progressState.progressMap[lesson.id];
+        if (lp != null && lp.status == LessonStatus.inProgress) {
+          activeUnitTitle = unit.title;
+          activeUnitOrder = unit.order;
+          break;
+        }
+      }
+    }
+
+    // 현재 유닛의 레슨 노드 상태 계산
+    final activeUnit = allUnits.firstWhere(
+      (u) => u.order == activeUnitOrder,
+      orElse: () => allUnits.first,
+    );
+
     return Container(
       color: const Color(0xFFFAFAFA),
       child: SafeArea(
@@ -20,8 +94,18 @@ class ChallengeHistoryScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 100),
           child: Column(
             children: [
-              _buildHeader(),
-              _buildWhiteCardSection(),
+              _buildHeader(
+                unitOrder: activeUnitOrder,
+                unitTitle: activeUnitTitle,
+                lessons: activeUnit.lessons,
+                progressMap: progressState.progressMap,
+              ),
+              _buildWhiteCardSection(
+                user: user,
+                completedLessons: completedLessons,
+                totalLessons: totalLessons,
+                activeUnitTitle: activeUnitTitle,
+              ),
             ],
           ),
         ),
@@ -32,7 +116,12 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // Header: teal-green background with learning path nodes
   // ---------------------------------------------------------------------------
-  Widget _buildHeader() {
+  Widget _buildHeader({
+    required int unitOrder,
+    required String unitTitle,
+    required List lessons,
+    required Map<String, LessonProgressModel> progressMap,
+  }) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -41,10 +130,9 @@ class ChallengeHistoryScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
         children: [
-          // Section label
-          const Text(
-            'UNIT 3',
-            style: TextStyle(
+          Text(
+            'UNIT $unitOrder',
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: Colors.white70,
@@ -52,40 +140,63 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '챌린지 학습',
-            style: TextStyle(
+          Text(
+            unitTitle,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 20),
-
-          // Learning-path nodes row
-          _buildPathNodes(),
+          _buildPathNodes(lessons, progressMap),
         ],
       ),
     );
   }
 
-  Widget _buildPathNodes() {
-    // 7 nodes: first 3 completed, 4th active, rest locked
-    final List<_NodeState> nodes = [
-      _NodeState.completed,
-      _NodeState.completed,
-      _NodeState.completed,
-      _NodeState.active,
-      _NodeState.locked,
-      _NodeState.locked,
-      _NodeState.locked,
-    ];
+  Widget _buildPathNodes(
+    List lessons,
+    Map<String, LessonProgressModel> progressMap,
+  ) {
+    final nodes = <_NodeState>[];
+    bool foundActive = false;
+
+    for (final lesson in lessons) {
+      final progress = progressMap[lesson.id];
+      if (progress == null || progress.status == LessonStatus.locked) {
+        nodes.add(_NodeState.locked);
+      } else if (progress.status == LessonStatus.completed) {
+        nodes.add(_NodeState.completed);
+      } else {
+        // inProgress or unlocked → active
+        if (!foundActive) {
+          nodes.add(_NodeState.active);
+          foundActive = true;
+        } else {
+          nodes.add(_NodeState.locked);
+        }
+      }
+    }
+
+    // 노드가 없으면 기본값
+    if (nodes.isEmpty) {
+      nodes.addAll([_NodeState.active, _NodeState.locked, _NodeState.locked]);
+    }
+
+    // 활성 노드가 없으면 첫 번째 미완료 노드를 활성으로
+    if (!foundActive && nodes.isNotEmpty) {
+      final firstNonCompleted =
+          nodes.indexWhere((n) => n != _NodeState.completed);
+      if (firstNonCompleted >= 0) {
+        nodes[firstNonCompleted] = _NodeState.active;
+      }
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(nodes.length * 2 - 1, (i) {
         if (i.isOdd) {
-          // Connector line between nodes
           final leftState = nodes[i ~/ 2];
           final isCompleted = leftState == _NodeState.completed;
           return Container(
@@ -114,7 +225,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             color: Colors.white,
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.check, size: 16, color: FigmaColors.tealGreen),
+          child:
+              const Icon(Icons.check, size: 16, color: FigmaColors.tealGreen),
         );
       case _NodeState.active:
         return Container(
@@ -132,7 +244,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
               ),
             ],
           ),
-          child: const Icon(Icons.star, size: 16, color: FigmaColors.tealGreen),
+          child:
+              const Icon(Icons.star, size: 16, color: FigmaColors.tealGreen),
         );
       case _NodeState.locked:
         return Container(
@@ -148,9 +261,14 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // White card body (675px design height)
+  // White card body
   // ---------------------------------------------------------------------------
-  Widget _buildWhiteCardSection() {
+  Widget _buildWhiteCardSection({
+    required dynamic user,
+    required int completedLessons,
+    required int totalLessons,
+    required String activeUnitTitle,
+  }) {
     return Transform.translate(
       offset: const Offset(0, -16),
       child: Container(
@@ -163,7 +281,6 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Title
             const Text(
               '챌린지',
               style: TextStyle(
@@ -173,21 +290,22 @@ class ChallengeHistoryScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // 2. Two stat cards side-by-side
-            _buildStatCardsRow(),
+            _buildStatCardsRow(
+              completedLessons: completedLessons,
+              totalLessons: totalLessons,
+              streak: user.streak,
+            ),
             const SizedBox(height: 24),
-
-            // 3. Calendar
             _buildCalendarSection(),
             const SizedBox(height: 24),
-
-            // 4. Level progress
-            _buildLevelProgress(),
+            _buildLevelProgress(user),
             const SizedBox(height: 24),
-
-            // 5. Subject info
-            _buildSubjectInfo(),
+            _buildSubjectInfo(
+              unitTitle: activeUnitTitle,
+              streak: user.streak,
+              xp: user.totalXp,
+              league: user.league,
+            ),
           ],
         ),
       ),
@@ -195,19 +313,30 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // 2. Stat cards
+  // Stat cards
   // ---------------------------------------------------------------------------
-  Widget _buildStatCardsRow() {
+  Widget _buildStatCardsRow({
+    required int completedLessons,
+    required int totalLessons,
+    required int streak,
+  }) {
     return Row(
       children: [
-        Expanded(child: _buildChallengeDoneCard()),
+        Expanded(
+          child: _buildChallengeDoneCard(completedLessons, totalLessons),
+        ),
         const SizedBox(width: 12),
-        Expanded(child: _buildRemainingCard()),
+        Expanded(
+          child: _buildRemainingCard(completedLessons, totalLessons, streak),
+        ),
       ],
     );
   }
 
-  Widget _buildChallengeDoneCard() {
+  Widget _buildChallengeDoneCard(int completed, int total) {
+    final progress = total > 0 ? completed / total : 0.0;
+    final percent = (progress * 100).toInt();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -244,29 +373,29 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            '6/12',
-            style: TextStyle(
+          Text(
+            '$completed/$total',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: FigmaColors.textDark,
             ),
           ),
           const SizedBox(height: 4),
-          // Mini progress bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: 6 / 12,
+              value: progress,
               minHeight: 6,
               backgroundColor: FigmaColors.gold.withValues(alpha: 0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(FigmaColors.gold),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(FigmaColors.gold),
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            '50% completed',
-            style: TextStyle(
+          Text(
+            '$percent% completed',
+            style: const TextStyle(
               fontSize: 11,
               color: FigmaColors.textSecondary,
             ),
@@ -276,7 +405,9 @@ class ChallengeHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRemainingCard() {
+  Widget _buildRemainingCard(int completed, int total, int streak) {
+    final remaining = total - completed;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -314,17 +445,17 @@ class ChallengeHistoryScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           RichText(
-            text: const TextSpan(
+            text: TextSpan(
               children: [
                 TextSpan(
-                  text: '6 ',
-                  style: TextStyle(
+                  text: '$streak ',
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: FigmaColors.textDark,
                   ),
                 ),
-                TextSpan(
+                const TextSpan(
                   text: 'Days',
                   style: TextStyle(
                     fontSize: 13,
@@ -336,17 +467,17 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '/ 10 Days',
-            style: TextStyle(
+          Text(
+            '/ $total Lessons',
+            style: const TextStyle(
               fontSize: 12,
               color: FigmaColors.textSecondary,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            '4 days left',
-            style: TextStyle(
+          Text(
+            '$remaining lessons left',
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
               color: FigmaColors.tealGreen,
@@ -358,49 +489,64 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. Calendar section
+  // Calendar section
   // ---------------------------------------------------------------------------
   Widget _buildCalendarSection() {
+    final now = _displayMonth;
+    final monthName = DateFormat('MMMM yyyy').format(now);
+
     return Column(
       children: [
-        // Month header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'December 2022',
-              style: TextStyle(
+            Text(
+              monthName,
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: FigmaColors.textDark,
               ),
             ),
-            TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: const Text(
-                'View',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: FigmaColors.skyBlue,
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _displayMonth = DateTime(now.year, now.month - 1);
+                      _isLoadingCalendar = true;
+                    });
+                    _loadStudyDates();
+                  },
+                  icon: const Icon(Icons.chevron_left, size: 20),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(4),
                 ),
-              ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _displayMonth = DateTime(now.year, now.month + 1);
+                      _isLoadingCalendar = true;
+                    });
+                    _loadStudyDates();
+                  },
+                  icon: const Icon(Icons.chevron_right, size: 20),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(4),
+                ),
+              ],
             ),
           ],
         ),
         const SizedBox(height: 12),
-
-        // Day-of-week headers
         _buildDayHeaders(),
         const SizedBox(height: 8),
-
-        // Date grid (December 2022 starts on Thursday)
-        _buildDateGrid(),
+        _isLoadingCalendar
+            ? const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : _buildDateGrid(),
       ],
     );
   }
@@ -428,12 +574,15 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildDateGrid() {
-    // December 2022: starts Thursday (offset 3), 31 days
-    const int startOffset = 3; // Mon=0 ... Thu=3
-    const int totalDays = 31;
+    final year = _displayMonth.year;
+    final month = _displayMonth.month;
+    final firstDay = DateTime(year, month, 1);
+    final totalDays = DateTime(year, month + 1, 0).day;
 
-    // Days the user studied (sample data matching design)
-    const Set<int> studiedDays = {1, 2, 5, 6, 7, 8, 12, 13, 14, 19, 20, 26, 27};
+    // Monday = 1, Sunday = 7 → offset = (weekday - 1)
+    final startOffset = firstDay.weekday - 1;
+    final today = DateTime.now();
+    final isCurrentMonth = today.year == year && today.month == month;
 
     final totalCells = startOffset + totalDays;
     final rowCount = (totalCells / 7).ceil();
@@ -451,7 +600,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
                 return const Expanded(child: SizedBox(height: 36));
               }
 
-              final isStudied = studiedDays.contains(dayNum);
+              final isStudied = _studiedDays.contains(dayNum);
+              final isToday = isCurrentMonth && dayNum == today.day;
 
               return Expanded(
                 child: Center(
@@ -460,17 +610,31 @@ class ChallengeHistoryScreen extends ConsumerWidget {
                     height: 36,
                     decoration: isStudied
                         ? BoxDecoration(
-                            color: studiedDayColor(dayNum),
+                            color: _studiedDayColor(dayNum),
                             borderRadius: BorderRadius.circular(10),
                           )
-                        : null,
+                        : isToday
+                            ? BoxDecoration(
+                                border: Border.all(
+                                  color: FigmaColors.tealGreen,
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              )
+                            : null,
                     alignment: Alignment.center,
                     child: Text(
                       '$dayNum',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: isStudied ? FontWeight.w700 : FontWeight.w400,
-                        color: isStudied ? Colors.white : FigmaColors.textDark,
+                        fontWeight: isStudied || isToday
+                            ? FontWeight.w700
+                            : FontWeight.w400,
+                        color: isStudied
+                            ? Colors.white
+                            : isToday
+                                ? FigmaColors.tealGreen
+                                : FigmaColors.textDark,
                       ),
                     ),
                   ),
@@ -483,19 +647,76 @@ class ChallengeHistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// Returns the background color for a studied calendar day.
-  static Color studiedDayColor(int day) {
-    if (day <= 2) return FigmaColors.tealGreen;
-    if (day <= 8) return FigmaColors.skyBlue;
-    if (day <= 14) return FigmaColors.gold;
-    if (day <= 20) return FigmaColors.tealGreen;
-    return FigmaColors.skyBlue;
+  Color _studiedDayColor(int day) {
+    // 주별로 다른 색상
+    if (day <= 7) return FigmaColors.tealGreen;
+    if (day <= 14) return FigmaColors.skyBlue;
+    if (day <= 21) return FigmaColors.gold;
+    return FigmaColors.tealGreen;
   }
 
   // ---------------------------------------------------------------------------
-  // 4. Level progress
+  // Level progress
   // ---------------------------------------------------------------------------
-  Widget _buildLevelProgress() {
+  Widget _buildLevelProgress(dynamic user) {
+    final league = (user.league as String).toLowerCase();
+    final totalXp = user.totalXp as int;
+
+    // 리그별 XP 임계값
+    final leagueThresholds = {
+      'bronze': {'xp': 0, 'next': 'Silver', 'nextXp': 500},
+      'silver': {'xp': 500, 'next': 'Gold', 'nextXp': 1100},
+      'gold': {'xp': 1100, 'next': 'Diamond', 'nextXp': 2500},
+      'diamond': {'xp': 2500, 'next': 'Master', 'nextXp': 5000},
+      'master': {'xp': 5000, 'next': 'Master', 'nextXp': 10000},
+    };
+
+    final current = leagueThresholds[league] ?? leagueThresholds['bronze']!;
+    final currentXpBase = current['xp'] as int;
+    final nextXp = current['nextXp'] as int;
+    final nextLeague = current['next'] as String;
+
+    final xpInTier = totalXp - currentXpBase;
+    final xpNeeded = nextXp - currentXpBase;
+    final progress = xpNeeded > 0 ? (xpInTier / xpNeeded).clamp(0.0, 1.0) : 1.0;
+    final percent = (progress * 100).toInt();
+
+    final leagueDisplay = league[0].toUpperCase() + league.substring(1);
+    final badgeLetter = league[0].toUpperCase();
+
+    // 리그별 그라디언트
+    LinearGradient badgeGradient;
+    Color progressColor;
+    switch (league) {
+      case 'gold':
+        badgeGradient = FigmaColors.goldGradient;
+        progressColor = FigmaColors.gold;
+        break;
+      case 'silver':
+        badgeGradient = const LinearGradient(
+          colors: [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
+        );
+        progressColor = const Color(0xFF90A4AE);
+        break;
+      case 'diamond':
+        badgeGradient = const LinearGradient(
+          colors: [Color(0xFF42A5F5), Color(0xFF64B5F6)],
+        );
+        progressColor = const Color(0xFF42A5F5);
+        break;
+      case 'master':
+        badgeGradient = const LinearGradient(
+          colors: [Color(0xFF7E57C2), Color(0xFF9575CD)],
+        );
+        progressColor = const Color(0xFF7E57C2);
+        break;
+      default: // bronze
+        badgeGradient = const LinearGradient(
+          colors: [Color(0xFFCD7F32), Color(0xFFDDA15E)],
+        );
+        progressColor = const Color(0xFFCD7F32);
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -504,18 +725,17 @@ class ChallengeHistoryScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // Rank badge
           Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              gradient: FigmaColors.goldGradient,
+              gradient: badgeGradient,
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
-            child: const Text(
-              'G',
-              style: TextStyle(
+            child: Text(
+              badgeLetter,
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
@@ -523,26 +743,24 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 14),
-
-          // Progress info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Gold Rank',
-                      style: TextStyle(
+                      '$leagueDisplay Rank',
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: FigmaColors.textDark,
                       ),
                     ),
                     Text(
-                      '50%',
-                      style: TextStyle(
+                      '$percent%',
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: FigmaColors.textSecondary,
@@ -553,17 +771,17 @@ class ChallengeHistoryScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
-                  child: const LinearProgressIndicator(
-                    value: 0.5,
+                  child: LinearProgressIndicator(
+                    value: progress,
                     minHeight: 8,
-                    backgroundColor: Color(0xFFE4E9EA),
-                    valueColor: AlwaysStoppedAnimation<Color>(FigmaColors.gold),
+                    backgroundColor: const Color(0xFFE4E9EA),
+                    valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  '549 / 1100 XP to Diamond',
-                  style: TextStyle(
+                Text(
+                  '$totalXp / $nextXp XP to $nextLeague',
+                  style: const TextStyle(
                     fontSize: 11,
                     color: FigmaColors.textSecondary,
                   ),
@@ -577,9 +795,37 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Subject info row
+  // Subject info row
   // ---------------------------------------------------------------------------
-  Widget _buildSubjectInfo() {
+  Widget _buildSubjectInfo({
+    required String unitTitle,
+    required int streak,
+    required int xp,
+    required String league,
+  }) {
+    // RankModel shortName 대신 간단하게 리그 약어 표시
+    final leagueLower = league.toLowerCase();
+    String rankShort;
+    switch (leagueLower) {
+      case 'bronze':
+        rankShort = 'ALv1';
+        break;
+      case 'silver':
+        rankShort = 'ALv2';
+        break;
+      case 'gold':
+        rankShort = 'HLv1';
+        break;
+      case 'diamond':
+        rankShort = 'HLv2';
+        break;
+      case 'master':
+        rankShort = 'GTLv1';
+        break;
+      default:
+        rankShort = 'ALv1';
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -588,16 +834,15 @@ class ChallengeHistoryScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // Subject chip
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: FigmaColors.tealGreen.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text(
-              '소인수분해',
-              style: TextStyle(
+            child: Text(
+              unitTitle,
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: FigmaColors.tealGreen,
@@ -605,25 +850,20 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             ),
           ),
           const Spacer(),
-
-          // Streak
-          _buildInfoPill(Icons.local_fire_department, '6', FigmaColors.streakGold),
+          _buildInfoPill(
+              Icons.local_fire_department, '$streak', FigmaColors.streakGold),
           const SizedBox(width: 10),
-
-          // XP
-          _buildInfoPill(Icons.bolt, '549', FigmaColors.skyBlue),
+          _buildInfoPill(Icons.bolt, '$xp', FigmaColors.skyBlue),
           const SizedBox(width: 10),
-
-          // Level
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: FigmaColors.gold.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text(
-              'HLv1',
-              style: TextStyle(
+            child: Text(
+              rankShort,
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: FigmaColors.gold,

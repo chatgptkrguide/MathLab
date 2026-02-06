@@ -60,6 +60,10 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
       }
 
+      match /lessonProgress/{progressId} {
+        allow read, write: if isOwner(userId);
+      }
+
       match /achievements/{achievementId} {
         allow read: if isOwner(userId);
         allow write: if isOwner(userId) &&
@@ -68,6 +72,10 @@ service cloud.firestore {
       }
 
       match /wrongAnswers/{answerId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /studyDates/{dateId} {
         allow read, write: if isOwner(userId);
       }
 
