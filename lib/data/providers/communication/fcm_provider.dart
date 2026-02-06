@@ -5,7 +5,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import '../../../shared/utils/logger.dart';
+import '../../../core/utils/app_logger.dart';
 
 // FCM Service Provider
 final fcmServiceProvider = Provider<FCMService>((ref) {
@@ -41,24 +41,24 @@ class FCMService {
       );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        Logger.info('FCM 권한 승인됨', tag: 'FCM');
+        AppLogger.info('FCM 권한 승인됨', tag: 'FCM');
       } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-        Logger.info('FCM 임시 권한 승인됨', tag: 'FCM');
+        AppLogger.info('FCM 임시 권한 승인됨', tag: 'FCM');
       } else {
-        Logger.warning('FCM 권한 거부됨', tag: 'FCM');
+        AppLogger.warning('FCM 권한 거부됨', tag: 'FCM');
         return;
       }
 
       // Get FCM token
       _token = await _messaging.getToken();
       if (_token != null) {
-        Logger.info('FCM 토큰 획득: ${_token!.substring(0, 20)}...', tag: 'FCM');
+        AppLogger.info('FCM 토큰 획득: ${_token!.substring(0, 20)}...', tag: 'FCM');
       }
 
       // Listen for token refresh
       _messaging.onTokenRefresh.listen((newToken) {
         _token = newToken;
-        Logger.info('FCM 토큰 갱신됨: ${newToken.substring(0, 20)}...', tag: 'FCM');
+        AppLogger.info('FCM 토큰 갱신됨: ${newToken.substring(0, 20)}...', tag: 'FCM');
         // TODO: Send new token to server
       });
 
@@ -81,9 +81,9 @@ class FCMService {
         _handleInitialMessage(initialMessage);
       }
 
-      Logger.info('FCM 서비스 초기화 완료', tag: 'FCM');
+      AppLogger.info('FCM 서비스 초기화 완료', tag: 'FCM');
     } catch (e) {
-      Logger.error('FCM 초기화 실패', error: e, tag: 'FCM');
+      AppLogger.error('FCM 초기화 실패', error: e, tag: 'FCM');
     }
   }
 
@@ -93,7 +93,7 @@ class FCMService {
       _token ??= await _messaging.getToken();
       return _token;
     } catch (e) {
-      Logger.error('FCM 토큰 가져오기 실패', error: e, tag: 'FCM');
+      AppLogger.error('FCM 토큰 가져오기 실패', error: e, tag: 'FCM');
       return null;
     }
   }
@@ -102,9 +102,9 @@ class FCMService {
   Future<void> subscribeToTopic(String topic) async {
     try {
       await _messaging.subscribeToTopic(topic);
-      Logger.info('FCM 토픽 구독: $topic', tag: 'FCM');
+      AppLogger.info('FCM 토픽 구독: $topic', tag: 'FCM');
     } catch (e) {
-      Logger.error('FCM 토픽 구독 실패: $topic', error: e, tag: 'FCM');
+      AppLogger.error('FCM 토픽 구독 실패: $topic', error: e, tag: 'FCM');
     }
   }
 
@@ -112,15 +112,15 @@ class FCMService {
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await _messaging.unsubscribeFromTopic(topic);
-      Logger.info('FCM 토픽 구독 해제: $topic', tag: 'FCM');
+      AppLogger.info('FCM 토픽 구독 해제: $topic', tag: 'FCM');
     } catch (e) {
-      Logger.error('FCM 토픽 구독 해제 실패: $topic', error: e, tag: 'FCM');
+      AppLogger.error('FCM 토픽 구독 해제 실패: $topic', error: e, tag: 'FCM');
     }
   }
 
   /// Handle foreground messages
   void _handleForegroundMessage(RemoteMessage message) {
-    Logger.info(
+    AppLogger.info(
       'FCM 포그라운드 메시지 수신: ${message.notification?.title ?? "제목 없음"}',
       tag: 'FCM',
     );
@@ -136,7 +136,7 @@ class FCMService {
 
   /// Handle background messages (app in background)
   void _handleBackgroundMessage(RemoteMessage message) {
-    Logger.info(
+    AppLogger.info(
       'FCM 백그라운드 메시지 수신 (앱 열림): ${message.notification?.title ?? "제목 없음"}',
       tag: 'FCM',
     );
@@ -148,7 +148,7 @@ class FCMService {
 
   /// Handle initial message (app opened from terminated state)
   void _handleInitialMessage(RemoteMessage message) {
-    Logger.info(
+    AppLogger.info(
       'FCM 초기 메시지 수신 (종료 상태에서 앱 열림): ${message.notification?.title ?? "제목 없음"}',
       tag: 'FCM',
     );
@@ -181,7 +181,7 @@ class FCMService {
     //     break;
     // }
 
-    Logger.info(
+    AppLogger.info(
       'FCM 알림 네비게이션 요청: ${data["type"] ?? "타입 없음"}',
       tag: 'FCM',
     );
@@ -194,7 +194,7 @@ class FCMService {
   void processPendingDeepLink(dynamic context) {
     // TODO: Implement pending deep link processing
     // For now, just log that the method was called
-    Logger.info('대기 중인 딥링크 처리 요청됨', tag: 'FCM');
+    AppLogger.info('대기 중인 딥링크 처리 요청됨', tag: 'FCM');
 
     // This would typically:
     // 1. Check if there's a pending deep link stored
@@ -205,14 +205,14 @@ class FCMService {
 
   /// Cleanup resources
   void dispose() {
-    Logger.info('FCM 서비스 정리됨', tag: 'FCM');
+    AppLogger.info('FCM 서비스 정리됨', tag: 'FCM');
   }
 }
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  Logger.info(
+  AppLogger.info(
     'FCM 백그라운드 메시지 처리 (앱 완전 종료 상태): ${message.notification?.title ?? "제목 없음"}',
     tag: 'FCM',
   );

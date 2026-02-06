@@ -3,11 +3,10 @@
 // Manages friend relationships and social features
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/friend_model.dart';
 import '../api_provider.dart';
-
-final logger = Logger();
 
 /// Friend State
 class FriendState {
@@ -99,13 +98,13 @@ class FriendNotifier extends StateNotifier<FriendState> {
         isLoading: false,
       );
 
-      logger.i('Loaded ${friends.length} friends');
-    } catch (e) {
+      AppLogger.info('Loaded ${friends.length} friends', tag: 'Friend');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Failed to load friends: $e');
     }
   }
 
@@ -132,11 +131,12 @@ class FriendNotifier extends StateNotifier<FriendState> {
         sentRequests: sentRequests,
       );
 
-      logger.i(
-          'Loaded ${pendingRequests.length} pending and ${sentRequests.length} sent requests');
-    } catch (e) {
-      logger.e('Failed to load friend requests: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info(
+          'Loaded ${pendingRequests.length} pending and ${sentRequests.length} sent requests',
+          tag: 'Friend');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -153,11 +153,11 @@ class FriendNotifier extends StateNotifier<FriendState> {
       // Reload requests
       await loadFriendRequests();
 
-      logger.i('Friend request sent to $toUserId');
+      AppLogger.info('Friend request sent to $toUserId', tag: 'Friend');
       return true;
-    } catch (e) {
-      logger.e('Failed to send friend request: $e');
-      state = state.copyWith(error: e.toString());
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
       return false;
     }
   }
@@ -178,11 +178,11 @@ class FriendNotifier extends StateNotifier<FriendState> {
         loadFriendRequests(),
       ]);
 
-      logger.i('Friend request accepted: $requestId');
+      AppLogger.info('Friend request accepted: $requestId', tag: 'Friend');
       return true;
-    } catch (e) {
-      logger.e('Failed to accept friend request: $e');
-      state = state.copyWith(error: e.toString());
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
       return false;
     }
   }
@@ -200,11 +200,11 @@ class FriendNotifier extends StateNotifier<FriendState> {
       // Reload requests
       await loadFriendRequests();
 
-      logger.i('Friend request rejected: $requestId');
+      AppLogger.info('Friend request rejected: $requestId', tag: 'Friend');
       return true;
-    } catch (e) {
-      logger.e('Failed to reject friend request: $e');
-      state = state.copyWith(error: e.toString());
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
       return false;
     }
   }
@@ -222,11 +222,11 @@ class FriendNotifier extends StateNotifier<FriendState> {
       // Reload friends
       await loadFriends();
 
-      logger.i('Friend removed: $friendId');
+      AppLogger.info('Friend removed: $friendId', tag: 'Friend');
       return true;
-    } catch (e) {
-      logger.e('Failed to remove friend: $e');
-      state = state.copyWith(error: e.toString());
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
       return false;
     }
   }
@@ -244,11 +244,11 @@ class FriendNotifier extends StateNotifier<FriendState> {
       // Reload friends
       await loadFriends();
 
-      logger.i('Friend blocked: $friendId');
+      AppLogger.info('Friend blocked: $friendId', tag: 'Friend');
       return true;
-    } catch (e) {
-      logger.e('Failed to block friend: $e');
-      state = state.copyWith(error: e.toString());
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
       return false;
     }
   }
@@ -269,10 +269,10 @@ class FriendNotifier extends StateNotifier<FriendState> {
 
       state = state.copyWith(friendActivities: activities);
 
-      logger.i('Loaded ${activities.length} friend activities');
-    } catch (e) {
-      logger.e('Failed to load friend activities: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Loaded ${activities.length} friend activities', tag: 'Friend');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -287,8 +287,8 @@ class FriendNotifier extends StateNotifier<FriendState> {
       );
 
       return results.cast<Map<String, dynamic>>();
-    } catch (e) {
-      logger.e('Failed to search users: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   }
@@ -313,8 +313,8 @@ final friendSuggestionsProvider =
       );
 
       return suggestions.cast<Map<String, dynamic>>();
-    } catch (e) {
-      logger.e('Failed to load friend suggestions: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   },

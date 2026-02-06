@@ -4,10 +4,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/league_model.dart';
-
-final _logger = Logger();
 
 /// 리더보드 기간 enum
 enum LeaderboardPeriod {
@@ -99,12 +98,12 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
         isLoading: false,
       );
 
-      _logger.i('Loaded ${allTimeEntries.length} leaderboard entries');
-    } catch (e) {
-      _logger.e('Failed to load leaderboard: $e');
+      AppLogger.info('Loaded ${allTimeEntries.length} leaderboard entries');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
     }
   }

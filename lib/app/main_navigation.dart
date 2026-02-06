@@ -11,7 +11,7 @@ import '../features/challenges/challenge_history_screen.dart';
 import '../data/providers/infrastructure/navigation_provider.dart';
 import '../data/providers/communication/fcm_provider.dart';
 import '../data/services/deep_link_service.dart';
-import '../shared/utils/logger.dart';
+import '../core/utils/app_logger.dart';
 
 /// 메인 네비게이션 위젯
 /// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
@@ -41,7 +41,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
   void _setupDeepLinkListeners() {
     // 1. 포그라운드 메시지 오픈 리스너
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      Logger.info('백그라운드 메시지 오픈: ${message.data}', tag: 'DeepLink');
+      AppLogger.info('백그라운드 메시지 오픈: ${message.data}', tag: 'DeepLink');
       if (message.data.isNotEmpty && mounted) {
         _deepLinkService.handleNotification(context, message.data);
       }
@@ -50,7 +50,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     // 2. 앱 종료 상태에서 알림 탭하여 실행된 경우
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null && message.data.isNotEmpty && mounted) {
-        Logger.info('앱 종료 상태에서 알림으로 실행: ${message.data}', tag: 'DeepLink');
+        AppLogger.info('앱 종료 상태에서 알림으로 실행: ${message.data}', tag: 'DeepLink');
         // 약간의 딜레이 후 처리 (UI가 완전히 로드될 때까지 대기)
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {

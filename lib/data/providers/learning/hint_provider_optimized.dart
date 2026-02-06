@@ -1,29 +1,29 @@
-// 💡 Hint Provider Optimized
+// 💡 Hint Provider
 //
-// Optimized hint management with XP-based unlock system
+// Hint management with XP-based unlock system
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/learning/problem.dart';
 import '../user/user_provider.dart';
 
-/// Hint state for optimized provider
-class HintStateOptimized {
+/// Hint state
+class HintState {
   final Set<String> unlockedHints;
   final bool isLoading;
   final String? error;
 
-  const HintStateOptimized({
+  const HintState({
     this.unlockedHints = const {},
     this.isLoading = false,
     this.error,
   });
 
-  HintStateOptimized copyWith({
+  HintState copyWith({
     Set<String>? unlockedHints,
     bool? isLoading,
     String? error,
   }) {
-    return HintStateOptimized(
+    return HintState(
       unlockedHints: unlockedHints ?? this.unlockedHints,
       isLoading: isLoading ?? this.isLoading,
       error: error,
@@ -31,14 +31,14 @@ class HintStateOptimized {
   }
 }
 
-/// Optimized hint notifier with XP cost system
-class HintProviderOptimized extends StateNotifier<HintStateOptimized> {
+/// Hint notifier with XP cost system
+class HintNotifier extends StateNotifier<HintState> {
   final Ref _ref;
 
   /// Cost in XP to unlock a hint
   static const int hintCost = 20;
 
-  HintProviderOptimized(this._ref) : super(const HintStateOptimized());
+  HintNotifier(this._ref) : super(const HintState());
 
   /// Unlock a hint for a problem
   Future<bool> unlockHint(Problem problem, int hintIndex) async {
@@ -84,12 +84,17 @@ class HintProviderOptimized extends StateNotifier<HintStateOptimized> {
 
   /// Reset hints
   void reset() {
-    state = const HintStateOptimized();
+    state = const HintState();
   }
 }
 
-/// Provider for optimized hint management
-final hintProviderOptimized =
-    StateNotifierProvider<HintProviderOptimized, HintStateOptimized>(
-  (ref) => HintProviderOptimized(ref),
+/// Provider for hint management
+final hintProvider =
+    StateNotifierProvider<HintNotifier, HintState>(
+  (ref) => HintNotifier(ref),
 );
+
+// Backward compatibility aliases
+typedef HintStateOptimized = HintState;
+typedef HintProviderOptimized = HintNotifier;
+final hintProviderOptimized = hintProvider;

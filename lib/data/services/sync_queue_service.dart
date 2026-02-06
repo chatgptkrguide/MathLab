@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:hive/hive.dart';
-import 'package:logger/logger.dart';
+import '../../core/utils/app_logger.dart';
 
 enum SyncOperationType {
   submitAnswer,
@@ -58,7 +58,6 @@ class SyncQueueService {
   static const String _boxName = 'sync_queue';
   static const int _maxRetries = 3;
 
-  final Logger _logger = Logger();
   Box<String>? _box;
   final List<SyncOperation> _queue = [];
   bool _isSyncing = false;
@@ -77,11 +76,11 @@ class SyncQueueService {
         final json = jsonDecode(_box!.get(key)!);
         _queue.add(SyncOperation.fromJson(json));
       } catch (e) {
-        _logger.e('Failed to load sync operation: $e');
+        AppLogger.error('Failed to load sync operation: $e');
       }
     }
 
-    _logger.i('Loaded ${_queue.length} pending sync operations');
+    AppLogger.info('Loaded ${_queue.length} pending sync operations');
   }
 
   Future<void> addOperation({
@@ -98,7 +97,7 @@ class SyncQueueService {
     _queue.add(operation);
     await _saveOperation(operation);
 
-    _logger.d('Added sync operation: ${operation.type.name}');
+    AppLogger.debug('Added sync operation: ${operation.type.name}');
   }
 
   Future<void> _saveOperation(SyncOperation operation) async {
@@ -116,7 +115,7 @@ class SyncQueueService {
     if (_isSyncing || _queue.isEmpty) return;
 
     _isSyncing = true;
-    _logger.i('Starting sync of ${_queue.length} operations');
+    AppLogger.info('Starting sync of ${_queue.length} operations');
 
     final operationsToSync = List<SyncOperation>.from(_queue);
 
@@ -127,7 +126,7 @@ class SyncQueueService {
 
         // Remove from queue on success
         await _removeOperation(operation.id);
-        _logger.d('Synced operation: ${operation.id}');
+        AppLogger.debug('Synced operation: ${operation.id}');
       } catch (e) {
         // Increment retry count
         operation.retryCount++;
@@ -136,13 +135,13 @@ class SyncQueueService {
         if (operation.retryCount >= _maxRetries) {
           // Remove after max retries
           await _removeOperation(operation.id);
-          _logger.e(
+          AppLogger.error(
             'Removed operation after ${operation.retryCount} retries: ${operation.id}',
           );
         } else {
           // Save updated operation
           await _saveOperation(operation);
-          _logger.w(
+          AppLogger.warning(
             'Retry ${operation.retryCount}/$_maxRetries for operation: ${operation.id}',
           );
         }
@@ -150,7 +149,7 @@ class SyncQueueService {
     }
 
     _isSyncing = false;
-    _logger.i('Sync completed. ${_queue.length} operations remaining');
+    AppLogger.info('Sync completed. ${_queue.length} operations remaining');
   }
 
   int get pendingCount => _queue.length;
@@ -161,7 +160,7 @@ class SyncQueueService {
     if (_box == null) return;
     await _box!.clear();
     _queue.clear();
-    _logger.i('Cleared sync queue');
+    AppLogger.info('Cleared sync queue');
   }
 
   void dispose() {

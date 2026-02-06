@@ -4,12 +4,11 @@
 
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../core/error/app_error.dart';
+import '../../core/utils/app_logger.dart';
 import '../services/connectivity_service.dart';
 import '../services/sync_queue_service.dart';
 import 'api_provider.dart';
-
-final logger = Logger();
 
 /// Connectivity Service Provider
 final connectivityServiceProvider = Provider<ConnectivityService>((ref) {
@@ -81,10 +80,10 @@ class SyncNotifier extends StateNotifier<SyncState> {
     _connectivitySubscription =
         _connectivityService.connectivityStream.listen((isOnline) {
       if (isOnline) {
-        logger.i('Device is online, starting sync...');
+        AppLogger.info('Device is online, starting sync...');
         syncAll();
       } else {
-        logger.w('Device is offline');
+        AppLogger.warning('Device is offline');
       }
     });
 
@@ -132,13 +131,13 @@ class SyncNotifier extends StateNotifier<SyncState> {
         pendingOperations: _queueService.pendingCount,
       );
 
-      logger.i('Sync completed successfully');
-    } catch (e) {
+      AppLogger.info('Sync completed successfully');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isSyncing: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Sync failed: $e');
     }
   }
 

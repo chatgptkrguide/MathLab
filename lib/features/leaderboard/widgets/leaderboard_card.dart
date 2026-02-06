@@ -352,24 +352,32 @@ class _FriendButton extends ConsumerWidget {
   Future<void> _sendFriendRequest(BuildContext context, WidgetRef ref) async {
     try {
       // AllUsersProvider에서 실제 사용자 정보 가져오기
-      final allUsers = ref.read(allUsersProvider);
-      final targetUser = allUsers.firstWhere(
-        (u) => u.id == entry.userId,
-        orElse: () => User(
-          id: entry.userId,
-          name: entry.userName,
-          email: '${entry.userId}@example.com',
-          joinDate: DateTime.now(),
-          level: entry.level,
-          xp: entry.xp,
-          streakDays: entry.streakDays,
-          currentGrade: entry.grade,
-          avatarUrl: '👤',
-          hearts: 5,
-          dailyXP: 0,
-          lastXPResetDate: DateTime.now(),
-        ),
-      );
+      final allUsersAsync = ref.read(allUsersProvider);
+      final allUsers = allUsersAsync.valueOrNull ?? [];
+      final targetUser = allUsers.isNotEmpty
+          ? allUsers.firstWhere(
+              (u) => u.id == entry.userId,
+              orElse: () => User(
+                id: entry.userId,
+                name: entry.userName,
+                email: '',
+                joinDate: DateTime.now(),
+                level: entry.level,
+                xp: entry.xp,
+                streakDays: entry.streakDays,
+                currentGrade: entry.grade,
+              ),
+            )
+          : User(
+              id: entry.userId,
+              name: entry.userName,
+              email: '',
+              joinDate: DateTime.now(),
+              level: entry.level,
+              xp: entry.xp,
+              streakDays: entry.streakDays,
+              currentGrade: entry.grade,
+            );
 
       await ref.read(friendsProvider.notifier).sendFriendRequest(
             userId: targetUser.id,

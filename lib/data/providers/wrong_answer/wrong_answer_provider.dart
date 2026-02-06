@@ -4,10 +4,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/wrong_answer_model.dart';
-
-final logger = Logger();
 
 /// Wrong Answer State
 class WrongAnswerState {
@@ -92,13 +91,13 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
         isLoading: false,
       );
 
-      logger.i('Loaded ${wrongAnswers.length} wrong answers from Firestore');
-    } catch (e) {
+      AppLogger.info('Loaded ${wrongAnswers.length} wrong answers from Firestore');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Failed to load wrong answers: $e');
     }
   }
 
@@ -140,10 +139,10 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
         filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
       );
 
-      logger.i('Added wrong answer: ${docRef.id}');
-    } catch (e) {
-      logger.e('Failed to add wrong answer: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Added wrong answer: ${docRef.id}');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -171,10 +170,10 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
         filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
       );
 
-      logger.i('Retried wrong answer: $wrongAnswerId');
-    } catch (e) {
-      logger.e('Failed to retry wrong answer: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Retried wrong answer: $wrongAnswerId');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -202,10 +201,10 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
         filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
       );
 
-      logger.i('Marked wrong answer as resolved: $wrongAnswerId');
-    } catch (e) {
-      logger.e('Failed to mark as resolved: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Marked wrong answer as resolved: $wrongAnswerId');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -222,10 +221,10 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
         filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
       );
 
-      logger.i('Deleted wrong answer: $wrongAnswerId');
-    } catch (e) {
-      logger.e('Failed to delete wrong answer: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Deleted wrong answer: $wrongAnswerId');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 

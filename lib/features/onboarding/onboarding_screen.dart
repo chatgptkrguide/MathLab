@@ -4,7 +4,7 @@ import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
 import '../../data/services/local_storage_service.dart';
 import '../../data/services/analytics_service.dart';
-import '../../shared/utils/logger.dart';
+import '../../core/utils/app_logger.dart';
 import 'widgets/onboarding_page.dart';
 
 /// 온보딩 화면
@@ -21,7 +21,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
       final data = await storage.loadMap(_onboardingCompleteKey);
       return data?['completed'] == true;
     } catch (e) {
-      Logger.error('Failed to check onboarding status', error: e);
+      AppLogger.error('Failed to check onboarding status', error: e);
       return false;
     }
   }
@@ -31,9 +31,9 @@ class OnboardingScreen extends ConsumerStatefulWidget {
     try {
       final storage = LocalStorageService();
       await storage.remove(_onboardingCompleteKey);
-      Logger.info('Onboarding reset');
+      AppLogger.info('Onboarding reset');
     } catch (e) {
-      Logger.error('Failed to reset onboarding', error: e);
+      AppLogger.error('Failed to reset onboarding', error: e);
     }
   }
 
@@ -299,14 +299,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         },
       );
 
-      Logger.info('Onboarding completed');
+      AppLogger.info('Onboarding completed');
 
       if (mounted) {
         // 메인 화면으로 이동
         Navigator.of(context).pushReplacementNamed('/home');
       }
     } catch (e) {
-      Logger.error('Failed to complete onboarding', error: e);
+      AppLogger.error('Failed to complete onboarding', error: e);
     }
   }
 }

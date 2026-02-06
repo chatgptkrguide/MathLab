@@ -7,9 +7,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/lesson/curriculum_data.dart';
 import '../../data/models/lesson/lesson_progress_model.dart';
 import '../../data/providers/auth/auth_provider.dart';
+import '../../data/providers/curriculum/curriculum_provider.dart';
 import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/figma_colors.dart';
@@ -61,55 +61,64 @@ class _ChallengeHistoryScreenState
     }
 
     final progressState = ref.watch(lessonProgressProvider(uid));
-    final allUnits = CurriculumData.getSampleUnits();
-    final totalLessons =
-        allUnits.fold<int>(0, (sum, u) => sum + u.lessonCount);
-    final completedLessons = progressState.completedCount;
+    final curriculumAsync = ref.watch(curriculumProvider);
 
-    // 현재 활성 유닛 찾기
-    String activeUnitTitle = allUnits.first.title;
-    int activeUnitOrder = 1;
-    for (final unit in allUnits) {
-      for (final lesson in unit.lessons) {
-        final lp = progressState.progressMap[lesson.id];
-        if (lp != null && lp.status == LessonStatus.inProgress) {
-          activeUnitTitle = unit.title;
-          activeUnitOrder = unit.order;
-          break;
-        }
-      }
-    }
-
-    // 현재 유닛의 레슨 노드 상태 계산
-    final activeUnit = allUnits.firstWhere(
-      (u) => u.order == activeUnitOrder,
-      orElse: () => allUnits.first,
-    );
-
-    return Container(
-      color: const Color(0xFFFAFAFA),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 100),
-          child: Column(
-            children: [
-              _buildHeader(
-                unitOrder: activeUnitOrder,
-                unitTitle: activeUnitTitle,
-                lessons: activeUnit.lessons,
-                progressMap: progressState.progressMap,
-              ),
-              _buildWhiteCardSection(
-                user: user,
-                completedLessons: completedLessons,
-                totalLessons: totalLessons,
-                activeUnitTitle: activeUnitTitle,
-              ),
-            ],
-          ),
-        ),
+    return curriculumAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const Center(
+        child: Text('커리큘럼을 불러오는데 실패했습니다'),
       ),
+      data: (allUnits) {
+        final totalLessons =
+            allUnits.fold<int>(0, (sum, u) => sum + u.lessonCount);
+        final completedLessons = progressState.completedCount;
+
+        // 현재 활성 유닛 찾기
+        String activeUnitTitle = allUnits.first.title;
+        int activeUnitOrder = 1;
+        for (final unit in allUnits) {
+          for (final lesson in unit.lessons) {
+            final lp = progressState.progressMap[lesson.id];
+            if (lp != null && lp.status == LessonStatus.inProgress) {
+              activeUnitTitle = unit.title;
+              activeUnitOrder = unit.order;
+              break;
+            }
+          }
+        }
+
+        // 현재 유닛의 레슨 노드 상태 계산
+        final activeUnit = allUnits.firstWhere(
+          (u) => u.order == activeUnitOrder,
+          orElse: () => allUnits.first,
+        );
+
+        return Container(
+          color: const Color(0xFFFAFAFA),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 100),
+              child: Column(
+                children: [
+                  _buildHeader(
+                    unitOrder: activeUnitOrder,
+                    unitTitle: activeUnitTitle,
+                    lessons: activeUnit.lessons,
+                    progressMap: progressState.progressMap,
+                  ),
+                  _buildWhiteCardSection(
+                    user: user,
+                    completedLessons: completedLessons,
+                    totalLessons: totalLessons,
+                    activeUnitTitle: activeUnitTitle,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

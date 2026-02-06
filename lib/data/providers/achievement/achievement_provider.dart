@@ -3,11 +3,10 @@
 // Manages achievements and user progress
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/achievement_model.dart';
 import '../api_provider.dart';
-
-final logger = Logger();
 
 /// Achievement State
 class AchievementState {
@@ -128,13 +127,13 @@ class AchievementNotifier extends StateNotifier<AchievementState> {
         isLoading: false,
       );
 
-      logger.i('Loaded ${achievements.length} achievements');
-    } catch (e) {
+      AppLogger.info('Loaded ${achievements.length} achievements', tag: 'Achievement');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Failed to load achievements: $e');
     }
   }
 
@@ -153,12 +152,12 @@ class AchievementNotifier extends StateNotifier<AchievementState> {
       if (newlyUnlocked.isNotEmpty) {
         // Reload achievements to get updated progress
         await loadAchievements();
-        logger.i('Unlocked ${newlyUnlocked.length} new achievements');
+        AppLogger.info('Unlocked ${newlyUnlocked.length} new achievements', tag: 'Achievement');
       }
 
       return newlyUnlocked;
-    } catch (e) {
-      logger.e('Failed to check for unlocks: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   }
@@ -240,8 +239,8 @@ final recentAchievementsProvider =
       return recentData
           .map((data) => AchievementModel.fromJson(data))
           .toList();
-    } catch (e) {
-      logger.e('Failed to load recent achievements: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   },

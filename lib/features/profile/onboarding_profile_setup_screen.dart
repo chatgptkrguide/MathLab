@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/services/temp_profile_storage.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
-import '../../shared/utils/logger.dart';
+import '../../core/utils/app_logger.dart';
 import 'widgets/widgets.dart';
 
 /// 온보딩 스타일 프로필 설정 화면
@@ -40,13 +40,13 @@ class _OnboardingProfileSetupScreenState
   }
 
   void _nextPage() {
-    Logger.info('_nextPage called: current=$_currentPage, total=$_totalPages',
+    AppLogger.info('_nextPage called: current=$_currentPage, total=$_totalPages',
         tag: 'OnboardingProfileSetup');
     if (_currentPage < _totalPages - 1) {
       // Haptic feedback for smooth transition
       HapticFeedback.lightImpact();
       setState(() => _currentPage++);
-      Logger.info('Moving to page $_currentPage',
+      AppLogger.info('Moving to page $_currentPage',
           tag: 'OnboardingProfileSetup');
       _pageController.animateToPage(
         _currentPage,
@@ -54,7 +54,7 @@ class _OnboardingProfileSetupScreenState
         curve: Curves.easeOutCubic,
       );
     } else {
-      Logger.info('Already at last page', tag: 'OnboardingProfileSetup');
+      AppLogger.info('Already at last page', tag: 'OnboardingProfileSetup');
     }
   }
 
@@ -99,7 +99,7 @@ class _OnboardingProfileSetupScreenState
         bio: null, // 나중에 프로필에서 추가 가능
       );
 
-      Logger.info('프로필 입력 완료: ${tempProfileData.name} (${tempProfileData.currentGrade})',
+      AppLogger.info('프로필 입력 완료: ${tempProfileData.name} (${tempProfileData.currentGrade})',
           tag: 'OnboardingProfileSetupScreen');
 
       await Future.delayed(const Duration(milliseconds: 500));
@@ -110,7 +110,7 @@ class _OnboardingProfileSetupScreenState
       }
     } catch (e) {
       HapticFeedback.vibrate();
-      Logger.error('프로필 저장 실패', error: e, tag: 'OnboardingProfileSetupScreen');
+      AppLogger.error('프로필 저장 실패', error: e, tag: 'OnboardingProfileSetupScreen');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +167,7 @@ class _OnboardingProfileSetupScreenState
                     onBack: _previousPage,
                     canProceed: _canProceed(),
                     onContinue: () {
-                      Logger.info('Button tapped: page=$_currentPage',
+                      AppLogger.info('Button tapped: page=$_currentPage',
                           tag: 'OnboardingProfileSetup');
                       if (_currentPage == _totalPages - 1) {
                         _saveProfile();
@@ -212,7 +212,7 @@ class _OnboardingProfileSetupScreenState
                     onBack: _previousPage,
                     canProceed: _canProceed(),
                     onContinue: () {
-                      Logger.info('Button tapped: page=$_currentPage',
+                      AppLogger.info('Button tapped: page=$_currentPage',
                           tag: 'OnboardingProfileSetup');
                       if (_currentPage == _totalPages - 1) {
                         _saveProfile();
@@ -291,7 +291,7 @@ class _OnboardingProfileSetupScreenState
                     onBack: _previousPage,
                     canProceed: _canProceed(),
                     onContinue: () {
-                      Logger.info('Button tapped: page=$_currentPage',
+                      AppLogger.info('Button tapped: page=$_currentPage',
                           tag: 'OnboardingProfileSetup');
                       _saveProfile();
                     },

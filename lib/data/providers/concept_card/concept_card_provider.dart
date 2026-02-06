@@ -3,11 +3,10 @@
 // Manages concept cards and user progress
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/concept_card_model.dart';
 import '../api_provider.dart';
-
-final logger = Logger();
 
 /// Concept Card State
 class ConceptCardState {
@@ -109,13 +108,13 @@ class ConceptCardNotifier extends StateNotifier<ConceptCardState> {
         isLoading: false,
       );
 
-      logger.i('Loaded ${conceptCards.length} concept cards');
-    } catch (e) {
+      AppLogger.info('Loaded ${conceptCards.length} concept cards');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Failed to load concept cards: $e');
     }
   }
 
@@ -153,9 +152,9 @@ class ConceptCardNotifier extends StateNotifier<ConceptCardState> {
 
       state = state.copyWith(progressMap: updatedProgressMap);
 
-      logger.i('Marked concept card as viewed: $conceptCardId');
-    } catch (e) {
-      logger.e('Failed to mark as viewed: $e');
+      AppLogger.info('Marked concept card as viewed: $conceptCardId');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
     }
   }
 
@@ -203,10 +202,10 @@ class ConceptCardNotifier extends StateNotifier<ConceptCardState> {
         bookmarkedCards: bookmarkedCards,
       );
 
-      logger.i('Toggled bookmark for concept card: $conceptCardId');
-    } catch (e) {
-      logger.e('Failed to toggle bookmark: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Toggled bookmark for concept card: $conceptCardId');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -263,8 +262,8 @@ final relatedConceptsProvider =
       return relatedData
           .map((data) => ConceptCardModel.fromJson(data))
           .toList();
-    } catch (e) {
-      logger.e('Failed to load related concepts: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   },

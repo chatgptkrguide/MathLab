@@ -3,27 +3,17 @@
 // Logs all HTTP requests and responses for debugging
 
 import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
+import '../../../../core/utils/app_logger.dart';
 
 class LoggingInterceptor extends Interceptor {
-  final Logger _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 5,
-      lineLength: 120,
-      colors: true,
-      printEmojis: true,
-      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
-    ),
-  );
-
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    _logger.d(
-      '🌐 REQUEST[${options.method}] => PATH: ${options.path}\n'
+    AppLogger.debug(
+      'REQUEST[${options.method}] => PATH: ${options.path}\n'
       'Headers: ${options.headers}\n'
       'Query Parameters: ${options.queryParameters}\n'
       'Data: ${options.data}',
+      tag: 'HTTP',
     );
 
     handler.next(options);
@@ -31,9 +21,10 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    _logger.i(
-      '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}\n'
+    AppLogger.info(
+      'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}\n'
       'Data: ${response.data}',
+      tag: 'HTTP',
     );
 
     handler.next(response);
@@ -41,11 +32,12 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _logger.e(
-      '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}\n'
+    AppLogger.error(
+      'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}\n'
       'Message: ${err.message}\n'
       'Error: ${err.error}\n'
       'Response: ${err.response?.data}',
+      tag: 'HTTP',
     );
 
     handler.next(err);

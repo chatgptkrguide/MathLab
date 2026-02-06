@@ -2,9 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/lesson/curriculum_data.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/models/lesson/lesson_progress_model.dart';
+import '../../../data/models/lesson/unit_model.dart';
+import '../../../data/providers/curriculum/curriculum_provider.dart';
 import '../../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/figma_colors.dart';
@@ -20,8 +21,6 @@ class LessonsScreenFigma extends ConsumerStatefulWidget {
 
 class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     with SingleTickerProviderStateMixin {
-  final units = CurriculumData.getSampleUnits();
-
   // 과목 선택 상태
   int _selectedSubjectIndex = 0;
   final List<String> _subjects = ['공통수학 1', '공통수학 2'];
@@ -55,7 +54,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       if (mounted) _bannerController.forward();
     });
 
-    // 첫 번째 레슨들 초기화 (신규 사용자용)
+    // 첫 번째 레슨들 초기화 (신규 사용자용) - 커리큘럼 로드 후 실행
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeFirstLessonsIfNeeded();
     });
@@ -64,6 +63,10 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
   void _initializeFirstLessonsIfNeeded() {
     final user = ref.read(userProvider);
     if (user == null) return;
+
+    final curriculumAsync = ref.read(curriculumProvider);
+    final units = curriculumAsync.valueOrNull;
+    if (units == null) return;
 
     final progressState = ref.read(lessonProgressProvider(user.id));
 
@@ -102,6 +105,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     final progressState = user != null
         ? ref.watch(lessonProgressProvider(user.id))
         : const LessonProgressState();
+    final curriculumAsync = ref.watch(curriculumProvider);
 
     return Scaffold(
       body: AnimatedContainer(
@@ -124,34 +128,48 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   ),
                 )
               else
-                // 스크롤 가능한 학습 경로
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 40),
-                    child: Column(
-                      children: [
-                        for (int i = 0; i < units.length; i++) ...[
-                          SlideTransition(
-                            position: _bannerSlideAnimation,
-                            child: FadeTransition(
-                              opacity: _bannerFadeAnimation,
-                              child: _buildUnitBanner(
-                                units[i].emoji,
-                                units[i].title,
-                                units[i].description,
+                curriculumAsync.when(
+                  loading: () => const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  ),
+                  error: (_, __) => const Expanded(
+                    child: Center(
+                      child: Text(
+                        '커리큘럼을 불러오는데 실패했습니다',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  data: (units) => Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 40),
+                      child: Column(
+                        children: [
+                          for (int i = 0; i < units.length; i++) ...[
+                            SlideTransition(
+                              position: _bannerSlideAnimation,
+                              child: FadeTransition(
+                                opacity: _bannerFadeAnimation,
+                                child: _buildUnitBanner(
+                                  units[i].emoji,
+                                  units[i].title,
+                                  units[i].description,
+                                ),
                               ),
                             ),
-                          ),
-                          LessonPathWidget(
-                            lessons: units[i].lessons,
-                            progressMap: progressState.progressMap,
-                            onLessonTap: (lessonId) =>
-                                _handleLessonTap(lessonId, progressState),
-                          ),
-                          if (i < units.length - 1) const SizedBox(height: 16),
+                            LessonPathWidget(
+                              lessons: units[i].lessons,
+                              progressMap: progressState.progressMap,
+                              onLessonTap: (lessonId) =>
+                                  _handleLessonTap(lessonId, units, progressState),
+                            ),
+                            if (i < units.length - 1) const SizedBox(height: 16),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -322,7 +340,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     );
   }
 
-  void _handleLessonTap(String lessonId, LessonProgressState progressState) {
+  void _handleLessonTap(String lessonId, List<UnitModel> units, LessonProgressState progressState) {
     final user = ref.read(userProvider);
     if (user == null) return;
 

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../shared/utils/logger.dart';
+import '../../core/utils/app_logger.dart';
 
 /// 로컬 스토리지 서비스
 /// SharedPreferences를 사용하여 간단한 데이터를 로컬에 저장/로드합니다
@@ -12,7 +12,7 @@ class LocalStorageService {
       final jsonString = jsonEncode(data);
       await prefs.setString(key, jsonString);
     } catch (e) {
-      Logger.error('Failed to save map data for key: $key', error: e);
+      AppLogger.error('Failed to save map data for key: $key', error: e);
       rethrow;
     }
   }
@@ -25,7 +25,7 @@ class LocalStorageService {
       if (jsonString == null) return null;
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      Logger.error('Failed to load map data for key: $key', error: e);
+      AppLogger.error('Failed to load map data for key: $key', error: e);
       return null;
     }
   }
@@ -36,7 +36,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(key, value);
     } catch (e) {
-      Logger.error('Failed to save string for key: $key', error: e);
+      AppLogger.error('Failed to save string for key: $key', error: e);
       rethrow;
     }
   }
@@ -47,7 +47,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(key);
     } catch (e) {
-      Logger.error('Failed to load string for key: $key', error: e);
+      AppLogger.error('Failed to load string for key: $key', error: e);
       return null;
     }
   }
@@ -58,7 +58,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(key, value);
     } catch (e) {
-      Logger.error('Failed to save bool for key: $key', error: e);
+      AppLogger.error('Failed to save bool for key: $key', error: e);
       rethrow;
     }
   }
@@ -69,7 +69,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(key);
     } catch (e) {
-      Logger.error('Failed to load bool for key: $key', error: e);
+      AppLogger.error('Failed to load bool for key: $key', error: e);
       return null;
     }
   }
@@ -80,7 +80,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(key, value);
     } catch (e) {
-      Logger.error('Failed to save int for key: $key', error: e);
+      AppLogger.error('Failed to save int for key: $key', error: e);
       rethrow;
     }
   }
@@ -91,7 +91,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getInt(key);
     } catch (e) {
-      Logger.error('Failed to load int for key: $key', error: e);
+      AppLogger.error('Failed to load int for key: $key', error: e);
       return null;
     }
   }
@@ -102,7 +102,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(key);
     } catch (e) {
-      Logger.error('Failed to remove data for key: $key', error: e);
+      AppLogger.error('Failed to remove data for key: $key', error: e);
       rethrow;
     }
   }
@@ -113,7 +113,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
     } catch (e) {
-      Logger.error('Failed to clear all data', error: e);
+      AppLogger.error('Failed to clear all data', error: e);
       rethrow;
     }
   }
@@ -124,7 +124,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.containsKey(key);
     } catch (e) {
-      Logger.error('Failed to check key: $key', error: e);
+      AppLogger.error('Failed to check key: $key', error: e);
       return false;
     }
   }

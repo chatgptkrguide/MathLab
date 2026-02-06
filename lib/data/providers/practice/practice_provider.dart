@@ -3,12 +3,11 @@
 // Manages practice sessions and problem attempts
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/practice_session_model.dart';
 import '../../models/problem/problem_model.dart';
 import '../api_provider.dart';
-
-final logger = Logger();
 
 /// Practice State
 class PracticeState {
@@ -106,14 +105,14 @@ class PracticeNotifier extends StateNotifier<PracticeState> {
         isLoading: false,
       );
 
-      logger.i(
+      AppLogger.info(
           'Started practice session: ${session.id} with ${problems.length} problems');
-    } catch (e) {
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Failed to start practice session: $e');
     }
   }
 
@@ -163,12 +162,12 @@ class PracticeNotifier extends StateNotifier<PracticeState> {
 
       state = state.copyWith(currentSession: updatedSession);
 
-      logger.i('Submitted practice answer: ${isCorrect ? "correct" : "incorrect"}');
+      AppLogger.info('Submitted practice answer: ${isCorrect ? "correct" : "incorrect"}');
 
       return isCorrect;
-    } catch (e) {
-      logger.e('Failed to submit practice answer: $e');
-      state = state.copyWith(error: e.toString());
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
       return false;
     }
   }
@@ -200,10 +199,10 @@ class PracticeNotifier extends StateNotifier<PracticeState> {
 
       state = state.copyWith(currentSession: updatedSession);
 
-      logger.i('Ended practice session: ${state.currentSession!.id}');
-    } catch (e) {
-      logger.e('Failed to end practice session: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Ended practice session: ${state.currentSession!.id}');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -239,8 +238,8 @@ final practiceHistoryProvider =
       return historyData
           .map((data) => PracticeSessionModel.fromJson(data))
           .toList();
-    } catch (e) {
-      logger.e('Failed to load practice history: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   },

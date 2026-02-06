@@ -101,6 +101,22 @@ class SampleProblems {
         ],
         points: 10,
       ),
+      // 드래그 앤 드롭 문제
+      ProblemModel(
+        id: 'add_6',
+        lessonId: 'lesson_1_1',
+        question: r'$? + ? = 7$에 알맞은 수를 드래그하세요.',
+        type: ProblemType.dragAndDrop,
+        difficulty: ProblemDifficulty.easy,
+        options: ['2', '3', '4', '5'],
+        correctAnswer: 'zone_1=3,zone_2=4',
+        explanation: r'$3 + 4 = 7$입니다.',
+        hints: [
+          '두 수를 더해서 7이 되어야 해요.',
+          '3과 4를 더하면 얼마인지 생각해보세요.',
+        ],
+        points: 15,
+      ),
     ];
   }
 

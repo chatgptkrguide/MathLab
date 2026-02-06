@@ -25,6 +25,5 @@ export '../providers/gamification/leaderboard_provider.dart' show LeaderboardPer
 
 // Other Models
 export 'concept_card_model.dart';
-export 'hint_model.dart';
 export 'practice_session_model.dart';
 export 'wrong_answer_model.dart';

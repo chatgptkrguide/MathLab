@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../core/utils/app_logger.dart';
 import '../../shared/constants/constants.dart';
 import '../../data/providers/user/user_provider.dart';
 
@@ -301,10 +306,103 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   void _handlePhotoChange() {
-    // TODO: 프로필 사진 변경 로직 구현
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('프로필 사진 변경 기능은 준비 중입니다.')),
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.mathBlue),
+              title: const Text('카메라로 촬영'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppColors.mathBlue),
+              title: const Text('갤러리에서 선택'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(ImageSource.gallery);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
     );
+  }
+
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 80,
+      );
+
+      if (pickedFile == null) return;
+
+      setState(() => _isLoading = true);
+
+      final user = ref.read(userProvider);
+      if (user == null) return;
+
+      // Firebase Storage에 업로드
+      final file = File(pickedFile.path);
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_photos')
+          .child('${user.uid}.jpg');
+
+      await storageRef.putFile(
+        file,
+        SettableMetadata(contentType: 'image/jpeg'),
+      );
+
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      // 사용자 프로필 업데이트
+      await ref.read(userProvider.notifier).updateProfile(
+            photoUrl: downloadUrl,
+          );
+
+      AppLogger.info('Profile photo updated', tag: 'Profile');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('프로필 사진이 변경되었습니다.')),
+        );
+      }
+    } catch (e) {
+      AppLogger.error('Failed to upload profile photo', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('프로필 사진 변경에 실패했습니다.')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _handleSave() async {

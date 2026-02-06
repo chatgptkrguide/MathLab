@@ -4,10 +4,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/lesson/lesson_progress_model.dart';
-
-final _logger = Logger();
 
 /// Lesson Progress State
 class LessonProgressState {
@@ -76,13 +75,13 @@ class LessonProgressNotifier extends StateNotifier<LessonProgressState> {
         isLoading: false,
       );
 
-      _logger.i('Loaded ${progressMap.length} lesson progress records');
-    } catch (e) {
+      AppLogger.info('Loaded ${progressMap.length} lesson progress records');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      _logger.e('Failed to load lesson progress: $e');
     }
   }
 
@@ -116,10 +115,10 @@ class LessonProgressNotifier extends StateNotifier<LessonProgressState> {
       updatedMap[lessonId] = progress;
       state = state.copyWith(progressMap: updatedMap);
 
-      _logger.i('Started lesson: $lessonId');
-    } catch (e) {
-      _logger.e('Failed to start lesson: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Started lesson: $lessonId');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -171,10 +170,10 @@ class LessonProgressNotifier extends StateNotifier<LessonProgressState> {
       updatedMap[lessonId] = progress;
       state = state.copyWith(progressMap: updatedMap);
 
-      _logger.i('Completed lesson: $lessonId with $stars stars');
-    } catch (e) {
-      _logger.e('Failed to complete lesson: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Completed lesson: $lessonId with $stars stars');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -199,10 +198,10 @@ class LessonProgressNotifier extends StateNotifier<LessonProgressState> {
       updatedMap[lessonId] = progress;
       state = state.copyWith(progressMap: updatedMap);
 
-      _logger.i('Unlocked lesson: $lessonId');
-    } catch (e) {
-      _logger.e('Failed to unlock lesson: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Unlocked lesson: $lessonId');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 
@@ -225,10 +224,10 @@ class LessonProgressNotifier extends StateNotifier<LessonProgressState> {
       await batch.commit();
       await loadProgress(); // 전체 리로드
 
-      _logger.i('Initialized ${firstLessonIds.length} first lessons');
-    } catch (e) {
-      _logger.e('Failed to initialize first lessons: $e');
-      state = state.copyWith(error: e.toString());
+      AppLogger.info('Initialized ${firstLessonIds.length} first lessons');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
     }
   }
 }

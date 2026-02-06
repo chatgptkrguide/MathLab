@@ -3,12 +3,11 @@
 // Manages league and leaderboard state
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
 import '../../models/league_model.dart';
 import '../../services/league_management_service.dart';
 import '../api_provider.dart';
-
-final logger = Logger();
 
 /// League Management Service Provider
 final leagueManagementServiceProvider = Provider<LeagueManagementService>((ref) {
@@ -78,13 +77,13 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
         isLoading: false,
       );
 
-      logger.i('Loaded league: ${userLeagueStatus.league.name}');
-    } catch (e) {
+      AppLogger.info('Loaded league: ${userLeagueStatus.league.name}');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: appError.userMessage,
       );
-      logger.e('Failed to load league: $e');
     }
   }
 
@@ -104,9 +103,9 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
 
       state = state.copyWith(leaderboard: leaderboard);
 
-      logger.i('Refreshed leaderboard');
-    } catch (e) {
-      logger.e('Failed to refresh leaderboard: $e');
+      AppLogger.info('Refreshed leaderboard');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
     }
   }
 
@@ -121,12 +120,12 @@ class LeagueNotifier extends StateNotifier<LeagueState> {
         leagueId: state.userLeagueStatus!.league.id,
       );
 
-      logger.i('Claimed rewards');
+      AppLogger.info('Claimed rewards');
 
       // Reload league status
       await loadUserLeague();
-    } catch (e) {
-      logger.e('Failed to claim rewards: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
     }
   }
 
@@ -234,8 +233,8 @@ final leagueHistoryProvider = FutureProvider.family<List<LeagueModel>, String>(
       return historyData
           .map((league) => LeagueModel.fromJson(league))
           .toList();
-    } catch (e) {
-      logger.e('Failed to load league history: $e');
+    } catch (e, stackTrace) {
+      AppErrorHandler.handle(e, stackTrace);
       return [];
     }
   },
@@ -251,8 +250,8 @@ final leagueTiersProvider = FutureProvider<List<LeagueModel>>((ref) async {
     return tiersData
         .map((tier) => LeagueModel.fromJson(tier))
         .toList();
-  } catch (e) {
-    logger.e('Failed to load league tiers: $e');
+  } catch (e, stackTrace) {
+    AppErrorHandler.handle(e, stackTrace);
     return [];
   }
 });

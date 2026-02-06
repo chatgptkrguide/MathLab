@@ -14,7 +14,7 @@ import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/models/problem/problem_session_model.dart';
-import '../../data/models/problem/sample_problems.dart';
+import '../../data/providers/problem/problem_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
@@ -23,6 +23,8 @@ import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/widgets/input/math_input_field.dart';
 import '../../shared/widgets/input/drag_and_drop_widget.dart';
 import '../../shared/utils/answer_validator.dart';
+import '../../data/models/learning/problem.dart' show Problem;
+import '../../data/providers/learning/hint_provider_optimized.dart';
 import 'widgets/hint_button.dart';
 import 'widgets/hint_popup.dart';
 
@@ -41,7 +43,7 @@ class ProblemSolvingScreen extends ConsumerStatefulWidget {
 }
 
 class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
-  late ProblemSessionModel session;
+  ProblemSessionModel? session;
   String? selectedAnswer;
   bool isAnswerChecked = false;
   bool isCorrect = false;
@@ -53,15 +55,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   // For dragAndDrop type
   Map<String, String> _dragDropPlacements = {};
 
-  // 힌트 시스템
-  final Map<String, Set<int>> _unlockedHints = {}; // problemId -> Set of unlocked hint indices
-  static const int _hintXpCost = 10;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeSession();
-  }
+  // 힌트 XP 비용 (provider의 hintCost 사용)
+  int get _hintXpCost => HintNotifier.hintCost;
 
   @override
   void dispose() {
@@ -69,8 +64,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     super.dispose();
   }
 
-  void _initializeSession() {
-    final problems = SampleProblems.getProblemsForLesson(widget.lessonId);
+  void _initializeSession(List<ProblemModel> problems) {
     session = ProblemSessionModel(
       sessionId: 'session_${DateTime.now().millisecondsSinceEpoch}',
       lessonId: widget.lessonId,
@@ -88,7 +82,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   void _checkAnswer() {
-    final currentProblem = session.currentProblem;
+    final currentProblem = session!.currentProblem;
     if (currentProblem == null) return;
 
     String? userAnswer;
@@ -138,11 +132,12 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
         if (_dragDropPlacements.isEmpty) return;
         userAnswer = _dragDropPlacements.toString();
 
-        // For now, use a simplified validation
-        // In a real implementation, you would parse the correct answer structure
-        result = _dragDropPlacements.isNotEmpty
-            ? ValidationResult.correct(feedback: '잘했어요! 🎉')
-            : ValidationResult.incorrect(feedback: '항목을 배치해주세요.');
+        // Parse correctAnswer as "zone_id=item_id,..." mapping
+        final correctPlacements = _parseDragDropAnswer(currentProblem.correctAnswer);
+        result = AnswerValidator.validateDragAndDrop(
+          _dragDropPlacements,
+          correctPlacements,
+        );
         break;
     }
 
@@ -152,20 +147,20 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
       validationResult = result;
 
       // Update session with answer
-      final updatedAnswers = Map<String, String>.from(session.userAnswers);
+      final updatedAnswers = Map<String, String>.from(session!.userAnswers);
       updatedAnswers[currentProblem.id] = userAnswer!;
 
-      final updatedCorrectness = Map<String, bool>.from(session.correctness);
+      final updatedCorrectness = Map<String, bool>.from(session!.correctness);
       updatedCorrectness[currentProblem.id] = result.isCorrect;
 
       // Calculate points based on score (for partial credit)
       final earnedPoints = (currentProblem.points * result.score).round();
 
-      session = session.copyWith(
+      session = session!.copyWith(
         userAnswers: updatedAnswers,
         correctness: updatedCorrectness,
-        hearts: result.isCorrect ? session.hearts : session.hearts - 1,
-        score: session.score + earnedPoints,
+        hearts: result.isCorrect ? session!.hearts : session!.hearts - 1,
+        score: session!.score + earnedPoints,
       );
     });
 
@@ -207,20 +202,20 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
 
   void _nextProblem() {
     // Check if hearts are depleted
-    if (session.hearts <= 0) {
+    if (session!.hearts <= 0) {
       _showFailureScreen();
       return;
     }
 
     // Check if all problems are completed
-    if (session.currentProblemIndex + 1 >= session.totalProblems) {
+    if (session!.currentProblemIndex + 1 >= session!.totalProblems) {
       _showCompletionScreen();
       return;
     }
 
     setState(() {
-      session = session.copyWith(
-        currentProblemIndex: session.currentProblemIndex + 1,
+      session = session!.copyWith(
+        currentProblemIndex: session!.currentProblemIndex + 1,
       );
       // Reset all input states
       selectedAnswer = null;
@@ -236,7 +231,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => ProblemCompletionScreen(
-          session: session,
+          session: session!,
           lessonTitle: widget.lessonTitle,
           lessonId: widget.lessonId,
         ),
@@ -266,7 +261,28 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentProblem = session.currentProblem;
+    final problemsAsync = ref.watch(problemsForLessonProvider(widget.lessonId));
+
+    return problemsAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: AppColors.backgroundLight,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        backgroundColor: AppColors.backgroundLight,
+        body: Center(child: Text('문제를 불러올 수 없습니다: $error')),
+      ),
+      data: (problems) {
+        if (session == null) {
+          _initializeSession(problems);
+        }
+        return _buildContent();
+      },
+    );
+  }
+
+  Widget _buildContent() {
+    final currentProblem = session!.currentProblem;
     if (currentProblem == null) {
       return const Scaffold(
         body: Center(child: Text('문제를 불러올 수 없습니다.')),
@@ -320,7 +336,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   Widget _buildProgressBar() {
-    final progress = (session.currentProblemIndex + 1) / session.totalProblems;
+    final progress = (session!.currentProblemIndex + 1) / session!.totalProblems;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -356,7 +372,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
                 ],
               ),
               Text(
-                '${session.currentProblemIndex + 1}/${session.totalProblems}',
+                '${session!.currentProblemIndex + 1}/${session!.totalProblems}',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: Colors.white.withValues(alpha: 0.8),
                 ),
@@ -388,12 +404,13 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   Widget _buildHeartsIndicator() {
-    final currentProblem = session.currentProblem;
+    final currentProblem = session!.currentProblem;
     final hints = currentProblem?.allHints ?? [];
     final user = ref.watch(userProvider);
     final userXp = user?.xp ?? 0;
     final problemId = currentProblem?.id ?? '';
-    final unlockedCount = _unlockedHints[problemId]?.length ?? 0;
+    final hintState = ref.watch(hintProvider);
+    final unlockedCount = _getUnlockedCount(hintState, problemId, hints.length);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -422,8 +439,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
                 (index) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 3),
                   child: Icon(
-                    index < session.hearts ? Icons.favorite : Icons.favorite_border,
-                    color: index < session.hearts
+                    index < session!.hearts ? Icons.favorite : Icons.favorite_border,
+                    color: index < session!.hearts
                         ? AppColors.mathRed
                         : AppColors.borderDark,
                     size: 22,
@@ -442,8 +459,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     final hints = problem.allHints;
     if (hints.isEmpty) return;
 
-    final problemId = problem.id;
-    final unlockedSet = _unlockedHints[problemId] ?? <int>{};
+    final hintState = ref.read(hintProvider);
+    final unlockedSet = _buildUnlockedSet(hintState, problem.id, hints.length);
 
     HintPopup.show(
       context: context,
@@ -455,7 +472,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     );
   }
 
-  /// 힌트 잠금 해제
+  /// 힌트 잠금 해제 (hintProvider 사용)
   Future<void> _unlockHint(ProblemModel problem, int hintIndex) async {
     final user = ref.read(userProvider);
     if (user == null) return;
@@ -472,16 +489,15 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
       return;
     }
 
-    // XP 차감
-    await ref.read(userProvider.notifier).addXp(-_hintXpCost);
-
-    // 힌트 잠금 해제 상태 업데이트
-    setState(() {
-      if (_unlockedHints[problem.id] == null) {
-        _unlockedHints[problem.id] = <int>{};
-      }
-      _unlockedHints[problem.id]!.add(hintIndex);
-    });
+    // hintProvider를 통해 잠금 해제 (XP 차감 포함)
+    final tempProblem = Problem(
+      id: problem.id,
+      lessonId: widget.lessonId,
+      question: problem.question,
+      correctAnswer: problem.correctAnswer,
+      hints: problem.allHints,
+    );
+    await ref.read(hintProvider.notifier).unlockHint(tempProblem, hintIndex);
 
     // 팝업 닫고 다시 열기 (업데이트된 상태 반영)
     if (mounted) {
@@ -489,6 +505,28 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
       final updatedUser = ref.read(userProvider);
       _showHintPopup(problem, updatedUser?.xp ?? 0);
     }
+  }
+
+  /// 특정 문제의 잠금 해제된 힌트 수 계산
+  int _getUnlockedCount(HintState hintState, String problemId, int totalHints) {
+    int count = 0;
+    for (int i = 0; i < totalHints; i++) {
+      if (hintState.unlockedHints.contains('${problemId}_$i')) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /// 특정 문제의 잠금 해제된 인덱스 Set 생성
+  Set<int> _buildUnlockedSet(HintState hintState, String problemId, int totalHints) {
+    final result = <int>{};
+    for (int i = 0; i < totalHints; i++) {
+      if (hintState.unlockedHints.contains('${problemId}_$i')) {
+        result.add(i);
+      }
+    }
+    return result;
   }
 
   Widget _buildQuestionCard(ProblemModel problem) {
@@ -636,11 +674,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   Widget _buildDragAndDropInput(ProblemModel problem) {
-    // For now, we'll use a placeholder for drag and drop
-    // In a real implementation, you would parse problem.options and problem.correctAnswer
-    // to create draggable items and drop zones
-
-    // Example draggable items
+    // Draggable items from problem options
     final items = problem.options.map((option) {
       return DraggableItem(
         id: option,
@@ -649,13 +683,23 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
       );
     }).toList();
 
-    // Example drop zones
-    final dropZones = [
-      const DropZone(
+    // Create drop zones from correctAnswer mapping
+    final correctPlacements = _parseDragDropAnswer(problem.correctAnswer);
+    final dropZones = correctPlacements.keys.map((zoneId) {
+      final zoneIndex = int.tryParse(zoneId.replaceAll('zone_', '')) ?? 1;
+      return DropZone(
+        id: zoneId,
+        hint: '$zoneIndex번 위치에 드래그하세요',
+      );
+    }).toList();
+
+    // Fallback: at least one drop zone
+    if (dropZones.isEmpty) {
+      dropZones.add(const DropZone(
         id: 'zone_1',
         hint: '여기에 답을 드래그하세요',
-      ),
-    ];
+      ));
+    }
 
     return DragAndDropMathWidget(
       items: items,
@@ -669,10 +713,30 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     );
   }
 
+  /// Parse drag-and-drop correct answer string into a placement map.
+  /// Format: "zone_1=value1,zone_2=value2" or simple "value" for single zone.
+  Map<String, String> _parseDragDropAnswer(String correctAnswer) {
+    final result = <String, String>{};
+    if (correctAnswer.contains('=')) {
+      final pairs = correctAnswer.split(',');
+      for (final pair in pairs) {
+        final parts = pair.trim().split('=');
+        if (parts.length == 2) {
+          result[parts[0].trim()] = parts[1].trim();
+        }
+      }
+    } else {
+      // Single zone fallback
+      result['zone_1'] = correctAnswer.trim();
+    }
+    return result;
+  }
+
   /// 잠금 해제된 힌트들 표시
   Widget _buildUnlockedHintsSection(ProblemModel problem) {
     final hints = problem.allHints;
-    final unlockedSet = _unlockedHints[problem.id] ?? <int>{};
+    final hintState = ref.watch(hintProvider);
+    final unlockedSet = _buildUnlockedSet(hintState, problem.id, hints.length);
 
     if (hints.isEmpty || unlockedSet.isEmpty) {
       return const SizedBox.shrink();
@@ -780,7 +844,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   Widget _buildActionButton() {
-    final currentProblem = session.currentProblem;
+    final currentProblem = session!.currentProblem;
     if (currentProblem == null) return const SizedBox();
 
     bool hasAnswer = false;

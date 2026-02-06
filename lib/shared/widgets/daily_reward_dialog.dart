@@ -132,9 +132,9 @@ class DailyRewardDialog extends ConsumerWidget {
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: isClaimed
-            ? FigmaColors.tealGreen.withOpacity(0.1)
+            ? FigmaColors.tealGreen.withValues(alpha: 0.1)
             : isCurrentDay
-                ? FigmaColors.gold.withOpacity(0.15)
+                ? FigmaColors.gold.withValues(alpha: 0.15)
                 : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -148,7 +148,7 @@ class DailyRewardDialog extends ConsumerWidget {
         boxShadow: isCurrentDay
             ? [
                 BoxShadow(
-                  color: FigmaColors.gold.withOpacity(0.3),
+                  color: FigmaColors.gold.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
