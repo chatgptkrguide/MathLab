@@ -4,7 +4,9 @@ import '../../shared/constants/figma_colors.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
+import '../../data/providers/daily_reward_provider.dart';
 import '../../shared/widgets/cards/daily_goal_card.dart';
+import '../../shared/widgets/daily_reward_dialog.dart';
 import 'widgets/home_top_section.dart';
 import 'widgets/home_start_button.dart';
 import 'widgets/home_robot_section.dart';
@@ -15,11 +17,28 @@ import 'widgets/home_subject_cards.dart';
 
 /// Figma 디자인 "00 home" 화면
 /// 스카이블루(#61A1D8) 배경 + 과목 카드 + 데일리 챌린지 + CTA 3개
-class HomeScreenFigma extends ConsumerWidget {
+class HomeScreenFigma extends ConsumerStatefulWidget {
   const HomeScreenFigma({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreenFigma> createState() => _HomeScreenFigmaState();
+}
+
+class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
+  @override
+  void initState() {
+    super.initState();
+    // 일일 보상 다이얼로그 체크
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final rewardState = ref.read(dailyRewardProvider);
+      if (rewardState.shouldShowDialog) {
+        DailyRewardDialog.show(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
 
     return Container(
@@ -47,7 +66,7 @@ class HomeScreenFigma extends ConsumerWidget {
               const SizedBox(height: 32),
 
               // 3. 오늘의 목표 카드
-              _buildTodayGoalCard(context, ref, user),
+              _buildTodayGoalCard(context, user),
 
               const SizedBox(height: 24),
 
@@ -88,7 +107,7 @@ class HomeScreenFigma extends ConsumerWidget {
   }
 
   /// 오늘의 목표 카드
-  Widget _buildTodayGoalCard(BuildContext context, WidgetRef ref, user) {
+  Widget _buildTodayGoalCard(BuildContext context, user) {
     final dailyXP = user?.dailyXP ?? 0;
     final dailyGoal = GameConstants.dailyGoalXP;
 
