@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/constants/constants.dart';
+import '../../../data/providers/auth/auth_provider.dart';
 
 /// 비밀번호 변경 다이얼로그
-class PasswordChangeDialog extends StatefulWidget {
+class PasswordChangeDialog extends ConsumerStatefulWidget {
   const PasswordChangeDialog({super.key});
 
   @override
-  State<PasswordChangeDialog> createState() => _PasswordChangeDialogState();
+  ConsumerState<PasswordChangeDialog> createState() => _PasswordChangeDialogState();
 }
 
-class _PasswordChangeDialogState extends State<PasswordChangeDialog> {
+class _PasswordChangeDialogState extends ConsumerState<PasswordChangeDialog> {
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -171,20 +173,29 @@ class _PasswordChangeDialogState extends State<PasswordChangeDialog> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: 비밀번호 변경 로직 구현
-      await Future.delayed(const Duration(seconds: 1));
+      final success = await ref.read(authProvider.notifier).changePassword(
+            _currentPasswordController.text,
+            _newPasswordController.text,
+          );
 
       if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('비밀번호 변경 실패: $e')),
-        );
+        if (success) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('비밀번호가 변경되었습니다.'),
+              backgroundColor: AppColors.mathGreen,
+            ),
+          );
+        } else {
+          final error = ref.read(authProvider).error;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error ?? '비밀번호 변경에 실패했습니다'),
+              backgroundColor: AppColors.mathRed,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) {

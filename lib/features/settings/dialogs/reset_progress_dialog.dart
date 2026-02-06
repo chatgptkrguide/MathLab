@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/constants/constants.dart';
+import '../../../data/providers/user/user_provider.dart';
+import '../../../data/providers/lesson/lesson_progress_provider.dart';
+import '../../../data/providers/wrong_answer/wrong_answer_provider.dart';
 
 /// 학습 초기화 확인 다이얼로그
-class ResetProgressDialog extends StatelessWidget {
+class ResetProgressDialog extends ConsumerStatefulWidget {
   const ResetProgressDialog({super.key});
+
+  @override
+  ConsumerState<ResetProgressDialog> createState() => _ResetProgressDialogState();
+}
+
+class _ResetProgressDialogState extends ConsumerState<ResetProgressDialog> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +65,7 @@ class ResetProgressDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '- 모든 레슨 진행 상태\n- XP 및 레벨\n- 연속 학습 기록\n- 업적 및 뱃지',
+                  '- 모든 레슨 진행 상태\n- XP 및 레벨\n- 연속 학습 기록\n- 업적 및 뱃지\n- 오답 노트',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -74,7 +85,7 @@ class ResetProgressDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
           child: Text(
             '취소',
             style: AppTextStyles.bodyMedium.copyWith(
@@ -83,13 +94,7 @@ class ResetProgressDialog extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            // TODO: 학습 초기화 로직 구현
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('학습 진행 상태가 초기화되었습니다.')),
-            );
-          },
+          onPressed: _isLoading ? null : _handleReset,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.warning,
             foregroundColor: Colors.white,
@@ -97,9 +102,61 @@ class ResetProgressDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
             ),
           ),
-          child: const Text('초기화'),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text('초기화'),
         ),
       ],
     );
+  }
+
+  Future<void> _handleReset() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final user = ref.read(userProvider);
+      if (user == null) {
+        throw Exception('사용자 정보를 찾을 수 없습니다');
+      }
+
+      // Reset user progress
+      await ref.read(userProvider.notifier).resetProgress();
+
+      // Invalidate lesson progress provider to refresh
+      ref.invalidate(lessonProgressProvider(user.uid));
+
+      // Invalidate wrong answer provider to refresh
+      ref.invalidate(wrongAnswerProvider(user.uid));
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('학습 진행 상태가 초기화되었습니다.'),
+            backgroundColor: AppColors.mathGreen,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('초기화 실패: $e'),
+            backgroundColor: AppColors.mathRed,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }

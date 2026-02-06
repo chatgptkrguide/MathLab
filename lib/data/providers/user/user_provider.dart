@@ -285,23 +285,57 @@ class User extends _$User {
   }
 
   /// 특정 월의 학습 날짜 목록 가져오기
+  /// studyDates 컬렉션에서 먼저 조회하고, 실패 시 lessonProgress에서 추출
   Future<Set<int>> getStudyDatesForMonth(int year, int month) async {
     if (state == null) return {};
 
+    final uid = state!.uid;
+
+    // 1차: studyDates 컬렉션에서 조회 시도
     try {
       final snapshot = await _firestore
           .collection('users')
-          .doc(state!.uid)
+          .doc(uid)
           .collection('studyDates')
           .where('year', isEqualTo: year)
           .where('month', isEqualTo: month)
           .get();
 
-      return snapshot.docs
-          .map((doc) => doc.data()['day'] as int)
-          .toSet();
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs
+            .map((doc) => doc.data()['day'] as int)
+            .toSet();
+      }
     } catch (e) {
-      AppLogger.error('Failed to get study dates', tag: 'User', error: e);
+      AppLogger.info('studyDates collection not available, falling back to lessonProgress', tag: 'User');
+    }
+
+    // 2차: lessonProgress의 lastAttemptedAt/completedAt에서 학습 날짜 추출
+    try {
+      final progressSnapshot = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('lessonProgress')
+          .get();
+
+      final dates = <int>{};
+      for (final doc in progressSnapshot.docs) {
+        final data = doc.data();
+
+        for (final field in ['lastAttemptedAt', 'completedAt']) {
+          final ts = data[field] as Timestamp?;
+          if (ts != null) {
+            final date = ts.toDate();
+            if (date.year == year && date.month == month) {
+              dates.add(date.day);
+            }
+          }
+        }
+      }
+
+      return dates;
+    } catch (e) {
+      AppLogger.error('Failed to get study dates from lessonProgress', tag: 'User', error: e);
       return {};
     }
   }
