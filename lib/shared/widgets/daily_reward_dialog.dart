@@ -97,9 +97,9 @@ class DailyRewardDialog extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.9,
       ),
       itemCount: 7,
       itemBuilder: (context, index) {
@@ -163,36 +163,39 @@ class DailyRewardDialog extends ConsumerWidget {
             opacity: isFuture ? 0.4 : 1.0,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // 날짜
                 Text(
                   'Day ${reward.day}',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.w600,
                     color: isCurrentDay
                         ? FigmaColors.gold
                         : FigmaColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 // 보상 이모지
                 Text(
                   reward.emoji,
                   style: TextStyle(
-                    fontSize: isSpecialDay ? 28 : 22,
+                    fontSize: isSpecialDay ? 24 : 20,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 1),
                 // 보상 라벨
                 Text(
                   reward.label,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.w500,
                     color: FigmaColors.textDark,
                   ),
                   textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

@@ -181,7 +181,7 @@ service cloud.firestore {
       allow write: if false; // Only backend manages rewards
     }
 
-    // User Daily Rewards Sub-collection
+    // User Daily Rewards Sub-collection (dailyRewards - legacy)
     match /users/{userId}/dailyRewards/{rewardId} {
       allow read: if isOwner(userId);
       allow create: if isOwner(userId) &&
@@ -189,6 +189,17 @@ service cloud.firestore {
                       request.resource.data.day >= 1 &&
                       request.resource.data.day <= 30;
       allow update, delete: if false; // Cannot update/delete claimed rewards
+    }
+
+    // User Daily Reward Sub-collection (dailyReward - current)
+    match /users/{userId}/dailyReward/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Units Collection (Read-only for all authenticated users)
+    match /units/{unitId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admins via backend
     }
 
     // App Configuration (Read-only)
