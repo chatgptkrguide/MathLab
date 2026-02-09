@@ -28,7 +28,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '최종 수정일: 2024년 12월 1일',
+              '최종 수정일: 2025년 2월 1일',
               style: AppTextStyles.bodySmall,
             ),
             const SizedBox(height: AppDimensions.paddingLarge),
@@ -88,11 +88,20 @@ class PrivacyPolicyScreen extends StatelessWidget {
               '앱은 개인정보 처리에 관한 업무를 총괄해서 책임지고, '
                   '이용자의 불만 처리 및 피해구제 등을 위해 아래와 같이 '
                   '개인정보 보호 책임자를 지정하고 있습니다.\n\n'
-                  '문의: mathlab.support@example.com',
+                  '문의: gomath.support@gmail.com',
             ),
 
             _buildSection(
-              '8. 개인정보 처리방침 변경',
+              '8. 제3자 서비스 및 SDK',
+              '앱은 서비스 제공을 위해 다음의 제3자 SDK를 사용합니다.\n\n'
+                  '- Google Firebase: 인증, 데이터 저장, 푸시 알림, 분석, 오류 보고\n'
+                  '- Google Sign-In: Google 계정을 통한 소셜 로그인\n'
+                  '- Apple Sign-In: Apple 계정을 통한 소셜 로그인 (iOS)\n\n'
+                  '각 서비스는 해당 제공자의 개인정보처리방침에 따라 데이터를 처리합니다.',
+            ),
+
+            _buildSection(
+              '9. 개인정보 처리방침 변경',
               '이 개인정보 처리방침은 법령 및 정책의 변경에 따라 수정될 수 있으며, '
                   '변경 시 앱 내 공지사항을 통해 안내합니다.',
             ),

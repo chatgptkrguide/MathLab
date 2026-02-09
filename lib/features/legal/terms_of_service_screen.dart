@@ -28,7 +28,7 @@ class TermsOfServiceScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '최종 수정일: 2024년 12월 1일',
+              '최종 수정일: 2025년 2월 1일',
               style: AppTextStyles.bodySmall,
             ),
             const SizedBox(height: AppDimensions.paddingLarge),
@@ -76,6 +76,28 @@ class TermsOfServiceScreen extends StatelessWidget {
               '제7조 (면책사항)',
               '1. 앱은 천재지변 등 불가항력적 사유로 인해 서비스를 제공할 수 없는 경우 책임이 면제됩니다.\n'
                   '2. 앱은 이용자의 귀책사유로 인한 서비스 이용 장애에 대해 책임을 지지 않습니다.',
+            ),
+
+            _buildSection(
+              '제8조 (회원 탈퇴 및 데이터 삭제)',
+              '1. 이용자는 언제든지 앱 설정에서 회원 탈퇴를 요청할 수 있습니다.\n'
+                  '2. 탈퇴 시 이용자의 개인정보 및 학습 기록은 즉시 삭제됩니다.\n'
+                  '3. 삭제된 데이터는 복구할 수 없으며, 동일 계정으로 재가입 시 새로운 계정으로 시작됩니다.',
+            ),
+
+            _buildSection(
+              '제9조 (제3자 서비스)',
+              '본 앱은 다음의 제3자 서비스를 활용합니다.\n\n'
+                  '- Google Firebase: 인증, 데이터 저장, 분석\n'
+                  '- Google Sign-In: 소셜 로그인\n'
+                  '- Apple Sign-In: 소셜 로그인 (iOS)\n\n'
+                  '각 서비스의 이용약관 및 개인정보처리방침은 해당 서비스 제공자의 정책을 따릅니다.',
+            ),
+
+            _buildSection(
+              '제10조 (문의)',
+              '서비스 이용에 관한 문의는 아래 이메일로 연락해주세요.\n\n'
+                  '이메일: gomath.support@gmail.com',
             ),
 
             const SizedBox(height: 100),

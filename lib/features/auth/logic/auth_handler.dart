@@ -172,6 +172,88 @@ class AuthHandler {
     }
   }
 
+  /// Apple 로그인
+  static Future<bool> handleAppleLogin({
+    required BuildContext context,
+    required WidgetRef ref,
+    required bool mounted,
+  }) async {
+    if (mounted) {
+      LoadingOverlay.show(context, message: 'Apple 로그인 중...');
+    }
+
+    try {
+      final success = await ref.read(authProvider.notifier).signInWithApple();
+
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (!mounted) return false;
+
+      if (success) {
+        final profileResult = await Navigator.of(context).push<TempProfileData>(
+          MaterialPageRoute(
+            builder: (context) => const OnboardingProfileSetupScreen(),
+          ),
+        );
+
+        if (profileResult == null || !mounted) return false;
+
+        if (mounted) {
+          LoadingOverlay.show(context, message: LoadingMessages.savingProfile);
+        }
+
+        await ref.read(authProvider.notifier).applyTempProfileToAccount(
+              profileResult,
+            );
+
+        if (!mounted) return false;
+
+        if (mounted) {
+          LoadingOverlay.hide(context);
+        }
+
+        final user = ref.read(userProvider);
+        if (mounted && user != null) {
+          await WelcomeDialog.show(
+            context,
+            user: user,
+            authMethod: 'apple',
+          );
+        }
+
+        return true;
+      } else {
+        if (mounted) {
+          _showErrorSnackBar(
+            context: context,
+            message: 'Apple 로그인에 실패했습니다. 다시 시도해주세요.',
+          );
+        }
+        return false;
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Apple Sign-In failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (mounted) {
+        _showErrorSnackBar(
+          context: context,
+          message: 'Apple 로그인 중 문제가 발생했습니다.',
+        );
+      }
+      return false;
+    }
+  }
+
   /// Kakao 로그인
   static Future<bool> handleKakaoLogin({
     required BuildContext context,

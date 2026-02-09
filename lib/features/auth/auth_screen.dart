@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_durations.dart';
+import '../legal/privacy_policy_screen.dart';
+import '../legal/terms_of_service_screen.dart';
 import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
 
@@ -95,6 +99,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     setState(() => _isLoading = true);
 
     await AuthHandler.handleKakaoLogin(
+      context: context,
+      ref: ref,
+      mounted: mounted,
+    );
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleAppleLogin() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    await AuthHandler.handleAppleLogin(
       context: context,
       ref: ref,
       mounted: mounted,
@@ -321,6 +340,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
                             const SizedBox(height: 12),
 
+                            // Apple 로그인 (iOS만 표시)
+                            if (Platform.isIOS) ...[
+                              _buildSocialButton(
+                                text: 'Apple로 계속하기',
+                                icon: null,
+                                fallbackIcon: Icons.apple,
+                                backgroundColor: Colors.black,
+                                textColor: Colors.white,
+                                onPressed: _handleAppleLogin,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+
                             // Kakao 로그인
                             _buildSocialButton(
                               text: 'Kakao로 계속하기',
@@ -366,6 +398,63 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             ),
                           );
                         },
+                      ),
+                    ),
+
+                    // 약관 및 개인정보처리방침 링크
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text.rich(
+                          TextSpan(
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.7),
+                              fontSize: 12,
+                              height: 1.5,
+                            ),
+                            children: [
+                              const TextSpan(text: '계속 진행하면 '),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const TermsOfServiceScreen()),
+                                  ),
+                                  child: Text(
+                                    '이용약관',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.95),
+                                      fontSize: 12,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const TextSpan(text: ' 및 '),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                                  ),
+                                  child: Text(
+                                    '개인정보처리방침',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.95),
+                                      fontSize: 12,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const TextSpan(text: '에 동의하게 됩니다.'),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
 

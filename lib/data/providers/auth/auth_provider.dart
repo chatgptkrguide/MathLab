@@ -3,8 +3,13 @@
 // Manages authentication state and operations using Firebase Auth, Google Sign-In, and Kakao SDK.
 // Integrates with SecureStorage for token management and UserProvider for user data.
 
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 // import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -264,6 +269,108 @@ class Auth extends _$Auth {
       state = state.copyWith(
         isLoading: false,
         error: 'Google 로그인 중 오류가 발생했습니다',
+      );
+      return false;
+    }
+  }
+
+  // ========================================
+  // Apple Authentication
+  // ========================================
+
+  /// Generate a random nonce for Apple Sign-In
+  String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  /// SHA256 hash of a string
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  /// Sign in with Apple
+  Future<bool> signInWithApple() async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      AppLogger.info('Starting Apple signin', tag: 'Auth');
+
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final oauthCredential = auth.OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      final userCredential = await _firebaseAuth.signInWithCredential(oauthCredential);
+
+      if (userCredential.user == null) {
+        throw const AuthException(
+          message: 'Apple 로그인에 실패했습니다',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      // Apple only provides name on first sign-in, update display name if available
+      if (appleCredential.givenName != null) {
+        final displayName = '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'.trim();
+        if (displayName.isNotEmpty) {
+          await userCredential.user!.updateDisplayName(displayName);
+        }
+      }
+
+      // Save auth token
+      final token = await userCredential.user!.getIdToken();
+      if (token != null) {
+        await _storage.saveAuthToken(token);
+      }
+
+      // Load or create user data
+      await ref.read(userProvider.notifier).loadUser(userCredential.user!.uid);
+
+      // Update state
+      state = state.copyWith(
+        firebaseUser: userCredential.user,
+        isAuthenticated: true,
+        isLoading: false,
+      );
+
+      AppLogger.info('Apple signin successful', tag: 'Auth');
+      return true;
+    } on SignInWithAppleAuthorizationException catch (e) {
+      AppLogger.error('Apple signin canceled or failed', tag: 'Auth', error: e);
+      state = state.copyWith(
+        isLoading: false,
+        error: e.code == AuthorizationErrorCode.canceled
+            ? null
+            : 'Apple 로그인에 실패했습니다',
+      );
+      return false;
+    } on auth.FirebaseAuthException catch (e) {
+      AppLogger.error('Apple signin failed', tag: 'Auth', error: e);
+      state = state.copyWith(
+        isLoading: false,
+        error: _getFirebaseAuthErrorMessage(e.code),
+      );
+      return false;
+    } catch (e, st) {
+      AppLogger.error('Apple signin failed', tag: 'Auth', error: e, stackTrace: st);
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Apple 로그인 중 오류가 발생했습니다',
       );
       return false;
     }
