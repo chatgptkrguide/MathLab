@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
@@ -341,7 +340,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             const SizedBox(height: 12),
 
                             // Apple 로그인 (iOS만 표시)
-                            if (Platform.isIOS) ...[
+                            if (defaultTargetPlatform == TargetPlatform.iOS) ...[
                               _buildSocialButton(
                                 text: 'Apple로 계속하기',
                                 icon: null,

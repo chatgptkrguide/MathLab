@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_text_styles.dart';
+import '../../legal/privacy_policy_screen.dart';
+import '../../legal/terms_of_service_screen.dart';
 
 /// 프리미엄 법적 텍스트 위젯 (이용약관, 개인정보처리방침)
 class PremiumLegalText extends StatelessWidget {
@@ -27,7 +29,10 @@ class PremiumLegalText extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () {
-                  // TODO: 이용약관 페이지 열기
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TermsOfServiceScreen()),
+                  );
                 },
                 child: Text(
                   '이용약관',
@@ -45,7 +50,10 @@ class PremiumLegalText extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: 개인정보처리방침 페이지 열기
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                  );
                 },
                 child: Text(
                   '개인정보처리방침',
