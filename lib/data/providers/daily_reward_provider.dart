@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/app_logger.dart';
-import '../../core/error/app_error.dart';
 import './infrastructure/firebase_providers.dart';
 import './user/user_provider.dart';
 import '../models/daily_reward_model.dart';
@@ -22,28 +21,39 @@ class DailyRewardState {
   final bool hasClaimedToday;
   final DateTime? lastClaimDate;
   final List<DailyRewardModel> rewards;
+  final bool isLoading;
+  final bool isClaiming;
 
   const DailyRewardState({
     this.currentDay = 1,
     this.hasClaimedToday = false,
     this.lastClaimDate,
     this.rewards = const [],
+    this.isLoading = true,
+    this.isClaiming = false,
   });
 
   /// 다이얼로그를 표시해야 하는지 여부
-  bool get shouldShowDialog => !hasClaimedToday;
+  bool get shouldShowDialog => !isLoading && !hasClaimedToday;
+
+  /// 보상 수령 가능 여부
+  bool get canClaim => !isLoading && !hasClaimedToday && !isClaiming && rewards.isNotEmpty;
 
   DailyRewardState copyWith({
     int? currentDay,
     bool? hasClaimedToday,
     DateTime? lastClaimDate,
     List<DailyRewardModel>? rewards,
+    bool? isLoading,
+    bool? isClaiming,
   }) {
     return DailyRewardState(
       currentDay: currentDay ?? this.currentDay,
       hasClaimedToday: hasClaimedToday ?? this.hasClaimedToday,
       lastClaimDate: lastClaimDate ?? this.lastClaimDate,
       rewards: rewards ?? this.rewards,
+      isLoading: isLoading ?? this.isLoading,
+      isClaiming: isClaiming ?? this.isClaiming,
     );
   }
 }
@@ -66,6 +76,7 @@ class DailyRewardNotifier extends StateNotifier<DailyRewardState> {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) {
         AppLogger.warning('No user logged in, skipping daily reward check', tag: 'DailyReward');
+        state = state.copyWith(isLoading: false);
         return;
       }
 
@@ -129,9 +140,15 @@ class DailyRewardNotifier extends StateNotifier<DailyRewardState> {
       }
     } catch (e, st) {
       AppLogger.error('Failed to check daily reward', tag: 'DailyReward', error: e, stackTrace: st);
-      // 오류 시 기본 상태로 설정
+      // 오류 시에도 기본 보상 목록은 표시
       _updateStateWithRewards(currentDay: 1, hasClaimedToday: false, lastClaimDate: null);
     }
+  }
+
+  /// 수동 새로고침 (사용자 로그인 후 호출용)
+  Future<void> refresh() async {
+    state = state.copyWith(isLoading: true);
+    await _checkDailyReward();
   }
 
   /// 보상 목록과 함께 상태 업데이트
@@ -158,20 +175,25 @@ class DailyRewardNotifier extends StateNotifier<DailyRewardState> {
       hasClaimedToday: hasClaimedToday,
       lastClaimDate: lastClaimDate,
       rewards: rewards,
+      isLoading: false,
     );
   }
 
   /// 보상 수령
-  Future<void> claimReward() async {
-    if (state.hasClaimedToday) {
-      AppLogger.warning('Already claimed today', tag: 'DailyReward');
-      return;
+  Future<bool> claimReward() async {
+    if (state.hasClaimedToday || state.isClaiming) {
+      AppLogger.warning('Already claimed today or claiming in progress', tag: 'DailyReward');
+      return false;
     }
+
+    state = state.copyWith(isClaiming: true);
 
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) {
-        throw const DataException(message: '로그인이 필요합니다');
+        AppLogger.error('No user logged in for claim', tag: 'DailyReward');
+        state = state.copyWith(isClaiming: false);
+        return false;
       }
 
       final uid = currentUser.uid;
@@ -240,12 +262,15 @@ class DailyRewardNotifier extends StateNotifier<DailyRewardState> {
         hasClaimedToday: true,
         lastClaimDate: now,
         rewards: updatedRewards,
+        isClaiming: false,
       );
 
       AppLogger.info('Daily reward claimed successfully', tag: 'DailyReward');
+      return true;
     } catch (e, st) {
       AppLogger.error('Failed to claim daily reward', tag: 'DailyReward', error: e, stackTrace: st);
-      rethrow;
+      state = state.copyWith(isClaiming: false);
+      return false;
     }
   }
 }

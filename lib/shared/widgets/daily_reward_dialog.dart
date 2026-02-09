@@ -228,9 +228,7 @@ class DailyRewardDialog extends ConsumerWidget {
     WidgetRef ref,
     DailyRewardState rewardState,
   ) {
-    final hasClaimedToday = rewardState.hasClaimedToday;
-
-    if (hasClaimedToday) {
+    if (rewardState.hasClaimedToday) {
       // 이미 수령 완료
       return Container(
         width: double.infinity,
@@ -251,53 +249,75 @@ class DailyRewardDialog extends ConsumerWidget {
       );
     }
 
+    if (rewardState.isLoading) {
+      // 로딩 중
+      return const SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     // 수령 가능
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () async {
-          await ref.read(dailyRewardProvider.notifier).claimReward();
+        onPressed: rewardState.canClaim
+            ? () async {
+                final success = await ref
+                    .read(dailyRewardProvider.notifier)
+                    .claimReward();
 
-          // 잠시 보여준 후 다이얼로그 닫기
-          if (context.mounted) {
-            await Future.delayed(const Duration(milliseconds: 800));
-            if (context.mounted) {
-              Navigator.of(context).pop();
-            }
-          }
-        },
+                if (success && context.mounted) {
+                  await Future.delayed(const Duration(milliseconds: 800));
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              }
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: FigmaColors.gold,
           foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey.shade300,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 2,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '보상 받기',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        child: rewardState.isClaiming
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white,
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    '보상 받기',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (rewardState.rewards.isNotEmpty)
+                    Text(
+                      rewardState.rewards
+                          .firstWhere(
+                            (r) => r.day == rewardState.currentDay,
+                            orElse: () => rewardState.rewards.first,
+                          )
+                          .emoji,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                ],
               ),
-            ),
-            const SizedBox(width: 8),
-            if (rewardState.rewards.isNotEmpty)
-              Text(
-                rewardState.rewards
-                    .firstWhere(
-                      (r) => r.day == rewardState.currentDay,
-                      orElse: () => rewardState.rewards.first,
-                    )
-                    .emoji,
-                style: const TextStyle(fontSize: 20),
-              ),
-          ],
-        ),
       ),
     );
   }

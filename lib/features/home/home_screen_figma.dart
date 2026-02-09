@@ -25,21 +25,36 @@ class HomeScreenFigma extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
+  bool _dialogShown = false;
+
   @override
   void initState() {
     super.initState();
     // 일일 보상 다이얼로그 체크
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final rewardState = ref.read(dailyRewardProvider);
-      if (rewardState.shouldShowDialog) {
-        DailyRewardDialog.show(context);
-      }
+      _checkAndShowRewardDialog();
     });
+  }
+
+  void _checkAndShowRewardDialog() {
+    if (_dialogShown) return;
+    final rewardState = ref.read(dailyRewardProvider);
+    if (!rewardState.isLoading && rewardState.shouldShowDialog) {
+      _dialogShown = true;
+      DailyRewardDialog.show(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+
+    // 보상 상태 변경 감지 → 로딩 완료 시 다이얼로그 표시
+    ref.listen<DailyRewardState>(dailyRewardProvider, (prev, next) {
+      if (prev != null && prev.isLoading && !next.isLoading) {
+        _checkAndShowRewardDialog();
+      }
+    });
 
     return Container(
       width: double.infinity,
