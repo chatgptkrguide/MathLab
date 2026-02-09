@@ -42,17 +42,7 @@ service cloud.firestore {
                       // Cannot change critical fields
                       request.resource.data.id == resource.data.id &&
                       request.resource.data.email == resource.data.email &&
-                      request.resource.data.createdAt == resource.data.createdAt &&
-                      // Hearts validation (0-5)
-                      request.resource.data.hearts >= 0 &&
-                      request.resource.data.hearts <= 5 &&
-                      // Streak validation (non-negative)
-                      request.resource.data.streak >= 0 &&
-                      // XP validation (non-negative)
-                      request.resource.data.xp >= 0 &&
-                      // TotalXP validation (non-negative, monotonically increasing)
-                      request.resource.data.totalXp >= resource.data.totalXp &&
-                      request.resource.data.totalXp <= resource.data.totalXp + 1000;
+                      request.resource.data.createdAt == resource.data.createdAt;
 
       // Delete: Owner can delete their own account
       allow delete: if isOwner(userId);
