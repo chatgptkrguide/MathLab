@@ -106,6 +106,12 @@ dev_dependencies:
   json_serializable: ^6.9.2
   riverpod_generator: ^2.6.3
 
+  # ========================================
+  # 앱 아이콘 & 스플래시 스크린
+  # ========================================
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
+
 flutter:
   uses-material-design: true
 
@@ -133,3 +139,27 @@ flutter:
   #         weight: 600
   #       - asset: assets/fonts/Pretendard-Medium.ttf
   #         weight: 500
+
+# ========================================
+# 앱 아이콘 설정 (flutter_launcher_icons)
+# ========================================
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#3B82F6"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+# ========================================
+# 스플래시 스크린 설정 (flutter_native_splash)
+# ========================================
+flutter_native_splash:
+  color: "#1CB0F6"
+  image: "assets/images/app_icon.png"
+  android: true
+  ios: true
+  android_12:
+    color: "#1CB0F6"
+    image: "assets/images/app_icon.png"

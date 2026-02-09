@@ -20,9 +20,7 @@ import 'features/auth/auth_screen.dart';
 import 'features/home/home_screen_figma.dart';
 import 'data/providers/communication/fcm_provider.dart';
 
-// TODO: Add firebase_options.dart file
-// Generate with: flutterfire configure
-// import 'firebase_options.dart';
+import 'firebase_options.dart';
 
 void main() async {
   // Ensure Flutter is initialized
@@ -57,14 +55,10 @@ void main() async {
     }
 
     // 3. Initialize Firebase
-    // TODO: Replace with actual firebase_options.dart after running `flutterfire configure`
-    // await Firebase.initializeApp(
-    //   options: DefaultFirebaseOptions.currentPlatform,
-    // );
-
-    // Temporary: Initialize Firebase without options (will fail without firebase_options.dart)
     try {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       AppLogger.info('Firebase initialized successfully', tag: 'App');
 
       // Register FCM background message handler
@@ -72,7 +66,7 @@ void main() async {
       AppLogger.info('FCM background handler registered', tag: 'App');
     } catch (e) {
       AppLogger.error(
-        'Firebase initialization failed - run "flutterfire configure" first',
+        'Firebase initialization failed',
         tag: 'App',
         error: e,
       );
