@@ -159,45 +159,51 @@ class DailyRewardDialog extends ConsumerWidget {
         alignment: Alignment.center,
         children: [
           // 메인 콘텐츠
-          Opacity(
-            opacity: isFuture ? 0.4 : 1.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 날짜
-                Text(
-                  'Day ${reward.day}',
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                    color: isCurrentDay
-                        ? FigmaColors.gold
-                        : FigmaColors.textSecondary,
+          Positioned.fill(
+            child: Opacity(
+              opacity: isFuture ? 0.4 : 1.0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 날짜
+                      Text(
+                        'Day ${reward.day}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: isCurrentDay
+                              ? FigmaColors.gold
+                              : FigmaColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      // 보상 이모지
+                      Text(
+                        reward.emoji,
+                        style: TextStyle(
+                          fontSize: isSpecialDay ? 24 : 20,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      // 보상 라벨
+                      Text(
+                        reward.label,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: FigmaColors.textDark,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 2),
-                // 보상 이모지
-                Text(
-                  reward.emoji,
-                  style: TextStyle(
-                    fontSize: isSpecialDay ? 24 : 20,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                // 보상 라벨
-                Text(
-                  reward.label,
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w500,
-                    color: FigmaColors.textDark,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+              ),
             ),
           ),
 
