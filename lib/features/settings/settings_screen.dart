@@ -11,7 +11,7 @@ import '../legal/terms_of_service_screen.dart';
 import '../legal/privacy_policy_screen.dart';
 import 'widgets/widgets.dart';
 import 'dialogs/dialogs.dart';
-import '../admin/admin_problem_list_screen.dart';
+import '../admin/admin_shell_screen.dart';
 
 /// 설정 화면
 /// - 계정 관리
@@ -189,15 +189,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       const Divider(height: 32),
                       const SectionHeader(title: '관리자'),
                       SettingTile(
-                        icon: Icons.quiz_outlined,
-                        title: '문제 관리',
-                        subtitle: '문제 생성/수정/삭제',
+                        icon: Icons.admin_panel_settings_outlined,
+                        title: '관리자 패널',
+                        subtitle: '콘텐츠 및 사용자 관리',
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  const AdminProblemListScreen(),
+                                  const AdminShellScreen(),
                             ),
                           );
                         },

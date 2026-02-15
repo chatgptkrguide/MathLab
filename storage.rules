@@ -107,10 +107,13 @@ service firebase.storage {
       allow write: if false; // Only admins via backend
     }
 
-    // Achievement Badge Images (Read-only for all)
+    // Achievement Badge Images (Read for all, Write for admin)
     match /achievements/{achievementId}/{fileName} {
       allow read: if true; // Public access for achievement badges
-      allow write: if false; // Only admins via backend
+      allow write: if isAdmin() &&
+                     isValidImageType() &&
+                     isValidFileSize(10);
+      allow delete: if isAdmin();
     }
 
     // App Assets (Read-only for all)
