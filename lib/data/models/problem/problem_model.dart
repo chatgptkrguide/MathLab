@@ -14,7 +14,8 @@ class ProblemModel {
   final String? hint; // Hint for the problem (legacy, use hints instead)
   final List<String> hints; // Step-by-step hints (단계별 힌트)
   final int points; // Points awarded for correct answer
-  final String? imageUrl; // Optional image for the problem
+  final String? imageUrl; // Optional single image (legacy, use imageUrls)
+  final List<String> imageUrls; // Multiple images for the problem
 
   const ProblemModel({
     required this.id,
@@ -29,7 +30,15 @@ class ProblemModel {
     this.hints = const [],
     this.points = 10,
     this.imageUrl,
+    this.imageUrls = const [],
   });
+
+  /// All images (imageUrls list or legacy single imageUrl)
+  List<String> get allImages {
+    if (imageUrls.isNotEmpty) return imageUrls;
+    if (imageUrl != null) return [imageUrl!];
+    return [];
+  }
 
   /// 모든 힌트 가져오기 (hints 리스트 또는 레거시 hint)
   List<String> get allHints {
@@ -58,6 +67,7 @@ class ProblemModel {
       hints: List<String>.from(json['hints'] ?? []),
       points: json['points'] as int? ?? 10,
       imageUrl: json['imageUrl'] as String?,
+      imageUrls: List<String>.from(json['imageUrls'] ?? []),
     );
   }
 
@@ -75,6 +85,7 @@ class ProblemModel {
       'hints': hints,
       'points': points,
       'imageUrl': imageUrl,
+      'imageUrls': imageUrls,
     };
   }
 

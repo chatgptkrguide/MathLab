@@ -22,6 +22,7 @@ import '../../shared/constants/figma_colors.dart';
 import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/widgets/input/math_input_field.dart';
 import '../../shared/widgets/input/drag_and_drop_widget.dart';
+import '../../shared/widgets/zoomable_image_viewer.dart';
 import '../../shared/utils/answer_validator.dart';
 import '../../data/models/learning/problem.dart' show Problem;
 import '../../data/providers/learning/hint_provider_optimized.dart';
@@ -600,23 +601,11 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
             ),
             mathFontSize: 28.0,
           ),
-          if (problem.imageUrl != null) ...[
+          if (problem.allImages.isNotEmpty) ...[
             const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                problem.imageUrl!,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 150,
-                    color: AppColors.backgroundLight,
-                    child: const Center(
-                      child: Icon(Icons.image_not_supported),
-                    ),
-                  );
-                },
-              ),
+            ProblemImageGallery(
+              imageUrls: problem.allImages,
+              problemId: problem.id,
             ),
           ],
         ],
