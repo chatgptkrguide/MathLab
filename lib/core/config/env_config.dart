@@ -16,18 +16,17 @@ class EnvConfig {
   // Private constructor to prevent instantiation
   EnvConfig._();
 
+  static bool _isInitialized = false;
+
   /// Initialize environment configuration
   /// Must be called before app starts
   static Future<void> initialize({String fileName = '.env'}) async {
     try {
       await dotenv.load(fileName: fileName);
+      _isInitialized = true;
     } catch (e) {
-      if (e.toString().contains('EmptyEnvFileError') ||
-          e.toString().contains('FileNotFoundError')) {
-        // Use defaults silently for empty/missing env files
-        return;
-      }
-      throw Exception('Failed to load environment file: $fileName. Error: $e');
+      // .env file not found or empty - use defaults
+      _isInitialized = false;
     }
   }
 
@@ -129,10 +128,17 @@ class EnvConfig {
     bool required = false,
     String? defaultValue,
   }) {
-    final value = dotenv.env[key];
+    String? value;
+    if (_isInitialized) {
+      try {
+        value = dotenv.env[key];
+      } catch (_) {
+        value = null;
+      }
+    }
 
     if (value == null || value.isEmpty) {
-      if (required) {
+      if (required && _isInitialized) {
         throw Exception(
           'Required environment variable "$key" is not set. '
           'Please check your .env file.',
@@ -141,9 +147,12 @@ class EnvConfig {
       if (defaultValue != null) {
         return defaultValue;
       }
-      throw Exception(
-        'Environment variable "$key" is not set and no default value provided.',
-      );
+      if (required) {
+        throw Exception(
+          'Environment variable "$key" is not set and .env file is not loaded.',
+        );
+      }
+      return '';
     }
 
     return value;
@@ -151,29 +160,40 @@ class EnvConfig {
 
   /// Get boolean environment variable
   static bool _getBoolEnvVar(String key, {required bool defaultValue}) {
-    final value = dotenv.env[key];
-    if (value == null || value.isEmpty) {
+    if (!_isInitialized) return defaultValue;
+    try {
+      final value = dotenv.env[key];
+      if (value == null || value.isEmpty) {
+        return defaultValue;
+      }
+      return value.toLowerCase() == 'true' || value == '1';
+    } catch (_) {
       return defaultValue;
     }
-    return value.toLowerCase() == 'true' || value == '1';
   }
 
   /// Validate all required environment variables
   static void validateEnvironment() {
+    if (!_isInitialized) {
+      // .env not loaded - skip validation (use defaults)
+      return;
+    }
+
     final requiredVars = [
       'API_BASE_URL',
-      'KAKAO_NATIVE_APP_KEY',
       'GOOGLE_WEB_CLIENT_ID',
-      'FCM_WEB_PUSH_KEY',
-      'FCM_SENDER_ID',
       'APP_ENV',
     ];
 
     final missingVars = <String>[];
 
     for (final varName in requiredVars) {
-      final value = dotenv.env[varName];
-      if (value == null || value.isEmpty) {
+      try {
+        final value = dotenv.env[varName];
+        if (value == null || value.isEmpty) {
+          missingVars.add(varName);
+        }
+      } catch (_) {
         missingVars.add(varName);
       }
     }
@@ -188,27 +208,17 @@ class EnvConfig {
   }
 
   /// Print environment configuration (for debugging)
-  /// ⚠️  Only use in development - never in production
+  /// Only use in development - never in production
   static void printConfig() {
     if (isProduction) {
       throw UnsupportedError('Cannot print config in production environment');
     }
 
     developer.log('=== Environment Configuration ===');
+    developer.log('Initialized: $_isInitialized');
     developer.log('Environment: $appEnv');
     developer.log('API Base URL: $apiBaseUrl');
     developer.log('Logging Enabled: $enableLogging');
-    developer.log('Kakao Key: ${_maskSecret(kakaoNativeAppKey)}');
-    developer.log('Google Client ID: ${_maskSecret(googleWebClientId)}');
-    developer.log('FCM Sender ID: ${_maskSecret(fcmSenderId)}');
     developer.log('================================');
-  }
-
-  /// Mask secret values for safe logging
-  static String _maskSecret(String secret) {
-    if (secret.length <= 8) {
-      return '***';
-    }
-    return '${secret.substring(0, 4)}...${secret.substring(secret.length - 4)}';
   }
 }
