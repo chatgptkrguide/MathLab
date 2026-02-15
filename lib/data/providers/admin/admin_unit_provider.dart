@@ -94,18 +94,16 @@ class AdminUnitNotifier extends StateNotifier<AsyncValue<void>> {
           .collection('lessons')
           .get();
 
-      final batch = _firestore.batch();
-
       // Collect lesson IDs for problem deletion
       final lessonIds = <String>[];
       for (final lessonDoc in lessonsSnapshot.docs) {
         lessonIds.add(lessonDoc.id);
-        batch.delete(lessonDoc.reference);
       }
 
-      // Delete the unit document
-      batch.delete(_firestore.collection('units').doc(id));
-      await batch.commit();
+      // Batch delete lessons + unit (chunk to stay under 500-doc limit)
+      final lessonRefs = lessonsSnapshot.docs.map((d) => d.reference).toList();
+      lessonRefs.add(_firestore.collection('units').doc(id));
+      await _batchDelete(lessonRefs);
 
       // Delete problems associated with those lessons
       for (final lessonId in lessonIds) {
@@ -113,11 +111,10 @@ class AdminUnitNotifier extends StateNotifier<AsyncValue<void>> {
             .collection('problems')
             .where('lessonId', isEqualTo: lessonId)
             .get();
-        final problemBatch = _firestore.batch();
-        for (final problemDoc in problemsSnapshot.docs) {
-          problemBatch.delete(problemDoc.reference);
+        if (problemsSnapshot.docs.isNotEmpty) {
+          await _batchDelete(
+              problemsSnapshot.docs.map((d) => d.reference).toList());
         }
-        await problemBatch.commit();
       }
 
       AppLogger.info(
@@ -129,6 +126,20 @@ class AdminUnitNotifier extends StateNotifier<AsyncValue<void>> {
       AppLogger.error('Failed to delete unit', tag: 'AdminUnit', error: e);
       state = AsyncValue.error(e, st);
       rethrow;
+    }
+  }
+
+  /// Helper to batch-delete documents in chunks of 499 (Firestore limit is 500)
+  Future<void> _batchDelete(List<DocumentReference> refs) async {
+    const chunkSize = 499;
+    for (var i = 0; i < refs.length; i += chunkSize) {
+      final chunk = refs.sublist(
+          i, i + chunkSize > refs.length ? refs.length : i + chunkSize);
+      final batch = _firestore.batch();
+      for (final ref in chunk) {
+        batch.delete(ref);
+      }
+      await batch.commit();
     }
   }
 

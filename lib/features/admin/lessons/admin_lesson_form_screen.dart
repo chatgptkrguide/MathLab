@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/constants/constants.dart';
@@ -188,6 +189,7 @@ class _AdminLessonFormScreenState
                                   controller: _orderController,
                                   decoration: _inputDecoration('0'),
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                   validator: (v) {
                                     if (v?.isEmpty ?? true) return '필수';
                                     if (int.tryParse(v!) == null) return '숫자';
@@ -207,6 +209,7 @@ class _AdminLessonFormScreenState
                                   controller: _xpRewardController,
                                   decoration: _inputDecoration('10'),
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                   validator: (v) {
                                     if (v?.isEmpty ?? true) return '필수';
                                     if (int.tryParse(v!) == null) return '숫자';
@@ -226,6 +229,7 @@ class _AdminLessonFormScreenState
                                   controller: _estimatedMinutesController,
                                   decoration: _inputDecoration('5'),
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                   validator: (v) {
                                     if (v?.isEmpty ?? true) return '필수';
                                     if (int.tryParse(v!) == null) return '숫자';

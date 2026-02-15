@@ -93,18 +93,24 @@ class AdminLessonNotifier extends StateNotifier<AsyncValue<void>> {
           .doc(lessonId)
           .delete();
 
-      // Delete associated problems
+      // Delete associated problems (chunked to stay under 500-doc batch limit)
       final problemsSnapshot = await _firestore
           .collection('problems')
           .where('lessonId', isEqualTo: lessonId)
           .get();
 
       if (problemsSnapshot.docs.isNotEmpty) {
-        final batch = _firestore.batch();
-        for (final doc in problemsSnapshot.docs) {
-          batch.delete(doc.reference);
+        final refs = problemsSnapshot.docs.map((d) => d.reference).toList();
+        const chunkSize = 499;
+        for (var i = 0; i < refs.length; i += chunkSize) {
+          final chunk = refs.sublist(
+              i, i + chunkSize > refs.length ? refs.length : i + chunkSize);
+          final batch = _firestore.batch();
+          for (final ref in chunk) {
+            batch.delete(ref);
+          }
+          await batch.commit();
         }
-        await batch.commit();
       }
 
       AppLogger.info(

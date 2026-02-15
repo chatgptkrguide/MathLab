@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -293,6 +294,7 @@ class _AdminAchievementFormScreenState
                             TextFormField(
                               controller: _targetValueController,
                               keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                               decoration: const InputDecoration(
                                 hintText: '예: 100',
                                 border: OutlineInputBorder(),
@@ -359,6 +361,7 @@ class _AdminAchievementFormScreenState
                                         controller: _xpRewardController,
                                         keyboardType:
                                             TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         decoration: const InputDecoration(
                                           hintText: '0',
                                           border: OutlineInputBorder(),
@@ -392,6 +395,7 @@ class _AdminAchievementFormScreenState
                                         controller: _gemsRewardController,
                                         keyboardType:
                                             TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         decoration: const InputDecoration(
                                           hintText: '0',
                                           border: OutlineInputBorder(),
@@ -637,21 +641,33 @@ class _AdminAchievementFormScreenState
 
         // Upload icon if picked
         if (_newIconFile != null) {
-          iconUrl =
-              await imageService.uploadImage('achievements/$docId', _newIconFile!);
-          // Update the achievement with the icon URL
-          final updatedAchievement = _buildAchievementModel(iconUrl);
-          await notifier.updateAchievement(docId, updatedAchievement);
+          try {
+            iconUrl = await imageService.uploadImage(
+                'achievements/$docId', _newIconFile!);
+            // Update the achievement with the icon URL
+            final updatedAchievement = _buildAchievementModel(iconUrl);
+            await notifier.updateAchievement(docId, updatedAchievement);
+          } catch (uploadError) {
+            // Achievement created but image upload failed - notify user
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('업적은 생성되었으나 이미지 업로드에 실패했습니다')),
+              );
+              Navigator.pop(context, true);
+            }
+            return;
+          }
         }
       }
 
       if (mounted) {
-        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_isEditing ? '업적이 수정되었습니다' : '업적이 생성되었습니다'),
           ),
         );
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {

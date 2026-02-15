@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/constants/constants.dart';
@@ -154,6 +155,7 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           hintText: '0',
                         ),
                         keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         validator: (v) {
                           if (v?.isEmpty ?? true) return '순서를 입력하세요';
                           if (int.tryParse(v!) == null) return '숫자를 입력하세요';

@@ -694,12 +694,12 @@ class _AdminProblemFormScreenState
       }
 
       if (mounted) {
-        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_isEditing ? '문제가 수정되었습니다' : '문제가 생성되었습니다'),
           ),
         );
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {

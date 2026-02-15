@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/constants/constants.dart';
@@ -80,7 +81,8 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
 
       await notifier.updateConfig(data);
 
-      // Refresh the config provider to reflect updated values
+      // Reset loaded flag so controllers update on next build
+      _isLoaded = false;
       ref.invalidate(adminConfigProvider);
 
       if (mounted) {
@@ -169,6 +171,7 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                           TextFormField(
                             controller: _maxDailyXPController,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                             decoration: const InputDecoration(
                               hintText: '예: 500',
                               border: OutlineInputBorder(),
@@ -191,6 +194,7 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                           TextFormField(
                             controller: _heartRecoveryMinutesController,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                             decoration: const InputDecoration(
                               hintText: '예: 30',
                               border: OutlineInputBorder(),
@@ -213,6 +217,7 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                           TextFormField(
                             controller: _maxHeartsController,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                             decoration: const InputDecoration(
                               hintText: '예: 5',
                               border: OutlineInputBorder(),
