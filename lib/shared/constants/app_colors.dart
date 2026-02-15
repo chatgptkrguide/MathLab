@@ -82,6 +82,11 @@ class AppColors {
   static const mathOrangeDark = Color(0xFFE08600); // 주황 다크
   static const mathGreenDark = Color(0xFF4CAF02); // 녹색 다크
 
+  // 관리자 색상
+  static const adminPurple = Color(0xFF9C27B0); // 관리자 보라
+  static const adminPurpleDark = Color(0xFF7B1FA2); // 관리자 보라 다크
+  static const adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)]; // 관리자 그라디언트
+
   // 소셜 로그인 색상
   static const kakaoYellow = Color(0xFFFEE500); // 카카오 노랑
   static const kakaoBrown = Color(0xFF3C1E1E); // 카카오 브라운

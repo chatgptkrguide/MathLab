@@ -41,6 +41,6 @@ final adminStatsProvider = FutureProvider<AdminStats>((ref) async {
     );
   } catch (e) {
     AppLogger.error('Failed to load admin stats', tag: 'AdminStats', error: e);
-    return const AdminStats();
+    rethrow;
   }
 });

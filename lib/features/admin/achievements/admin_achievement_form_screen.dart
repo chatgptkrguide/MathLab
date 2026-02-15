@@ -10,9 +10,6 @@ import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../../data/models/achievement_model.dart';
 import '../../../data/providers/admin/admin_achievement_provider.dart';
 
-/// Admin gradient colors (purple)
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminAchievementFormScreen extends ConsumerStatefulWidget {
   final AchievementModel? achievement;
 
@@ -95,7 +92,7 @@ class _AdminAchievementFormScreenState
           children: [
             AdaptiveAppHeader(
               title: _isEditing ? '업적 수정' : '새 업적',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),

@@ -7,9 +7,6 @@ import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../data/providers/admin/admin_user_provider.dart';
 
-/// Admin gradient colors (purple)
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminUserDetailScreen extends ConsumerStatefulWidget {
   final UserModel user;
 
@@ -54,7 +51,7 @@ class _AdminUserDetailScreenState
             children: [
               AdaptiveAppHeader(
                 title: user.displayName ?? '사용자 상세',
-                gradientColors: _adminGradient,
+                gradientColors: AppColors.adminGradient,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -134,7 +131,7 @@ class _AdminUserDetailScreenState
         CircleAvatar(
           radius: 40,
           backgroundColor:
-              isAdmin ? const Color(0xFF9C27B0) : AppColors.mathBlue,
+              isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
           child: Text(
             initial,
             style: const TextStyle(
@@ -165,7 +162,7 @@ class _AdminUserDetailScreenState
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: (isAdmin ? const Color(0xFF9C27B0) : AppColors.mathBlue)
+            color: (isAdmin ? AppColors.adminPurple : AppColors.mathBlue)
                 .withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
           ),
@@ -175,7 +172,7 @@ class _AdminUserDetailScreenState
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color:
-                  isAdmin ? const Color(0xFF9C27B0) : AppColors.mathBlue,
+                  isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
             ),
           ),
         ),
@@ -291,7 +288,7 @@ class _AdminUserDetailScreenState
                   label: '관리자',
                   icon: Icons.admin_panel_settings_outlined,
                   isSelected: isAdmin,
-                  color: const Color(0xFF9C27B0),
+                  color: AppColors.adminPurple,
                   onTap: () {
                     if (!isAdmin) {
                       _confirmRoleChange('admin');
@@ -361,7 +358,7 @@ class _AdminUserDetailScreenState
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF9C27B0),
+              foregroundColor: AppColors.adminPurple,
             ),
             child: const Text('변경'),
           ),
@@ -374,7 +371,7 @@ class _AdminUserDetailScreenState
         await ref
             .read(adminUserNotifierProvider.notifier)
             .updateUserRole(widget.user.uid, newRole);
-        ref.invalidate(adminUsersProvider);
+        ref.read(adminUserListProvider.notifier).refresh();
         setState(() {
           _currentRole = newRole;
           _hasChanges = true;

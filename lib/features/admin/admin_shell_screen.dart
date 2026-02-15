@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../data/providers/admin/admin_stats_provider.dart';
+import '../../data/providers/user/user_provider.dart';
 import 'widgets/admin_stat_card.dart';
 import 'widgets/admin_menu_card.dart';
 import 'admin_problem_list_screen.dart';
@@ -12,14 +13,37 @@ import 'achievements/admin_achievement_list_screen.dart';
 import 'users/admin_user_list_screen.dart';
 import 'config/admin_config_screen.dart';
 
-/// Admin gradient colors (purple to distinguish from user screens)
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminShellScreen extends ConsumerWidget {
   const AdminShellScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
+    if (user == null || !user.isAdmin) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock_outline, size: 64, color: AppColors.textTertiary),
+                const SizedBox(height: 16),
+                const Text('접근 권한이 없습니다',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary)),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('돌아가기'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final statsAsync = ref.watch(adminStatsProvider);
 
     return Scaffold(
@@ -29,7 +53,7 @@ class AdminShellScreen extends ConsumerWidget {
           children: [
             AdaptiveAppHeader(
               title: '관리자 패널',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),

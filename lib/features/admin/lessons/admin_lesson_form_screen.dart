@@ -7,8 +7,6 @@ import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/providers/admin/admin_lesson_provider.dart';
 
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminLessonFormScreen extends ConsumerStatefulWidget {
   final String unitId;
   final LessonModel? lesson;
@@ -80,7 +78,7 @@ class _AdminLessonFormScreenState
           children: [
             AdaptiveAppHeader(
               title: _isEditing ? '레슨 수정' : '새 레슨',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),

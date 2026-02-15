@@ -7,9 +7,6 @@ import '../../../data/models/achievement_model.dart';
 import '../../../data/providers/admin/admin_achievement_provider.dart';
 import 'admin_achievement_form_screen.dart';
 
-/// Admin gradient colors (purple)
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminAchievementListScreen extends ConsumerStatefulWidget {
   const AdminAchievementListScreen({super.key});
 
@@ -31,7 +28,7 @@ class _AdminAchievementListScreenState
           children: [
             AdaptiveAppHeader(
               title: '업적 관리',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),

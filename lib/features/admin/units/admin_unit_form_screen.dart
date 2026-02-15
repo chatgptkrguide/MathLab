@@ -7,8 +7,6 @@ import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../../data/models/lesson/unit_model.dart';
 import '../../../data/providers/admin/admin_unit_provider.dart';
 
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminUnitFormScreen extends ConsumerStatefulWidget {
   final UnitModel? unit;
 
@@ -60,7 +58,7 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
           children: [
             AdaptiveAppHeader(
               title: _isEditing ? '유닛 수정' : '새 유닛',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),

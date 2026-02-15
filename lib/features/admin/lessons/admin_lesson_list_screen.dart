@@ -7,8 +7,6 @@ import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/providers/admin/admin_lesson_provider.dart';
 import 'admin_lesson_form_screen.dart';
 
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminLessonListScreen extends ConsumerStatefulWidget {
   final String unitId;
   final String unitTitle;
@@ -37,7 +35,7 @@ class _AdminLessonListScreenState
           children: [
             AdaptiveAppHeader(
               title: '${widget.unitTitle} - 레슨',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
@@ -144,9 +142,11 @@ class _AdminLessonListScreenState
           .reorderLessons(widget.unitId, reordered);
       ref.invalidate(adminLessonsProvider(widget.unitId));
     } catch (e) {
+      // Rollback: re-fetch original order from server
+      ref.invalidate(adminLessonsProvider(widget.unitId));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('순서 변경 실패: $e')),
+          const SnackBar(content: Text('순서 변경에 실패했습니다. 다시 시도해주세요.')),
         );
       }
     }

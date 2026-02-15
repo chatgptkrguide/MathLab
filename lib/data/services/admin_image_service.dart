@@ -53,6 +53,7 @@ class AdminImageService {
       AppLogger.info('Image deleted: $imageUrl', tag: 'AdminImageService');
     } catch (e) {
       AppLogger.error('Failed to delete image', tag: 'AdminImageService', error: e);
+      rethrow;
     }
   }
 

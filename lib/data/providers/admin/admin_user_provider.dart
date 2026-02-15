@@ -5,22 +5,85 @@ import '../../../core/utils/app_logger.dart';
 import '../../models/user/user_model.dart';
 import '../infrastructure/firebase_providers.dart';
 
-/// Fetches all users ordered by creation date (newest first), limited to 100
-final adminUsersProvider = FutureProvider<List<UserModel>>((ref) async {
-  final firestore = ref.read(firestoreProvider);
+const _pageSize = 30;
 
-  try {
-    final snapshot = await firestore
-        .collection('users')
-        .orderBy('createdAt', descending: true)
-        .limit(100)
-        .get();
+/// Manages paginated user list for admin
+class AdminUserListNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
+  final FirebaseFirestore _firestore;
+  DocumentSnapshot? _lastDocument;
+  bool _hasMore = true;
 
-    return snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
-  } catch (e) {
-    AppLogger.error('Failed to load users', tag: 'AdminUser', error: e);
-    rethrow;
+  AdminUserListNotifier(this._firestore) : super(const AsyncValue.loading()) {
+    loadInitial();
   }
+
+  bool get hasMore => _hasMore;
+
+  Future<void> loadInitial() async {
+    state = const AsyncValue.loading();
+    _lastDocument = null;
+    _hasMore = true;
+
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .orderBy('createdAt', descending: true)
+          .limit(_pageSize)
+          .get();
+
+      final users =
+          snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
+      _hasMore = snapshot.docs.length >= _pageSize;
+      if (snapshot.docs.isNotEmpty) {
+        _lastDocument = snapshot.docs.last;
+      }
+
+      AppLogger.info('Admin: ${users.length} users loaded (initial)',
+          tag: 'AdminUser');
+      state = AsyncValue.data(users);
+    } catch (e, st) {
+      AppLogger.error('Failed to load users', tag: 'AdminUser', error: e);
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (!_hasMore || _lastDocument == null) return;
+    final currentUsers = state.valueOrNull ?? [];
+
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .orderBy('createdAt', descending: true)
+          .startAfterDocument(_lastDocument!)
+          .limit(_pageSize)
+          .get();
+
+      final newUsers =
+          snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
+      _hasMore = snapshot.docs.length >= _pageSize;
+      if (snapshot.docs.isNotEmpty) {
+        _lastDocument = snapshot.docs.last;
+      }
+
+      AppLogger.info('Admin: ${newUsers.length} more users loaded',
+          tag: 'AdminUser');
+      state = AsyncValue.data([...currentUsers, ...newUsers]);
+    } catch (e) {
+      AppLogger.error('Failed to load more users', tag: 'AdminUser', error: e);
+      // Keep existing data, just show error via SnackBar
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadInitial();
+  }
+}
+
+final adminUserListProvider = StateNotifierProvider<AdminUserListNotifier,
+    AsyncValue<List<UserModel>>>((ref) {
+  final firestore = ref.read(firestoreProvider);
+  return AdminUserListNotifier(firestore);
 });
 
 /// Notifier for admin user management operations

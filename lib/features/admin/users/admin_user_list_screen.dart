@@ -7,9 +7,6 @@ import '../../../data/models/user/user_model.dart';
 import '../../../data/providers/admin/admin_user_provider.dart';
 import 'admin_user_detail_screen.dart';
 
-/// Admin gradient colors (purple)
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminUserListScreen extends ConsumerStatefulWidget {
   const AdminUserListScreen({super.key});
 
@@ -51,7 +48,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final usersAsync = ref.watch(adminUsersProvider);
+    final usersAsync = ref.watch(adminUserListProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -60,7 +57,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
           children: [
             AdaptiveAppHeader(
               title: '사용자 관리',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
@@ -137,9 +134,20 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                 },
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(
-                  child: Text('오류: $e',
-                      style: const TextStyle(color: AppColors.error)),
+                error: (_, __) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('사용자 목록을 불러올 수 없습니다',
+                          style: TextStyle(color: AppColors.error)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () =>
+                            ref.read(adminUserListProvider.notifier).refresh(),
+                        child: const Text('다시 시도'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -159,14 +167,14 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
           _roleFilter = label;
         });
       },
-      selectedColor: const Color(0xFF9C27B0).withValues(alpha: 0.15),
+      selectedColor: AppColors.adminPurple.withValues(alpha: 0.15),
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFF9C27B0) : AppColors.textSecondary,
+        color: isSelected ? AppColors.adminPurple : AppColors.textSecondary,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         fontSize: 13,
       ),
       side: BorderSide(
-        color: isSelected ? const Color(0xFF9C27B0) : AppColors.borderLight,
+        color: isSelected ? AppColors.adminPurple : AppColors.borderLight,
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
@@ -175,7 +183,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
   Widget _buildEmptyState() {
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(adminUsersProvider);
+        await ref.read(adminUserListProvider.notifier).refresh();
       },
       child: ListView(
         children: const [
@@ -208,14 +216,33 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
   }
 
   Widget _buildUserList(List<UserModel> users) {
+    final hasMore = ref.read(adminUserListProvider.notifier).hasMore;
+
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(adminUsersProvider);
+        await ref.read(adminUserListProvider.notifier).refresh();
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: users.length,
+        itemCount: users.length + (hasMore ? 1 : 0),
         itemBuilder: (context, index) {
+          if (index == users.length) {
+            // Load more button
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: OutlinedButton(
+                  onPressed: () =>
+                      ref.read(adminUserListProvider.notifier).loadMore(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.adminPurple,
+                    side: const BorderSide(color: AppColors.adminPurple),
+                  ),
+                  child: const Text('더 보기'),
+                ),
+              ),
+            );
+          }
           final user = users[index];
           return _AdminUserCard(
             user: user,
@@ -234,7 +261,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
       ),
     );
     if (result == true) {
-      ref.invalidate(adminUsersProvider);
+      ref.read(adminUserListProvider.notifier).refresh();
     }
   }
 }
@@ -269,7 +296,7 @@ class _AdminUserCard extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor:
-                    isAdmin ? const Color(0xFF9C27B0) : AppColors.mathBlue,
+                    isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
                 child: Text(
                   initial,
                   style: const TextStyle(
@@ -315,7 +342,7 @@ class _AdminUserCard extends StatelessWidget {
               // Role badge
               _buildChip(
                 isAdmin ? 'admin' : 'user',
-                isAdmin ? const Color(0xFF9C27B0) : AppColors.mathBlue,
+                isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
               ),
               const SizedBox(width: 4),
               const Icon(Icons.chevron_right,

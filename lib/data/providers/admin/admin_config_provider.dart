@@ -23,7 +23,7 @@ final adminConfigProvider =
   } catch (e) {
     AppLogger.error('Failed to load app config',
         tag: 'AdminConfig', error: e);
-    return {};
+    rethrow;
   }
 });
 

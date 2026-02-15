@@ -6,9 +6,6 @@ import '../../../shared/constants/constants.dart';
 import '../../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../../data/providers/admin/admin_config_provider.dart';
 
-/// Admin gradient colors (purple)
-const _adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
-
 class AdminConfigScreen extends ConsumerStatefulWidget {
   const AdminConfigScreen({super.key});
 
@@ -114,7 +111,7 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
           children: [
             AdaptiveAppHeader(
               title: '앱 설정',
-              gradientColors: _adminGradient,
+              gradientColors: AppColors.adminGradient,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
