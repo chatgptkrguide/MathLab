@@ -65,10 +65,11 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   void _initializeSession(List<ProblemModel> problems) {
+    final user = ref.read(userProvider);
     session = ProblemSessionModel(
       sessionId: 'session_${DateTime.now().millisecondsSinceEpoch}',
       lessonId: widget.lessonId,
-      userId: 'demo_user',
+      userId: user?.uid ?? 'anonymous',
       problems: problems,
       startedAt: DateTime.now(),
     );
@@ -292,42 +293,47 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // Top progress bar
-            _buildProgressBar(),
+            // 메인 콘텐츠
+            Column(
+              children: [
+                // Top progress bar
+                _buildProgressBar(),
 
-            // Hearts indicator
-            _buildHeartsIndicator(),
+                // Hearts indicator
+                _buildHeartsIndicator(),
 
-            // Question area
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Question card
-                    _buildQuestionCard(currentProblem),
+                // Question area
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Question card
+                        _buildQuestionCard(currentProblem),
 
-                    const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                    // Answer input (varies by problem type)
-                    _buildAnswerInput(currentProblem),
+                        // Answer input (varies by problem type)
+                        _buildAnswerInput(currentProblem),
 
-                    const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                    // 잠금 해제된 힌트 표시
-                    _buildUnlockedHintsSection(currentProblem),
-                  ],
+                        // 잠금 해제된 힌트 표시
+                        _buildUnlockedHintsSection(currentProblem),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+
+                // Bottom action button
+                _buildActionButton(),
+              ],
             ),
 
-            // Bottom action button
-            _buildActionButton(),
-
-            // Feedback overlay
+            // Feedback overlay (Stack 위에 올바르게 배치)
             if (isAnswerChecked) _buildFeedbackOverlay(currentProblem),
           ],
         ),
@@ -994,100 +1000,123 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     }
 
     return Positioned.fill(
-      child: Container(
-        color: backgroundColor,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: 80,
-                  color: Colors.white,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: AppTextStyles.heading1.copyWith(
+      child: GestureDetector(
+        onTap: _nextProblem,
+        child: Container(
+          color: backgroundColor,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  Icon(
+                    icon,
+                    size: 80,
                     color: Colors.white,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                if (isPartialCredit) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    '${(result.score * 100).toStringAsFixed(0)}% 정확도',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-                if (!isCorrect && problem.explanation != null) ...[
                   const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                  Text(
+                    title,
+                    style: AppTextStyles.heading1.copyWith(
+                      color: Colors.white,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '설명',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        MathRichText(
-                          text: problem.explanation!,
-                          textStyle: AppTextStyles.bodyLarge.copyWith(
-                            color: Colors.white,
-                          ),
-                          mathFontSize: 18.0,
-                        ),
-                      ],
-                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ],
-                if (result?.hints != null && result!.hints!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
+                  if (isPartialCredit) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      '${(result.score * 100).toStringAsFixed(0)}% 정확도',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '💡 힌트',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                  ],
+                  if (!isCorrect && problem.explanation != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '설명',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        ...result.hints!.map((hint) => Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                '• $hint',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.9),
+                          const SizedBox(height: 8),
+                          MathRichText(
+                            text: problem.explanation!,
+                            textStyle: AppTextStyles.bodyLarge.copyWith(
+                              color: Colors.white,
+                            ),
+                            mathFontSize: 18.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (result?.hints != null && result!.hints!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '💡 힌트',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          ...result.hints!.map((hint) => Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  '• $hint',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
                                 ),
-                              ),
-                            )),
-                      ],
+                              )),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  // 계속 버튼
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Text(
+                      '탭하여 계속',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
           ),
         ),

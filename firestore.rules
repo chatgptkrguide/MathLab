@@ -42,7 +42,29 @@ service cloud.firestore {
                       // Cannot change critical fields
                       request.resource.data.id == resource.data.id &&
                       request.resource.data.email == resource.data.email &&
-                      request.resource.data.createdAt == resource.data.createdAt;
+                      request.resource.data.createdAt == resource.data.createdAt &&
+                      // Gamification field bounds (prevent cheating)
+                      // Hearts: must stay in 0-5 range
+                      (!('hearts' in request.resource.data) ||
+                        (request.resource.data.hearts >= 0 && request.resource.data.hearts <= 5)) &&
+                      // XP: absolute bounds (0-10000), max +200 per update
+                      (!('xp' in request.resource.data) ||
+                        (request.resource.data.xp >= 0 && request.resource.data.xp <= 10000 &&
+                         request.resource.data.xp <= resource.data.xp + 200)) &&
+                      // TotalXP: absolute bounds, max +200 per update
+                      (!('totalXp' in request.resource.data) ||
+                        (request.resource.data.totalXp >= 0 &&
+                         request.resource.data.totalXp <= resource.data.totalXp + 200)) &&
+                      // Gems: absolute bounds (0-10000), max +100 per update
+                      (!('gems' in request.resource.data) ||
+                        (request.resource.data.gems >= 0 && request.resource.data.gems <= 10000)) &&
+                      // Level: must be 1-100, can only go up by 1
+                      (!('level' in request.resource.data) ||
+                        (request.resource.data.level >= 1 && request.resource.data.level <= 100 &&
+                         request.resource.data.level <= resource.data.level + 1)) &&
+                      // Streak: reasonable bounds (0-365)
+                      (!('streak' in request.resource.data) ||
+                        (request.resource.data.streak >= 0 && request.resource.data.streak <= 365));
 
       // Delete: Owner can delete their own account
       allow delete: if isOwner(userId);

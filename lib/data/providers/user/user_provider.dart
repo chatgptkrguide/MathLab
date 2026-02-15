@@ -617,7 +617,7 @@ class User extends _$User {
         hearts: 5,
         gems: 0,
         achievements: [],
-        league: 'bronze',
+        league: 'Bronze',
         lastStudyDate: null,
         updatedAt: now,
       );
@@ -632,7 +632,7 @@ class User extends _$User {
         'hearts': 5,
         'gems': 0,
         'achievements': [],
-        'league': 'bronze',
+        'league': 'Bronze',
         'lastStudyDate': null,
         'updatedAt': Timestamp.fromDate(now),
       });

@@ -37,7 +37,12 @@ class EnvConfig {
 
   /// API Base URL
   static String get apiBaseUrl {
-    return _getEnvVar('API_BASE_URL', defaultValue: 'http://localhost:8080/api/v1');
+    final url = _getEnvVar('API_BASE_URL', defaultValue: 'https://asia-northeast3-mathlab-gomath.cloudfunctions.net');
+    // Enforce HTTPS in production
+    if (isProduction && url.startsWith('http://')) {
+      throw UnsupportedError('API_BASE_URL must use HTTPS in production');
+    }
+    return url;
   }
 
   /// Check if running in production

@@ -126,11 +126,23 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     );
   }
 
+  /// 레벨 기반 현재 학습 단계명
+  String _getLevelTopicName(int level) {
+    if (level <= 3) return '기초 연산';
+    if (level <= 6) return '분수와 소수';
+    if (level <= 10) return '방정식';
+    if (level <= 15) return '함수';
+    if (level <= 20) return '기하';
+    if (level <= 30) return '통계와 확률';
+    return '심화 학습';
+  }
+
   /// 상태 바: 현재 레슨명 + 스트릭 + XP + 레벨
   Widget _buildStatusBar(user) {
     final streak = user?.streak ?? 0;
     final xp = user?.xp ?? 0;
     final level = user?.level ?? 1;
+    final topicName = _getLevelTopicName(level);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -155,9 +167,9 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  '소인수분해',
-                  style: TextStyle(
+                child: Text(
+                  topicName,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

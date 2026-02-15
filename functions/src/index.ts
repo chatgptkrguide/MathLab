@@ -5,52 +5,46 @@
 
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { Response } from 'express';
 import { createLogger } from './utils/logger';
 import { formatErrorResponse } from './utils/error-handler';
-import { verifyIOSReceipt } from './services/ios-verification';
-import { verifyAndroidReceipt } from './services/android-verification';
-import {
-  syncAllSubscriptions,
-  cleanupExpiredSubscriptions,
-  getSubscriptionStats
-} from './services/subscription-sync';
-import { processIOSWebhook } from './webhooks/ios-webhook';
-import { processAndroidWebhook } from './webhooks/android-webhook';
-import {
-  IOSReceiptVerificationRequest,
-  AndroidReceiptVerificationRequest
-} from './types/subscription';
+import { verifyAuth, AuthenticatedRequest, verifyUserMatch } from './utils/auth-middleware';
 
 // Firebase Admin 초기화
 admin.initializeApp();
 
 const logger = createLogger('CloudFunctions');
 
-// ==================== Firestore Triggers ====================
+// ==================== CORS & Auth Helpers ====================
 
-/**
- * User Lifecycle Triggers
- */
-export { onUserCreated, onUserXPUpdated } from './triggers/user-triggers';
+const ALLOWED_ORIGINS = [
+  'https://gomath-mathlab.web.app',
+  'https://gomath-mathlab.firebaseapp.com',
+];
 
-/**
- * League Management Triggers
- */
-export {
-  weeklyLeagueReset,
-  onLeagueParticipantUpdated,
-  dailyLeagueReminder
-} from './triggers/league-triggers';
+function setCorsHeaders(res: Response, method: string = 'POST'): void {
+  // In production, restrict to known origins
+  const origin = ALLOWED_ORIGINS[0];
+  res.set('Access-Control-Allow-Origin', origin);
+  res.set('Access-Control-Allow-Methods', method);
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.set('Access-Control-Allow-Credentials', 'true');
+}
 
-// ==================== FCM Push Notification Functions ====================
+function handlePreflight(req: AuthenticatedRequest, res: Response): boolean {
+  if (req.method === 'OPTIONS') {
+    setCorsHeaders(res, 'POST, GET, OPTIONS');
+    res.status(204).send('');
+    return true;
+  }
+  return false;
+}
 
-import {
-  registerFCMToken,
-  removeFCMToken,
-  sendNotificationToUser,
-  NotificationType,
-  NotificationPayload,
-} from './services/fcm-service';
+// ==================== Firestore Triggers (TODO: implement) ====================
+
+// TODO: Uncomment when trigger modules are created
+// export { onUserCreated, onUserXPUpdated } from './triggers/user-triggers';
+// export { weeklyLeagueReset, onLeagueParticipantUpdated, dailyLeagueReminder } from './triggers/league-triggers';
 
 /**
  * iOS 영수증 검증 HTTP Function
@@ -64,40 +58,29 @@ import {
  * }
  */
 export const verifyIOSReceiptFunction = functions
-  .region('asia-northeast3') // Seoul
-  .https.onRequest(async (req, res) => {
-    // CORS 설정
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+  .region('asia-northeast3')
+  .https.onRequest(async (req: AuthenticatedRequest, res) => {
+    setCorsHeaders(res);
+    if (handlePreflight(req, res)) return;
 
     if (req.method !== 'POST') {
-      res.status(405).json({
-        success: false,
-        error: {
-          code: 'METHOD_NOT_ALLOWED',
-          message: 'Only POST requests are allowed'
-        }
-      });
+      res.status(405).json({ success: false, error: { code: 'METHOD_NOT_ALLOWED', message: 'Only POST requests are allowed' } });
       return;
     }
+
+    // Auth verification
+    const uid = await verifyAuth(req, res);
+    if (!uid) return;
+    if (!verifyUserMatch(uid, req.body.userId, res)) return;
 
     try {
       logger.info('iOS receipt verification request received', {
         userId: req.body.userId,
-        productId: req.body.productId
+        productId: req.body.productId,
       });
 
-      const request: IOSReceiptVerificationRequest = req.body;
-      const result = await verifyIOSReceipt(request);
-
-      res.status(200).json(result);
-
+      // TODO: Implement verifyIOSReceipt service
+      res.status(501).json({ success: false, error: { code: 'NOT_IMPLEMENTED', message: 'iOS receipt verification not yet implemented' } });
     } catch (error) {
       logger.error('iOS receipt verification failed', error as Error);
       const errorResponse = formatErrorResponse(error as Error);
@@ -117,40 +100,29 @@ export const verifyIOSReceiptFunction = functions
  * }
  */
 export const verifyAndroidReceiptFunction = functions
-  .region('asia-northeast3') // Seoul
-  .https.onRequest(async (req, res) => {
-    // CORS 설정
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+  .region('asia-northeast3')
+  .https.onRequest(async (req: AuthenticatedRequest, res) => {
+    setCorsHeaders(res);
+    if (handlePreflight(req, res)) return;
 
     if (req.method !== 'POST') {
-      res.status(405).json({
-        success: false,
-        error: {
-          code: 'METHOD_NOT_ALLOWED',
-          message: 'Only POST requests are allowed'
-        }
-      });
+      res.status(405).json({ success: false, error: { code: 'METHOD_NOT_ALLOWED', message: 'Only POST requests are allowed' } });
       return;
     }
+
+    // Auth verification
+    const uid = await verifyAuth(req, res);
+    if (!uid) return;
+    if (!verifyUserMatch(uid, req.body.userId, res)) return;
 
     try {
       logger.info('Android receipt verification request received', {
         userId: req.body.userId,
-        productId: req.body.productId
+        productId: req.body.productId,
       });
 
-      const request: AndroidReceiptVerificationRequest = req.body;
-      const result = await verifyAndroidReceipt(request);
-
-      res.status(200).json(result);
-
+      // TODO: Implement verifyAndroidReceipt service
+      res.status(501).json({ success: false, error: { code: 'NOT_IMPLEMENTED', message: 'Android receipt verification not yet implemented' } });
     } catch (error) {
       logger.error('Android receipt verification failed', error as Error);
       const errorResponse = formatErrorResponse(error as Error);
@@ -163,25 +135,20 @@ export const verifyAndroidReceiptFunction = functions
  *
  * Apple이 구독 상태 변경 시 호출하는 웹훅
  */
+// Webhooks: No user auth (called by Apple/Google servers)
 export const iosWebhook = functions
-  .region('asia-northeast3') // Seoul
+  .region('asia-northeast3')
   .https.onRequest(async (req, res) => {
     if (req.method !== 'POST') {
-      res.status(405).json({
-        success: false,
-        error: 'Only POST requests are allowed'
-      });
+      res.status(405).json({ success: false, error: 'Only POST requests are allowed' });
       return;
     }
 
     try {
       logger.info('iOS webhook received');
 
-      const payload = req.body;
-      const result = await processIOSWebhook(payload);
-
-      res.status(200).json(result);
-
+      // TODO: Implement processIOSWebhook + Apple signature verification
+      res.status(501).json({ success: false, error: 'iOS webhook not yet implemented' });
     } catch (error) {
       logger.error('iOS webhook processing failed', error as Error);
       const errorResponse = formatErrorResponse(error as Error);
@@ -195,19 +162,14 @@ export const iosWebhook = functions
  * Google Cloud Pub/Sub를 통해 호출되는 웹훅
  */
 export const androidWebhook = functions
-  .region('asia-northeast3') // Seoul
+  .region('asia-northeast3')
   .pubsub.topic('android-subscription-notifications')
   .onPublish(async (message) => {
     try {
       logger.info('Android webhook received via Pub/Sub');
 
-      const result = await processAndroidWebhook(message);
-
-      logger.info('Android webhook processed', {
-        success: result.success,
-        action: result.action
-      });
-
+      // TODO: Implement processAndroidWebhook
+      logger.warn('Android webhook processing not yet implemented');
     } catch (error) {
       logger.error('Android webhook processing failed', error as Error);
       throw error;
@@ -220,23 +182,17 @@ export const androidWebhook = functions
  * 매일 00:00 KST (15:00 UTC)에 실행
  */
 export const syncSubscriptions = functions
-  .region('asia-northeast3') // Seoul
-  .pubsub.schedule('0 15 * * *') // 매일 15:00 UTC (00:00 KST)
+  .region('asia-northeast3')
+  .pubsub.schedule('0 15 * * *')
   .timeZone('Asia/Seoul')
-  .onRun(async (context) => {
+  .onRun(async () => {
     try {
       logger.info('Starting scheduled subscription sync');
 
-      const result = await syncAllSubscriptions();
-
-      logger.info('Scheduled subscription sync completed', {
-        totalProcessed: result.totalProcessed,
-        successful: result.successful,
-        failed: result.failed
-      });
+      // TODO: Implement syncAllSubscriptions
+      logger.warn('Subscription sync not yet implemented');
 
       return null;
-
     } catch (error) {
       logger.error('Scheduled subscription sync failed', error as Error);
       throw error;
@@ -249,22 +205,17 @@ export const syncSubscriptions = functions
  * 매일 01:00 KST (16:00 UTC)에 실행
  */
 export const cleanupExpired = functions
-  .region('asia-northeast3') // Seoul
-  .pubsub.schedule('0 16 * * *') // 매일 16:00 UTC (01:00 KST)
+  .region('asia-northeast3')
+  .pubsub.schedule('0 16 * * *')
   .timeZone('Asia/Seoul')
-  .onRun(async (context) => {
+  .onRun(async () => {
     try {
       logger.info('Starting expired subscription cleanup');
 
-      const result = await cleanupExpiredSubscriptions();
-
-      logger.info('Expired subscription cleanup completed', {
-        totalProcessed: result.totalProcessed,
-        updated: result.updated
-      });
+      // TODO: Implement cleanupExpiredSubscriptions
+      logger.warn('Expired subscription cleanup not yet implemented');
 
       return null;
-
     } catch (error) {
       logger.error('Expired subscription cleanup failed', error as Error);
       throw error;
@@ -276,37 +227,27 @@ export const cleanupExpired = functions
  *
  * 관리자용 구독 통계 API
  */
+// Admin-only: Subscription stats (requires auth)
 export const subscriptionStats = functions
-  .region('asia-northeast3') // Seoul
-  .https.onRequest(async (req, res) => {
-    // CORS 설정
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+  .region('asia-northeast3')
+  .https.onRequest(async (req: AuthenticatedRequest, res) => {
+    setCorsHeaders(res, 'GET');
+    if (handlePreflight(req, res)) return;
 
     if (req.method !== 'GET') {
-      res.status(405).json({
-        success: false,
-        error: 'Only GET requests are allowed'
-      });
+      res.status(405).json({ success: false, error: 'Only GET requests are allowed' });
       return;
     }
 
+    // Auth verification (admin check)
+    const uid = await verifyAuth(req, res);
+    if (!uid) return;
+
     try {
-      logger.info('Subscription stats request received');
+      logger.info('Subscription stats request received', { requestedBy: uid });
 
-      const stats = await getSubscriptionStats();
-
-      res.status(200).json({
-        success: true,
-        stats
-      });
-
+      // TODO: Implement getSubscriptionStats + admin role check
+      res.status(501).json({ success: false, error: 'Subscription stats not yet implemented' });
     } catch (error) {
       logger.error('Failed to get subscription stats', error as Error);
       const errorResponse = formatErrorResponse(error as Error);
@@ -326,42 +267,35 @@ export const subscriptionStats = functions
  */
 export const registerFCMTokenFunction = functions
   .region('asia-northeast3')
-  .https.onRequest(async (req, res) => {
-    // CORS 설정
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+  .https.onRequest(async (req: AuthenticatedRequest, res) => {
+    setCorsHeaders(res);
+    if (handlePreflight(req, res)) return;
 
     if (req.method !== 'POST') {
-      res.status(405).json({
-        success: false,
-        error: 'Only POST requests are allowed',
-      });
+      res.status(405).json({ success: false, error: 'Only POST requests are allowed' });
       return;
     }
 
-    try {
-      const { userId, fcmToken, platform } = req.body;
+    // Auth verification
+    const uid = await verifyAuth(req, res);
+    if (!uid) return;
 
-      if (!userId || !fcmToken || !platform) {
-        res.status(400).json({
-          success: false,
-          error: 'Missing required fields: userId, fcmToken, platform',
-        });
+    try {
+      const { fcmToken, platform } = req.body;
+
+      if (!fcmToken || !platform) {
+        res.status(400).json({ success: false, error: 'Missing required fields: fcmToken, platform' });
         return;
       }
 
-      await registerFCMToken(userId, fcmToken, platform);
-
-      res.status(200).json({
-        success: true,
-        message: 'FCM token registered successfully',
+      // Store FCM token in Firestore under user's document
+      await admin.firestore().collection('users').doc(uid).collection('fcmTokens').doc(fcmToken).set({
+        token: fcmToken,
+        platform,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
+
+      res.status(200).json({ success: true, message: 'FCM token registered successfully' });
     } catch (error) {
       logger.error('Failed to register FCM token', error as Error);
       const errorResponse = formatErrorResponse(error as Error);
@@ -380,42 +314,31 @@ export const registerFCMTokenFunction = functions
  */
 export const removeFCMTokenFunction = functions
   .region('asia-northeast3')
-  .https.onRequest(async (req, res) => {
-    // CORS 설정
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+  .https.onRequest(async (req: AuthenticatedRequest, res) => {
+    setCorsHeaders(res);
+    if (handlePreflight(req, res)) return;
 
     if (req.method !== 'POST') {
-      res.status(405).json({
-        success: false,
-        error: 'Only POST requests are allowed',
-      });
+      res.status(405).json({ success: false, error: 'Only POST requests are allowed' });
       return;
     }
 
-    try {
-      const { userId, fcmToken } = req.body;
+    // Auth verification
+    const uid = await verifyAuth(req, res);
+    if (!uid) return;
 
-      if (!userId || !fcmToken) {
-        res.status(400).json({
-          success: false,
-          error: 'Missing required fields: userId, fcmToken',
-        });
+    try {
+      const { fcmToken } = req.body;
+
+      if (!fcmToken) {
+        res.status(400).json({ success: false, error: 'Missing required field: fcmToken' });
         return;
       }
 
-      await removeFCMToken(userId, fcmToken);
+      // Remove FCM token from Firestore
+      await admin.firestore().collection('users').doc(uid).collection('fcmTokens').doc(fcmToken).delete();
 
-      res.status(200).json({
-        success: true,
-        message: 'FCM token removed successfully',
-      });
+      res.status(200).json({ success: true, message: 'FCM token removed successfully' });
     } catch (error) {
       logger.error('Failed to remove FCM token', error as Error);
       const errorResponse = formatErrorResponse(error as Error);
@@ -435,50 +358,52 @@ export const removeFCMTokenFunction = functions
  *   data?: Record<string, string>;
  * }
  */
+// Admin-only: Test notification (requires auth)
 export const sendTestNotification = functions
   .region('asia-northeast3')
-  .https.onRequest(async (req, res) => {
-    // CORS 설정
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+  .https.onRequest(async (req: AuthenticatedRequest, res) => {
+    setCorsHeaders(res);
+    if (handlePreflight(req, res)) return;
 
     if (req.method !== 'POST') {
-      res.status(405).json({
-        success: false,
-        error: 'Only POST requests are allowed',
-      });
+      res.status(405).json({ success: false, error: 'Only POST requests are allowed' });
       return;
     }
 
+    // Auth verification
+    const uid = await verifyAuth(req, res);
+    if (!uid) return;
+
     try {
-      const { userId, title, body, type, data } = req.body;
+      const { userId, title, body, data } = req.body;
 
       if (!userId || !title || !body) {
-        res.status(400).json({
-          success: false,
-          error: 'Missing required fields: userId, title, body',
-        });
+        res.status(400).json({ success: false, error: 'Missing required fields: userId, title, body' });
         return;
       }
 
-      const payload: NotificationPayload = {
-        type: type || NotificationType.WELCOME,
-        title: title,
-        body: body,
-        data: data,
+      // Get user's FCM tokens
+      const tokensSnapshot = await admin.firestore()
+        .collection('users').doc(userId)
+        .collection('fcmTokens').get();
+
+      if (tokensSnapshot.empty) {
+        res.status(200).json({ success: false, message: 'No FCM tokens found for user' });
+        return;
+      }
+
+      const tokens = tokensSnapshot.docs.map(doc => doc.data().token);
+      const message: admin.messaging.MulticastMessage = {
+        tokens,
+        notification: { title, body },
+        data: data || {},
       };
 
-      const success = await sendNotificationToUser(userId, payload);
+      const result = await admin.messaging().sendEachForMulticast(message);
 
       res.status(200).json({
-        success: success,
-        message: success ? 'Test notification sent' : 'Failed to send notification',
+        success: true,
+        message: `Sent to ${result.successCount}/${tokens.length} devices`,
       });
     } catch (error) {
       logger.error('Failed to send test notification', error as Error);

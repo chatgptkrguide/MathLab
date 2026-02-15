@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/problem/problem_model.dart';
 import '../../data/models/problem/problem_session_model.dart';
 import '../../data/models/problem/sample_problems.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/figma_colors.dart';
 import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/utils/answer_validator.dart';
@@ -9,14 +11,14 @@ import '../../shared/utils/answer_validator.dart';
 /// 레벨 테스트 화면 (피그마 08 프레임)
 /// 문제 풀이 화면과 유사하지만 헤더가 "레벨테스트"이고
 /// 결과에 따라 랭크가 결정됨
-class LevelTestScreen extends StatefulWidget {
+class LevelTestScreen extends ConsumerStatefulWidget {
   const LevelTestScreen({super.key});
 
   @override
-  State<LevelTestScreen> createState() => _LevelTestScreenState();
+  ConsumerState<LevelTestScreen> createState() => _LevelTestScreenState();
 }
 
-class _LevelTestScreenState extends State<LevelTestScreen> {
+class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
   late ProblemSessionModel session;
   String? selectedAnswer;
   bool isAnswerChecked = false;
@@ -27,10 +29,11 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
   void initState() {
     super.initState();
     final problems = SampleProblems.getProblemsForLesson('lesson_1_1');
+    final user = ref.read(userProvider);
     session = ProblemSessionModel(
       sessionId: 'level_test_${DateTime.now().millisecondsSinceEpoch}',
       lessonId: 'level_test',
-      userId: 'demo_user',
+      userId: user?.uid ?? 'anonymous',
       problems: problems,
       startedAt: DateTime.now(),
     );
