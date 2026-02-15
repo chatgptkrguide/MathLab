@@ -93,7 +93,7 @@ class _AdminProblemListScreenState
           // Unit dropdown
           Expanded(
             child: DropdownButtonFormField<String>(
-              value: _selectedUnitId,
+              initialValue: _selectedUnitId,
               decoration: const InputDecoration(
                 labelText: '유닛',
                 contentPadding:
@@ -123,7 +123,7 @@ class _AdminProblemListScreenState
           // Lesson dropdown
           Expanded(
             child: DropdownButtonFormField<String>(
-              value: _selectedLessonId,
+              initialValue: _selectedLessonId,
               decoration: const InputDecoration(
                 labelText: '레슨',
                 contentPadding:

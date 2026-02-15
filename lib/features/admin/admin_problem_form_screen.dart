@@ -196,7 +196,7 @@ class _AdminProblemFormScreenState
                                 _buildSectionLabel('문제 유형'),
                                 const SizedBox(height: 4),
                                 DropdownButtonFormField<ProblemType>(
-                                  value: _selectedType,
+                                  initialValue: _selectedType,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
@@ -235,7 +235,7 @@ class _AdminProblemFormScreenState
                                 _buildSectionLabel('난이도'),
                                 const SizedBox(height: 4),
                                 DropdownButtonFormField<ProblemDifficulty>(
-                                  value: _selectedDifficulty,
+                                  initialValue: _selectedDifficulty,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
@@ -497,7 +497,7 @@ class _AdminProblemFormScreenState
         _buildSectionLabel('레슨'),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
-          value: _selectedLessonId,
+          initialValue: _selectedLessonId,
           isExpanded: true,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

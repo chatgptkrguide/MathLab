@@ -156,7 +156,7 @@ class _AdminAchievementFormScreenState
                                 _buildSectionLabel('카테고리'),
                                 const SizedBox(height: 4),
                                 DropdownButtonFormField<AchievementCategory>(
-                                  value: _selectedCategory,
+                                  initialValue: _selectedCategory,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
@@ -192,7 +192,7 @@ class _AdminAchievementFormScreenState
                                 _buildSectionLabel('희귀도'),
                                 const SizedBox(height: 4),
                                 DropdownButtonFormField<AchievementRarity>(
-                                  value: _selectedRarity,
+                                  initialValue: _selectedRarity,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
@@ -259,7 +259,7 @@ class _AdminAchievementFormScreenState
                             _buildSectionLabel('조건 유형'),
                             const SizedBox(height: 4),
                             DropdownButtonFormField<AchievementType>(
-                              value: _selectedCriteriaType,
+                              initialValue: _selectedCriteriaType,
                               isExpanded: true,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
