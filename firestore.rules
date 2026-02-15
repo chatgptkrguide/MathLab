@@ -22,6 +22,11 @@ service cloud.firestore {
       return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
     }
 
+    function isAdmin() {
+      return isSignedIn() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // Users Collection
     match /users/{userId} {
       // Read: Owner can read their own data
@@ -106,10 +111,10 @@ service cloud.firestore {
       }
     }
 
-    // Problems Collection (Read-only for all authenticated users)
+    // Problems Collection (Read for authenticated, Write for admin)
     match /problems/{problemId} {
       allow read: if isSignedIn();
-      allow write: if false; // Only admins via backend
+      allow write: if isAdmin();
     }
 
     // Lessons Collection (Read-only for all authenticated users)
@@ -212,10 +217,16 @@ service cloud.firestore {
       allow read, write: if isOwner(userId);
     }
 
-    // Units Collection (Read-only for all authenticated users)
+    // Units Collection (Read for authenticated, Write for admin)
     match /units/{unitId} {
       allow read: if isSignedIn();
-      allow write: if false; // Only admins via backend
+      allow write: if isAdmin();
+
+      // Lessons sub-collection
+      match /lessons/{lessonId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
     }
 
     // App Configuration (Read-only)

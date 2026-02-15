@@ -13,6 +13,7 @@ class UserModel {
   final AuthProvider authProvider;
   final bool isGuest;
   final bool isEmailVerified;
+  final String role;
 
   // Profile Information
   final DateTime createdAt;
@@ -50,6 +51,7 @@ class UserModel {
     required this.authProvider,
     this.isGuest = false,
     this.isEmailVerified = false,
+    this.role = 'user',
     required this.createdAt,
     required this.updatedAt,
     this.lastLoginAt,
@@ -128,6 +130,7 @@ class UserModel {
       ),
       isGuest: data['isGuest'] ?? false,
       isEmailVerified: data['isEmailVerified'] ?? false,
+      role: data['role'] as String? ?? 'user',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       lastLoginAt: data['lastLoginAt'] != null
@@ -168,6 +171,7 @@ class UserModel {
       'authProvider': authProvider.name,
       'isGuest': isGuest,
       'isEmailVerified': isEmailVerified,
+      'role': role,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
       'lastLoginAt': lastLoginAt != null ? Timestamp.fromDate(lastLoginAt!) : null,
@@ -201,6 +205,7 @@ class UserModel {
       'authProvider': authProvider.name,
       'isGuest': isGuest,
       'isEmailVerified': isEmailVerified,
+      'role': role,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'lastLoginAt': lastLoginAt?.toIso8601String(),
@@ -236,6 +241,7 @@ class UserModel {
     AuthProvider? authProvider,
     bool? isGuest,
     bool? isEmailVerified,
+    String? role,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? lastLoginAt,
@@ -265,6 +271,7 @@ class UserModel {
       authProvider: authProvider ?? this.authProvider,
       isGuest: isGuest ?? this.isGuest,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+      role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
@@ -290,6 +297,9 @@ class UserModel {
   // ========================================
   // Business Logic Helpers
   // ========================================
+
+  /// Check if user is admin
+  bool get isAdmin => role == 'admin';
 
   /// Check if user needs to update streak
   bool get shouldUpdateStreak {

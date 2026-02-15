@@ -30,6 +30,11 @@ service firebase.storage {
       ];
     }
 
+    function isAdmin() {
+      return isSignedIn() &&
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // User Profile Images
     match /users/{userId}/profile/{fileName} {
       // Read: Anyone can read profile images
@@ -87,10 +92,13 @@ service firebase.storage {
       allow delete: if isOwner(userId);
     }
 
-    // Problem Images (Read-only for authenticated users)
+    // Problem Images (Read for authenticated, Write for admin)
     match /problems/{problemId}/{fileName} {
       allow read: if isSignedIn();
-      allow write: if false; // Only admins via backend
+      allow write: if isAdmin() &&
+                     isValidImageType() &&
+                     isValidFileSize(10);
+      allow delete: if isAdmin();
     }
 
     // Lesson Images (Read-only for authenticated users)
