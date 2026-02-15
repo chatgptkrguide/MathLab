@@ -100,6 +100,10 @@ service cloud.firestore {
                        request.resource.data.endDate is timestamp &&
                        request.resource.data.endDate > request.resource.data.startDate;
       }
+
+      match /fcmTokens/{tokenId} {
+        allow read, write: if isOwner(userId);
+      }
     }
 
     // Problems Collection (Read-only for all authenticated users)
