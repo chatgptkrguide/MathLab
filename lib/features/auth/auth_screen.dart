@@ -389,7 +389,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return const Text(
-                            'GoMath',
+                            'MathLab',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
