@@ -12,7 +12,7 @@ import '../../data/providers/auth/auth_provider.dart';
 import '../../data/providers/curriculum/curriculum_provider.dart';
 import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/providers/user/user_provider.dart';
-import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/app_colors.dart';
 
 class ChallengeHistoryScreen extends ConsumerStatefulWidget {
   const ChallengeHistoryScreen({super.key});
@@ -134,7 +134,7 @@ class _ChallengeHistoryScreenState
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        gradient: FigmaColors.tealGradient,
+        gradient: AppColors.tealGradient,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
@@ -235,7 +235,7 @@ class _ChallengeHistoryScreenState
             shape: BoxShape.circle,
           ),
           child:
-              const Icon(Icons.check, size: 16, color: FigmaColors.tealGreen),
+              const Icon(Icons.check, size: 16, color: AppColors.tealGreen),
         );
       case _NodeState.active:
         return Container(
@@ -254,7 +254,7 @@ class _ChallengeHistoryScreenState
             ],
           ),
           child:
-              const Icon(Icons.star, size: 16, color: FigmaColors.tealGreen),
+              const Icon(Icons.star, size: 16, color: AppColors.tealGreen),
         );
       case _NodeState.locked:
         return Container(
@@ -295,7 +295,7 @@ class _ChallengeHistoryScreenState
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: FigmaColors.textDark,
+                color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 16),
@@ -349,7 +349,7 @@ class _ChallengeHistoryScreenState
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: FigmaColors.gold.withValues(alpha: 0.12),
+        color: AppColors.gold.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -361,13 +361,13 @@ class _ChallengeHistoryScreenState
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: FigmaColors.gold.withValues(alpha: 0.25),
+                  color: AppColors.gold.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.emoji_events_rounded,
                   size: 18,
-                  color: FigmaColors.gold,
+                  color: AppColors.gold,
                 ),
               ),
               const Spacer(),
@@ -376,7 +376,7 @@ class _ChallengeHistoryScreenState
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: FigmaColors.textSecondary,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ],
@@ -387,7 +387,7 @@ class _ChallengeHistoryScreenState
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: FigmaColors.textDark,
+              color: AppColors.textDark,
             ),
           ),
           const SizedBox(height: 4),
@@ -396,9 +396,9 @@ class _ChallengeHistoryScreenState
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 6,
-              backgroundColor: FigmaColors.gold.withValues(alpha: 0.2),
+              backgroundColor: AppColors.gold.withValues(alpha: 0.2),
               valueColor:
-                  const AlwaysStoppedAnimation<Color>(FigmaColors.gold),
+                  const AlwaysStoppedAnimation<Color>(AppColors.gold),
             ),
           ),
           const SizedBox(height: 6),
@@ -406,7 +406,7 @@ class _ChallengeHistoryScreenState
             '$percent% completed',
             style: const TextStyle(
               fontSize: 11,
-              color: FigmaColors.textSecondary,
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -420,7 +420,7 @@ class _ChallengeHistoryScreenState
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: FigmaColors.tealGreen.withValues(alpha: 0.10),
+        color: AppColors.tealGreen.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -432,13 +432,13 @@ class _ChallengeHistoryScreenState
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: FigmaColors.tealGreen.withValues(alpha: 0.2),
+                  color: AppColors.tealGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.timer_outlined,
                   size: 18,
-                  color: FigmaColors.tealGreen,
+                  color: AppColors.tealGreen,
                 ),
               ),
               const Spacer(),
@@ -447,7 +447,7 @@ class _ChallengeHistoryScreenState
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: FigmaColors.textSecondary,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ],
@@ -461,7 +461,7 @@ class _ChallengeHistoryScreenState
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: FigmaColors.textDark,
+                    color: AppColors.textDark,
                   ),
                 ),
                 const TextSpan(
@@ -469,7 +469,7 @@ class _ChallengeHistoryScreenState
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: FigmaColors.textSecondary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -480,7 +480,7 @@ class _ChallengeHistoryScreenState
             '/ $total Lessons',
             style: const TextStyle(
               fontSize: 12,
-              color: FigmaColors.textSecondary,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 6),
@@ -489,7 +489,7 @@ class _ChallengeHistoryScreenState
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: FigmaColors.tealGreen,
+              color: AppColors.tealGreen,
             ),
           ),
         ],
@@ -514,7 +514,7 @@ class _ChallengeHistoryScreenState
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: FigmaColors.textDark,
+                color: AppColors.textDark,
               ),
             ),
             Row(
@@ -572,7 +572,7 @@ class _ChallengeHistoryScreenState
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: FigmaColors.textSecondary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -625,7 +625,7 @@ class _ChallengeHistoryScreenState
                         : isToday
                             ? BoxDecoration(
                                 border: Border.all(
-                                  color: FigmaColors.tealGreen,
+                                  color: AppColors.tealGreen,
                                   width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(10),
@@ -642,8 +642,8 @@ class _ChallengeHistoryScreenState
                         color: isStudied
                             ? Colors.white
                             : isToday
-                                ? FigmaColors.tealGreen
-                                : FigmaColors.textDark,
+                                ? AppColors.tealGreen
+                                : AppColors.textDark,
                       ),
                     ),
                   ),
@@ -658,10 +658,10 @@ class _ChallengeHistoryScreenState
 
   Color _studiedDayColor(int day) {
     // 주별로 다른 색상
-    if (day <= 7) return FigmaColors.tealGreen;
-    if (day <= 14) return FigmaColors.skyBlue;
-    if (day <= 21) return FigmaColors.gold;
-    return FigmaColors.tealGreen;
+    if (day <= 7) return AppColors.tealGreen;
+    if (day <= 14) return AppColors.skyBlue;
+    if (day <= 21) return AppColors.gold;
+    return AppColors.tealGreen;
   }
 
   // ---------------------------------------------------------------------------
@@ -698,8 +698,8 @@ class _ChallengeHistoryScreenState
     Color progressColor;
     switch (league) {
       case 'gold':
-        badgeGradient = FigmaColors.goldGradient;
-        progressColor = FigmaColors.gold;
+        badgeGradient = AppColors.goldGradient;
+        progressColor = AppColors.gold;
         break;
       case 'silver':
         badgeGradient = const LinearGradient(
@@ -764,7 +764,7 @@ class _ChallengeHistoryScreenState
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: FigmaColors.textDark,
+                        color: AppColors.textDark,
                       ),
                     ),
                     Text(
@@ -772,7 +772,7 @@ class _ChallengeHistoryScreenState
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: FigmaColors.textSecondary,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -792,7 +792,7 @@ class _ChallengeHistoryScreenState
                   '$totalXp / $nextXp XP to $nextLeague',
                   style: const TextStyle(
                     fontSize: 11,
-                    color: FigmaColors.textSecondary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -846,7 +846,7 @@ class _ChallengeHistoryScreenState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: FigmaColors.tealGreen.withValues(alpha: 0.12),
+              color: AppColors.tealGreen.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -854,20 +854,20 @@ class _ChallengeHistoryScreenState
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: FigmaColors.tealGreen,
+                color: AppColors.tealGreen,
               ),
             ),
           ),
           const Spacer(),
           _buildInfoPill(
-              Icons.local_fire_department, '$streak', FigmaColors.streakGold),
+              Icons.local_fire_department, '$streak', AppColors.streakGold),
           const SizedBox(width: 10),
-          _buildInfoPill(Icons.bolt, '$xp', FigmaColors.skyBlue),
+          _buildInfoPill(Icons.bolt, '$xp', AppColors.skyBlue),
           const SizedBox(width: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: FigmaColors.gold.withValues(alpha: 0.12),
+              color: AppColors.gold.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -875,7 +875,7 @@ class _ChallengeHistoryScreenState
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: FigmaColors.gold,
+                color: AppColors.gold,
               ),
             ),
           ),

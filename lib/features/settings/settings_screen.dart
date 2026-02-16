@@ -62,6 +62,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             Expanded(
               child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingMedium,
+                  vertical: AppDimensions.paddingSmall,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -69,219 +73,281 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (authState.currentAccount != null && !authState.isGuest)
                       UserInfoSection(user: user),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
 
                     // 계정 섹션
                     const SectionHeader(title: '계정'),
-                    SettingTile(
-                      icon: Icons.person_outline,
-                      title: '프로필 편집',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const EditProfileScreen(),
+                    const SizedBox(height: 8),
+                    _buildSettingsCard(
+                      children: [
+                        SettingTile(
+                          icon: Icons.person_outline,
+                          title: '프로필 편집',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const EditProfileScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        if (authState.isGuest) ...[
+                          const _SettingDivider(),
+                          SettingTile(
+                            icon: Icons.login,
+                            title: '회원가입 / 로그인',
+                            subtitle: '게스트 계정을 연결하세요',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AuthScreen(),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                    if (authState.isGuest)
-                      SettingTile(
-                        icon: Icons.login,
-                        title: '회원가입 / 로그인',
-                        subtitle: '게스트 계정을 연결하세요',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AuthScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    SettingTile(
-                      icon: Icons.email_outlined,
-                      title: '이메일 변경',
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const EmailChangeDialog(),
-                        );
-                      },
-                    ),
-                    SettingTile(
-                      icon: Icons.lock_outline,
-                      title: '비밀번호 변경',
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const PasswordChangeDialog(),
-                        );
-                      },
+                        ],
+                        const _SettingDivider(),
+                        SettingTile(
+                          icon: Icons.email_outlined,
+                          title: '이메일 변경',
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  const EmailChangeDialog(),
+                            );
+                          },
+                        ),
+                        const _SettingDivider(),
+                        SettingTile(
+                          icon: Icons.lock_outline,
+                          title: '비밀번호 변경',
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  const PasswordChangeDialog(),
+                            );
+                          },
+                        ),
+                      ],
                     ),
 
-                    const Divider(height: 32),
+                    const SizedBox(height: 20),
 
                     // 알림 섹션
                     const SectionHeader(title: '알림'),
-                    SettingTile(
-                      icon: Icons.notifications_outlined,
-                      title: '알림 설정',
-                      subtitle: '알림 타입 및 시간 설정',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const NotificationSettingsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    SettingSwitchTile(
-                      icon: Icons.volume_up_outlined,
-                      title: '사운드',
-                      subtitle: '효과음 및 배경음악',
-                      value: _soundEnabled,
-                      onChanged: (value) {
-                        setState(() {
-                          _soundEnabled = value;
-                        });
-                      },
+                    const SizedBox(height: 8),
+                    _buildSettingsCard(
+                      children: [
+                        SettingTile(
+                          icon: Icons.notifications_outlined,
+                          title: '알림 설정',
+                          subtitle: '알림 타입 및 시간 설정',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const NotificationSettingsScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const _SettingDivider(),
+                        SettingSwitchTile(
+                          icon: Icons.volume_up_outlined,
+                          title: '사운드',
+                          subtitle: '효과음 및 배경음악',
+                          value: _soundEnabled,
+                          onChanged: (value) {
+                            setState(() {
+                              _soundEnabled = value;
+                            });
+                          },
+                        ),
+                      ],
                     ),
 
-                    const Divider(height: 32),
+                    const SizedBox(height: 20),
 
                     // 언어 및 테마 섹션
                     const SectionHeader(title: '언어 및 테마'),
-                    SettingTile(
-                      icon: Icons.language,
-                      title: '언어',
-                      subtitle: _selectedLanguage,
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => LanguageSelectionDialog(
-                            currentLanguage: _selectedLanguage,
-                            onLanguageChanged: (language) {
-                              setState(() {
-                                _selectedLanguage = language;
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                    SettingSwitchTile(
-                      icon: Icons.dark_mode_outlined,
-                      title: '다크 모드',
-                      subtitle: '어두운 테마 사용',
-                      value: _darkModeEnabled,
-                      onChanged: (value) {
-                        setState(() {
-                          _darkModeEnabled = value;
-                        });
-                      },
+                    const SizedBox(height: 8),
+                    _buildSettingsCard(
+                      children: [
+                        SettingTile(
+                          icon: Icons.language,
+                          title: '언어',
+                          subtitle: _selectedLanguage,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => LanguageSelectionDialog(
+                                currentLanguage: _selectedLanguage,
+                                onLanguageChanged: (language) {
+                                  setState(() {
+                                    _selectedLanguage = language;
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        const _SettingDivider(),
+                        SettingSwitchTile(
+                          icon: Icons.dark_mode_outlined,
+                          title: '다크 모드',
+                          subtitle: '어두운 테마 사용',
+                          value: _darkModeEnabled,
+                          onChanged: (value) {
+                            setState(() {
+                              _darkModeEnabled = value;
+                            });
+                          },
+                        ),
+                      ],
                     ),
 
                     // 관리자 섹션 (admin만 표시)
                     if (user?.isAdmin == true) ...[
-                      const Divider(height: 32),
+                      const SizedBox(height: 20),
                       const SectionHeader(title: '관리자'),
-                      SettingTile(
-                        icon: Icons.admin_panel_settings_outlined,
-                        title: '관리자 패널',
-                        subtitle: '콘텐츠 및 사용자 관리',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const AdminShellScreen(),
-                            ),
-                          );
-                        },
+                      const SizedBox(height: 8),
+                      _buildSettingsCard(
+                        children: [
+                          SettingTile(
+                            icon: Icons.admin_panel_settings_outlined,
+                            title: '관리자 패널',
+                            subtitle: '콘텐츠 및 사용자 관리',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AdminShellScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
 
-                    const Divider(height: 32),
+                    const SizedBox(height: 20),
 
                     // 정보 섹션
                     const SectionHeader(title: '정보'),
-                    SettingTile(
-                      icon: Icons.info_outline,
-                      title: '앱 정보',
-                      subtitle: 'v1.0.0',
-                      onTap: () {
-                        _showAboutDialog();
-                      },
+                    const SizedBox(height: 8),
+                    _buildSettingsCard(
+                      children: [
+                        SettingTile(
+                          icon: Icons.info_outline,
+                          title: '앱 정보',
+                          subtitle: 'v1.0.0',
+                          onTap: () {
+                            _showAboutDialog();
+                          },
+                        ),
+                        const _SettingDivider(),
+                        SettingTile(
+                          icon: Icons.description_outlined,
+                          title: '이용약관',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const TermsOfServiceScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const _SettingDivider(),
+                        SettingTile(
+                          icon: Icons.privacy_tip_outlined,
+                          title: '개인정보 처리방침',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const PrivacyPolicyScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    SettingTile(
-                      icon: Icons.description_outlined,
-                      title: '이용약관',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TermsOfServiceScreen(),
+
+                    const SizedBox(height: 20),
+
+                    // 위험 영역 - 학습 초기화, 로그아웃, 계정 탈퇴
+                    const SectionHeader(title: '계정 관리'),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.mathRed.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.mathRed.withValues(alpha: 0.15),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          SettingTile(
+                            icon: Icons.refresh,
+                            title: '학습 초기화',
+                            subtitle: '모든 학습 진행 상태를 초기화합니다',
+                            titleColor: AppColors.warning,
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    const ResetProgressDialog(),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                    SettingTile(
-                      icon: Icons.privacy_tip_outlined,
-                      title: '개인정보 처리방침',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PrivacyPolicyScreen(),
+                          Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: AppColors.mathRed.withValues(alpha: 0.12),
                           ),
-                        );
-                      },
-                    ),
-
-                    const Divider(height: 32),
-
-                    // 학습 데이터 섹션
-                    const SectionHeader(title: '학습 데이터'),
-                    SettingTile(
-                      icon: Icons.refresh,
-                      title: '학습 초기화',
-                      subtitle: '모든 학습 진행 상태를 초기화합니다',
-                      titleColor: AppColors.warning,
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const ResetProgressDialog(),
-                        );
-                      },
-                    ),
-
-                    const Divider(height: 32),
-
-                    // 로그아웃 / 탈퇴 섹션
-                    SettingTile(
-                      icon: Icons.logout,
-                      title: '로그아웃',
-                      titleColor: AppColors.mathRed,
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const LogoutDialog(),
-                        );
-                      },
-                    ),
-                    SettingTile(
-                      icon: Icons.delete_outline,
-                      title: '계정 탈퇴',
-                      titleColor: AppColors.mathRed,
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const DeleteAccountDialog(),
-                        );
-                      },
+                          SettingTile(
+                            icon: Icons.logout,
+                            title: '로그아웃',
+                            titleColor: AppColors.mathRed,
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => const LogoutDialog(),
+                              );
+                            },
+                          ),
+                          Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: AppColors.mathRed.withValues(alpha: 0.12),
+                          ),
+                          SettingTile(
+                            icon: Icons.delete_outline,
+                            title: '계정 탈퇴',
+                            titleColor: AppColors.mathRed,
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    const DeleteAccountDialog(),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 100), // 네비게이션 바 공간
@@ -295,13 +361,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  /// Settings card container with white bg, borderRadius 16, subtle shadow
+  Widget _buildSettingsCard({required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
   /// 앱 정보 다이얼로그
   void _showAboutDialog() {
     showAboutDialog(
       context: context,
       applicationName: 'MathLab',
       applicationVersion: '1.0.0',
-      applicationIcon: const Text('🧮', style: TextStyle(fontSize: 40)),
+      applicationIcon: const Text('M', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: AppColors.mathBlue)),
       children: [
         const Text(
           '매일 5분, 수학이 쉬워진다',
@@ -313,6 +397,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           style: TextStyle(fontSize: 14),
         ),
       ],
+    );
+  }
+}
+
+/// Light gray divider with inset
+class _SettingDivider extends StatelessWidget {
+  const _SettingDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Divider(
+      height: 1,
+      indent: 16,
+      endIndent: 16,
+      color: AppColors.borderLight,
     );
   }
 }

@@ -1,62 +1,101 @@
-/// 앱 전체에서 사용하는 크기 및 여백 상수
+/// Unified spacing, sizing, and dimension constants for the MathLab app.
 class AppDimensions {
-  // 패딩
-  static const double paddingXSmall = 4.0;
-  static const double paddingSmall = 8.0;
-  static const double paddingMedium = 16.0;
-  static const double paddingLarge = 24.0;
-  static const double paddingXLarge = 32.0;
+  AppDimensions._();
 
-  // 마진
-  static const double marginXSmall = 4.0;
-  static const double marginSmall = 8.0;
-  static const double marginMedium = 16.0;
-  static const double marginLarge = 24.0;
-  static const double marginXLarge = 32.0;
+  // ============================================================
+  // === Spacing Scale: 2, 4, 8, 12, 16, 20, 24, 32, 40, 48 ===
+  // ============================================================
+  static const double spacing2 = 2.0;
+  static const double spacing4 = 4.0;
+  static const double spacing8 = 8.0;
+  static const double spacing12 = 12.0;
+  static const double spacing16 = 16.0;
+  static const double spacing20 = 20.0;
+  static const double spacing24 = 24.0;
+  static const double spacing32 = 32.0;
+  static const double spacing40 = 40.0;
+  static const double spacing48 = 48.0;
 
-  // 간격 (Spacing)
-  static const double spacingS = 8.0;
-  static const double spacingM = 16.0;
-  static const double spacingL = 24.0;
-  static const double spacingXL = 32.0;
-  static const double spacingXXL = 48.0;
+  // === Spacing aliases (semantic) ===
+  static const double spacingXXS = spacing2;
+  static const double spacingXS = spacing4;
+  static const double spacingS = spacing8;
+  static const double spacingM = spacing16;
+  static const double spacingL = spacing24;
+  static const double spacingXL = spacing32;
+  static const double spacingXXL = spacing48;
 
-  // 보더 라디우스
-  static const double radiusS = 8.0;
-  static const double radiusSmall = 8.0;
-  static const double radiusM = 12.0;
-  static const double radiusMedium = 12.0;
-  static const double radiusL = 16.0;
-  static const double radiusLarge = 16.0;
-  static const double radiusXL = 24.0;
-  static const double radiusXLarge = 24.0;
+  // ============================================================
+  // === Padding (aliases for spacing) ===
+  // ============================================================
+  static const double paddingXSmall = spacing4;
+  static const double paddingSmall = spacing8;
+  static const double paddingMedium = spacing16;
+  static const double paddingLarge = spacing24;
+  static const double paddingXLarge = spacing32;
 
-  // 패딩 단축형
+  // Short aliases
   static const double paddingXS = paddingXSmall;
   static const double paddingS = paddingSmall;
   static const double paddingM = paddingMedium;
   static const double paddingL = paddingLarge;
   static const double paddingXL = paddingXLarge;
 
-  // 아이콘 크기
+  // ============================================================
+  // === Margin (aliases for spacing) ===
+  // ============================================================
+  static const double marginXSmall = spacing4;
+  static const double marginSmall = spacing8;
+  static const double marginMedium = spacing16;
+  static const double marginLarge = spacing24;
+  static const double marginXLarge = spacing32;
+
+  // ============================================================
+  // === Border Radius Scale: 4, 8, 12, 16, 20, 24 ===
+  // ============================================================
+  static const double radius4 = 4.0;
+  static const double radius8 = 8.0;
+  static const double radius12 = 12.0;
+  static const double radius16 = 16.0;
+  static const double radius20 = 20.0;
+  static const double radius24 = 24.0;
+  static const double radiusFull = 999.0;
+
+  // Semantic radius aliases
+  static const double radiusS = radius8;
+  static const double radiusSmall = radius8;
+  static const double radiusM = radius12;
+  static const double radiusMedium = radius12;
+  static const double radiusL = radius16;
+  static const double radiusLarge = radius16;
+  static const double radiusXL = radius24;
+  static const double radiusXLarge = radius24;
+
+  // ============================================================
+  // === Icon Sizes ===
+  // ============================================================
   static const double iconSmall = 16.0;
   static const double iconMedium = 24.0;
   static const double iconLarge = 32.0;
   static const double iconXLarge = 48.0;
 
-  // 버튼 높이
+  // ============================================================
+  // === Button Heights ===
+  // ============================================================
   static const double buttonHeightSmall = 40.0;
   static const double buttonHeightMedium = 48.0;
   static const double buttonHeightLarge = 56.0;
 
-  // 인증 화면 버튼 높이
+  // Auth screen button heights
   static const double mainButtonHeight = 64.0;
   static const double socialButtonHeight = 56.0;
 
-  // 화면 패딩
+  // ============================================================
+  // === Screen Layout ===
+  // ============================================================
   static const double screenHorizontalPadding = 24.0;
 
-  // 인증 화면 레이아웃
+  // Auth screen layout
   static const double authMathIsTopSpacing = 40.0;
   static const double authMathIsFunSpacing = 20.0;
   static const double authChatbotTopPosition = 80.0;
@@ -66,7 +105,17 @@ class AppDimensions {
   static const double authDividerButtonSpacing = 20.0;
   static const double authButtonSmallSpacing = 12.0;
 
-  // 로고 크기
+  // ============================================================
+  // === Logo ===
+  // ============================================================
   static const double logoWidth = 120.0;
   static const double logoHeight = 40.0;
+
+  // ============================================================
+  // === Elevation ===
+  // ============================================================
+  static const double elevationNone = 0.0;
+  static const double elevationLow = 2.0;
+  static const double elevationMedium = 4.0;
+  static const double elevationHigh = 8.0;
 }

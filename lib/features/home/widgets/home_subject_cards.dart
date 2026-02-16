@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
 
 /// 피그마 "00 home" 과목 선택 카드
 /// 공통수학 1, 공통수학 2 카드 2개를 가로로 배치
@@ -14,7 +14,7 @@ class HomeSubjectCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -35,7 +35,7 @@ class HomeSubjectCards extends StatelessWidget {
                   subtitle: '다항식, 방정식, 부등식',
                   icon: Icons.functions_rounded,
                   progress: 0.45,
-                  color: FigmaColors.royalBlue,
+                  color: AppColors.royalBlue,
                   onTap: () => onSubjectTap('common_math_1'),
                 ),
               ),
@@ -46,7 +46,7 @@ class HomeSubjectCards extends StatelessWidget {
                   subtitle: '함수, 수열, 통계',
                   icon: Icons.show_chart_rounded,
                   progress: 0.12,
-                  color: FigmaColors.tealGreen,
+                  color: AppColors.tealGreen,
                   onTap: () => onSubjectTap('common_math_2'),
                 ),
               ),
@@ -113,7 +113,7 @@ class _SubjectCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: FigmaColors.textDark,
+                color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 4),
@@ -123,7 +123,7 @@ class _SubjectCard extends StatelessWidget {
               subtitle,
               style: const TextStyle(
                 fontSize: 11,
-                color: FigmaColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

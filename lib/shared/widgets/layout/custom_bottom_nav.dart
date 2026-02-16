@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/figma_colors.dart';
+import '../../constants/app_colors.dart';
 
 /// 피그마 디자인 하단 네비게이션 바
 /// 5탭: 학습(0), 오답(1), Home(2, 가운데 강조), 프로필(3), 학습이력(4)
@@ -15,30 +15,32 @@ class CustomBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Semantics(
       container: true,
       label: '하단 네비게이션',
       child: Container(
-        height: 68 + MediaQuery.of(context).padding.bottom,
+        height: 68 + bottomPadding,
         padding: EdgeInsets.only(
           left: 1,
           right: 1,
           top: 4,
-          bottom: MediaQuery.of(context).padding.bottom + 8,
+          bottom: bottomPadding + 8,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
+          border: const Border(
             top: BorderSide(
-              color: Colors.grey.withValues(alpha: 0.1),
+              color: AppColors.borderLight,
               width: 0.5,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 12,
-              offset: const Offset(0, -3),
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
             ),
           ],
         ),
@@ -94,6 +96,7 @@ class CustomBottomNavigation extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
               width: 52,
               height: 52,
               decoration: BoxDecoration(
@@ -101,16 +104,16 @@ class CustomBottomNavigation extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isSelected
-                      ? const [Color(0xFF58CC02), Color(0xFF4CAF02)]
+                      ? const [AppColors.mathGreen, AppColors.mathGreenDark]
                       : [
-                          FigmaColors.skyBlue.withValues(alpha: 0.85),
-                          FigmaColors.skyBlue.withValues(alpha: 0.7),
+                          AppColors.skyBlue.withValues(alpha: 0.85),
+                          AppColors.skyBlue.withValues(alpha: 0.7),
                         ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: FigmaColors.skyBlue
+                    color: AppColors.skyBlue
                         .withValues(alpha: isSelected ? 0.35 : 0.2),
                     blurRadius: isSelected ? 10 : 6,
                     offset: Offset(0, isSelected ? 4 : 3),
@@ -124,7 +127,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   child: Icon(
                     icon,
                     color: Colors.white,
-                    size: 24,
+                    size: isSelected ? 26 : 24,
                   ),
                 ),
               ),
@@ -145,44 +148,45 @@ class CustomBottomNavigation extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 상단 인디케이터
+              // Pill-shaped background indicator
               AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                height: 2.5,
-                width: isSelected ? 28 : 0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
-                  color: FigmaColors.skyBlue,
-                  borderRadius: BorderRadius.circular(1.5),
+                  color: isSelected
+                      ? AppColors.skyBlue.withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
                 ),
-              ),
-              const SizedBox(height: 6),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
                 child: Icon(
                   icon,
                   color: isSelected
-                      ? FigmaColors.skyBlue
-                      : Colors.grey.withValues(alpha: 0.5),
-                  size: isSelected ? 25 : 23,
+                      ? AppColors.skyBlue
+                      : AppColors.textTertiary,
+                  size: isSelected ? 26 : 24,
                 ),
               ),
               const SizedBox(height: 4),
               Flexible(
-                child: Text(
-                  label,
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 250),
                   style: TextStyle(
                     color: isSelected
-                        ? FigmaColors.skyBlue
-                        : Colors.grey.withValues(alpha: 0.6),
+                        ? AppColors.skyBlue
+                        : AppColors.textTertiary,
                     fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.w600,
-                    fontSize: isSelected ? 10.5 : 9.5,
+                        isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: isSelected ? 12 : 11,
                     height: 1.1,
                     letterSpacing: 0.2,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                  ),
                 ),
               ),
             ],

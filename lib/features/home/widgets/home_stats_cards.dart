@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user/user_model.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
 
 class HomeStatsCards extends StatelessWidget {
   final UserModel? user;
@@ -10,14 +10,14 @@ class HomeStatsCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
             child: _StatCard(
               icon: Icons.bolt_rounded,
-              iconColor: const Color(0xFFFFC800),
-              iconBg: const Color(0xFFFFF8E1),
+              iconColor: AppColors.xpGold,
+              iconBg: AppColors.beigOrange,
               label: 'XP',
               value: '${user?.xp ?? 0}',
             ),
@@ -26,8 +26,8 @@ class HomeStatsCards extends StatelessWidget {
           Expanded(
             child: _StatCard(
               icon: Icons.shield_rounded,
-              iconColor: FigmaColors.royalBlue,
-              iconBg: const Color(0xFFE8EEFF),
+              iconColor: AppColors.royalBlue,
+              iconBg: AppColors.beigBlue,
               label: '레벨',
               value: '${user?.level ?? 1}',
             ),
@@ -36,8 +36,8 @@ class HomeStatsCards extends StatelessWidget {
           Expanded(
             child: _StatCard(
               icon: Icons.local_fire_department_rounded,
-              iconColor: const Color(0xFFFF6B35),
-              iconBg: const Color(0xFFFFEDE6),
+              iconColor: AppColors.streakOrange,
+              iconBg: AppColors.beigOrange,
               label: '연속',
               value: '${user?.streak ?? 0}일',
             ),
@@ -72,8 +72,8 @@ class _StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -95,16 +95,16 @@ class _StatCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF3C3C3C),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[500],
+              color: AppColors.textSecondary,
             ),
           ),
         ],

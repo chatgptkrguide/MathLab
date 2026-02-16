@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
 import '../../lessons/figma/lessons_screen_figma.dart';
 
 /// 피그마 "00 home" 딥블루(#0014F7) CTA 버튼 + 재생 아이콘
@@ -9,7 +9,7 @@ class HomeStartButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -23,11 +23,11 @@ class HomeStartButton extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(
-            gradient: FigmaColors.deepBlueCTA,
+            gradient: AppColors.deepBlueCTA,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: FigmaColors.deepBlue.withValues(alpha: 0.4),
+                color: AppColors.deepBlue.withValues(alpha: 0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),

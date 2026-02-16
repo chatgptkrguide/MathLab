@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
 
 /// 피그마 골드 배경(#F3C283) 데일리 챌린지 카드
 class HomeDailyChallenge extends StatelessWidget {
@@ -8,16 +8,19 @@ class HomeDailyChallenge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: FigmaColors.goldGradient,
-          borderRadius: BorderRadius.circular(20),
+          gradient: AppColors.goldGradient,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
           boxShadow: [
             BoxShadow(
-              color: FigmaColors.gold.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

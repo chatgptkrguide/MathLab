@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/widgets/indicators/circular_progress_ring.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/game_constants.dart';
+import '../../../shared/constants/app_colors.dart';
 
 /// 홈 화면 로봇 섹션 (2026-01-25 업데이트 - 실시간 데이터 연동)
 ///
@@ -120,23 +121,23 @@ class HomeRobotSection extends ConsumerWidget {
     if (progress >= 1.0) {
       message = '오늘의 목표를 달성했어요! 정말 대단해요! 🎉';
       emoji = '🏆';
-      backgroundColor = const Color(0xFF58CC02); // 녹색
+      backgroundColor = AppColors.mathGreen;
     } else if (progress >= 0.75) {
       message = '거의 다 왔어요! 조금만 더 힘내요! 💪';
       emoji = '⭐';
-      backgroundColor = const Color(0xFFFF9600); // 주황
+      backgroundColor = AppColors.mathOrange;
     } else if (progress >= 0.5) {
       message = '벌써 반이나 했어요! 잘하고 있어요! 😊';
       emoji = '🌟';
-      backgroundColor = const Color(0xFF1CB0F6); // 파랑
+      backgroundColor = AppColors.mathBlue;
     } else if (progress >= 0.25) {
       message = '좋은 시작이에요! 계속 해봐요! 🚀';
       emoji = '✨';
-      backgroundColor = const Color(0xFF1CB0F6);
+      backgroundColor = AppColors.mathBlue;
     } else {
       message = '오늘도 수학 공부 시작해볼까요? 💫';
       emoji = '🤖';
-      backgroundColor = const Color(0xFF4A90E2);
+      backgroundColor = AppColors.skyBlue;
     }
 
     final remaining = (dailyGoal - dailyXP).clamp(0, dailyGoal);

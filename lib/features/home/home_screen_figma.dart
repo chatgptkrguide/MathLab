@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
@@ -60,7 +60,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
       width: double.infinity,
       height: double.infinity,
       decoration: const BoxDecoration(
-        gradient: FigmaColors.homeGradient,
+        gradient: AppColors.homeGradient,
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -83,12 +83,12 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               // 2. 로봇 캐릭터 + 진행률 링
               const HomeRobotSection(),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               // 3. 오늘의 목표 카드
               _buildTodayGoalCard(context, user),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               // 4. 학습 시작하기 버튼
               const HomeStartButton(),
@@ -145,14 +145,14 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     final topicName = _getLevelTopicName(level);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.25),
+            color: Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -241,7 +241,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     final dailyGoal = GameConstants.dailyGoalXP;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GestureDetector(
         onTap: () {
           ref.read(navigationProvider.notifier).goToLessons();

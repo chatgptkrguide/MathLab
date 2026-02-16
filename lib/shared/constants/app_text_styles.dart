@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// 앱 전체에서 사용하는 텍스트 스타일 정의
+/// Unified text style system for the MathLab app.
 class AppTextStyles {
-  // Display 스타일
+  AppTextStyles._();
+
+  // ============================================================
+  // === Display (large hero text) ===
+  // ============================================================
   static const displayLarge = TextStyle(
     fontSize: 48,
     fontWeight: FontWeight.bold,
@@ -18,7 +22,9 @@ class AppTextStyles {
     height: 1.2,
   );
 
-  // Headline 스타일
+  // ============================================================
+  // === Headline (section headers) ===
+  // ============================================================
   static const headlineLarge = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,
@@ -38,11 +44,13 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  // Convenience aliases for common usage
+  // Convenience aliases
   static const heading1 = headlineLarge;
   static const heading2 = headlineMedium;
 
-  // Title 스타일
+  // ============================================================
+  // === Title (card titles, list headers) ===
+  // ============================================================
   static const titleLarge = TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.bold,
@@ -61,7 +69,9 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  // Body 스타일
+  // ============================================================
+  // === Body (paragraph text) ===
+  // ============================================================
   static const bodyLarge = TextStyle(
     fontSize: 16,
     color: AppColors.textPrimary,
@@ -77,18 +87,19 @@ class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  // Caption style
-  static const caption = TextStyle(
-    fontSize: 12,
-    color: AppColors.textSecondary,
-    fontWeight: FontWeight.normal,
-  );
-
-  // Label 스타일
+  // ============================================================
+  // === Label / Caption (metadata, chips, badges) ===
+  // ============================================================
   static const labelLarge = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
+  );
+
+  static const labelMedium = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
   );
 
   static const labelSmall = TextStyle(
@@ -97,9 +108,23 @@ class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  // Button style
+  static const caption = TextStyle(
+    fontSize: 12,
+    color: AppColors.textSecondary,
+    fontWeight: FontWeight.normal,
+  );
+
+  // ============================================================
+  // === Button text ===
+  // ============================================================
   static const button = TextStyle(
     fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+  );
+
+  static const buttonSmall = TextStyle(
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: Colors.white,
   );

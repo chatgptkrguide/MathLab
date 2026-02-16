@@ -1,6 +1,6 @@
-// 🔍 Wrong Answer Filter Chips
+// Wrong Answer Filter Chips
 //
-// Filter chips for wrong answer list
+// Pill-shaped filter chips with filled/outlined states
 
 import 'package:flutter/material.dart';
 import '../../../data/providers/wrong_answer/wrong_answer_provider.dart';
@@ -20,33 +20,33 @@ class WrongAnswerFilterChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildFilterChip(
+            _buildChip(
               label: '전체',
               filter: WrongAnswerFilter.all,
-              icon: Icons.list_alt,
+              icon: Icons.list_alt_rounded,
             ),
             const SizedBox(width: 8),
-            _buildFilterChip(
+            _buildChip(
               label: '미해결',
               filter: WrongAnswerFilter.unresolved,
-              icon: Icons.error_outline,
+              icon: Icons.error_outline_rounded,
             ),
             const SizedBox(width: 8),
-            _buildFilterChip(
+            _buildChip(
               label: '복습 필요',
               filter: WrongAnswerFilter.needsReview,
-              icon: Icons.alarm,
+              icon: Icons.alarm_rounded,
             ),
             const SizedBox(width: 8),
-            _buildFilterChip(
+            _buildChip(
               label: '해결 완료',
               filter: WrongAnswerFilter.resolved,
-              icon: Icons.check_circle,
+              icon: Icons.check_circle_rounded,
             ),
           ],
         ),
@@ -54,42 +54,49 @@ class WrongAnswerFilterChips extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip({
+  Widget _buildChip({
     required String label,
     required WrongAnswerFilter filter,
     required IconData icon,
   }) {
     final isSelected = currentFilter == filter;
 
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: isSelected ? Colors.white : AppColors.primary,
+    return GestureDetector(
+      onTap: () => onFilterChanged(filter),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary
+              : AppColors.primary.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primary
+                : AppColors.primary.withValues(alpha: 0.2),
+            width: 1.5,
           ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: AppTextStyles.bodyMedium.copyWith(
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 15,
               color: isSelected ? Colors.white : AppColors.primary,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isSelected ? Colors.white : AppColors.primary,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
-      selected: isSelected,
-      onSelected: (_) => onFilterChanged(filter),
-      backgroundColor: Colors.white,
-      selectedColor: AppColors.primary,
-      checkmarkColor: Colors.white,
-      side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.3),
-        width: isSelected ? 2 : 1,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
   }
 }

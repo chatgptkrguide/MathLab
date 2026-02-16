@@ -1,6 +1,6 @@
-// 📝 Wrong Answer Card
+// Wrong Answer Card
 //
-// Displays a single wrong answer with details and action buttons
+// Redesigned card with left status stripe, type badge, and clean layout
 
 import 'package:flutter/material.dart';
 import '../../../data/models/wrong_answer_model.dart';
@@ -19,293 +19,382 @@ class WrongAnswerCard extends StatelessWidget {
     required this.onMarkResolved,
   });
 
+  Color get _statusColor =>
+      wrongAnswer.isResolved ? AppColors.mathGreen : AppColors.mathRed;
+
+  Color get _typeBadgeColor {
+    switch (wrongAnswer.problemType) {
+      case 'multipleChoice':
+      case 'trueFalse':
+        return AppColors.primary;
+      case 'fillInBlank':
+        return AppColors.mathPurple;
+      case 'dragAndDrop':
+      case 'matching':
+        return AppColors.mathOrange;
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  String get _typeLabel {
+    switch (wrongAnswer.problemType) {
+      case 'multipleChoice':
+        return '객관식';
+      case 'trueFalse':
+        return '참/거짓';
+      case 'fillInBlank':
+        return '주관식';
+      case 'dragAndDrop':
+        return '드래그&드롭';
+      case 'matching':
+        return '매칭';
+      default:
+        return '문제';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: wrongAnswer.isResolved
-            ? BorderSide(color: Colors.green.shade200, width: 2)
-            : wrongAnswer.shouldReview()
-                ? BorderSide(color: Colors.orange.shade200, width: 2)
-                : BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header: Status badges and attempt count
-            Row(
-              children: [
-                if (wrongAnswer.isResolved)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.check_circle,
-                          size: 14,
-                          color: Colors.green.shade700,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '해결 완료',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else if (wrongAnswer.shouldReview())
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.alarm,
-                          size: 14,
-                          color: Colors.orange.shade700,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '복습 필요',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: Colors.orange.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Left status stripe
+              Container(
+                width: 5,
+                decoration: BoxDecoration(
+                  color: _statusColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
                   ),
-                const Spacer(),
+                ),
+              ),
+              // Card content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Top row: type badge + status + difficulty
+                      _buildTopRow(),
+                      const SizedBox(height: 12),
+                      // Problem text preview
+                      Text(
+                        wrongAnswer.problemText,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w500,
+                          height: 1.4,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 12),
+                      // Answer comparison (compact)
+                      _buildAnswerComparison(),
+                      // Explanation
+                      if (wrongAnswer.explanation != null) ...[
+                        const SizedBox(height: 10),
+                        _buildExplanation(),
+                      ],
+                      const SizedBox(height: 14),
+                      // Bottom row: date + actions
+                      _buildBottomRow(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopRow() {
+    return Row(
+      children: [
+        // Problem type badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: _typeBadgeColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            _typeLabel,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: _typeBadgeColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        // Status badge
+        if (wrongAnswer.isResolved)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.mathGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.check_circle_rounded,
+                  size: 12,
+                  color: AppColors.mathGreen,
+                ),
+                const SizedBox(width: 3),
                 Text(
-                  '${wrongAnswer.daysSinceAttempt}일 전',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: Colors.grey,
+                  '해결',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.mathGreen,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            // Problem text
-            Text(
-              wrongAnswer.problemText,
-              style: AppTextStyles.bodyLarge.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+          )
+        else if (wrongAnswer.shouldReview())
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.mathOrange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-
-            const SizedBox(height: 16),
-
-            // Your Answer
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.close,
-                    color: Colors.red.shade700,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '내 답',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: Colors.red.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          wrongAnswer.userAnswer,
-                          style: AppTextStyles.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Correct Answer
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade200),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.check,
-                    color: Colors.green.shade700,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '정답',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          wrongAnswer.correctAnswer,
-                          style: AppTextStyles.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Explanation (if available)
-            if (wrongAnswer.explanation != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.alarm_rounded,
+                  size: 12,
+                  color: AppColors.mathOrange,
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      color: Colors.blue.shade700,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '설명',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.blue.shade700,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            wrongAnswer.explanation!,
-                            style: AppTextStyles.bodyMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 3),
+                Text(
+                  '복습',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.mathOrange,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        const Spacer(),
+        // Attempt count
+        if (wrongAnswer.attemptCount > 1)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.replay_rounded,
+                size: 13,
+                color: AppColors.textSecondary.withValues(alpha: 0.6),
+              ),
+              const SizedBox(width: 3),
+              Text(
+                '${wrongAnswer.attemptCount}회',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.textSecondary.withValues(alpha: 0.6),
                 ),
               ),
             ],
+          ),
+      ],
+    );
+  }
 
-            const SizedBox(height: 16),
-
-            // Action Buttons
-            if (!wrongAnswer.isResolved) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onRetry,
-                      icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('다시 풀기'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: BorderSide(color: AppColors.primary),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: onMarkResolved,
-                      icon: const Icon(Icons.check, size: 18),
-                      label: const Text('해결 완료'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+  Widget _buildAnswerComparison() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.mathRed.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: AppColors.mathRed.withValues(alpha: 0.15),
               ),
-            ],
-
-            // Attempt count
-            if (wrongAnswer.attemptCount > 1) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.replay,
-                    size: 14,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${wrongAnswer.attemptCount}번째 도전',
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.close_rounded,
+                  size: 15,
+                  color: AppColors.mathRed.withValues(alpha: 0.7),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    wrongAnswer.userAnswer,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.grey.shade600,
+                      color: AppColors.mathRed,
+                      fontWeight: FontWeight.w500,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-            ],
-          ],
+                ),
+              ],
+            ),
+          ),
         ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 6),
+          child: Icon(
+            Icons.arrow_forward_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.mathGreen.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: AppColors.mathGreen.withValues(alpha: 0.15),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.check_rounded,
+                  size: 15,
+                  color: AppColors.mathGreen.withValues(alpha: 0.7),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    wrongAnswer.correctAnswer,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.mathGreen,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExplanation() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(10),
       ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.lightbulb_outline_rounded,
+            color: AppColors.primary.withValues(alpha: 0.6),
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              wrongAnswer.explanation!,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomRow() {
+    return Row(
+      children: [
+        // Date label
+        Text(
+          wrongAnswer.daysSinceAttempt == 0
+              ? '오늘'
+              : '${wrongAnswer.daysSinceAttempt}일 전',
+          style: AppTextStyles.labelSmall.copyWith(
+            color: AppColors.textSecondary.withValues(alpha: 0.6),
+          ),
+        ),
+        const Spacer(),
+        // Action buttons
+        if (!wrongAnswer.isResolved) ...[
+          // Retry button
+          SizedBox(
+            height: 34,
+            child: OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded, size: 15),
+              label: const Text('다시 풀기'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary, width: 1.5),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: AppTextStyles.labelSmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Resolve button
+          SizedBox(
+            height: 34,
+            child: ElevatedButton.icon(
+              onPressed: onMarkResolved,
+              icon: const Icon(Icons.check_rounded, size: 15),
+              label: const Text('해결'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mathGreen,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: AppTextStyles.labelSmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

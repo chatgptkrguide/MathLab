@@ -1,86 +1,99 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
-/// Figma 디자인 색상 상수
+/// Figma design colors - deprecated in favor of unified AppColors.
+/// All values redirect to AppColors for a single source of truth.
+@Deprecated('Use AppColors instead')
 class FigmaColors {
   FigmaColors._();
 
-  // === 피그마 메인 색상 ===
-  static const Color skyBlue = Color(0xFF61A1D8);       // 앱 메인 배경
-  static const Color darkNavy = Color(0xFF211E41);       // 스플래시/로그인 배경
-  static const Color royalBlue = Color(0xFF4575F6);      // 액센트
-  static const Color deepBlue = Color(0xFF0014F7);       // CTA 버튼
-  static const Color gold = Color(0xFFF3C283);           // 챌린지 카드
-  static const Color tealGreen = Color(0xFF45A6AD);      // 진행률 바
+  // === Main Colors ===
+  @Deprecated('Use AppColors.skyBlue instead')
+  static const Color skyBlue = AppColors.skyBlue;
+  @Deprecated('Use AppColors.darkNavy instead')
+  static const Color darkNavy = AppColors.darkNavy;
+  @Deprecated('Use AppColors.royalBlue instead')
+  static const Color royalBlue = AppColors.royalBlue;
+  @Deprecated('Use AppColors.deepBlue instead')
+  static const Color deepBlue = AppColors.deepBlue;
+  @Deprecated('Use AppColors.gold instead')
+  static const Color gold = AppColors.gold;
+  @Deprecated('Use AppColors.tealGreen instead')
+  static const Color tealGreen = AppColors.tealGreen;
 
-  // === 기존 색상 유지 ===
-  static const Color primary = Color(0xFF1CB0F6);
-  static const Color secondary = Color(0xFF58CC02);
+  // === Legacy aliases ===
+  @Deprecated('Use AppColors.primary instead')
+  static const Color primary = AppColors.primary;
+  @Deprecated('Use AppColors.mathGreen instead')
+  static const Color secondary = AppColors.mathGreen;
 
-  // === 노드 색상 (피그마) ===
-  static const Color nodeGreen = Color(0xFF58CC02);      // 완료된 노드
-  static const Color nodeLocked = Color(0xFFB0B0B0);     // 잠긴 노드
-  static const Color nodeOrange = Color(0xFFFF9600);     // Practice 노드
-  static const Color nodePurple = Color(0xFFCE82FF);     // Story 노드
-  static const Color nodeRed = Color(0xFFFF4B4B);        // Challenge 노드
-  static const Color nodeBoss = Color(0xFF8B5CF6);       // Boss 노드
-  static const Color nodeActive = Color(0xFF2B59FF);     // 활성 노드 배경
-  static const Color nodeLockedBg = Color(0xFFE4E9EA);   // 잠금 노드 배경
-  static const Color nodeUnlockedBg = Color(0xFFE4F5FF); // 언락 노드 배경
-  static const Color nodeHighlight = Color(0xFFD5F0FF);  // 하이라이트 노드
+  // === Node Colors ===
+  @Deprecated('Use AppColors.nodeGreen instead')
+  static const Color nodeGreen = AppColors.nodeGreen;
+  @Deprecated('Use AppColors.nodeLocked instead')
+  static const Color nodeLocked = AppColors.nodeLocked;
+  @Deprecated('Use AppColors.nodeOrange instead')
+  static const Color nodeOrange = AppColors.nodeOrange;
+  @Deprecated('Use AppColors.nodePurple instead')
+  static const Color nodePurple = AppColors.nodePurple;
+  @Deprecated('Use AppColors.nodeRed instead')
+  static const Color nodeRed = AppColors.nodeRed;
+  @Deprecated('Use AppColors.nodeBoss instead')
+  static const Color nodeBoss = AppColors.nodeBoss;
+  @Deprecated('Use AppColors.nodeActive instead')
+  static const Color nodeActive = AppColors.nodeActive;
+  @Deprecated('Use AppColors.nodeLockedBg instead')
+  static const Color nodeLockedBg = AppColors.nodeLockedBg;
+  @Deprecated('Use AppColors.nodeUnlockedBg instead')
+  static const Color nodeUnlockedBg = AppColors.nodeUnlockedBg;
+  @Deprecated('Use AppColors.nodeHighlight instead')
+  static const Color nodeHighlight = AppColors.nodeHighlight;
 
-  // === 피그마 텍스트/UI 색상 ===
-  static const Color textDark = Color(0xFF2A2E2D);       // 메인 텍스트
-  static const Color textSecondary = Color(0xFF7D8381);  // 보조 텍스트
-  static const Color textLight = Color(0xFFAAAAAA);      // 비활성 텍스트
-  static const Color cardBg = Color(0xFFF5F5F5);         // 카드 배경
-  static const Color chipBg = Color(0xFFF1F2F1);         // 칩 배경
-  static const Color profileBg = Color(0xFFE4F5FF);      // 프로필 카드 배경
-  static const Color premiumBg = Color(0xFFD3E9FF);      // 프리미엄 카드 배경
-  static const Color premiumBlue = Color(0xFF2E90FA);    // 프리미엄 라벨
-  static const Color badgeOrange = Color(0xFFFF9121);    // 뱃지 오렌지
-  static const Color streakGold = Color(0xFFFFB53E);     // 스트릭 골드
+  // === Text / UI Colors ===
+  @Deprecated('Use AppColors.textDark instead')
+  static const Color textDark = AppColors.textDark;
+  @Deprecated('Use AppColors.textSecondary instead')
+  static const Color textSecondary = AppColors.textSecondary;
+  @Deprecated('Use AppColors.textLight instead')
+  static const Color textLight = AppColors.textLight;
+  @Deprecated('Use AppColors.cardBg instead')
+  static const Color cardBg = AppColors.cardBg;
+  @Deprecated('Use AppColors.chipBg instead')
+  static const Color chipBg = AppColors.chipBg;
+  @Deprecated('Use AppColors.profileBg instead')
+  static const Color profileBg = AppColors.profileBg;
+  @Deprecated('Use AppColors.premiumBg instead')
+  static const Color premiumBg = AppColors.premiumBg;
+  @Deprecated('Use AppColors.premiumBlue instead')
+  static const Color premiumBlue = AppColors.premiumBlue;
+  @Deprecated('Use AppColors.badgeOrange instead')
+  static const Color badgeOrange = AppColors.badgeOrange;
+  @Deprecated('Use AppColors.streakGold instead')
+  static const Color streakGold = AppColors.streakGold;
 
-  // === 그라디언트 ===
-  static const LinearGradient homeGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF61A1D8), Color(0xFF5494C8)],
-  );
+  // === Gradients ===
+  @Deprecated('Use AppColors.homeGradient instead')
+  static const LinearGradient homeGradient = AppColors.homeGradient;
+  @Deprecated('Use AppColors.skyBlueGradient instead')
+  static const LinearGradient skyBlueGradient = AppColors.skyBlueGradient;
+  @Deprecated('Use AppColors.tealGradient instead')
+  static const LinearGradient tealGradient = AppColors.tealGradient;
+  @Deprecated('Use AppColors.deepBlueCTA instead')
+  static const LinearGradient deepBlueCTA = AppColors.deepBlueCTA;
+  @Deprecated('Use AppColors.greenCTA instead')
+  static const LinearGradient greenCTA = AppColors.greenCTA;
+  @Deprecated('Use AppColors.goldGradient instead')
+  static const LinearGradient goldGradient = AppColors.goldGradient;
 
-  static const LinearGradient skyBlueGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF61A1D8), Color(0xFF4A8BC2)],
-  );
-
-  static const LinearGradient tealGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF45A6AD), Color(0xFF3A8F95)],
-  );
-
-  static const LinearGradient deepBlueCTA = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF1A3CF7), Color(0xFF0014F7)],
-  );
-
-  static const LinearGradient greenCTA = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF58CC02), Color(0xFF46A302)],
-  );
-
-  static const LinearGradient goldGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFF3C283), Color(0xFFE8A85C)],
-  );
-
-  // === 글래스모피즘 & Shimmer ===
-  static const Color glassBg = Color(0x26FFFFFF);         // 15% white
-  static const Color glassBorder = Color(0x33FFFFFF);     // 20% white
-  static const Color shimmerBase = Color(0x33FFFFFF);     // shimmer 기본
-  static const Color shimmerHighlight = Color(0x80FFFFFF); // shimmer 하이라이트
-  static const Color glossyHighlight = Color(0x4DFFFFFF); // 노드 글로시 하이라이트
+  // === Glassmorphism & Shimmer ===
+  @Deprecated('Use AppColors.glassBg instead')
+  static const Color glassBg = AppColors.glassBg;
+  @Deprecated('Use AppColors.glassBorder instead')
+  static const Color glassBorder = AppColors.glassBorder;
+  @Deprecated('Use AppColors.shimmerBase instead')
+  static const Color shimmerBase = AppColors.shimmerBase;
+  @Deprecated('Use AppColors.shimmerHighlight instead')
+  static const Color shimmerHighlight = AppColors.shimmerHighlight;
+  @Deprecated('Use AppColors.glossyHighlight instead')
+  static const Color glossyHighlight = AppColors.glossyHighlight;
 }

@@ -19,7 +19,7 @@ class HomeTopSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -114,7 +114,7 @@ class HomeTopSection extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: Colors.white.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
@@ -198,8 +198,8 @@ class HomeTopSection extends StatelessWidget {
         return AuthProviderInfo(
           icon: Icons.chat_bubble,
           label: 'Kakao',
-          color: const Color(0xFFFEE500),
-          textColor: Colors.black87,
+          color: AppColors.kakaoYellow,
+          textColor: AppColors.kakaoBrown,
         );
       case AuthProvider.email:
         return AuthProviderInfo(
@@ -212,7 +212,7 @@ class HomeTopSection extends StatelessWidget {
         return AuthProviderInfo(
           icon: Icons.person_outline,
           label: '게스트',
-          color: Colors.grey,
+          color: AppColors.textTertiary,
           textColor: Colors.white,
         );
     }

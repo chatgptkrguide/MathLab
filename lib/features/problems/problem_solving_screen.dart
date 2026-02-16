@@ -18,7 +18,6 @@ import '../../data/providers/problem/problem_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
-import '../../shared/constants/figma_colors.dart';
 import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/widgets/input/math_input_field.dart';
 import '../../shared/widgets/input/drag_and_drop_widget.dart';
@@ -43,7 +42,8 @@ class ProblemSolvingScreen extends ConsumerStatefulWidget {
   ConsumerState<ProblemSolvingScreen> createState() => _ProblemSolvingScreenState();
 }
 
-class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
+class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
+    with TickerProviderStateMixin {
   ProblemSessionModel? session;
   String? selectedAnswer;
   bool isAnswerChecked = false;
@@ -59,9 +59,56 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   // 힌트 XP 비용 (provider의 hintCost 사용)
   int get _hintXpCost => HintNotifier.hintCost;
 
+  // Heart animation
+  late AnimationController _heartAnimController;
+  late Animation<double> _heartScaleAnim;
+  int _previousHearts = 5;
+
+  // Feedback slide-up animation
+  late AnimationController _feedbackAnimController;
+  late Animation<Offset> _feedbackSlideAnim;
+  late Animation<double> _feedbackFadeAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _heartAnimController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _heartScaleAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.5), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.2), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 30),
+    ]).animate(CurvedAnimation(
+      parent: _heartAnimController,
+      curve: Curves.easeInOut,
+    ));
+
+    _feedbackAnimController = AnimationController(
+      duration: const Duration(milliseconds: 350),
+      vsync: this,
+    );
+    _feedbackSlideAnim = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _feedbackAnimController,
+      curve: Curves.easeOutCubic,
+    ));
+    _feedbackFadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _feedbackAnimController,
+        curve: Curves.easeOut,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _textController.dispose();
+    _heartAnimController.dispose();
+    _feedbackAnimController.dispose();
     super.dispose();
   }
 
@@ -143,6 +190,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
         break;
     }
 
+    _previousHearts = session!.hearts;
+
     setState(() {
       isAnswerChecked = true;
       isCorrect = result.isCorrect;
@@ -165,6 +214,14 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
         score: session!.score + earnedPoints,
       );
     });
+
+    // Trigger heart loss animation
+    if (!result.isCorrect) {
+      _heartAnimController.forward(from: 0);
+    }
+
+    // Trigger feedback slide-up animation
+    _feedbackAnimController.forward(from: 0);
 
     // 오답일 경우 자동 저장
     if (!result.isCorrect) {
@@ -215,7 +272,12 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
       return;
     }
 
+    // Reset animations
+    _feedbackAnimController.reset();
+    _heartAnimController.reset();
+
     setState(() {
+      _previousHearts = session!.hearts;
       session = session!.copyWith(
         currentProblemIndex: session!.currentProblemIndex + 1,
       );
@@ -344,15 +406,16 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
 
   Widget _buildProgressBar() {
     final progress = (session!.currentProblemIndex + 1) / session!.totalProblems;
+    final percentText = '${(progress * 100).toInt()}%';
 
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingMedium,
         vertical: 12,
       ),
-      decoration: BoxDecoration(
-        color: FigmaColors.skyBlue,
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration(
+        color: AppColors.skyBlue,
+        borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(16),
           bottomRight: Radius.circular(16),
         ),
@@ -420,21 +483,39 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          Container(
-            height: 14,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(7),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(7),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 14,
-                backgroundColor: Colors.transparent,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  FigmaColors.tealGreen,
+          // Gradient progress bar with percentage label
+          Stack(
+            children: [
+              Container(
+                height: 8,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(4),
                 ),
+              ),
+              FractionallySizedBox(
+                widthFactor: progress.clamp(0.0, 1.0),
+                child: Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.tealGreen, AppColors.mathGreen],
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              percentText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -459,7 +540,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
       ),
       child: Row(
         children: [
-          // 힌트 버튼 (힌트가 있을 때만 표시)
+          // Hint button (only shown when hints exist)
           if (hints.isNotEmpty)
             HintButton(
               unlockedCount: unlockedCount,
@@ -470,22 +551,67 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
             )
           else
             const SizedBox(width: 16),
-          // 하트 표시 (가운데 정렬)
+          // Animated hearts display
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 5,
-                (index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: Icon(
-                    index < session!.hearts ? Icons.favorite : Icons.favorite_border,
-                    color: index < session!.hearts
-                        ? AppColors.mathRed
-                        : AppColors.borderDark,
-                    size: 22,
-                  ),
-                ),
+                (index) {
+                  final isFilled = index < session!.hearts;
+                  final isLostHeart = !isFilled &&
+                      index == session!.hearts &&
+                      session!.hearts < _previousHearts;
+
+                  Widget heartIcon = Icon(
+                    isFilled ? Icons.favorite : Icons.favorite_border,
+                    color: isFilled ? AppColors.mathRed : AppColors.borderDark,
+                    size: 24,
+                  );
+
+                  // Wrap filled hearts with subtle shadow
+                  if (isFilled) {
+                    heartIcon = Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mathRed.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: heartIcon,
+                    );
+                  }
+
+                  // Animate the heart that was just lost
+                  if (isLostHeart) {
+                    heartIcon = AnimatedBuilder(
+                      animation: _heartAnimController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _heartScaleAnim.value,
+                          child: Icon(
+                            Icons.favorite_border,
+                            color: Color.lerp(
+                              AppColors.mathRed,
+                              AppColors.borderDark,
+                              _heartAnimController.value,
+                            ),
+                            size: 24,
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: heartIcon,
+                  );
+                },
               ),
             ),
           ),
@@ -629,44 +755,79 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
   }
 
   Widget _buildAnswerOptions(ProblemModel problem) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
+    return Column(
       children: problem.options.map((option) {
         final isSelected = selectedAnswer == option;
         final isThisCorrect = option == problem.correctAnswer;
 
-        Color backgroundColor = const Color(0xFFE6EEEB);
-        Color textColor = FigmaColors.textDark;
+        Color backgroundColor = Colors.white;
+        Color borderColor = AppColors.borderLight;
+        double borderWidth = 1.0;
+        Color textColor = AppColors.textDark;
+        IconData? trailingIcon;
+        Color? trailingIconColor;
 
         if (isAnswerChecked) {
           if (isThisCorrect) {
-            backgroundColor = AppColors.mathGreen;
-            textColor = Colors.white;
+            backgroundColor = AppColors.mathGreen.withValues(alpha: 0.1);
+            borderColor = AppColors.mathGreen;
+            borderWidth = 2.0;
+            textColor = AppColors.mathGreen;
+            trailingIcon = Icons.check_circle_rounded;
+            trailingIconColor = AppColors.mathGreen;
           } else if (isSelected && !isCorrect) {
-            backgroundColor = AppColors.mathRed;
-            textColor = Colors.white;
+            backgroundColor = AppColors.mathRed.withValues(alpha: 0.1);
+            borderColor = AppColors.mathRed;
+            borderWidth = 2.0;
+            textColor = AppColors.mathRed;
+            trailingIcon = Icons.cancel_rounded;
+            trailingIconColor = AppColors.mathRed;
           }
         } else if (isSelected) {
-          backgroundColor = FigmaColors.skyBlue;
-          textColor = Colors.white;
+          backgroundColor = AppColors.primary.withValues(alpha: 0.08);
+          borderColor = AppColors.primary;
+          borderWidth = 2.0;
+          textColor = AppColors.primary;
         }
 
-        return GestureDetector(
-          onTap: () => _selectAnswer(option),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Text(
-              option,
-              style: AppTextStyles.bodyLarge.copyWith(
-                fontWeight: isSelected || (isAnswerChecked && isThisCorrect)
-                    ? FontWeight.w600
-                    : FontWeight.normal,
-                color: textColor,
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: GestureDetector(
+            onTap: () => _selectAnswer(option),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: borderColor,
+                  width: borderWidth,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      option,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        fontWeight: isSelected || (isAnswerChecked && isThisCorrect)
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  if (trailingIcon != null)
+                    Icon(trailingIcon, color: trailingIconColor, size: 22),
+                ],
               ),
             ),
           ),
@@ -919,7 +1080,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
         child: canCheck || canContinue
             ? DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: FigmaColors.deepBlueCTA,
+                  gradient: AppColors.deepBlueCTA,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ElevatedButton(
@@ -970,145 +1131,221 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen> {
     final result = validationResult;
     final isPartialCredit = result != null && result.score > 0 && result.score < 1.0;
 
-    Color backgroundColor;
+    Color panelColor;
+    Color accentColor;
     String title;
     IconData icon;
 
     if (isCorrect) {
-      backgroundColor = AppColors.mathGreen.withValues(alpha: 0.95);
+      panelColor = AppColors.mathGreen;
+      accentColor = AppColors.mathGreen;
       title = result?.feedback ?? '정답입니다!';
-      icon = Icons.check_circle;
+      icon = Icons.check_circle_rounded;
     } else if (isPartialCredit) {
-      backgroundColor = AppColors.mathYellow.withValues(alpha: 0.95);
+      panelColor = AppColors.mathYellow;
+      accentColor = AppColors.mathYellow;
       title = result.feedback ?? '거의 맞았어요!';
-      icon = Icons.star_half;
+      icon = Icons.star_half_rounded;
     } else {
-      backgroundColor = AppColors.mathRed.withValues(alpha: 0.95);
+      panelColor = AppColors.mathRed;
+      accentColor = AppColors.mathRed;
       title = result?.feedback ?? '틀렸습니다';
-      icon = Icons.cancel;
+      icon = Icons.cancel_rounded;
     }
 
     return Positioned.fill(
-      child: GestureDetector(
-        onTap: _nextProblem,
-        child: Container(
-          color: backgroundColor,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(),
-                  Icon(
-                    icon,
-                    size: 80,
-                    color: Colors.white,
+      child: AnimatedBuilder(
+        animation: _feedbackAnimController,
+        builder: (context, child) {
+          return Stack(
+            children: [
+              // Semi-transparent background overlay
+              GestureDetector(
+                onTap: _nextProblem,
+                child: Container(
+                  color: Colors.black.withValues(
+                    alpha: 0.3 * _feedbackFadeAnim.value,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    title,
-                    style: AppTextStyles.heading1.copyWith(
+                ),
+              ),
+              // Slide-up result panel from bottom
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SlideTransition(
+                  position: _feedbackSlideAnim,
+                  child: Container(
+                    decoration: BoxDecoration(
                       color: Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accentColor.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, -4),
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (isPartialCredit) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      '${(result.score * 100).toStringAsFixed(0)}% 정확도',
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                  if (!isCorrect && problem.explanation != null) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '설명',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                    child: SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Drag handle
+                            Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: AppColors.borderLight,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          MathRichText(
-                            text: problem.explanation!,
-                            textStyle: AppTextStyles.bodyLarge.copyWith(
-                              color: Colors.white,
-                            ),
-                            mathFontSize: 18.0,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  if (result?.hints != null && result!.hints!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '💡 힌트',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          ...result.hints!.map((hint) => Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  '• $hint',
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.9),
+                            const SizedBox(height: 20),
+                            // Icon and title row
+                            Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: panelColor.withValues(alpha: 0.12),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(icon, color: panelColor, size: 28),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        title,
+                                        style: AppTextStyles.headlineSmall.copyWith(
+                                          color: panelColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (isPartialCredit)
+                                        Text(
+                                          '${(result.score * 100).toStringAsFixed(0)}% 정확도',
+                                          style: AppTextStyles.bodyMedium.copyWith(
+                                            color: accentColor.withValues(alpha: 0.8),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
-                              )),
-                        ],
+                              ],
+                            ),
+                            if (!isCorrect && problem.explanation != null) ...[
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withValues(alpha: 0.06),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: accentColor.withValues(alpha: 0.15),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '설명',
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: accentColor,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    MathRichText(
+                                      text: problem.explanation!,
+                                      textStyle: AppTextStyles.bodyMedium.copyWith(
+                                        color: AppColors.textPrimary,
+                                        height: 1.5,
+                                      ),
+                                      mathFontSize: 16.0,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            if (result?.hints != null && result!.hints!.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.mathOrange.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '힌트',
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.mathOrange,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ...result.hints!.map((hint) => Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(
+                                            hint,
+                                            style: AppTextStyles.bodyMedium.copyWith(
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 20),
+                            // Continue button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                onPressed: _nextProblem,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: panelColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  '계속하기',
+                                  style: AppTextStyles.button.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                  const Spacer(),
-                  // 계속 버튼
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Text(
-                      '탭하여 계속',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
+            ],
+          );
+        },
       ),
     );
   }

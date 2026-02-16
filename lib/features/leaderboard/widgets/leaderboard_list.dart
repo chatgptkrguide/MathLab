@@ -36,6 +36,7 @@ class LeaderboardList extends StatelessWidget {
             child: LeaderboardCard(
               entry: entry,
               isTopThree: isTopThree,
+              index: index,
             ),
           );
         },

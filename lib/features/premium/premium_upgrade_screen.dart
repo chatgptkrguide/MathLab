@@ -9,6 +9,7 @@ import 'widgets/widgets.dart';
 /// 프리미엄 업그레이드 화면
 ///
 /// 무료 vs 프리미엄 기능 비교, 가격 플랜, 구매 버튼을 제공합니다.
+/// Hero section: gradient blue to purple background
 class PremiumUpgradeScreen extends ConsumerStatefulWidget {
   const PremiumUpgradeScreen({super.key});
 
@@ -36,11 +37,16 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: AppColors.premiumGradient,
+            colors: [
+              Color(0xFF1CB0F6), // Brand blue
+              Color(0xFF7E57C2), // Purple
+              Color(0xFF5E35B1), // Deep purple
+            ],
+            stops: [0.0, 0.6, 1.0],
           ),
         ),
         child: SafeArea(
@@ -55,7 +61,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
                       // 히어로 섹션
                       const PremiumHeroSection(),
@@ -132,7 +138,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
       // 성공 메시지
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('🎉 7일 무료 체험이 시작되었습니다!'),
+          content: Text('7일 무료 체험이 시작되었습니다!'),
           backgroundColor: AppColors.mathGreen,
         ),
       );
@@ -178,7 +184,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
             // 성공 메시지
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('🎉 프리미엄 구독이 완료되었습니다!'),
+                content: Text('프리미엄 구독이 완료되었습니다!'),
                 backgroundColor: AppColors.mathGreen,
               ),
             );

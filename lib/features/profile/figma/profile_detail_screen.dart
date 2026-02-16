@@ -9,7 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../data/models/user/user_model.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 import '../edit_profile_screen.dart';
 
 class ProfileDetailScreen extends ConsumerWidget {
@@ -20,7 +22,7 @@ class ProfileDetailScreen extends ConsumerWidget {
     final user = ref.watch(userProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.backgroundLight,
       body: user == null
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
@@ -46,15 +48,20 @@ class ProfileDetailScreen extends ConsumerWidget {
                 // Logout
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spacing24,
+                      vertical: AppDimensions.spacing16,
+                    ),
                     child: OutlinedButton.icon(
                       onPressed: () => _handleLogout(context, ref),
                       icon: const Icon(Icons.logout),
                       label: const Text('로그아웃'),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppDimensions.spacing12,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radius12),
                         ),
                       ),
                     ),
@@ -68,19 +75,49 @@ class ProfileDetailScreen extends ConsumerWidget {
   }
 
   // ──────────────────────────────────────────────
+  // Section Header
+  // ──────────────────────────────────────────────
+
+  Widget _buildSectionHeader(String title, {String? actionText, VoidCallback? onAction}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: AppTextStyles.titleLarge.copyWith(
+            fontSize: 18,
+            color: AppColors.textDark,
+          ),
+        ),
+        if (actionText != null)
+          GestureDetector(
+            onTap: onAction,
+            child: Text(
+              actionText,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.royalBlue,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ──────────────────────────────────────────────
   // Profile Header
   // ──────────────────────────────────────────────
 
   Widget _buildProfileHeader(BuildContext context, UserModel user) {
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 20,
-        bottom: 24,
-        left: 24,
-        right: 24,
+        top: MediaQuery.of(context).padding.top + AppDimensions.spacing20,
+        bottom: AppDimensions.spacing24,
+        left: AppDimensions.spacing24,
+        right: AppDimensions.spacing24,
       ),
       decoration: const BoxDecoration(
-        gradient: FigmaColors.skyBlueGradient,
+        gradient: AppColors.skyBlueGradient,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
@@ -104,43 +141,43 @@ class ProfileDetailScreen extends ConsumerWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const Icon(
                         Icons.person_rounded,
-                        size: 48,
+                        size: AppDimensions.iconXLarge,
                         color: Colors.white,
                       ),
                     ),
                   )
-                : const Icon(Icons.person_rounded, size: 48, color: Colors.white),
+                : const Icon(Icons.person_rounded, size: AppDimensions.iconXLarge, color: Colors.white),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
 
           // Name
           Text(
             user.displayName ?? '사용자',
-            style: const TextStyle(
+            style: AppTextStyles.titleLarge.copyWith(
               color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacing4),
 
           // Level badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: AppDimensions.spacing4,
+            ),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
             child: Text(
               'Level ${user.level}',
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.white,
-                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
 
           // Edit Profile button
           GestureDetector(
@@ -150,22 +187,24 @@ class ProfileDetailScreen extends ConsumerWidget {
               );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing20,
+                vertical: AppDimensions.spacing8,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppDimensions.radius20),
               ),
-              child: const Text(
+              child: Text(
                 'Edit Profile',
-                style: TextStyle(
-                  color: FigmaColors.royalBlue,
-                  fontSize: 14,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.royalBlue,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // Follower / Following counts
           Row(
@@ -175,7 +214,9 @@ class ProfileDetailScreen extends ConsumerWidget {
               Container(
                 width: 1,
                 height: 20,
-                margin: const EdgeInsets.symmetric(horizontal: 24),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing24,
+                ),
                 color: Colors.white.withValues(alpha: 0.4),
               ),
               _buildFollowStat('팔로잉', '0'),
@@ -191,19 +232,16 @@ class ProfileDetailScreen extends ConsumerWidget {
       children: [
         Text(
           count,
-          style: const TextStyle(
-            color: Colors.white,
+          style: AppTextStyles.titleLarge.copyWith(
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: AppDimensions.spacing2),
         Text(
           label,
-          style: TextStyle(
+          style: AppTextStyles.labelMedium.copyWith(
             color: Colors.white.withValues(alpha: 0.8),
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -219,66 +257,71 @@ class ProfileDetailScreen extends ConsumerWidget {
     final studyDays = DateTime.now().difference(user.createdAt).inDays + 1;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing24,
+        AppDimensions.spacing20,
+        AppDimensions.spacing24,
+        0,
+      ),
       child: Column(
         children: [
-          // Row 1: 학습일, XP, 연속학습
+          // Row 1
           Row(
             children: [
               Expanded(
                 child: _StatBox(
                   icon: Icons.calendar_today_rounded,
-                  iconColor: FigmaColors.royalBlue,
+                  iconColor: AppColors.royalBlue,
                   label: '학습일',
                   value: '$studyDays일',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _StatBox(
                   icon: Icons.bolt_rounded,
-                  iconColor: FigmaColors.streakGold,
+                  iconColor: AppColors.streakGold,
                   label: 'XP',
                   value: '${user.xp}',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _StatBox(
                   icon: Icons.local_fire_department_rounded,
-                  iconColor: FigmaColors.badgeOrange,
+                  iconColor: AppColors.badgeOrange,
                   label: '연속학습',
                   value: '${user.streak}일',
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          // Row 2: 랭크, 문제 수, 포인트
+          const SizedBox(height: AppDimensions.spacing12),
+          // Row 2
           Row(
             children: [
               Expanded(
                 child: _StatBox(
                   icon: Icons.emoji_events_rounded,
-                  iconColor: FigmaColors.tealGreen,
+                  iconColor: AppColors.tealGreen,
                   label: '랭크',
                   value: 'H Lv${user.level}',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _StatBox(
                   icon: Icons.check_circle_rounded,
-                  iconColor: FigmaColors.nodeGreen,
+                  iconColor: AppColors.nodeGreen,
                   label: '문제 수',
                   value: '${user.totalXp ~/ 10}',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _StatBox(
                   icon: Icons.diamond_rounded,
-                  iconColor: FigmaColors.royalBlue,
+                  iconColor: AppColors.royalBlue,
                   label: '포인트',
                   value: '${user.gems}',
                 ),
@@ -296,70 +339,95 @@ class ProfileDetailScreen extends ConsumerWidget {
 
   Widget _buildPremiumCard() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        0,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppDimensions.spacing20),
         decoration: BoxDecoration(
-          color: FigmaColors.premiumBg,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: FigmaColors.premiumBlue.withValues(alpha: 0.2),
-            width: 1,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF4A7CF7), Color(0xFF9B59B6)],
           ),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF4A7CF7).withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            // Icon
+            // Crown icon
             Container(
-              width: 48,
-              height: 48,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: FigmaColors.premiumBlue.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(AppDimensions.radius16),
               ),
               child: const Icon(
-                Icons.workspace_premium_rounded,
-                color: FigmaColors.premiumBlue,
-                size: 28,
+                Icons.auto_awesome_rounded,
+                color: Colors.white,
+                size: 32,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing16),
             // Text content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: FigmaColors.premiumBlue,
-                      borderRadius: BorderRadius.circular(8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 3,
                     ),
-                    child: const Text(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius8),
+                    ),
+                    child: Text(
                       'Premium',
-                      style: TextStyle(
+                      style: AppTextStyles.bodySmall.copyWith(
                         color: Colors.white,
-                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
+                  const SizedBox(height: AppDimensions.spacing8),
+                  Text(
                     '광고 없이 무제한 학습을 시작하세요',
-                    style: TextStyle(
-                      color: FigmaColors.textDark,
-                      fontSize: 14,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spacing16,
+                      vertical: AppDimensions.spacing8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppDimensions.radius20),
+                    ),
+                    child: Text(
+                      '자세히 보기',
+                      style: AppTextStyles.titleSmall.copyWith(
+                        color: const Color(0xFF4A7CF7),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: FigmaColors.premiumBlue,
-              size: 24,
             ),
           ],
         ),
@@ -379,7 +447,7 @@ class ProfileDetailScreen extends ConsumerWidget {
         progress: 0.65,
         completedLessons: 13,
         totalLessons: 20,
-        color: FigmaColors.royalBlue,
+        color: AppColors.royalBlue,
         icon: Icons.functions_rounded,
       ),
       _SubjectCardData(
@@ -388,27 +456,25 @@ class ProfileDetailScreen extends ConsumerWidget {
         progress: 0.25,
         completedLessons: 5,
         totalLessons: 20,
-        color: FigmaColors.tealGreen,
+        color: AppColors.tealGreen,
         icon: Icons.auto_graph_rounded,
       ),
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '학습 과목',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: FigmaColors.textDark,
-            ),
-          ),
-          const SizedBox(height: 12),
+          _buildSectionHeader('학습 과목', actionText: '더보기 >'),
+          const SizedBox(height: AppDimensions.spacing16),
           ...subjects.map((subject) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: AppDimensions.spacing12),
                 child: _buildSubjectCard(subject),
               )),
         ],
@@ -418,10 +484,10 @@ class ProfileDetailScreen extends ConsumerWidget {
 
   Widget _buildSubjectCard(_SubjectCardData subject) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -434,11 +500,11 @@ class ProfileDetailScreen extends ConsumerWidget {
         children: [
           // Subject icon
           Container(
-            width: 48,
-            height: 48,
+            width: AppDimensions.iconXLarge,
+            height: AppDimensions.iconXLarge,
             decoration: BoxDecoration(
               color: subject.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
             child: Icon(
               subject.icon,
@@ -454,53 +520,47 @@ class ProfileDetailScreen extends ConsumerWidget {
               children: [
                 Text(
                   subject.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: FigmaColors.textDark,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.textDark,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppDimensions.spacing2),
                 Text(
                   subject.subtitle,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: FigmaColors.textSecondary,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacing8),
                 // Progress bar
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius4),
                   child: LinearProgressIndicator(
                     value: subject.progress,
                     minHeight: 6,
-                    backgroundColor: const Color(0xFFF0F0F0),
+                    backgroundColor: AppColors.cardBg,
                     valueColor: AlwaysStoppedAnimation<Color>(subject.color),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           // Progress text
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
                 '${(subject.progress * 100).toInt()}%',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.titleMedium.copyWith(
                   color: subject.color,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: AppDimensions.spacing2),
               Text(
                 '${subject.completedLessons}/${subject.totalLessons}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: FigmaColors.textSecondary,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
                 ),
               ),
             ],
@@ -517,14 +577,21 @@ class ProfileDetailScreen extends ConsumerWidget {
   Widget _buildStreakHistory() {
     final days = ['월', '화', '수', '목', '금', '토', '일'];
     final studied = [true, true, true, false, true, true, false];
+    // Assume today is the 6th day (Saturday, index 5) for demo
+    const todayIndex = 5;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        0,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppDimensions.spacing20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -536,46 +603,62 @@ class ProfileDetailScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '이번 주 학습',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: FigmaColors.textDark,
-              ),
-            ),
-            const SizedBox(height: 16),
+            _buildSectionHeader('이번 주 학습'),
+            const SizedBox(height: AppDimensions.spacing16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(7, (i) {
+                final isCompleted = studied[i];
+                final isToday = i == todayIndex;
+                final isFuture = i > todayIndex;
+
                 return Column(
                   children: [
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
-                        color: studied[i]
-                            ? FigmaColors.nodeGreen
-                            : const Color(0xFFF0F0F0),
+                        gradient: isCompleted
+                            ? const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [AppColors.nodeGreen, AppColors.mathGreenDark],
+                              )
+                            : null,
+                        color: isCompleted
+                            ? null
+                            : isFuture
+                                ? AppColors.cardBg
+                                : AppColors.cardBg,
                         shape: BoxShape.circle,
+                        border: isToday && !isCompleted
+                            ? Border.all(color: AppColors.nodeGreen, width: 2.5)
+                            : null,
                       ),
                       child: Icon(
-                        studied[i]
+                        isCompleted
                             ? Icons.check_rounded
-                            : Icons.remove_rounded,
-                        color: studied[i] ? Colors.white : Colors.grey[400],
+                            : isFuture
+                                ? Icons.remove_rounded
+                                : Icons.close_rounded,
+                        color: isCompleted
+                            ? Colors.white
+                            : isFuture
+                                ? AppColors.textLight
+                                : AppColors.textLight,
                         size: 18,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppDimensions.spacing8),
                     Text(
                       days[i],
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: AppTextStyles.labelSmall.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: studied[i]
-                            ? FigmaColors.textDark
-                            : Colors.grey[400],
+                        color: isCompleted
+                            ? AppColors.textDark
+                            : isToday
+                                ? AppColors.nodeGreen
+                                : AppColors.textLight,
                       ),
                     ),
                   ],
@@ -594,21 +677,26 @@ class ProfileDetailScreen extends ConsumerWidget {
 
   Widget _buildBadgeCollection() {
     final badges = [
-      _BadgeData('첫 레슨', Icons.star_rounded, FigmaColors.gold, true),
-      _BadgeData('3일 연속', Icons.local_fire_department_rounded, FigmaColors.badgeOrange, true),
-      _BadgeData('100 XP', Icons.bolt_rounded, FigmaColors.streakGold, true),
-      _BadgeData('완벽한 점수', Icons.emoji_events_rounded, FigmaColors.nodeGreen, false),
-      _BadgeData('7일 연속', Icons.calendar_month_rounded, FigmaColors.royalBlue, false),
-      _BadgeData('산술 마스터', Icons.calculate_rounded, FigmaColors.nodePurple, false),
+      _BadgeData('첫 레슨', Icons.star_rounded, AppColors.gold, true),
+      _BadgeData('3일 연속', Icons.local_fire_department_rounded, AppColors.badgeOrange, true),
+      _BadgeData('100 XP', Icons.bolt_rounded, AppColors.streakGold, true),
+      _BadgeData('완벽한 점수', Icons.emoji_events_rounded, AppColors.nodeGreen, false),
+      _BadgeData('7일 연속', Icons.calendar_month_rounded, AppColors.royalBlue, false),
+      _BadgeData('산술 마스터', Icons.calculate_rounded, AppColors.nodePurple, false),
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        0,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppDimensions.spacing20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -620,59 +708,111 @@ class ProfileDetailScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '뱃지 컬렉션',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: FigmaColors.textDark,
-              ),
-            ),
-            const SizedBox(height: 16),
+            _buildSectionHeader('뱃지 컬렉션', actionText: '더보기 >'),
+            const SizedBox(height: AppDimensions.spacing16),
             GridView.count(
               crossAxisCount: 3,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              crossAxisSpacing: AppDimensions.spacing12,
+              mainAxisSpacing: AppDimensions.spacing12,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: badges.map((badge) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: badge.unlocked
-                        ? badge.color.withValues(alpha: 0.1)
-                        : const Color(0xFFF0F0F0),
-                    borderRadius: BorderRadius.circular(16),
-                    border: badge.unlocked
-                        ? Border.all(color: badge.color.withValues(alpha: 0.3))
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        badge.icon,
-                        color: badge.unlocked ? badge.color : Colors.grey[400],
-                        size: 32,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        badge.name,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: badge.unlocked
-                              ? FigmaColors.textDark
-                              : Colors.grey[400],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                );
+                return badge.unlocked
+                    ? _buildUnlockedBadge(badge)
+                    : _buildLockedBadge(badge);
               }).toList(),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildUnlockedBadge(_BadgeData badge) {
+    return Container(
+      decoration: BoxDecoration(
+        color: badge.color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        border: Border.all(
+          color: badge.color.withValues(alpha: 0.3),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: badge.color.withValues(alpha: 0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            badge.icon,
+            color: badge.color,
+            size: AppDimensions.iconLarge,
+          ),
+          const SizedBox(height: AppDimensions.spacing4),
+          Text(
+            badge.name,
+            style: AppTextStyles.labelSmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLockedBadge(_BadgeData badge) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                badge.icon,
+                color: AppColors.textLight,
+                size: AppDimensions.iconLarge,
+              ),
+              const SizedBox(height: AppDimensions.spacing4),
+              Text(
+                badge.name,
+                style: AppTextStyles.labelSmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textLight,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          // Lock overlay
+          Positioned(
+            right: 6,
+            top: 6,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: AppColors.nodeLocked,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.lock_rounded,
+                color: Colors.white,
+                size: 12,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -687,7 +827,9 @@ class ProfileDetailScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('로그아웃'),
         content: const Text('정말 로그아웃하시겠습니까?'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -696,7 +838,7 @@ class ProfileDetailScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
             child: const Text('로그아웃'),
@@ -707,7 +849,6 @@ class ProfileDetailScreen extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       await ref.read(authProvider.notifier).signOut();
-      // AuthWrapper will automatically show AuthScreen when auth state changes
     }
   }
 }
@@ -732,13 +873,16 @@ class _StatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacing16,
+        horizontal: AppDimensions.spacing8,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -746,22 +890,27 @@ class _StatBox extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 24),
-          const SizedBox(height: 6),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
+            ),
+            child: Icon(icon, color: iconColor, size: 28),
+          ),
+          const SizedBox(height: AppDimensions.spacing8),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: FigmaColors.textDark,
+            style: AppTextStyles.titleMedium.copyWith(
+              color: AppColors.textDark,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: AppDimensions.spacing2),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 11,
-              color: FigmaColors.textSecondary,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: AppColors.textSecondary,
             ),
           ),
         ],

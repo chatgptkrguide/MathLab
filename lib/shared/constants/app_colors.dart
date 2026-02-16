@@ -1,20 +1,166 @@
 import 'package:flutter/material.dart';
 
-/// 앱 전체에서 사용하는 색상 정의
+/// Unified color system for the MathLab app.
+/// Combines original Duolingo-style colors with Figma design tokens.
 class AppColors {
-  // 브랜드 컬러
-  static const mathBlue = Color(0xFF1CB0F6); // 수학 파랑 (듀오링고 스타일)
-  static const primary = mathBlue; // Primary color (alias for mathBlue)
-  static const mathGreen = Color(0xFF58CC02); // 듀오링고 녹색
-  static const mathOrange = Color(0xFFFF9600); // 수학 주황
-  static const mathYellow = Color(0xFFFFC800); // 수학 노랑
-  static const mathPurple = Color(0xFFCE82FF); // 수학 보라
-  static const mathRed = Color(0xFFFF4B4B); // 수학 빨강
+  AppColors._();
 
-  // 버튼 컬러
-  static const mathButtonBlue = Color(0xFF1899D6); // 버튼 파랑
+  // ============================================================
+  // === Brand Primary ===
+  // ============================================================
+  static const primary = Color(0xFF1CB0F6); // Math Blue (main brand)
+  static const primaryDark = Color(0xFF1899D6); // Button blue
+  static const primaryLight = Color(0xFF61A1D8); // Sky blue (Figma)
 
-  // 그라디언트
+  // ============================================================
+  // === Brand Secondary ===
+  // ============================================================
+  static const mathBlue = Color(0xFF1CB0F6); // Duolingo blue
+  static const mathGreen = Color(0xFF58CC02); // Duolingo green
+  static const mathOrange = Color(0xFFFF9600); // Math orange
+  static const mathYellow = Color(0xFFFFC800); // Math yellow
+  static const mathPurple = Color(0xFFCE82FF); // Math purple
+  static const mathRed = Color(0xFFFF4B4B); // Math red
+  static const mathButtonBlue = Color(0xFF1899D6); // Button blue
+
+  // ============================================================
+  // === Figma Accent Colors ===
+  // ============================================================
+  static const skyBlue = Color(0xFF61A1D8); // Figma main bg
+  static const darkNavy = Color(0xFF211E41); // Splash/login bg
+  static const royalBlue = Color(0xFF4575F6); // Accent
+  static const deepBlue = Color(0xFF0014F7); // CTA button
+  static const gold = Color(0xFFF3C283); // Challenge card
+  static const tealGreen = Color(0xFF45A6AD); // Progress bar
+
+  // ============================================================
+  // === Semantic Colors ===
+  // ============================================================
+  static const success = Color(0xFF58CC02); // Green
+  static const error = Color(0xFFFF4B4B); // Red
+  static const warning = Color(0xFFFF9600); // Orange
+  static const info = Color(0xFF1CB0F6); // Info blue
+
+  // Aliases for backward compatibility
+  static const successGreen = Color(0xFF58CC02);
+  static const errorRed = Color(0xFFFF4B4B);
+  static const warningOrange = Color(0xFFFF9600);
+  static const disabled = Color(0xFFAFAFAF);
+
+  // ============================================================
+  // === Surface / Background ===
+  // ============================================================
+  static const surface = Colors.white;
+  static const background = Colors.white;
+  static const backgroundLight = Color(0xFFF7F7F7);
+  static const cardBg = Color(0xFFF5F5F5);
+  static const chipBg = Color(0xFFF1F2F1);
+  static const profileBg = Color(0xFFE4F5FF);
+  static const premiumBg = Color(0xFFD3E9FF);
+
+  // ============================================================
+  // === Text Colors ===
+  // ============================================================
+  static const textPrimary = Color(0xFF3C3C3C); // Main text
+  static const textSecondary = Color(0xFF777777); // Secondary text
+  static const textTertiary = Color(0xFFAFAFAF); // Inactive text
+  static const textDark = Color(0xFF2A2E2D); // Figma main text
+  static const textLight = Color(0xFFAAAAAA); // Figma inactive text
+  static const textOnPrimary = Colors.white;
+
+  // ============================================================
+  // === Border Colors ===
+  // ============================================================
+  static const borderLight = Color(0xFFE5E5E5);
+  static const borderDark = Color(0xFFCCCCCC);
+
+  // ============================================================
+  // === Duolingo Pastel Backgrounds ===
+  // ============================================================
+  static const beigOrange = Color(0xFFFFF7ED);
+  static const beigBlue = Color(0xFFEEF2FF);
+  static const beigGreen = Color(0xFFECFDF5);
+  static const beigPurple = Color(0xFFF3E8FF);
+
+  // ============================================================
+  // === Gamification / Levels ===
+  // ============================================================
+  static const xpGold = Color(0xFFFFC800);
+  static const streakOrange = Color(0xFFFF9600);
+  static const levelPurple = Color(0xFFCE82FF);
+
+  static const levelBronze = Color(0xFFCD7F32);
+  static const levelSilver = Color(0xFFC0C0C0);
+  static const levelGold = Color(0xFFFFD700);
+  static const levelBronzeDark = Color(0xFFA0622E);
+  static const levelSilverDark = Color(0xFF909090);
+  static const levelGoldDark = Color(0xFFDAA520);
+
+  // ============================================================
+  // === Dark Variants ===
+  // ============================================================
+  static const mathOrangeDark = Color(0xFFE08600);
+  static const mathGreenDark = Color(0xFF4CAF02);
+
+  // ============================================================
+  // === Node Colors (Figma lesson path) ===
+  // ============================================================
+  static const nodeGreen = Color(0xFF58CC02);
+  static const nodeLocked = Color(0xFFB0B0B0);
+  static const nodeOrange = Color(0xFFFF9600);
+  static const nodePurple = Color(0xFFCE82FF);
+  static const nodeRed = Color(0xFFFF4B4B);
+  static const nodeBoss = Color(0xFF8B5CF6);
+  static const nodeActive = Color(0xFF2B59FF);
+  static const nodeLockedBg = Color(0xFFE4E9EA);
+  static const nodeUnlockedBg = Color(0xFFE4F5FF);
+  static const nodeHighlight = Color(0xFFD5F0FF);
+
+  // ============================================================
+  // === Premium ===
+  // ============================================================
+  static const premiumGold = Color(0xFFFFD700);
+  static const premiumPurple = Color(0xFFCE82FF);
+  static const premiumBlue = Color(0xFF2E90FA);
+  static const premiumGradient = [Color(0xFFFFD700), Color(0xFFFFA500)];
+
+  // ============================================================
+  // === Badge / Streak (Figma) ===
+  // ============================================================
+  static const badgeOrange = Color(0xFFFF9121);
+  static const streakGold = Color(0xFFFFB53E);
+
+  // ============================================================
+  // === Admin ===
+  // ============================================================
+  static const adminPurple = Color(0xFF9C27B0);
+  static const adminPurpleDark = Color(0xFF7B1FA2);
+  static const adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)];
+
+  // ============================================================
+  // === Social Login ===
+  // ============================================================
+  static const kakaoYellow = Color(0xFFFEE500);
+  static const kakaoBrown = Color(0xFF3C1E1E);
+
+  // ============================================================
+  // === Header ===
+  // ============================================================
+  static const headerText = Colors.white;
+  static const headerBlueGradient = [Color(0xFF1CB0F6), Color(0xFF1899D6)];
+
+  // ============================================================
+  // === Glassmorphism & Shimmer ===
+  // ============================================================
+  static const glassBg = Color(0x26FFFFFF); // 15% white
+  static const glassBorder = Color(0x33FFFFFF); // 20% white
+  static const shimmerBase = Color(0x33FFFFFF);
+  static const shimmerHighlight = Color(0x80FFFFFF);
+  static const glossyHighlight = Color(0x4DFFFFFF);
+
+  // ============================================================
+  // === Gradients ===
+  // ============================================================
   static const mathBlueGradient = LinearGradient(
     colors: [Color(0xFF1CB0F6), Color(0xFF1899D6)],
     begin: Alignment.topLeft,
@@ -27,67 +173,39 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
-  // Surface (배경)
-  static const surface = Colors.white;
+  static const homeGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF61A1D8), Color(0xFF5494C8)],
+  );
 
-  // 텍스트 컬러
-  static const textPrimary = Color(0xFF3C3C3C); // 주요 텍스트
-  static const textSecondary = Color(0xFF777777); // 보조 텍스트
-  static const textTertiary = Color(0xFFAFAFAF); // 비활성 텍스트
+  static const skyBlueGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF61A1D8), Color(0xFF4A8BC2)],
+  );
 
-  // 배경 컬러
-  static const background = Colors.white;
-  static const backgroundLight = Color(0xFFF7F7F7);
+  static const tealGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF45A6AD), Color(0xFF3A8F95)],
+  );
 
-  // 테두리 컬러
-  static const borderLight = Color(0xFFE5E5E5);
-  static const borderDark = Color(0xFFCCCCCC);
+  static const deepBlueCTA = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF1A3CF7), Color(0xFF0014F7)],
+  );
 
-  // 상태 컬러
-  static const success = Color(0xFF58CC02); // 성공
-  static const error = Color(0xFFFF4B4B); // 오류
-  static const warning = Color(0xFFFF9600); // 경고
-  static const info = Color(0xFF1CB0F6); // 정보
+  static const greenCTA = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF58CC02), Color(0xFF46A302)],
+  );
 
-  // 듀오링고 스타일 배경색
-  static const beigOrange = Color(0xFFFFF7ED); // 주황 베이지
-  static const beigBlue = Color(0xFFEEF2FF); // 파랑 베이지
-  static const beigGreen = Color(0xFFECFDF5); // 녹색 베이지
-  static const beigPurple = Color(0xFFF3E8FF); // 보라 베이지
-
-  // 추가 상태 색상
-  static const successGreen = Color(0xFF58CC02); // 성공 녹색
-  static const errorRed = Color(0xFFFF4B4B); // 에러 빨강
-  static const warningOrange = Color(0xFFFF9600); // 경고 주황
-  static const disabled = Color(0xFFAFAFAF); // 비활성
-
-  // 프리미엄 색상
-  static const premiumGold = Color(0xFFFFD700); // 프리미엄 골드
-  static const premiumPurple = Color(0xFFCE82FF); // 프리미엄 보라
-  static const premiumGradient = [Color(0xFFFFD700), Color(0xFFFFA500)]; // 프리미엄 그라디언트
-
-  // 헤더 색상
-  static const headerText = Colors.white; // 헤더 텍스트
-  static const headerBlueGradient = [Color(0xFF1CB0F6), Color(0xFF1899D6)]; // 헤더 블루 그라디언트
-
-  // 레벨 색상
-  static const levelBronze = Color(0xFFCD7F32); // 브론즈
-  static const levelSilver = Color(0xFFC0C0C0); // 실버
-  static const levelGold = Color(0xFFFFD700); // 골드
-  static const levelBronzeDark = Color(0xFFA0622E); // 브론즈 다크
-  static const levelSilverDark = Color(0xFF909090); // 실버 다크
-  static const levelGoldDark = Color(0xFFDAA520); // 골드 다크
-
-  // 다크 변형 색상
-  static const mathOrangeDark = Color(0xFFE08600); // 주황 다크
-  static const mathGreenDark = Color(0xFF4CAF02); // 녹색 다크
-
-  // 관리자 색상
-  static const adminPurple = Color(0xFF9C27B0); // 관리자 보라
-  static const adminPurpleDark = Color(0xFF7B1FA2); // 관리자 보라 다크
-  static const adminGradient = [Color(0xFF9C27B0), Color(0xFF7B1FA2)]; // 관리자 그라디언트
-
-  // 소셜 로그인 색상
-  static const kakaoYellow = Color(0xFFFEE500); // 카카오 노랑
-  static const kakaoBrown = Color(0xFF3C1E1E); // 카카오 브라운
+  static const goldGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF3C283), Color(0xFFE8A85C)],
+  );
 }
