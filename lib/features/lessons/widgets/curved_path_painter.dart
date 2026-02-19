@@ -136,27 +136,14 @@ class PathLayoutCalculator {
     final positions = <Offset>[];
 
     for (int i = 0; i < nodeCount; i++) {
-      // 지그재그 패턴: 왼쪽 → 오른쪽 → 왼쪽 → 오른쪽
+      // 지그재그 패턴: 중앙 → 왼쪽 → 오른쪽 → 왼쪽 → 오른쪽 ...
       double xOffset;
-      switch (i % 4) {
-        case 0:
-          xOffset = -amp * 0.3; // 약간 왼쪽
-          break;
-        case 1:
-          xOffset = amp; // 오른쪽
-          break;
-        case 2:
-          xOffset = -amp * 0.3; // 약간 왼쪽
-          break;
-        case 3:
-          xOffset = amp; // 오른쪽
-          break;
-        default:
-          xOffset = 0;
+      if (i == 0) {
+        xOffset = 0; // 첫 번째 노드는 중앙
+      } else {
+        // 홀수: 왼쪽, 짝수: 오른쪽 (대칭)
+        xOffset = (i % 2 == 1) ? -amp : amp;
       }
-
-      // 첫 번째 노드는 중앙에
-      if (i == 0) xOffset = 0;
 
       final x = centerX + xOffset;
       final y = startY + (i * verticalSpacing);

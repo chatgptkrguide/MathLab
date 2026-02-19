@@ -164,29 +164,24 @@ class CustomBottomNavigation extends StatelessWidget {
                   color: isSelected
                       ? AppColors.skyBlue
                       : AppColors.textTertiary,
-                  size: isSelected ? 26 : 24,
+                  size: 24,
                 ),
               ),
-              const SizedBox(height: 4),
-              Flexible(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 250),
-                  style: TextStyle(
-                    color: isSelected
-                        ? AppColors.skyBlue
-                        : AppColors.textTertiary,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.w500,
-                    fontSize: isSelected ? 12 : 11,
-                    height: 1.1,
-                    letterSpacing: 0.2,
-                  ),
-                  child: Text(
-                    label,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                  ),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: TextStyle(
+                  color: isSelected
+                      ? AppColors.skyBlue
+                      : AppColors.textTertiary,
+                  fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.w500,
+                  fontSize: 11,
+                  height: 1.0,
+                  letterSpacing: 0.2,
                 ),
               ),
             ],

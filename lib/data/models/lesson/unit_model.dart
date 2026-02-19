@@ -12,6 +12,7 @@ class UnitModel {
   final String emoji; // Unit icon emoji
   final List<LessonModel> lessons;
   final UnitTheme theme;
+  final String subject; // e.g. '공통수학1', '공통수학2'
 
   const UnitModel({
     required this.id,
@@ -21,6 +22,7 @@ class UnitModel {
     required this.emoji,
     this.lessons = const [],
     this.theme = UnitTheme.blue,
+    this.subject = '공통수학1',
   });
 
   /// Get total XP available in this unit
@@ -44,6 +46,7 @@ class UnitModel {
         (e) => e.name == json['theme'],
         orElse: () => UnitTheme.blue,
       ),
+      subject: json['subject'] as String? ?? '공통수학1',
     );
   }
 
@@ -56,6 +59,7 @@ class UnitModel {
       'emoji': emoji,
       'lessons': lessons.map((e) => e.toJson()).toList(),
       'theme': theme.name,
+      'subject': subject,
     };
   }
 

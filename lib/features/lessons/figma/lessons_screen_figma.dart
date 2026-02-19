@@ -93,6 +93,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     super.dispose();
   }
 
+  String get _currentSubject =>
+      _selectedSubjectIndex == 0 ? '공통수학1' : '공통수학2';
+
   LinearGradient get _currentGradient {
     return _selectedSubjectIndex == 0
         ? FigmaColors.skyBlueGradient
@@ -142,36 +145,41 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                       ),
                     ),
                   ),
-                  data: (units) => Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 40),
-                      child: Column(
-                        children: [
-                          for (int i = 0; i < units.length; i++) ...[
-                            SlideTransition(
-                              position: _bannerSlideAnimation,
-                              child: FadeTransition(
-                                opacity: _bannerFadeAnimation,
-                                child: _buildUnitBanner(
-                                  units[i].emoji,
-                                  units[i].title,
-                                  units[i].description,
+                  data: (allUnits) {
+                    final units = allUnits
+                        .where((u) => u.subject == _currentSubject)
+                        .toList();
+                    return Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 40),
+                        child: Column(
+                          children: [
+                            for (int i = 0; i < units.length; i++) ...[
+                              SlideTransition(
+                                position: _bannerSlideAnimation,
+                                child: FadeTransition(
+                                  opacity: _bannerFadeAnimation,
+                                  child: _buildUnitBanner(
+                                    units[i].emoji,
+                                    units[i].title,
+                                    units[i].description,
+                                  ),
                                 ),
                               ),
-                            ),
-                            LessonPathWidget(
-                              lessons: units[i].lessons,
-                              progressMap: progressState.progressMap,
-                              onLessonTap: (lessonId) =>
-                                  _handleLessonTap(lessonId, units, progressState),
-                            ),
-                            if (i < units.length - 1) const SizedBox(height: 16),
+                              LessonPathWidget(
+                                lessons: units[i].lessons,
+                                progressMap: progressState.progressMap,
+                                onLessonTap: (lessonId) =>
+                                    _handleLessonTap(lessonId, allUnits, progressState),
+                              ),
+                              if (i < units.length - 1) const SizedBox(height: 16),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
             ],
           ),

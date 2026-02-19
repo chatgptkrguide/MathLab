@@ -187,33 +187,23 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: 18,
-                color: AppColors.textPrimary,
-              ),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.error_outline_rounded,
+              size: 22,
+              color: AppColors.primary,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Text(
             '오답 노트',
             style: AppTextStyles.headlineMedium.copyWith(
