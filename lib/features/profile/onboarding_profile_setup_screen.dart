@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/providers/user/user_provider.dart';
 import '../../data/services/temp_profile_storage.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
@@ -89,23 +90,27 @@ class _OnboardingProfileSetupScreenState
     setState(() => _isLoading = true);
 
     try {
-      // 단순화된 프로필 데이터 (이름 + 학년만 수집)
+      final name = _nameController.text.trim();
       final tempProfileData = TempProfileData(
-        name: _nameController.text.trim(),
-        birthDate: null, // 나중에 프로필에서 추가 가능
-        gender: null, // 나중에 프로필에서 추가 가능
+        name: name,
+        birthDate: null,
+        gender: null,
         currentGrade: _selectedGrade,
-        schoolName: null, // 나중에 프로필에서 추가 가능
-        bio: null, // 나중에 프로필에서 추가 가능
+        schoolName: null,
+        bio: null,
       );
 
-      AppLogger.info('프로필 입력 완료: ${tempProfileData.name} (${tempProfileData.currentGrade})',
+      AppLogger.info('프로필 입력 완료: $name ($_selectedGrade)',
           tag: 'OnboardingProfileSetupScreen');
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Provider를 통해 직접 프로필 저장 (AuthWrapper 자동 리빌드)
+      await ref.read(userProvider.notifier).updateProfile(displayName: name);
 
-      if (mounted) {
-        HapticFeedback.heavyImpact();
+      if (!mounted) return;
+      HapticFeedback.heavyImpact();
+
+      // Navigator.push로 열린 경우 pop, 아니면 AuthWrapper가 자동 처리
+      if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop(tempProfileData);
       }
     } catch (e) {
@@ -115,7 +120,7 @@ class _OnboardingProfileSetupScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('프로필 저장 중 오류가 발생했습니다: $e'),
+            content: const Text('프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

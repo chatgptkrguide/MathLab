@@ -6,12 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
-import '../../../data/services/temp_profile_storage.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_durations.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 import '../../../shared/widgets/welcome_dialog.dart';
-import '../../profile/onboarding_profile_setup_screen.dart';
 
 /// 인증 관련 로직 핸들러
 class AuthHandler {
@@ -91,10 +89,8 @@ class AuthHandler {
     }
 
     try {
-      // 1. 구글 로그인 먼저 실행
       final success = await ref.read(authProvider.notifier).signInWithGoogle();
 
-      // Hide loading overlay
       if (mounted) {
         LoadingOverlay.hide(context);
       }
@@ -102,42 +98,7 @@ class AuthHandler {
       if (!mounted) return false;
 
       if (success) {
-        // 2. 로그인 성공 후 프로필 설정 화면으로 이동
-        final profileResult = await Navigator.of(context).push<TempProfileData>(
-          MaterialPageRoute(
-            builder: (context) => const OnboardingProfileSetupScreen(),
-          ),
-        );
-
-        if (profileResult == null || !mounted) return false;
-
-        // Show saving profile overlay
-        if (mounted) {
-          LoadingOverlay.show(context, message: LoadingMessages.savingProfile);
-        }
-
-        // 3. 프로필 정보를 사용자 계정에 업데이트
-        await ref.read(authProvider.notifier).applyTempProfileToAccount(
-              profileResult,
-            );
-
-        if (!mounted) return false;
-
-        // Hide saving overlay
-        if (mounted) {
-          LoadingOverlay.hide(context);
-        }
-
-        // 5. Show welcome dialog
-        final user = ref.read(userProvider);
-        if (mounted && user != null) {
-          await WelcomeDialog.show(
-            context,
-            user: user,
-            authMethod: 'google',
-          );
-        }
-
+        // AuthWrapper가 프로필 설정/메인 화면 전환을 자동 처리
         return true;
       } else {
         if (mounted) {
@@ -149,19 +110,16 @@ class AuthHandler {
         return false;
       }
     } catch (e, stackTrace) {
-      // Log detailed error for debugging (server-side only)
       AppLogger.error(
         'Google Sign-In failed',
         error: e,
         stackTrace: stackTrace,
       );
 
-      // Hide loading overlay on error
       if (mounted) {
         LoadingOverlay.hide(context);
       }
 
-      // Show generic user-friendly message
       if (mounted) {
         _showErrorSnackBar(
           context: context,
@@ -192,37 +150,7 @@ class AuthHandler {
       if (!mounted) return false;
 
       if (success) {
-        final profileResult = await Navigator.of(context).push<TempProfileData>(
-          MaterialPageRoute(
-            builder: (context) => const OnboardingProfileSetupScreen(),
-          ),
-        );
-
-        if (profileResult == null || !mounted) return false;
-
-        if (mounted) {
-          LoadingOverlay.show(context, message: LoadingMessages.savingProfile);
-        }
-
-        await ref.read(authProvider.notifier).applyTempProfileToAccount(
-              profileResult,
-            );
-
-        if (!mounted) return false;
-
-        if (mounted) {
-          LoadingOverlay.hide(context);
-        }
-
-        final user = ref.read(userProvider);
-        if (mounted && user != null) {
-          await WelcomeDialog.show(
-            context,
-            user: user,
-            authMethod: 'apple',
-          );
-        }
-
+        // AuthWrapper가 프로필 설정/메인 화면 전환을 자동 처리
         return true;
       } else {
         if (mounted) {

@@ -73,9 +73,7 @@ class Auth extends _$Auth {
     final currentUser = _firebaseAuth.currentUser;
 
     if (currentUser != null) {
-      // Load user data from UserProvider
-      ref.read(userProvider.notifier).loadUser(currentUser.uid);
-
+      // AuthWrapper handles loadUser to avoid race conditions
       return AuthState(
         firebaseUser: currentUser,
         isAuthenticated: true,

@@ -24,6 +24,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   String? _lastAccountId;
   bool _isInitializing = false;
   bool _shouldShowWelcome = false;
+  bool _hasInitError = false;
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     if (currentUserId == _lastAccountId) return;
 
     _isInitializing = true;
+    _hasInitError = false;
     final isNewLogin = _lastAccountId != null && _lastAccountId != currentUserId;
     _lastAccountId = currentUserId;
 
@@ -90,6 +92,8 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       AppLogger.info('FCM 푸시 알림 서비스 활성화됨', tag: 'AuthWrapper');
     } catch (e) {
       AppLogger.error('초기화 실패', error: e, tag: 'AuthWrapper');
+      _hasInitError = true;
+      if (mounted) setState(() {});
     } finally {
       _isInitializing = false;
     }
@@ -119,8 +123,41 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       return const AuthScreen();
     }
 
-    // 인증되었지만 사용자 정보가 없는 경우 (로딩 중)
+    // 인증되었지만 사용자 정보가 없는 경우
     if (user == null) {
+      // 초기화 에러 발생 시 재시도 UI 표시
+      if (_hasInitError) {
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                const Text('사용자 정보를 불러올 수 없습니다'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    _hasInitError = false;
+                    _lastAccountId = null;
+                    setState(() {});
+                    Future.microtask(() => _checkAndInitialize());
+                  },
+                  child: const Text('다시 시도'),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    ref.read(authProvider.notifier).signOut();
+                  },
+                  child: const Text('로그아웃'),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+      // 정상 로딩 중
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
