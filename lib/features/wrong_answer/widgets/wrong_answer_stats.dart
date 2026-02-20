@@ -21,7 +21,7 @@ class WrongAnswerStats extends StatelessWidget {
     final needsReview = statistics['needsReview'] ?? 0;
 
     return SizedBox(
-      height: 110,
+      height: 130,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -104,11 +104,15 @@ class _StatCard extends StatelessWidget {
             child: Icon(icon, color: Colors.white, size: 18),
           ),
           const Spacer(),
-          Text(
-            value.toString(),
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value.toString(),
+              style: AppTextStyles.headlineMedium.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 2),
@@ -118,6 +122,8 @@ class _StatCard extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.85),
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
