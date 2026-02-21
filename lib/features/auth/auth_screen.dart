@@ -334,7 +334,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             // Google login
                             _buildSocialButton(
                               text: 'Google로 계속하기',
-                              icon: 'assets/icons/google_icon.png',
+                              icon: null,
                               fallbackIcon: Icons.g_mobiledata,
                               backgroundColor: Colors.white,
                               textColor: AppColors.textDark,
@@ -359,7 +359,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             // Kakao login
                             _buildSocialButton(
                               text: 'Kakao로 계속하기',
-                              icon: 'assets/icons/kakao_icon.png',
+                              icon: null,
                               fallbackIcon: Icons.chat_bubble,
                               backgroundColor: AppColors.kakaoYellow,
                               textColor: AppColors.kakaoBrown,
@@ -388,7 +388,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: Image.asset(
-                        'assets/images/login/logo.png',
+                        'assets/icons/gomath_logo.png',
                         height: AppDimensions.logoHeight,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
@@ -458,7 +458,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: AppDimensions.spacing32),
                   ],
                 ),
               ),
@@ -490,7 +490,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }) {
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: AppDimensions.buttonHeightMedium,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
