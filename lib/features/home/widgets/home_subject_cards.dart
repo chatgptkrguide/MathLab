@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 
 /// 피그마 "00 home" 과목 선택 카드
 /// 공통수학 1, 공통수학 2 카드 2개를 가로로 배치
@@ -14,19 +16,18 @@ class HomeSubjectCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '과목 선택',
-            style: TextStyle(
+            style: AppTextStyles.titleLarge.copyWith(
               color: Colors.white,
               fontSize: 18,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
@@ -39,7 +40,7 @@ class HomeSubjectCards extends StatelessWidget {
                   onTap: () => onSubjectTap('common_math_1'),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _SubjectCard(
                   title: '공통수학 2',
@@ -80,10 +81,10 @@ class _SubjectCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -101,38 +102,34 @@ class _SubjectCard extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
               ),
               child: Icon(icon, color: color, size: 22),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
 
             // 과목명
             Text(
               title,
-              style: const TextStyle(
+              style: AppTextStyles.titleMedium.copyWith(
                 fontSize: 15,
-                fontWeight: FontWeight.bold,
                 color: AppColors.textDark,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacing4),
 
             // 설명
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-              ),
+              style: AppTextStyles.labelSmall,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
 
             // 진행률 바
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppDimensions.radius4),
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 6,
@@ -140,13 +137,12 @@ class _SubjectCard extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacing4),
 
             // 진행률 텍스트
             Text(
               '${(progress * 100).toInt()}% 완료',
-              style: TextStyle(
-                fontSize: 11,
+              style: AppTextStyles.labelSmall.copyWith(
                 fontWeight: FontWeight.w600,
                 color: color,
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/app_text_styles.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
@@ -145,12 +147,15 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     final topicName = _getLevelTopicName(level);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing16,
+          vertical: AppDimensions.spacing8,
+        ),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.18),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
           border: Border.all(
             color: Colors.white.withValues(alpha: 0.1),
             width: 1,
@@ -162,69 +167,72 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
             // 현재 레슨명
             Flexible(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing8,
+                  vertical: AppDimensions.spacing4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius8),
                 ),
                 child: Text(
                   topicName,
-                  style: const TextStyle(
+                  style: AppTextStyles.bodySmall.copyWith(
                     color: Colors.white,
-                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacing8),
             // 스트릭
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('🔥', style: TextStyle(fontSize: 14)),
-                const SizedBox(width: 3),
+                const SizedBox(width: AppDimensions.spacing2),
                 Text(
                   '$streak',
-                  style: const TextStyle(
+                  style: AppTextStyles.labelMedium.copyWith(
                     color: Colors.white,
-                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppDimensions.spacing8),
             // XP
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.bolt_rounded, color: Colors.amber, size: 16),
-                const SizedBox(width: 2),
+                const Icon(Icons.bolt_rounded, color: Colors.amber, size: AppDimensions.iconSmall),
+                const SizedBox(width: AppDimensions.spacing2),
                 Text(
                   '$xp',
-                  style: const TextStyle(
+                  style: AppTextStyles.labelMedium.copyWith(
                     color: Colors.white,
-                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppDimensions.spacing8),
             // 레벨
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing8,
+                vertical: AppDimensions.spacing2,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radius8),
               ),
               child: Text(
                 'HLv$level',
-                style: const TextStyle(
+                style: AppTextStyles.bodySmall.copyWith(
                   color: Colors.white,
-                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),

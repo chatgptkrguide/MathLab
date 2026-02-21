@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 
 /// 피그마 홈 화면 하단 CTA 3개: 과제 확인, AI 튜터, 멤버 채팅
 class HomeActionButtons extends StatelessWidget {
@@ -8,7 +10,7 @@ class HomeActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
       child: Row(
         children: [
           Expanded(
@@ -20,7 +22,7 @@ class HomeActionButtons extends StatelessWidget {
               onTap: () {},
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _ActionButton(
               icon: Icons.smart_toy_rounded,
@@ -30,7 +32,7 @@ class HomeActionButtons extends StatelessWidget {
               onTap: () {},
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _ActionButton(
               icon: Icons.chat_rounded,
@@ -66,10 +68,13 @@ class _ActionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppDimensions.spacing16,
+          horizontal: AppDimensions.spacing8,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -85,29 +90,27 @@ class _ActionButton extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: AppDimensions.iconMedium),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
+              style: AppTextStyles.labelSmall.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
                 height: 1.3,
               ),
             ),
             if (sublabel != null) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: AppDimensions.spacing2),
               Text(
                 sublabel!,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: AppTextStyles.labelSmall.copyWith(
                   fontSize: 10,
-                  fontWeight: FontWeight.w500,
                   color: color,
                 ),
               ),

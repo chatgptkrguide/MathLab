@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 
 class HomeStatsCards extends StatelessWidget {
   final UserModel? user;
@@ -10,7 +12,7 @@ class HomeStatsCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
       child: Row(
         children: [
           Expanded(
@@ -22,7 +24,7 @@ class HomeStatsCards extends StatelessWidget {
               value: '${user?.xp ?? 0}',
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _StatCard(
               icon: Icons.shield_rounded,
@@ -32,7 +34,7 @@ class HomeStatsCards extends StatelessWidget {
               value: '${user?.level ?? 1}',
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _StatCard(
               icon: Icons.local_fire_department_rounded,
@@ -66,10 +68,13 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacing16,
+        horizontal: AppDimensions.spacing12,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -85,26 +90,23 @@ class _StatCard extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: iconBg,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
-            child: Icon(icon, color: iconColor, size: 24),
+            child: Icon(icon, color: iconColor, size: AppDimensions.iconMedium),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppDimensions.spacing8),
           Text(
             value,
-            style: const TextStyle(
+            style: AppTextStyles.headlineSmall.copyWith(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: AppDimensions.spacing2),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 12,
+            style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
             ),
           ),
         ],

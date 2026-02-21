@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/security/input_validator.dart';
+import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
 import 'logic/auth_handler.dart';
 
 class EmailLoginScreen extends ConsumerStatefulWidget {
@@ -88,7 +90,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(AppDimensions.spacing24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -117,7 +119,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     hintText: 'example@email.com',
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     ),
                   ),
                   validator: (value) {
@@ -164,7 +166,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                       },
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     ),
                   ),
                   validator: (value) {
@@ -205,7 +207,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     ),
                   ),
                   child: _isLoading
@@ -291,19 +293,12 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             Navigator.of(context).pop(true);
                           }
                         },
-                  icon: Image.asset(
-                    'assets/icons/google_logo.png',
-                    height: 24,
-                    width: 24,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.g_mobiledata);
-                    },
-                  ),
+                  icon: const Icon(Icons.g_mobiledata),
                   label: const Text('Google로 계속하기'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     ),
                   ),
                 ),
@@ -324,21 +319,14 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             Navigator.of(context).pop(true);
                           }
                         },
-                  icon: Image.asset(
-                    'assets/icons/kakao_logo.png',
-                    height: 24,
-                    width: 24,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.chat_bubble);
-                    },
-                  ),
+                  icon: const Icon(Icons.chat_bubble),
                   label: const Text('Kakao로 계속하기'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: const Color(0xFFFEE500),
-                    foregroundColor: Colors.black87,
+                    backgroundColor: AppColors.kakaoYellow,
+                    foregroundColor: AppColors.kakaoBrown,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     ),
                   ),
                 ),
