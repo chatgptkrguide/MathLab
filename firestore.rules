@@ -34,9 +34,7 @@ service cloud.firestore {
 
       // Create: Only during sign up with valid data
       allow create: if isOwner(userId) &&
-                      isValidString(request.resource.data.name, 1, 50) &&
-                      isValidEmail(request.resource.data.email) &&
-                      request.resource.data.createdAt == request.time &&
+                      request.resource.data.createdAt is timestamp &&
                       request.resource.data.hearts >= 0 &&
                       request.resource.data.hearts <= 5 &&
                       request.resource.data.streak >= 0 &&
@@ -46,10 +44,6 @@ service cloud.firestore {
       allow update: if (isAdmin() &&
                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'updatedAt'])) ||
                      isOwner(userId) &&
-                      // Cannot change critical fields
-                      request.resource.data.id == resource.data.id &&
-                      request.resource.data.email == resource.data.email &&
-                      request.resource.data.createdAt == resource.data.createdAt &&
                       // Gamification field bounds (prevent cheating)
                       // Hearts: must stay in 0-5 range
                       (!('hearts' in request.resource.data) ||

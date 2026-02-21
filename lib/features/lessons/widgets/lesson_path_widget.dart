@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/models/lesson/lesson_progress_model.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
 import 'curved_path_painter.dart';
 
 /// 듀오링고 스타일 학습 경로 위젯
@@ -287,11 +287,11 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
       decoration: BoxDecoration(
-        gradient: FigmaColors.deepBlueCTA,
+        gradient: AppColors.deepBlueCTA,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: FigmaColors.deepBlue.withValues(alpha: 0.4),
+            color: AppColors.deepBlue.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -378,7 +378,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
                     ],
                     stops: const [0.0, 0.5, 1.0],
                   ),
-            color: isLocked ? FigmaColors.nodeLockedBg : null,
+            color: isLocked ? AppColors.nodeLockedBg : null,
             border: Border.all(
               color: isCompleted
                   ? Colors.white.withValues(alpha: 0.6)
@@ -418,7 +418,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            FigmaColors.glossyHighlight,
+                            AppColors.glossyHighlight,
                             Colors.white.withValues(alpha: 0.0),
                           ],
                         ),
@@ -500,7 +500,7 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: FigmaColors.gold,
+        color: AppColors.gold,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -521,22 +521,22 @@ class _LessonPathWidgetState extends State<LessonPathWidget>
   }
 
   Color _getNodeColor(LessonStatus status, LessonType type) {
-    if (status == LessonStatus.locked) return FigmaColors.nodeLocked;
-    if (status == LessonStatus.completed) return FigmaColors.nodeGreen;
+    if (status == LessonStatus.locked) return AppColors.nodeLocked;
+    if (status == LessonStatus.completed) return AppColors.nodeGreen;
 
     switch (type) {
       case LessonType.story:
-        return FigmaColors.nodePurple;
+        return AppColors.nodePurple;
       case LessonType.practice:
-        return FigmaColors.nodeOrange;
+        return AppColors.nodeOrange;
       case LessonType.review:
-        return FigmaColors.skyBlue;
+        return AppColors.skyBlue;
       case LessonType.challenge:
-        return FigmaColors.nodeRed;
+        return AppColors.nodeRed;
       case LessonType.boss:
-        return FigmaColors.nodeBoss;
+        return AppColors.nodeBoss;
       default:
-        return FigmaColors.royalBlue;
+        return AppColors.royalBlue;
     }
   }
 

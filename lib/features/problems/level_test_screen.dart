@@ -4,7 +4,7 @@ import '../../data/models/problem/problem_model.dart';
 import '../../data/models/problem/problem_session_model.dart';
 import '../../data/models/problem/sample_problems.dart';
 import '../../data/providers/user/user_provider.dart';
-import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/math/math_renderer.dart';
 import '../../shared/utils/answer_validator.dart';
 
@@ -68,7 +68,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: const BoxDecoration(
-        gradient: FigmaColors.skyBlueGradient,
+        gradient: AppColors.skyBlueGradient,
       ),
       child: Row(
         children: [
@@ -138,7 +138,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: FigmaColors.textSecondary,
+                  color: AppColors.textSecondary,
                 ),
               ),
               Text(
@@ -146,7 +146,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: FigmaColors.skyBlue,
+                  color: AppColors.skyBlue,
                 ),
               ),
             ],
@@ -158,7 +158,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
               value: progress,
               minHeight: 10,
               backgroundColor: const Color(0xFFE4E9EA),
-              valueColor: const AlwaysStoppedAnimation<Color>(FigmaColors.skyBlue),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.skyBlue),
             ),
           ),
         ],
@@ -191,14 +191,14 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: FigmaColors.textSecondary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
                 MathRenderer(
                   latex: problem.question,
                   fontSize: 20,
-                  color: FigmaColors.textDark,
+                  color: AppColors.textDark,
                 ),
               ],
             ),
@@ -209,8 +209,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
           if (problem.type == ProblemType.multipleChoice)
             ...problem.options.map((option) {
               final isSelected = selectedAnswer == option;
-              Color bgColor = FigmaColors.chipBg;
-              Color textColor = FigmaColors.textDark;
+              Color bgColor = AppColors.chipBg;
+              Color textColor = AppColors.textDark;
               Color borderColor = Colors.transparent;
 
               if (isAnswerChecked && isSelected) {
@@ -224,9 +224,9 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                   borderColor = Colors.red;
                 }
               } else if (isSelected) {
-                bgColor = FigmaColors.skyBlue.withValues(alpha: 0.12);
-                textColor = FigmaColors.skyBlue;
-                borderColor = FigmaColors.skyBlue;
+                bgColor = AppColors.skyBlue.withValues(alpha: 0.12);
+                textColor = AppColors.skyBlue;
+                borderColor = AppColors.skyBlue;
               }
 
               return Padding(
@@ -273,7 +273,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
         child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: selectedAnswer != null
-                ? FigmaColors.deepBlueCTA
+                ? AppColors.deepBlueCTA
                 : null,
             color: selectedAnswer != null ? null : const Color(0xFFE4E9EA),
             borderRadius: BorderRadius.circular(16),
@@ -292,7 +292,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: selectedAnswer != null ? Colors.white : FigmaColors.textLight,
+                color: selectedAnswer != null ? Colors.white : AppColors.textLight,
               ),
             ),
           ),
@@ -381,7 +381,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: FigmaColors.skyBlueGradient,
+          gradient: AppColors.skyBlueGradient,
         ),
         child: SafeArea(
           child: Center(
@@ -419,7 +419,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                         '당신의 랭크',
                         style: TextStyle(
                           fontSize: 14,
-                          color: FigmaColors.textSecondary,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -444,7 +444,7 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: FigmaColors.skyBlue,
+                        foregroundColor: AppColors.skyBlue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

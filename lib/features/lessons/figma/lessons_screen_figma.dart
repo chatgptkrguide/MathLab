@@ -8,7 +8,7 @@ import '../../../data/models/lesson/unit_model.dart';
 import '../../../data/providers/curriculum/curriculum_provider.dart';
 import '../../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
-import '../../../shared/constants/figma_colors.dart';
+import '../../../shared/constants/app_colors.dart';
 import '../widgets/lesson_path_widget.dart';
 import '../../problems/problem_solving_screen.dart';
 
@@ -98,8 +98,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
   LinearGradient get _currentGradient {
     return _selectedSubjectIndex == 0
-        ? FigmaColors.skyBlueGradient
-        : FigmaColors.tealGradient;
+        ? AppColors.skyBlueGradient
+        : AppColors.tealGradient;
   }
 
   @override
@@ -229,8 +229,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                             style: TextStyle(
                               color: isSelected
                                   ? (_selectedSubjectIndex == 0
-                                      ? FigmaColors.skyBlue
-                                      : FigmaColors.tealGreen)
+                                      ? AppColors.skyBlue
+                                      : AppColors.tealGreen)
                                   : Colors.white,
                               fontSize: 13,
                               fontWeight:
@@ -309,9 +309,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
-              color: FigmaColors.glassBg,
+              color: AppColors.glassBg,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: FigmaColors.glassBorder),
+              border: Border.all(color: AppColors.glassBorder),
             ),
             child: Row(
               children: [

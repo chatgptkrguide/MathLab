@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/daily_reward_model.dart';
 import '../../data/providers/daily_reward_provider.dart';
-import '../../shared/constants/figma_colors.dart';
+import '../../shared/constants/app_colors.dart';
 
 /// 일일 보상 다이얼로그
 class DailyRewardDialog extends ConsumerWidget {
@@ -43,7 +43,7 @@ class DailyRewardDialog extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: FigmaColors.textDark,
+                color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 8),
@@ -51,7 +51,7 @@ class DailyRewardDialog extends ConsumerWidget {
               'Day ${rewardState.currentDay} / 7',
               style: const TextStyle(
                 fontSize: 14,
-                color: FigmaColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 24),
@@ -73,7 +73,7 @@ class DailyRewardDialog extends ConsumerWidget {
                 child: const Text(
                   '닫기',
                   style: TextStyle(
-                    color: FigmaColors.textSecondary,
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
                 ),
@@ -132,23 +132,23 @@ class DailyRewardDialog extends ConsumerWidget {
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: isClaimed
-            ? FigmaColors.tealGreen.withValues(alpha: 0.1)
+            ? AppColors.tealGreen.withValues(alpha: 0.1)
             : isCurrentDay
-                ? FigmaColors.gold.withValues(alpha: 0.15)
+                ? AppColors.gold.withValues(alpha: 0.15)
                 : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCurrentDay
-              ? FigmaColors.gold
+              ? AppColors.gold
               : isClaimed
-                  ? FigmaColors.tealGreen
+                  ? AppColors.tealGreen
                   : Colors.grey.shade200,
           width: isCurrentDay ? 2.5 : 1,
         ),
         boxShadow: isCurrentDay
             ? [
                 BoxShadow(
-                  color: FigmaColors.gold.withValues(alpha: 0.3),
+                  color: AppColors.gold.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -177,8 +177,8 @@ class DailyRewardDialog extends ConsumerWidget {
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: isCurrentDay
-                              ? FigmaColors.gold
-                              : FigmaColors.textSecondary,
+                              ? AppColors.gold
+                              : AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -196,7 +196,7 @@ class DailyRewardDialog extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
-                          color: FigmaColors.textDark,
+                          color: AppColors.textDark,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -216,7 +216,7 @@ class DailyRewardDialog extends ConsumerWidget {
                 width: 18,
                 height: 18,
                 decoration: const BoxDecoration(
-                  color: FigmaColors.tealGreen,
+                  color: AppColors.tealGreen,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -252,7 +252,7 @@ class DailyRewardDialog extends ConsumerWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: FigmaColors.textSecondary,
+            color: AppColors.textSecondary,
           ),
         ),
       );
@@ -286,7 +286,7 @@ class DailyRewardDialog extends ConsumerWidget {
               }
             : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: FigmaColors.gold,
+          backgroundColor: AppColors.gold,
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey.shade300,
           padding: const EdgeInsets.symmetric(vertical: 16),

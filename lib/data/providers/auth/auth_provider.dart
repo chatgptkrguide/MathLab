@@ -64,7 +64,14 @@ class AuthState {
 @Riverpod(keepAlive: true)
 class Auth extends _$Auth {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  GoogleSignIn? _googleSignIn;
+
+  GoogleSignIn _getGoogleSignIn() {
+    _googleSignIn ??= GoogleSignIn(
+      scopes: ['email'],
+    );
+    return _googleSignIn!;
+  }
   final SecureStorageService _storage = SecureStorageService();
 
   @override
@@ -209,7 +216,7 @@ class Auth extends _$Auth {
       AppLogger.info('Starting Google signin', tag: 'Auth');
 
       // Trigger the Google Sign-In flow
-      final googleUser = await _googleSignIn.signIn();
+      final googleUser = await _getGoogleSignIn().signIn();
 
       if (googleUser == null) {
         // User canceled the sign-in
@@ -538,7 +545,7 @@ class Auth extends _$Auth {
       // Sign out from all providers
       await Future.wait([
         _firebaseAuth.signOut(),
-        _googleSignIn.signOut(),
+        _getGoogleSignIn().signOut(),
         // Kakao logout is handled automatically when Firebase signs out
       ]);
 
