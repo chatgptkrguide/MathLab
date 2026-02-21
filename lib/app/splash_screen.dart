@@ -82,16 +82,60 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
+  /// 로고 이미지 위젯 (로드 실패 시 π 심볼 폴백)
+  Widget _buildLogo() {
+    return Image.asset(
+      'assets/icons/logo_main.png',
+      width: 160,
+      height: 160,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        // 이미지 로드 실패 시 기존 π 심볼 폴백
+        return Container(
+          width: 160,
+          height: 160,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.surface.withValues(alpha: 0.3),
+                AppColors.surface.withValues(alpha: 0.1),
+              ],
+            ),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.surface.withValues(alpha: 0.5),
+              width: 3,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              'π',
+              style: TextStyle(
+                fontSize: 80,
+                fontWeight: FontWeight.bold,
+                color: AppColors.surface,
+                shadows: [
+                  Shadow(
+                    color: AppColors.mathButtonBlue.withValues(alpha: 0.5),
+                    blurRadius: 15,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1CB0F6), Color(0xFF1899D6)],
-          ),
+          gradient: AppColors.homeGradient,
         ),
         child: Center(
           child: FadeTransition(
@@ -101,115 +145,8 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 로고 - 모던한 수학 심볼
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // 배경 원형
-                      Container(
-                        width: 180,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.surface.withValues(alpha: 0.3),
-                              AppColors.surface.withValues(alpha: 0.1),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.surface.withValues(alpha: 0.5),
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.surface.withValues(alpha: 0.2),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                      ),
-                      // 중심 수식 기호
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // π 기호
-                          Text(
-                            'π',
-                            style: TextStyle(
-                              fontSize: 80,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.surface,
-                              shadows: [
-                                Shadow(
-                                  color:
-                                      AppColors.mathButtonBlue.withValues(alpha: 0.5),
-                                  blurRadius: 15,
-                                ),
-                              ],
-                            ),
-                          ),
-                          // 작은 수식
-                          Text(
-                            '∫ f(x) dx',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.surface.withValues(alpha: 0.9),
-                              fontStyle: FontStyle.italic,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ],
-                      ),
-                      // 궤도 효과 (작은 기호들)
-                      Positioned(
-                        top: 20,
-                        right: 30,
-                        child: Transform.rotate(
-                          angle: 0.3,
-                          child: Text(
-                            '∑',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.surface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 25,
-                        left: 25,
-                        child: Transform.rotate(
-                          angle: -0.2,
-                          child: Text(
-                            '√',
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.surface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 35,
-                        left: 35,
-                        child: Text(
-                          '∞',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.surface.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // 로고 이미지 (실패 시 π 폴백)
+                  _buildLogo(),
 
                   const SizedBox(height: AppDimensions.spacingXXL),
 
@@ -220,7 +157,6 @@ class _SplashScreenState extends State<SplashScreen>
                       color: AppColors.surface,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2,
-                      fontSize: 52,
                       shadows: [
                         Shadow(
                           color: Colors.black.withValues(alpha: 0.25),
@@ -239,7 +175,6 @@ class _SplashScreenState extends State<SplashScreen>
                     style: AppTextStyles.titleMedium.copyWith(
                       color: AppColors.surface.withValues(alpha: 0.9),
                       fontWeight: FontWeight.w600,
-                      fontSize: 18,
                     ),
                   ),
 
@@ -247,8 +182,8 @@ class _SplashScreenState extends State<SplashScreen>
 
                   // 로딩 인디케이터
                   const SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: AppDimensions.spacing40,
+                    height: AppDimensions.spacing40,
                     child: CircularProgressIndicator(
                       valueColor:
                           AlwaysStoppedAnimation<Color>(AppColors.surface),
