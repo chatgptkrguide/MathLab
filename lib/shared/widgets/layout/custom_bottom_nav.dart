@@ -61,7 +61,7 @@ class CustomBottomNavigation extends StatelessWidget {
             _buildNavItem(
               index: 2,
               icon: Icons.home_rounded,
-              label: 'Home',
+              label: 'GoMath',
               isSpecial: true,
             ),
             _buildNavItem(
@@ -124,10 +124,15 @@ class CustomBottomNavigation extends StatelessWidget {
                 child: AnimatedScale(
                   duration: const Duration(milliseconds: 200),
                   scale: isSelected ? 1.05 : 1.0,
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: isSelected ? 26 : 24,
+                  child: Image.asset(
+                    'assets/icons/gomath_logo_small.png',
+                    width: isSelected ? 26 : 24,
+                    height: isSelected ? 26 : 24,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      icon,
+                      color: Colors.white,
+                      size: isSelected ? 26 : 24,
+                    ),
                   ),
                 ),
               ),
