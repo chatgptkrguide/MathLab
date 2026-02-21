@@ -52,14 +52,21 @@ class HomeTopSection extends StatelessWidget {
                   letterSpacing: 0.5,
                 ),
               ),
-              const Text(
-                'GoMath',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.0,
-                ),
+              Image.asset(
+                'assets/icons/gomath_logo_small.png',
+                height: 32,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Text(
+                    'GoMath',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  );
+                },
               ),
             ],
           ),
