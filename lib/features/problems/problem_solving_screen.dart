@@ -377,12 +377,12 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                         // Question card
                         _buildQuestionCard(currentProblem),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppDimensions.spacing24),
 
                         // Answer input (varies by problem type)
                         _buildAnswerInput(currentProblem),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppDimensions.spacing24),
 
                         // 잠금 해제된 힌트 표시
                         _buildUnlockedHintsSection(currentProblem),
@@ -411,13 +411,13 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingMedium,
-        vertical: 12,
+        vertical: AppDimensions.spacing12,
       ),
       decoration: const BoxDecoration(
         color: AppColors.skyBlue,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+          bottomLeft: Radius.circular(AppDimensions.radius16),
+          bottomRight: Radius.circular(AppDimensions.radius16),
         ),
       ),
       child: Column(
@@ -429,9 +429,9 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+                    child: const Icon(Icons.close_rounded, color: Colors.white, size: AppDimensions.iconMedium),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Text(
                     widget.lessonTitle,
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -445,24 +445,23 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                 children: [
                   // XP badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: 3),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius8),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.bolt_rounded, color: Colors.amber, size: 14),
-                        const SizedBox(width: 2),
+                        const Icon(Icons.bolt_rounded, color: Colors.amber, size: AppDimensions.iconSmall),
+                        const SizedBox(width: AppDimensions.spacing2),
                         Consumer(
                           builder: (context, ref, _) {
                             final user = ref.watch(userProvider);
                             return Text(
                               '${user?.xp ?? 0}',
-                              style: const TextStyle(
+                              style: AppTextStyles.caption.copyWith(
                                 color: Colors.white,
-                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
                             );
@@ -471,7 +470,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   Text(
                     '${session!.currentProblemIndex + 1}/${session!.totalProblems}',
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -482,39 +481,38 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppDimensions.spacing8),
           // Gradient progress bar with percentage label
           Stack(
             children: [
               Container(
-                height: 8,
+                height: AppDimensions.spacing8,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius4),
                 ),
               ),
               FractionallySizedBox(
                 widthFactor: progress.clamp(0.0, 1.0),
                 child: Container(
-                  height: 8,
+                  height: AppDimensions.spacing8,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [AppColors.tealGreen, AppColors.mathGreen],
                     ),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius4),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacing4),
           Align(
             alignment: Alignment.centerRight,
             child: Text(
               percentText,
-              style: const TextStyle(
+              style: AppTextStyles.labelSmall.copyWith(
                 color: Colors.white,
-                fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -536,7 +534,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingMedium,
-        vertical: 8,
+        vertical: AppDimensions.spacing8,
       ),
       child: Row(
         children: [
@@ -550,7 +548,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
               onTap: () => _showHintPopup(currentProblem!, userXp),
             )
           else
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing16),
           // Animated hearts display
           Expanded(
             child: Row(
@@ -566,7 +564,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                   Widget heartIcon = Icon(
                     isFilled ? Icons.favorite : Icons.favorite_border,
                     color: isFilled ? AppColors.mathRed : AppColors.borderDark,
-                    size: 24,
+                    size: AppDimensions.iconMedium,
                   );
 
                   // Wrap filled hearts with subtle shadow
@@ -600,7 +598,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                               AppColors.borderDark,
                               _heartAnimController.value,
                             ),
-                            size: 24,
+                            size: AppDimensions.iconMedium,
                           ),
                         );
                       },
@@ -697,10 +695,10 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
   Widget _buildQuestionCard(ProblemModel problem) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacing24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -719,7 +717,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           MathRichText(
             text: problem.question,
             textStyle: AppTextStyles.heading2.copyWith(
@@ -728,7 +726,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
             mathFontSize: 28.0,
           ),
           if (problem.allImages.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
             ProblemImageGallery(
               imageUrls: problem.allImages,
               problemId: problem.id,
@@ -796,10 +794,10 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
             onTap: () => _selectAnswer(option),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16),
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
                 border: Border.all(
                   color: borderColor,
                   width: borderWidth,
@@ -849,7 +847,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
             }
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
         MathKeyboard(
           controller: _textController,
           onDone: () {
@@ -938,7 +936,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
       children: sortedUnlocked.map((index) {
         if (index >= hints.length) return const SizedBox.shrink();
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.only(bottom: AppDimensions.spacing12),
           child: _buildHintCard(hints[index], index + 1),
         );
       }).toList(),
@@ -947,7 +945,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
   Widget _buildHintCard(String hint, int hintNumber) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -961,7 +959,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
           color: AppColors.mathOrange.withValues(alpha: 0.3),
           width: 1.5,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         boxShadow: [
           BoxShadow(
             color: AppColors.mathOrange.withValues(alpha: 0.1),
@@ -975,8 +973,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
         children: [
           // 힌트 번호 배지
           Container(
-            width: 32,
-            height: 32,
+            width: AppDimensions.iconLarge,
+            height: AppDimensions.iconLarge,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -995,23 +993,21 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
             child: Center(
               child: Text(
                 '$hintNumber',
-                style: const TextStyle(
+                style: AppTextStyles.titleSmall.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '힌트 $hintNumber',
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: AppTextStyles.caption.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.mathOrange,
                   ),
@@ -1076,12 +1072,12 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
       ),
       child: SizedBox(
         width: double.infinity,
-        height: 56,
+        height: AppDimensions.buttonHeightLarge,
         child: canCheck || canContinue
             ? DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: AppColors.deepBlueCTA,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
                 ),
                 child: ElevatedButton(
                   onPressed: canCheck
@@ -1093,7 +1089,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius16),
                     ),
                     elevation: 0,
                   ),
@@ -1112,7 +1108,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.borderLight,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius16),
                   ),
                   elevation: 0,
                 ),
@@ -1179,8 +1175,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
+                        topLeft: Radius.circular(AppDimensions.radius24),
+                        topRight: Radius.circular(AppDimensions.radius24),
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -1193,33 +1189,33 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                     child: SafeArea(
                       top: false,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                        padding: const EdgeInsets.all(AppDimensions.spacing24),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             // Drag handle
                             Container(
-                              width: 40,
-                              height: 4,
+                              width: AppDimensions.spacing40,
+                              height: AppDimensions.spacing4,
                               decoration: BoxDecoration(
                                 color: AppColors.borderLight,
-                                borderRadius: BorderRadius.circular(2),
+                                borderRadius: BorderRadius.circular(AppDimensions.spacing2),
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppDimensions.spacing20),
                             // Icon and title row
                             Row(
                               children: [
                                 Container(
-                                  width: 48,
-                                  height: 48,
+                                  width: AppDimensions.iconXLarge,
+                                  height: AppDimensions.iconXLarge,
                                   decoration: BoxDecoration(
                                     color: panelColor.withValues(alpha: 0.12),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(icon, color: panelColor, size: 28),
                                 ),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: AppDimensions.spacing16),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1245,13 +1241,13 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                               ],
                             ),
                             if (!isCorrect && problem.explanation != null) ...[
-                              const SizedBox(height: 16),
+                              const SizedBox(height: AppDimensions.spacing16),
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(AppDimensions.spacing16),
                                 decoration: BoxDecoration(
                                   color: accentColor.withValues(alpha: 0.06),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radius12),
                                   border: Border.all(
                                     color: accentColor.withValues(alpha: 0.15),
                                   ),
@@ -1280,13 +1276,13 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                               ),
                             ],
                             if (result?.hints != null && result!.hints!.isNotEmpty) ...[
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppDimensions.spacing12),
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(AppDimensions.spacing12),
                                 decoration: BoxDecoration(
                                   color: AppColors.mathOrange.withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radius12),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1298,9 +1294,9 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: AppDimensions.spacing4),
                                     ...result.hints!.map((hint) => Padding(
-                                          padding: const EdgeInsets.only(top: 4),
+                                          padding: const EdgeInsets.only(top: AppDimensions.spacing4),
                                           child: Text(
                                             hint,
                                             style: AppTextStyles.bodyMedium.copyWith(
@@ -1312,18 +1308,18 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                                 ),
                               ),
                             ],
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppDimensions.spacing20),
                             // Continue button
                             SizedBox(
                               width: double.infinity,
-                              height: 52,
+                              height: AppDimensions.buttonHeightLarge,
                               child: ElevatedButton(
                                 onPressed: _nextProblem,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: panelColor,
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(AppDimensions.radius16),
                                   ),
                                   elevation: 0,
                                 ),
@@ -1418,7 +1414,7 @@ class _ProblemCompletionScreenState
       backgroundColor: AppColors.mathGreen,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(AppDimensions.spacing32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1427,7 +1423,7 @@ class _ProblemCompletionScreenState
                 size: 100,
                 color: Colors.white,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacing24),
               Text(
                 '레슨 완료!',
                 style: AppTextStyles.heading1.copyWith(
@@ -1435,14 +1431,14 @@ class _ProblemCompletionScreenState
                   fontSize: 32,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               Text(
                 widget.lessonTitle,
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: Colors.white.withValues(alpha: 0.9),
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: AppDimensions.spacing48),
 
               // Stars
               Row(
@@ -1450,27 +1446,27 @@ class _ProblemCompletionScreenState
                 children: List.generate(
                   3,
                   (index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8),
                     child: Icon(
                       index < widget.session.starsEarned
                           ? Icons.star
                           : Icons.star_border,
-                      size: 48,
+                      size: AppDimensions.iconXLarge,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: AppDimensions.spacing48),
 
               // Stats
               _buildStatCard(
                   '정답률',
                   '${(widget.session.accuracy * 100).toStringAsFixed(0)}%'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               _buildStatCard('점수', '${widget.session.score}점'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               _buildStatCard('남은 하트', '${widget.session.hearts}/5'),
 
               const Spacer(),
@@ -1478,7 +1474,7 @@ class _ProblemCompletionScreenState
               // Continue button
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: AppDimensions.buttonHeightLarge,
                 child: ElevatedButton(
                   onPressed: _isSaving
                       ? null
@@ -1488,14 +1484,14 @@ class _ProblemCompletionScreenState
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     ),
                     elevation: 0,
                   ),
                   child: _isSaving
                       ? const SizedBox(
-                          width: 24,
-                          height: 24,
+                          width: AppDimensions.iconMedium,
+                          height: AppDimensions.iconMedium,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor:
@@ -1519,10 +1515,10 @@ class _ProblemCompletionScreenState
 
   Widget _buildStatCard(String label, String value) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacing20),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
