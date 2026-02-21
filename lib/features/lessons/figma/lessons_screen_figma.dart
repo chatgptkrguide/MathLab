@@ -9,6 +9,8 @@ import '../../../data/providers/curriculum/curriculum_provider.dart';
 import '../../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 import '../widgets/lesson_path_widget.dart';
 import '../../problems/problem_solving_screen.dart';
 
@@ -152,7 +154,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                     return Expanded(
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 40),
+                        padding: const EdgeInsets.only(bottom: AppDimensions.spacing40),
                         child: Column(
                           children: [
                             for (int i = 0; i < units.length; i++) ...[
@@ -173,7 +175,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                                 onLessonTap: (lessonId) =>
                                     _handleLessonTap(lessonId, allUnits, progressState),
                               ),
-                              if (i < units.length - 1) const SizedBox(height: 16),
+                              if (i < units.length - 1) const SizedBox(height: AppDimensions.spacing16),
                             ],
                           ],
                         ),
@@ -193,7 +195,12 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     final xp = user?.xp ?? 0;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing20,
+        AppDimensions.spacing12,
+        AppDimensions.spacing20,
+        AppDimensions.spacing16,
+      ),
       child: Column(
         children: [
           // 상단: 과목 선택 탭 + 정보 배지
@@ -205,7 +212,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   children: List.generate(_subjects.length, (index) {
                     final isSelected = _selectedSubjectIndex == index;
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.only(right: AppDimensions.spacing8),
                       child: GestureDetector(
                         onTap: () {
                           if (_selectedSubjectIndex != index) {
@@ -217,22 +224,21 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
+                              horizontal: 14, vertical: AppDimensions.spacing8),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? Colors.white
                                 : Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius20),
                           ),
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
-                            style: TextStyle(
+                            style: AppTextStyles.labelMedium.copyWith(
                               color: isSelected
                                   ? (_selectedSubjectIndex == 0
                                       ? AppColors.skyBlue
                                       : AppColors.tealGreen)
                                   : Colors.white,
-                              fontSize: 13,
                               fontWeight:
                                   isSelected ? FontWeight.bold : FontWeight.w500,
                             ),
@@ -251,24 +257,23 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.local_fire_department_rounded,
                         color: Color(0xFFFF9600), size: 18),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacing4),
                     Text('$streak',
-                        style: const TextStyle(
+                        style: AppTextStyles.bodyMedium.copyWith(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14)),
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
 
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacing8),
 
               // XP (실제 데이터)
               Container(
@@ -276,19 +281,18 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.star_rounded,
                         color: Color(0xFFFFC800), size: 18),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacing4),
                     Text('$xp',
-                        style: const TextStyle(
+                        style: AppTextStyles.bodyMedium.copyWith(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14)),
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -301,40 +305,47 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
   Widget _buildUnitBanner(String emoji, String title, String description) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing24,
+        vertical: AppDimensions.spacing12,
+      ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing20,
+              vertical: 14,
+            ),
             decoration: BoxDecoration(
               color: AppColors.glassBg,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.radius16),
               border: Border.all(color: AppColors.glassBorder),
             ),
             child: Row(
               children: [
-                Text(emoji, style: const TextStyle(fontSize: 28)),
-                const SizedBox(width: 12),
+                Text(emoji, style: AppTextStyles.displaySmall.copyWith(
+                  fontSize: 28,
+                )),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: AppTextStyles.titleMedium.copyWith(
                           color: Colors.white,
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppDimensions.spacing2),
                       Text(
                         description,
-                        style: TextStyle(
+                        style: AppTextStyles.labelMedium.copyWith(
                           color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -399,7 +410,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
           backgroundColor: Colors.red[400],
           behavior: SnackBarBehavior.floating,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radius12)),
         ),
       );
       return;
