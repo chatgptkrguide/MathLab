@@ -110,13 +110,13 @@ class _AdminAchievementFormScreenState
               child: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Name
                       _buildSectionLabel('업적 이름'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       TextFormField(
                         controller: _nameController,
                         decoration: const InputDecoration(
@@ -127,11 +127,11 @@ class _AdminAchievementFormScreenState
                         validator: (v) =>
                             v == null || v.isEmpty ? '이름을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Description
                       _buildSectionLabel('설명'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       TextFormField(
                         controller: _descriptionController,
                         maxLines: 2,
@@ -142,7 +142,7 @@ class _AdminAchievementFormScreenState
                         validator: (v) =>
                             v == null || v.isEmpty ? '설명을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Category & Rarity
                       Row(
@@ -152,22 +152,21 @@ class _AdminAchievementFormScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildSectionLabel('카테고리'),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppDimensions.spacing4),
                                 DropdownButtonFormField<AchievementCategory>(
                                   initialValue: _selectedCategory,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
                                     contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 10),
+                                        horizontal: AppDimensions.spacing12, vertical: 10),
                                   ),
                                   items: AchievementCategory.values
                                       .map((c) => DropdownMenuItem(
                                             value: c,
                                             child: Text(
                                               _categoryLabel(c),
-                                              style: const TextStyle(
-                                                  fontSize: 14),
+                                              style: AppTextStyles.bodyMedium,
                                             ),
                                           ))
                                       .toList(),
@@ -182,31 +181,29 @@ class _AdminAchievementFormScreenState
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacing12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildSectionLabel('희귀도'),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppDimensions.spacing4),
                                 DropdownButtonFormField<AchievementRarity>(
                                   initialValue: _selectedRarity,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
                                     contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 10),
+                                        horizontal: AppDimensions.spacing12, vertical: 10),
                                   ),
                                   items: AchievementRarity.values
                                       .map((r) => DropdownMenuItem(
                                             value: r,
                                             child: Text(
                                               _rarityLabel(r),
-                                              style: TextStyle(
-                                                fontSize: 14,
+                                              style: AppTextStyles.titleSmall.copyWith(
                                                 color:
                                                     Color(_rarityColor(r)),
-                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ))
@@ -224,38 +221,36 @@ class _AdminAchievementFormScreenState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Icon image section
                       _buildSectionLabel('아이콘 이미지'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacing8),
                       _buildIconImageSection(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Criteria section
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppDimensions.spacing12),
                         decoration: BoxDecoration(
                           color: AppColors.backgroundLight,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radius12),
                           border: Border.all(color: AppColors.borderLight),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               '달성 조건',
-                              style: TextStyle(
-                                fontSize: 16,
+                              style: AppTextStyles.titleMedium.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppDimensions.spacing12),
 
                             // Criteria type
                             _buildSectionLabel('조건 유형'),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacing4),
                             DropdownButtonFormField<AchievementType>(
                               initialValue: _selectedCriteriaType,
                               isExpanded: true,
@@ -263,7 +258,7 @@ class _AdminAchievementFormScreenState
                                 border: OutlineInputBorder(),
                                 isDense: true,
                                 contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
+                                    horizontal: AppDimensions.spacing12, vertical: 10),
                               ),
                               items: AchievementType.values
                                   .map((t) => DropdownMenuItem(
@@ -271,7 +266,7 @@ class _AdminAchievementFormScreenState
                                         child: Text(
                                           _criteriaTypeLabel(t),
                                           style:
-                                              const TextStyle(fontSize: 14),
+                                              AppTextStyles.bodyMedium,
                                         ),
                                       ))
                                   .toList(),
@@ -283,11 +278,11 @@ class _AdminAchievementFormScreenState
                                 }
                               },
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppDimensions.spacing12),
 
                             // Target value
                             _buildSectionLabel('목표 값'),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacing4),
                             TextFormField(
                               controller: _targetValueController,
                               keyboardType: TextInputType.number,
@@ -307,11 +302,11 @@ class _AdminAchievementFormScreenState
                                 return null;
                               },
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppDimensions.spacing12),
 
                             // Specific requirement (optional)
                             _buildSectionLabel('특수 조건 (선택)'),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacing4),
                             TextFormField(
                               controller: _specificRequirementController,
                               decoration: const InputDecoration(
@@ -323,28 +318,26 @@ class _AdminAchievementFormScreenState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Rewards section
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppDimensions.spacing12),
                         decoration: BoxDecoration(
                           color: AppColors.backgroundLight,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radius12),
                           border: Border.all(color: AppColors.borderLight),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               '보상',
-                              style: TextStyle(
-                                fontSize: 16,
+                              style: AppTextStyles.titleMedium.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppDimensions.spacing12),
                             Row(
                               children: [
                                 Expanded(
@@ -353,7 +346,7 @@ class _AdminAchievementFormScreenState
                                         CrossAxisAlignment.start,
                                     children: [
                                       _buildSectionLabel('XP 보상'),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: AppDimensions.spacing4),
                                       TextFormField(
                                         controller: _xpRewardController,
                                         keyboardType:
@@ -365,7 +358,7 @@ class _AdminAchievementFormScreenState
                                           isDense: true,
                                           contentPadding:
                                               EdgeInsets.symmetric(
-                                                  horizontal: 12,
+                                                  horizontal: AppDimensions.spacing12,
                                                   vertical: 10),
                                         ),
                                         validator: (v) {
@@ -380,14 +373,14 @@ class _AdminAchievementFormScreenState
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: AppDimensions.spacing12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       _buildSectionLabel('젬 보상'),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: AppDimensions.spacing4),
                                       TextFormField(
                                         controller: _gemsRewardController,
                                         keyboardType:
@@ -399,7 +392,7 @@ class _AdminAchievementFormScreenState
                                           isDense: true,
                                           contentPadding:
                                               EdgeInsets.symmetric(
-                                                  horizontal: 12,
+                                                  horizontal: AppDimensions.spacing12,
                                                   vertical: 10),
                                         ),
                                         validator: (v) {
@@ -419,19 +412,19 @@ class _AdminAchievementFormScreenState
                           ],
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
 
                       // Save button
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
+                        height: AppDimensions.spacing48,
                         child: ElevatedButton(
                           onPressed: _isSaving ? null : _save,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.mathGreen,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppDimensions.radius12),
                             ),
                           ),
                           child: _isSaving
@@ -443,13 +436,12 @@ class _AdminAchievementFormScreenState
                                 )
                               : Text(
                                   _isEditing ? '수정하기' : '저장하기',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
+                                  style: AppTextStyles.titleMedium.copyWith(
+                                      color: Colors.white),
                                 ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: AppDimensions.spacing40),
                     ],
                   ),
                 ),
@@ -471,11 +463,11 @@ class _AdminAchievementFormScreenState
       children: [
         if (hasExisting || hasNewFile)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: AppDimensions.spacing8),
             child: Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius8),
                   child: hasNewFile
                       ? Image.file(
                           _newIconFile!,
@@ -503,10 +495,10 @@ class _AdminAchievementFormScreenState
                     left: 4,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                          horizontal: 6, vertical: AppDimensions.spacing2),
                       decoration: BoxDecoration(
                         color: AppColors.mathGreen,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppDimensions.radius4),
                       ),
                       child: const Text(
                         'NEW',
@@ -531,7 +523,7 @@ class _AdminAchievementFormScreenState
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(AppDimensions.spacing4),
                       decoration: const BoxDecoration(
                         color: AppColors.mathRed,
                         shape: BoxShape.circle,
@@ -555,7 +547,7 @@ class _AdminAchievementFormScreenState
                 side: const BorderSide(color: AppColors.mathBlue),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacing8),
             OutlinedButton.icon(
               onPressed: () => _pickIconImage(ImageSource.camera),
               icon: const Icon(Icons.camera_alt_outlined, size: 18),
@@ -574,11 +566,7 @@ class _AdminAchievementFormScreenState
   Widget _buildSectionLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      ),
+      style: AppTextStyles.titleSmall,
     );
   }
 

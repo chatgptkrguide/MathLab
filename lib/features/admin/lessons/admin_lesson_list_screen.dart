@@ -78,24 +78,24 @@ class _AdminLessonListScreenState
       onRefresh: () async =>
           ref.invalidate(adminLessonsProvider(widget.unitId)),
       child: ListView(
-        children: const [
-          SizedBox(height: 120),
+        children: [
+          const SizedBox(height: 120),
           Center(
             child: Column(
               children: [
-                Icon(Icons.menu_book_outlined,
+                const Icon(Icons.menu_book_outlined,
                     size: 64, color: AppColors.textTertiary),
-                SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 Text(
                   '레슨이 없습니다',
-                  style: TextStyle(
+                  style: AppTextStyles.headlineSmall.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: AppDimensions.spacing8),
+                const Text(
                   '+ 버튼을 눌러 새 레슨을 추가하세요',
                   style: TextStyle(color: AppColors.textTertiary),
                 ),
@@ -112,7 +112,7 @@ class _AdminLessonListScreenState
       onRefresh: () async =>
           ref.invalidate(adminLessonsProvider(widget.unitId)),
       child: ReorderableListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
         itemCount: lessons.length,
         onReorder: (oldIndex, newIndex) =>
             _onReorder(lessons, oldIndex, newIndex),
@@ -225,13 +225,13 @@ class _AdminLessonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacing12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radius12)),
       child: InkWell(
         onTap: onEdit,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacing12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -240,10 +240,8 @@ class _AdminLessonCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       lesson.title,
-                      style: const TextStyle(
+                      style: AppTextStyles.titleSmall.copyWith(
                         fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -251,18 +249,15 @@ class _AdminLessonCard extends StatelessWidget {
                 ],
               ),
               if (lesson.description.isNotEmpty) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacing4),
                 Text(
                   lesson.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: AppTextStyles.labelMedium,
                 ),
               ],
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
               Row(
                 children: [
                   _buildChip(_typeLabel(lesson.type), AppColors.mathBlue),
@@ -281,15 +276,15 @@ class _AdminLessonCard extends StatelessWidget {
                     color: AppColors.mathBlue,
                     onPressed: onEdit,
                     constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(AppDimensions.spacing4),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacing4),
                   IconButton(
                     icon: const Icon(Icons.delete_outline, size: 20),
                     color: AppColors.mathRed,
                     onPressed: onDelete,
                     constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(AppDimensions.spacing4),
                   ),
                 ],
               ),
@@ -302,15 +297,15 @@ class _AdminLessonCard extends StatelessWidget {
 
   Widget _buildChip(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
       ),
       child: Text(
         label,
-        style:
-            TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+        style: AppTextStyles.labelSmall.copyWith(
+            color: color, fontWeight: FontWeight.w600),
       ),
     );
   }

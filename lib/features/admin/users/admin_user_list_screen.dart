@@ -73,7 +73,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
             ),
             // Search bar
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              padding: const EdgeInsets.fromLTRB(AppDimensions.spacing16, AppDimensions.spacing12, AppDimensions.spacing16, AppDimensions.spacing4),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -96,11 +96,11 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                   filled: true,
                   fillColor: AppColors.backgroundLight,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius12),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing12),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -111,13 +111,13 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
             ),
             // Role filter chips
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+              padding: const EdgeInsets.fromLTRB(AppDimensions.spacing16, AppDimensions.spacing4, AppDimensions.spacing16, AppDimensions.spacing8),
               child: Row(
                 children: [
                   _buildFilterChip('전체'),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   _buildFilterChip('admin'),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   _buildFilterChip('user'),
                 ],
               ),
@@ -140,7 +140,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                     children: [
                       const Text('사용자 목록을 불러올 수 없습니다',
                           style: TextStyle(color: AppColors.error)),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
                       ElevatedButton(
                         onPressed: () =>
                             ref.read(adminUserListProvider.notifier).refresh(),
@@ -168,15 +168,14 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
         });
       },
       selectedColor: AppColors.adminPurple.withValues(alpha: 0.15),
-      labelStyle: TextStyle(
+      labelStyle: AppTextStyles.labelMedium.copyWith(
         color: isSelected ? AppColors.adminPurple : AppColors.textSecondary,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-        fontSize: 13,
       ),
       side: BorderSide(
         color: isSelected ? AppColors.adminPurple : AppColors.borderLight,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radius20)),
     );
   }
 
@@ -186,24 +185,24 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
         await ref.read(adminUserListProvider.notifier).refresh();
       },
       child: ListView(
-        children: const [
-          SizedBox(height: 120),
+        children: [
+          const SizedBox(height: 120),
           Center(
             child: Column(
               children: [
-                Icon(Icons.people_outline, size: 64,
+                const Icon(Icons.people_outline, size: 64,
                     color: AppColors.textTertiary),
-                SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 Text(
                   '사용자가 없습니다',
-                  style: TextStyle(
+                  style: AppTextStyles.headlineSmall.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: AppDimensions.spacing8),
+                const Text(
                   '검색 조건을 변경해 보세요',
                   style: TextStyle(color: AppColors.textTertiary),
                 ),
@@ -223,13 +222,13 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
         await ref.read(adminUserListProvider.notifier).refresh();
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
         itemCount: users.length + (hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == users.length) {
             // Load more button
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing16),
               child: Center(
                 child: OutlinedButton(
                   onPressed: () =>
@@ -283,13 +282,13 @@ class _AdminUserCard extends StatelessWidget {
     final isAdmin = user.role == 'admin';
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacing12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radius12)),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacing12),
           child: Row(
             children: [
               // Avatar
@@ -299,14 +298,13 @@ class _AdminUserCard extends StatelessWidget {
                     isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
                 child: Text(
                   initial,
-                  style: const TextStyle(
+                  style: AppTextStyles.headlineSmall.copyWith(
                     color: Colors.white,
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               // User info
               Expanded(
                 child: Column(
@@ -314,28 +312,23 @@ class _AdminUserCard extends StatelessWidget {
                   children: [
                     Text(
                       user.displayName ?? '이름 없음',
-                      style: const TextStyle(
+                      style: AppTextStyles.titleSmall.copyWith(
                         fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppDimensions.spacing2),
                     Text(
                       user.email ?? '이메일 없음',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.labelMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacing8),
               // Level badge
               _buildChip('Lv.${user.level}', AppColors.mathOrange),
               const SizedBox(width: 6),
@@ -344,7 +337,7 @@ class _AdminUserCard extends StatelessWidget {
                 isAdmin ? 'admin' : 'user',
                 isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacing4),
               const Icon(Icons.chevron_right,
                   color: AppColors.textTertiary, size: 20),
             ],
@@ -356,15 +349,15 @@ class _AdminUserCard extends StatelessWidget {
 
   Widget _buildChip(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
       ),
       child: Text(
         label,
-        style: TextStyle(
-            fontSize: 11, color: color, fontWeight: FontWeight.w600),
+        style: AppTextStyles.labelSmall.copyWith(
+            color: color, fontWeight: FontWeight.w600),
       ),
     );
   }

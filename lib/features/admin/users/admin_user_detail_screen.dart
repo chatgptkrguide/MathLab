@@ -68,12 +68,12 @@ class _AdminUserDetailScreenState
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
                   child: Column(
                     children: [
                       // Profile header
                       _buildProfileHeader(user),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppDimensions.spacing20),
                       // Info sections
                       _buildInfoSection('기본 정보', [
                         _buildInfoRow(
@@ -85,7 +85,7 @@ class _AdminUserDetailScreenState
                         _buildInfoRow(Icons.update_outlined, '최종 수정',
                             _formatDate(user.updatedAt)),
                       ]),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
                       _buildInfoSection('학습 정보', [
                         _buildInfoRow(Icons.trending_up_outlined, '레벨',
                             'Lv.${user.level}'),
@@ -96,7 +96,7 @@ class _AdminUserDetailScreenState
                         _buildInfoRow(Icons.local_fire_department_outlined,
                             '스트릭', '${user.streak}일'),
                       ]),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
                       _buildInfoSection('게이미피케이션', [
                         _buildInfoRow(Icons.favorite_outlined, '하트',
                             '${user.hearts} / ${user.maxHearts}'),
@@ -105,10 +105,10 @@ class _AdminUserDetailScreenState
                         _buildInfoRow(
                             Icons.emoji_events_outlined, '리그', user.league),
                       ]),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacing24),
                       // Role toggle section
                       _buildRoleToggleSection(),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
                     ],
                   ),
                 ),
@@ -134,42 +134,36 @@ class _AdminUserDetailScreenState
               isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
           child: Text(
             initial,
-            style: const TextStyle(
+            style: AppTextStyles.headlineLarge.copyWith(
               color: Colors.white,
               fontSize: 32,
-              fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDimensions.spacing12),
         Text(
           user.displayName ?? '이름 없음',
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+          style: AppTextStyles.headlineSmall,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacing4),
         Text(
           user.email ?? '이메일 없음',
-          style: const TextStyle(
-            fontSize: 14,
+          style: AppTextStyles.titleSmall.copyWith(
+            fontWeight: FontWeight.normal,
             color: AppColors.textSecondary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacing8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: AppDimensions.spacing4),
           decoration: BoxDecoration(
             color: (isAdmin ? AppColors.adminPurple : AppColors.mathBlue)
                 .withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radius16),
           ),
           child: Text(
             isAdmin ? 'ADMIN' : 'USER',
-            style: TextStyle(
-              fontSize: 12,
+            style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w700,
               color:
                   isAdmin ? AppColors.adminPurple : AppColors.mathBlue,
@@ -185,24 +179,22 @@ class _AdminUserDetailScreenState
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.backgroundLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(AppDimensions.spacing16, AppDimensions.spacing12, AppDimensions.spacing16, AppDimensions.spacing8),
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 16,
+              style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
               ),
             ),
           ),
           ...rows,
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacing4),
         ],
       ),
     );
@@ -210,25 +202,23 @@ class _AdminUserDetailScreenState
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing8),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.textSecondary),
-          const SizedBox(width: 12),
+          Icon(icon, size: AppDimensions.spacing20, color: AppColors.textSecondary),
+          const SizedBox(width: AppDimensions.spacing12),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
+            style: AppTextStyles.titleSmall.copyWith(
+              fontWeight: FontWeight.normal,
               color: AppColors.textSecondary,
             ),
           ),
           const Spacer(),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
+            style: AppTextStyles.titleSmall.copyWith(
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
             ),
           ),
         ],
@@ -243,30 +233,27 @@ class _AdminUserDetailScreenState
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.backgroundLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         border: Border.all(color: AppColors.borderLight),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '역할 변경',
-            style: TextStyle(
-              fontSize: 16,
+            style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
+          const SizedBox(height: AppDimensions.spacing8),
+          Text(
             '사용자의 역할을 변경합니다. 관리자 권한을 부여하면 관리자 패널에 접근할 수 있습니다.',
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
+            style: AppTextStyles.labelMedium.copyWith(
+              fontWeight: FontWeight.normal,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
           Row(
             children: [
               Expanded(
@@ -282,7 +269,7 @@ class _AdminUserDetailScreenState
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildRoleButton(
                   label: '관리자',
@@ -312,12 +299,12 @@ class _AdminUserDetailScreenState
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDimensions.radius12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing16),
         decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radius12),
           border: Border.all(
             color: isSelected ? color : AppColors.borderLight,
             width: isSelected ? 2 : 1,
@@ -326,11 +313,10 @@ class _AdminUserDetailScreenState
         child: Column(
           children: [
             Icon(icon, size: 28, color: isSelected ? color : AppColors.textTertiary),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTextStyles.titleSmall.copyWith(
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected ? color : AppColors.textSecondary,
               ),

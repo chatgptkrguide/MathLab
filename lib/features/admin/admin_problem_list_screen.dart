@@ -87,7 +87,7 @@ class _AdminProblemListScreenState
     final lessons = selectedUnit?.lessons ?? <LessonModel>[];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing16, AppDimensions.spacing12, AppDimensions.spacing16, AppDimensions.spacing4),
       child: Row(
         children: [
           // Unit dropdown
@@ -97,7 +97,7 @@ class _AdminProblemListScreenState
               decoration: const InputDecoration(
                 labelText: '유닛',
                 contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: AppDimensions.spacing8),
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
@@ -119,7 +119,7 @@ class _AdminProblemListScreenState
               },
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacing8),
           // Lesson dropdown
           Expanded(
             child: DropdownButtonFormField<String>(
@@ -127,7 +127,7 @@ class _AdminProblemListScreenState
               decoration: const InputDecoration(
                 labelText: '레슨',
                 contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: AppDimensions.spacing8),
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
@@ -158,23 +158,23 @@ class _AdminProblemListScreenState
         ref.invalidate(adminProblemsProvider(_selectedLessonId));
       },
       child: ListView(
-        children: const [
-          SizedBox(height: 120),
+        children: [
+          const SizedBox(height: 120),
           Center(
             child: Column(
               children: [
-                Icon(Icons.quiz_outlined, size: 64, color: AppColors.textTertiary),
-                SizedBox(height: 16),
+                const Icon(Icons.quiz_outlined, size: 64, color: AppColors.textTertiary),
+                const SizedBox(height: AppDimensions.spacing16),
                 Text(
                   '문제가 없습니다',
-                  style: TextStyle(
+                  style: AppTextStyles.headlineSmall.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: AppDimensions.spacing8),
+                const Text(
                   '+ 버튼을 눌러 새 문제를 추가하세요',
                   style: TextStyle(color: AppColors.textTertiary),
                 ),
@@ -192,7 +192,7 @@ class _AdminProblemListScreenState
         ref.invalidate(adminProblemsProvider(_selectedLessonId));
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
         itemCount: problems.length,
         itemBuilder: (context, index) {
           final problem = problems[index];
@@ -275,13 +275,13 @@ class _AdminProblemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacing12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radius12)),
       child: InkWell(
         onTap: onEdit,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacing12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -290,13 +290,12 @@ class _AdminProblemCard extends StatelessWidget {
                 problem.question,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: AppTextStyles.titleSmall.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
               // Chips row
               Row(
                 children: [
@@ -310,14 +309,11 @@ class _AdminProblemCard extends StatelessWidget {
                   _buildChip('${problem.points}pt', AppColors.mathOrange),
                   if (problem.allImages.isNotEmpty) ...[
                     const SizedBox(width: 6),
-                    Icon(Icons.image, size: 16, color: AppColors.textSecondary),
-                    const SizedBox(width: 2),
+                    Icon(Icons.image, size: AppDimensions.spacing16, color: AppColors.textSecondary),
+                    const SizedBox(width: AppDimensions.spacing2),
                     Text(
                       '${problem.allImages.length}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.bodySmall,
                     ),
                   ],
                   const Spacer(),
@@ -326,15 +322,15 @@ class _AdminProblemCard extends StatelessWidget {
                     color: AppColors.mathBlue,
                     onPressed: onEdit,
                     constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(AppDimensions.spacing4),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacing4),
                   IconButton(
                     icon: const Icon(Icons.delete_outline, size: 20),
                     color: AppColors.mathRed,
                     onPressed: onDelete,
                     constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(AppDimensions.spacing4),
                   ),
                 ],
               ),
@@ -347,14 +343,14 @@ class _AdminProblemCard extends StatelessWidget {
 
   Widget _buildChip(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+        style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.w600),
       ),
     );
   }
