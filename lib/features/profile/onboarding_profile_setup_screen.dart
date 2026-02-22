@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/services/temp_profile_storage.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../core/utils/app_logger.dart';
 import 'widgets/widgets.dart';
@@ -138,9 +139,9 @@ class _OnboardingProfileSetupScreenState
   Widget build(BuildContext context) {
     // 듀오링고 스타일 배경 색상 (3페이지)
     final List<Color> pageColors = [
-      const Color(0xFFFFF7ED), // 주황 베이지 - 이름
-      const Color(0xFFEEF2FF), // 파랑 베이지 - 학년
-      const Color(0xFFECFDF5), // 녹색 베이지 - 완료
+      AppColors.beigOrange, // 주황 베이지 - 이름
+      AppColors.beigBlue, // 파랑 베이지 - 학년
+      AppColors.beigGreen, // 녹색 베이지 - 완료
     ];
 
     return Scaffold(
@@ -234,7 +235,7 @@ class _OnboardingProfileSetupScreenState
                           title: '초등학생',
                           icon: '🎒',
                           grades: ['초1', '초2', '초3', '초4', '초5', '초6'],
-                          color: const Color(0xFF58CC02),
+                          color: AppColors.mathGreen,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
                             setState(() {
@@ -248,7 +249,7 @@ class _OnboardingProfileSetupScreenState
                           title: '중학생',
                           icon: '📚',
                           grades: ['중1', '중2', '중3'],
-                          color: const Color(0xFF1CB0F6),
+                          color: AppColors.mathBlue,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
                             setState(() {
@@ -262,7 +263,7 @@ class _OnboardingProfileSetupScreenState
                           title: '고등학생',
                           icon: '🎓',
                           grades: ['고1', '고2', '고3'],
-                          color: const Color(0xFFFF9600),
+                          color: AppColors.mathOrange,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
                             setState(() {
@@ -276,7 +277,7 @@ class _OnboardingProfileSetupScreenState
                           title: '성인',
                           icon: '📖',
                           grades: ['대학생', '성인'],
-                          color: const Color(0xFFCE82FF),
+                          color: AppColors.mathPurple,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
                             setState(() {
@@ -306,17 +307,17 @@ class _OnboardingProfileSetupScreenState
                       children: [
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(AppDimensions.spacing24),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius20),
                             border: Border.all(
-                              color: const Color(0xFF58CC02),
+                              color: AppColors.mathGreen,
                               width: 2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF58CC02).withValues(alpha: 0.2),
+                                color: AppColors.mathGreen.withValues(alpha: 0.2),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -330,7 +331,7 @@ class _OnboardingProfileSetupScreenState
                                     '👤',
                                     style: const TextStyle(fontSize: 32),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: AppDimensions.spacing12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +342,7 @@ class _OnboardingProfileSetupScreenState
                                             color: AppColors.textSecondary,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: AppDimensions.spacing4),
                                         Text(
                                           _nameController.text.trim(),
                                           style: AppTextStyles.headlineSmall.copyWith(
@@ -353,16 +354,16 @@ class _OnboardingProfileSetupScreenState
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: AppDimensions.spacing16),
                               Divider(color: AppColors.borderLight),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: AppDimensions.spacing16),
                               Row(
                                 children: [
                                   Text(
                                     '🎓',
                                     style: const TextStyle(fontSize: 32),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: AppDimensions.spacing12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,7 +374,7 @@ class _OnboardingProfileSetupScreenState
                                             color: AppColors.textSecondary,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: AppDimensions.spacing4),
                                         Text(
                                           _selectedGrade,
                                           style: AppTextStyles.headlineSmall.copyWith(
@@ -388,17 +389,17 @@ class _OnboardingProfileSetupScreenState
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppDimensions.spacing24),
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppDimensions.spacing16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFF7ED),
-                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.beigOrange,
+                            borderRadius: BorderRadius.circular(AppDimensions.radius12),
                           ),
                           child: Row(
                             children: [
                               const Text('💡', style: TextStyle(fontSize: 24)),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: AppDimensions.spacing12),
                               Expanded(
                                 child: Text(
                                   '나머지 정보는 프로필에서 언제든지 추가할 수 있어요',

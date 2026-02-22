@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
 import '../../data/providers/subscription/premium_providers.dart';
 import '../../data/providers/infrastructure/firebase_providers.dart';
 import '../../data/models/subscription/premium_tier.dart';
@@ -42,7 +43,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF1CB0F6), // Brand blue
+              AppColors.mathBlue, // Brand blue
               Color(0xFF7E57C2), // Purple
               Color(0xFF5E35B1), // Deep purple
             ],
@@ -61,17 +62,17 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // 히어로 섹션
                       const PremiumHeroSection(),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
 
                       // 기능 비교표
                       const PremiumFeatureComparison(),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
 
                       // 가격 플랜
                       PremiumPricingPlans(
@@ -83,7 +84,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacing24),
 
                       // 무료 체험 버튼 (조건부)
                       if (canStartTrial) ...[
@@ -91,7 +92,7 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                           isPurchasing: _isPurchasing,
                           onPressed: () => _handleStartTrial(user?.uid ?? ''),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacing16),
                       ],
 
                       // 구매 버튼
@@ -100,12 +101,12 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
                         onPressed: () => _handlePurchase(user?.uid ?? ''),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // 이용약관 & 개인정보처리방침
                       const PremiumLegalText(),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
                     ],
                   ),
                 ),
