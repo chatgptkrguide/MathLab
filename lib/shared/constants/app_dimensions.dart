@@ -51,10 +51,12 @@ class AppDimensions {
   static const double marginXLarge = spacing32;
 
   // ============================================================
-  // === Border Radius Scale: 4, 8, 12, 16, 20, 24 ===
+  // === Border Radius Scale: 4, 6, 8, 10, 12, 16, 20, 24 ===
   // ============================================================
   static const double radius4 = 4.0;
+  static const double radius6 = 6.0;
   static const double radius8 = 8.0;
+  static const double radius10 = 10.0;
   static const double radius12 = 12.0;
   static const double radius16 = 16.0;
   static const double radius20 = 20.0;
