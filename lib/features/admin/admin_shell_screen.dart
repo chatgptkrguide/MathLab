@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/app_text_styles.dart';
 import '../../shared/widgets/layout/adaptive_app_header.dart';
 import '../../data/providers/admin/admin_stats_provider.dart';
 import '../../data/providers/user/user_provider.dart';
@@ -28,11 +30,13 @@ class AdminShellScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.lock_outline, size: 64, color: AppColors.textTertiary),
-                const SizedBox(height: 16),
-                const Text('접근 권한이 없습니다',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary)),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacing16),
+                Text('접근 권한이 없습니다',
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      fontSize: 18,
+                      color: AppColors.textSecondary,
+                    )),
+                const SizedBox(height: AppDimensions.spacing24),
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('돌아가기'),
@@ -76,27 +80,23 @@ class AdminShellScreen extends ConsumerWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Stats section
-                    const Text(
+                    Text(
                       '통계',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.headlineSmall.copyWith(fontSize: 18),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
                     statsAsync.when(
                       data: (stats) => GridView.count(
                         crossAxisCount: 2,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
+                        mainAxisSpacing: AppDimensions.spacing12,
+                        crossAxisSpacing: AppDimensions.spacing12,
                         childAspectRatio: 1.6,
                         children: [
                           AdminStatCard(
@@ -127,7 +127,7 @@ class AdminShellScreen extends ConsumerWidget {
                       ),
                       loading: () => const Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32),
+                          padding: EdgeInsets.all(AppDimensions.spacing32),
                           child: CircularProgressIndicator(),
                         ),
                       ),
@@ -136,23 +136,19 @@ class AdminShellScreen extends ConsumerWidget {
                             style: const TextStyle(color: AppColors.error)),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppDimensions.spacing24),
                     // Menu section
-                    const Text(
+                    Text(
                       '관리 메뉴',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.headlineSmall.copyWith(fontSize: 18),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
+                      mainAxisSpacing: AppDimensions.spacing12,
+                      crossAxisSpacing: AppDimensions.spacing12,
                       childAspectRatio: 1.3,
                       children: [
                         AdminMenuCard(
@@ -216,7 +212,7 @@ class AdminShellScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppDimensions.spacing32),
                   ],
                 ),
               ),

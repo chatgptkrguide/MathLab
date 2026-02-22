@@ -130,7 +130,7 @@ class _AdminProblemFormScreenState
               child: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -140,11 +140,11 @@ class _AdminProblemFormScreenState
                         loading: () => const LinearProgressIndicator(),
                         error: (_, __) => const Text('커리큘럼 로드 실패'),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Question
                       _buildSectionLabel('질문 (LaTeX 지원)'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       TextFormField(
                         controller: _questionController,
                         maxLines: 3,
@@ -172,19 +172,19 @@ class _AdminProblemFormScreenState
                         },
                       ),
                       if (_showLatexPreview) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(AppDimensions.spacing12),
                           decoration: BoxDecoration(
                             color: AppColors.backgroundLight,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius8),
                             border: Border.all(color: AppColors.borderLight),
                           ),
                           child: _buildLatexPreview(_questionController.text),
                         ),
                       ],
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Type & Difficulty
                       Row(
@@ -194,21 +194,20 @@ class _AdminProblemFormScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildSectionLabel('문제 유형'),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppDimensions.spacing4),
                                 DropdownButtonFormField<ProblemType>(
                                   initialValue: _selectedType,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
                                     contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 10),
+                                        horizontal: AppDimensions.spacing12, vertical: 10),
                                   ),
                                   items: ProblemType.values
                                       .map((t) => DropdownMenuItem(
                                             value: t,
                                             child: Text(_typeLabel(t),
-                                                style: const TextStyle(
-                                                    fontSize: 14)),
+                                                style: AppTextStyles.bodyMedium),
                                           ))
                                       .toList(),
                                   onChanged: (v) {
@@ -227,27 +226,26 @@ class _AdminProblemFormScreenState
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacing12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildSectionLabel('난이도'),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppDimensions.spacing4),
                                 DropdownButtonFormField<ProblemDifficulty>(
                                   initialValue: _selectedDifficulty,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     isDense: true,
                                     contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 10),
+                                        horizontal: AppDimensions.spacing12, vertical: 10),
                                   ),
                                   items: ProblemDifficulty.values
                                       .map((d) => DropdownMenuItem(
                                             value: d,
                                             child: Text(_difficultyLabel(d),
-                                                style: const TextStyle(
-                                                    fontSize: 14)),
+                                                style: AppTextStyles.bodyMedium),
                                           ))
                                       .toList(),
                                   onChanged: (v) {
@@ -263,11 +261,11 @@ class _AdminProblemFormScreenState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Points
                       _buildSectionLabel('포인트'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       TextFormField(
                         controller: _pointsController,
                         keyboardType: TextInputType.number,
@@ -281,15 +279,15 @@ class _AdminProblemFormScreenState
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Options (for multipleChoice)
                       if (_selectedType == ProblemType.multipleChoice) ...[
                         _buildSectionLabel('선택지'),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppDimensions.spacing4),
                         ..._optionControllers.asMap().entries.map((entry) {
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.only(bottom: AppDimensions.spacing8),
                             child: Row(
                               children: [
                                 SizedBox(
@@ -311,14 +309,14 @@ class _AdminProblemFormScreenState
                                       isDense: true,
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 10),
+                                              horizontal: AppDimensions.spacing12, vertical: 10),
                                     ),
                                   ),
                                 ),
                                 if (_optionControllers.length > 2)
                                   IconButton(
                                     icon: const Icon(Icons.remove_circle_outline,
-                                        size: 20, color: AppColors.mathRed),
+                                        size: AppDimensions.spacing20, color: AppColors.mathRed),
                                     onPressed: () {
                                       setState(() {
                                         _optionControllers[entry.key].dispose();
@@ -327,7 +325,7 @@ class _AdminProblemFormScreenState
                                       });
                                     },
                                     constraints: const BoxConstraints(),
-                                    padding: const EdgeInsets.only(left: 4),
+                                    padding: const EdgeInsets.only(left: AppDimensions.spacing4),
                                   ),
                               ],
                             ),
@@ -344,12 +342,12 @@ class _AdminProblemFormScreenState
                             icon: const Icon(Icons.add, size: 18),
                             label: const Text('선택지 추가'),
                           ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                       ],
 
                       // Correct answer
                       _buildSectionLabel('정답'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       TextFormField(
                         controller: _correctAnswerController,
                         decoration: const InputDecoration(
@@ -360,11 +358,11 @@ class _AdminProblemFormScreenState
                         validator: (v) =>
                             v == null || v.isEmpty ? '정답을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Explanation
                       _buildSectionLabel('해설 (선택)'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       TextFormField(
                         controller: _explanationController,
                         maxLines: 2,
@@ -373,14 +371,14 @@ class _AdminProblemFormScreenState
                           border: OutlineInputBorder(),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Hints
                       _buildSectionLabel('힌트 (선택)'),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacing4),
                       ..._hintControllers.asMap().entries.map((entry) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: AppDimensions.spacing8),
                           child: Row(
                             children: [
                               Expanded(
@@ -391,13 +389,13 @@ class _AdminProblemFormScreenState
                                     border: const OutlineInputBorder(),
                                     isDense: true,
                                     contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 10),
+                                        horizontal: AppDimensions.spacing12, vertical: 10),
                                   ),
                                 ),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.remove_circle_outline,
-                                    size: 20, color: AppColors.mathRed),
+                                    size: AppDimensions.spacing20, color: AppColors.mathRed),
                                 onPressed: () {
                                   setState(() {
                                     _hintControllers[entry.key].dispose();
@@ -405,7 +403,7 @@ class _AdminProblemFormScreenState
                                   });
                                 },
                                 constraints: const BoxConstraints(),
-                                padding: const EdgeInsets.only(left: 4),
+                                padding: const EdgeInsets.only(left: AppDimensions.spacing4),
                               ),
                             ],
                           ),
@@ -420,7 +418,7 @@ class _AdminProblemFormScreenState
                         icon: const Icon(Icons.add, size: 18),
                         label: const Text('힌트 추가'),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Images
                       AdminImagePickerSection(
@@ -440,37 +438,35 @@ class _AdminProblemFormScreenState
                           });
                         },
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
 
                       // Save button
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
+                        height: AppDimensions.spacing48,
                         child: ElevatedButton(
                           onPressed: _isSaving ? null : _save,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.mathGreen,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppDimensions.radius12),
                             ),
                           ),
                           child: _isSaving
                               ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
+                                  width: AppDimensions.spacing24,
+                                  height: AppDimensions.spacing24,
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2, color: Colors.white),
                                 )
                               : Text(
                                   _isEditing ? '수정하기' : '저장하기',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
+                                  style: AppTextStyles.titleMedium,
                                 ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: AppDimensions.spacing40),
                     ],
                   ),
                 ),
@@ -495,7 +491,7 @@ class _AdminProblemFormScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionLabel('레슨'),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacing4),
         DropdownButtonFormField<String>(
           initialValue: _selectedLessonId,
           isExpanded: true,
@@ -503,7 +499,7 @@ class _AdminProblemFormScreenState
             border: OutlineInputBorder(),
             isDense: true,
             contentPadding:
-                EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: 10),
           ),
           items: allLessons
               .map((entry) => DropdownMenuItem(
@@ -511,7 +507,7 @@ class _AdminProblemFormScreenState
                     child: Text(
                       '${entry.key.emoji} ${entry.key.title} > ${entry.value.title}',
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 14),
+                      style: AppTextStyles.bodyMedium,
                     ),
                   ))
               .toList(),
@@ -529,11 +525,7 @@ class _AdminProblemFormScreenState
   Widget _buildSectionLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      ),
+      style: AppTextStyles.titleSmall,
     );
   }
 
@@ -555,7 +547,7 @@ class _AdminProblemFormScreenState
         alignment: PlaceholderAlignment.middle,
         child: Math.tex(
           match.group(1)!,
-          textStyle: const TextStyle(fontSize: 18),
+          textStyle: AppTextStyles.headlineSmall.copyWith(fontSize: 18),
         ),
       ));
       lastEnd = match.end;

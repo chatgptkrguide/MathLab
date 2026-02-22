@@ -132,13 +132,13 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                   return Form(
                     key: _formKey,
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppDimensions.spacing16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Announcement
                           _buildSectionLabel('공지사항'),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacing4),
                           TextFormField(
                             controller: _announcementController,
                             maxLines: 4,
@@ -147,11 +147,11 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                               border: OutlineInputBorder(),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
 
                           // App Version
                           _buildSectionLabel('앱 버전'),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacing4),
                           TextFormField(
                             controller: _appVersionController,
                             decoration: const InputDecoration(
@@ -160,11 +160,11 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                               isDense: true,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
 
                           // Max Daily XP
                           _buildSectionLabel('일일 최대 XP'),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacing4),
                           TextFormField(
                             controller: _maxDailyXPController,
                             keyboardType: TextInputType.number,
@@ -183,11 +183,11 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
 
                           // Heart Recovery Minutes
                           _buildSectionLabel('하트 회복 시간(분)'),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacing4),
                           TextFormField(
                             controller: _heartRecoveryMinutesController,
                             keyboardType: TextInputType.number,
@@ -206,11 +206,11 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
 
                           // Max Hearts
                           _buildSectionLabel('최대 하트 수'),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacing4),
                           TextFormField(
                             controller: _maxHeartsController,
                             keyboardType: TextInputType.number,
@@ -229,38 +229,36 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: AppDimensions.spacing32),
 
                           // Save button
                           SizedBox(
                             width: double.infinity,
-                            height: 48,
+                            height: AppDimensions.spacing48,
                             child: ElevatedButton(
                               onPressed: _isSaving ? null : _save,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.mathGreen,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radius12),
                                 ),
                               ),
                               child: _isSaving
                                   ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
+                                      width: AppDimensions.spacing24,
+                                      height: AppDimensions.spacing24,
                                       child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           color: Colors.white),
                                     )
-                                  : const Text(
+                                  : Text(
                                       '저장하기',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600),
+                                      style: AppTextStyles.titleMedium,
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 40),
+                          const SizedBox(height: AppDimensions.spacing40),
                         ],
                       ),
                     ),
@@ -275,7 +273,7 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
                     children: [
                       Text('설정 로드 실패: $e',
                           style: const TextStyle(color: AppColors.error)),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
                       ElevatedButton(
                         onPressed: () => ref.invalidate(adminConfigProvider),
                         child: const Text('다시 시도'),
@@ -294,11 +292,7 @@ class _AdminConfigScreenState extends ConsumerState<AdminConfigScreen> {
   Widget _buildSectionLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      ),
+      style: AppTextStyles.titleSmall,
     );
   }
 }

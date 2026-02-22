@@ -94,7 +94,7 @@ class _AdminLessonFormScreenState
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing16),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -108,7 +108,7 @@ class _AdminLessonFormScreenState
                         validator: (v) =>
                             v?.isEmpty ?? true ? '제목을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Description
                       _label('설명'),
@@ -119,7 +119,7 @@ class _AdminLessonFormScreenState
                         validator: (v) =>
                             v?.isEmpty ?? true ? '설명을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Type + Difficulty row
                       Row(
@@ -147,7 +147,7 @@ class _AdminLessonFormScreenState
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacing12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +173,7 @@ class _AdminLessonFormScreenState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Order + XP + Minutes row
                       Row(
@@ -197,7 +197,7 @@ class _AdminLessonFormScreenState
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacing12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +217,7 @@ class _AdminLessonFormScreenState
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacing12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +239,7 @@ class _AdminLessonFormScreenState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Concepts
                       _label('개념 태그'),
@@ -253,7 +253,7 @@ class _AdminLessonFormScreenState
                               onFieldSubmitted: (_) => _addConcept(),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacing8),
                           IconButton(
                             icon: const Icon(Icons.add_circle_outline),
                             color: AppColors.mathGreen,
@@ -261,14 +261,14 @@ class _AdminLessonFormScreenState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacing8),
                       Wrap(
                         spacing: 6,
                         runSpacing: 6,
                         children: _concepts.map((c) {
                           return Chip(
-                            label: Text(c, style: const TextStyle(fontSize: 12)),
-                            deleteIcon: const Icon(Icons.close, size: 16),
+                            label: Text(c, style: AppTextStyles.bodySmall),
+                            deleteIcon: const Icon(Icons.close, size: AppDimensions.spacing16),
                             onDeleted: () {
                               setState(() => _concepts.remove(c));
                             },
@@ -277,7 +277,7 @@ class _AdminLessonFormScreenState
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
 
                       // Save button
                       ElevatedButton(
@@ -287,19 +287,17 @@ class _AdminLessonFormScreenState
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius12),
                           ),
                         ),
                         child: _saving
                             ? const SizedBox(
-                                height: 20,
-                                width: 20,
+                                height: AppDimensions.spacing20,
+                                width: AppDimensions.spacing20,
                                 child: CircularProgressIndicator(
                                     strokeWidth: 2, color: Colors.white))
                             : Text(_isEditing ? '수정하기' : '생성하기',
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600)),
+                                style: AppTextStyles.titleMedium),
                       ),
                     ],
                   ),
@@ -316,7 +314,7 @@ class _AdminLessonFormScreenState
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(text,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+          style: AppTextStyles.titleSmall),
     );
   }
 
@@ -325,7 +323,7 @@ class _AdminLessonFormScreenState
       border: const OutlineInputBorder(),
       isDense: true,
       contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          const EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: 10),
       hintText: hint,
     );
   }

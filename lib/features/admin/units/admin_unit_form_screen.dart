@@ -74,16 +74,15 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing16),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Emoji
-                      const Text('이모지',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('이모지',
+                          style: AppTextStyles.titleSmall),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _emojiController,
@@ -91,18 +90,17 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           border: OutlineInputBorder(),
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                              horizontal: AppDimensions.spacing12, vertical: 10),
                           hintText: '📐',
                         ),
                         validator: (v) =>
                             v?.isEmpty ?? true ? '이모지를 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Title
-                      const Text('제목',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('제목',
+                          style: AppTextStyles.titleSmall),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _titleController,
@@ -110,18 +108,17 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           border: OutlineInputBorder(),
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                              horizontal: AppDimensions.spacing12, vertical: 10),
                           hintText: '유닛 제목',
                         ),
                         validator: (v) =>
                             v?.isEmpty ?? true ? '제목을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Description
-                      const Text('설명',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('설명',
+                          style: AppTextStyles.titleSmall),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _descriptionController,
@@ -129,19 +126,18 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           border: OutlineInputBorder(),
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                              horizontal: AppDimensions.spacing12, vertical: 10),
                           hintText: '유닛 설명',
                         ),
                         maxLines: 2,
                         validator: (v) =>
                             v?.isEmpty ?? true ? '설명을 입력하세요' : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Order
-                      const Text('순서',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('순서',
+                          style: AppTextStyles.titleSmall),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _orderController,
@@ -149,7 +145,7 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           border: OutlineInputBorder(),
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                              horizontal: AppDimensions.spacing12, vertical: 10),
                           hintText: '0',
                         ),
                         keyboardType: TextInputType.number,
@@ -160,12 +156,11 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Theme
-                      const Text('테마',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('테마',
+                          style: AppTextStyles.titleSmall),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<UnitTheme>(
                         initialValue: _selectedTheme,
@@ -173,7 +168,7 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           border: OutlineInputBorder(),
                           isDense: true,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                              horizontal: AppDimensions.spacing12, vertical: 10),
                         ),
                         items: UnitTheme.values.map((t) {
                           return DropdownMenuItem(
@@ -185,7 +180,7 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           if (v != null) setState(() => _selectedTheme = v);
                         },
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacing32),
 
                       // Save button
                       ElevatedButton(
@@ -195,18 +190,17 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius12),
                           ),
                         ),
                         child: _saving
                             ? const SizedBox(
-                                height: 20,
-                                width: 20,
+                                height: AppDimensions.spacing20,
+                                width: AppDimensions.spacing20,
                                 child: CircularProgressIndicator(
                                     strokeWidth: 2, color: Colors.white))
                             : Text(_isEditing ? '수정하기' : '생성하기',
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                                style: AppTextStyles.titleMedium),
                       ),
                     ],
                   ),

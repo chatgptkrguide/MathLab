@@ -70,24 +70,23 @@ class _AdminUnitListScreenState extends ConsumerState<AdminUnitListScreen> {
     return RefreshIndicator(
       onRefresh: () async => ref.invalidate(adminUnitsProvider),
       child: ListView(
-        children: const [
-          SizedBox(height: 120),
+        children: [
+          const SizedBox(height: 120),
           Center(
             child: Column(
               children: [
-                Icon(Icons.folder_outlined,
+                const Icon(Icons.folder_outlined,
                     size: 64, color: AppColors.textTertiary),
-                SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 Text(
                   '유닛이 없습니다',
-                  style: TextStyle(
+                  style: AppTextStyles.headlineSmall.copyWith(
                     fontSize: 18,
-                    fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: AppDimensions.spacing8),
+                const Text(
                   '+ 버튼을 눌러 새 유닛을 추가하세요',
                   style: TextStyle(color: AppColors.textTertiary),
                 ),
@@ -103,7 +102,7 @@ class _AdminUnitListScreenState extends ConsumerState<AdminUnitListScreen> {
     return RefreshIndicator(
       onRefresh: () async => ref.invalidate(adminUnitsProvider),
       child: ReorderableListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
         itemCount: units.length,
         onReorder: (oldIndex, newIndex) => _onReorder(units, oldIndex, newIndex),
         itemBuilder: (context, index) {
@@ -223,38 +222,31 @@ class _AdminUnitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacing12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radius12)),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppDimensions.spacing12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Text(unit.emoji, style: const TextStyle(fontSize: 28)),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         unit.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.titleMedium,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppDimensions.spacing2),
                       Text(
                         unit.description,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
+                        style: AppTextStyles.labelMedium,
                       ),
                     ],
                   ),
@@ -262,7 +254,7 @@ class _AdminUnitCard extends StatelessWidget {
                 const Icon(Icons.drag_handle, color: AppColors.textTertiary),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Row(
               children: [
                 _buildChip('레슨 ${unit.lessonCount}개', AppColors.mathBlue),
@@ -272,28 +264,28 @@ class _AdminUnitCard extends StatelessWidget {
                 _buildChip(unit.theme.name, _themeColor(unit.theme)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.list_alt_outlined, size: 20),
+                  icon: const Icon(Icons.list_alt_outlined, size: AppDimensions.spacing20),
                   color: AppColors.mathGreen,
                   onPressed: onManageLessons,
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(AppDimensions.spacing4),
                   tooltip: '레슨 관리',
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacing4),
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  icon: const Icon(Icons.edit_outlined, size: AppDimensions.spacing20),
                   color: AppColors.mathBlue,
                   onPressed: onEdit,
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(AppDimensions.spacing4),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacing4),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, size: 20),
+                  icon: const Icon(Icons.delete_outline, size: AppDimensions.spacing20),
                   color: AppColors.mathRed,
                   onPressed: onDelete,
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(AppDimensions.spacing4),
                 ),
               ],
             ),
@@ -305,15 +297,14 @@ class _AdminUnitCard extends StatelessWidget {
 
   Widget _buildChip(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
       ),
       child: Text(
         label,
-        style:
-            TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+        style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.w600),
       ),
     );
   }
