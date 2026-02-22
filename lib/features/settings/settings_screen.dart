@@ -73,11 +73,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (authState.currentAccount != null && !authState.isGuest)
                       UserInfoSection(user: user),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
 
                     // 계정 섹션
                     const SectionHeader(title: '계정'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
                         SettingTile(
@@ -136,11 +136,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacing20),
 
                     // 알림 섹션
                     const SectionHeader(title: '알림'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
                         SettingTile(
@@ -172,11 +172,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacing20),
 
                     // 언어 및 테마 섹션
                     const SectionHeader(title: '언어 및 테마'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
                         SettingTile(
@@ -214,9 +214,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                     // 관리자 섹션 (admin만 표시)
                     if (user?.isAdmin == true) ...[
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppDimensions.spacing20),
                       const SectionHeader(title: '관리자'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacing8),
                       _buildSettingsCard(
                         children: [
                           SettingTile(
@@ -237,11 +237,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacing20),
 
                     // 정보 섹션
                     const SectionHeader(title: '정보'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
                         SettingTile(
@@ -283,11 +283,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacing20),
 
                     // 위험 영역 - 학습 초기화, 로그아웃, 계정 탈퇴
                     const SectionHeader(title: '계정 관리'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.mathRed.withValues(alpha: 0.05),
@@ -366,7 +366,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -385,16 +385,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       applicationName: 'MathLab',
       applicationVersion: '1.0.0',
-      applicationIcon: const Text('M', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: AppColors.mathBlue)),
+      applicationIcon: Image.asset(
+        'assets/icons/gomath_logo_small.png',
+        width: 48,
+        height: 48,
+        errorBuilder: (_, __, ___) => const Text('M', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: AppColors.mathBlue)),
+      ),
       children: [
-        const Text(
+        Text(
           '매일 5분, 수학이 쉬워진다',
-          style: TextStyle(fontSize: 16),
+          style: AppTextStyles.titleMedium,
         ),
-        const SizedBox(height: 16),
-        const Text(
+        const SizedBox(height: AppDimensions.spacing16),
+        Text(
           '게이미피케이션을 통한 재미있는 수학 학습 앱',
-          style: TextStyle(fontSize: 14),
+          style: AppTextStyles.bodyMedium,
         ),
       ],
     );

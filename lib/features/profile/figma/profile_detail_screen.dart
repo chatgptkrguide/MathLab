@@ -351,12 +351,12 @@ class ProfileDetailScreen extends ConsumerWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF4A7CF7), Color(0xFF9B59B6)],
+            colors: [Color(0xFF4A7CF7), AppColors.mathPurple],
           ),
           borderRadius: BorderRadius.circular(AppDimensions.radius16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4A7CF7).withValues(alpha: 0.3),
+              color: AppColors.royalBlue.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -422,7 +422,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                     child: Text(
                       '자세히 보기',
                       style: AppTextStyles.titleSmall.copyWith(
-                        color: const Color(0xFF4A7CF7),
+                        color: AppColors.royalBlue,
                       ),
                     ),
                   ),

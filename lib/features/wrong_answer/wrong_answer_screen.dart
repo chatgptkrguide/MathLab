@@ -9,6 +9,7 @@ import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/models/wrong_answer_model.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
 import 'widgets/wrong_answer_card.dart';
 import 'widgets/wrong_answer_stats.dart';
@@ -72,15 +73,15 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE8F4FD), // Light sky blue top
-              Colors.white,      // White bottom
+              AppColors.skyBlue.withValues(alpha: 0.15),
+              Colors.white,
             ],
-            stops: [0.0, 0.4],
+            stops: const [0.0, 0.4],
           ),
         ),
         child: SafeArea(
@@ -112,14 +113,14 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
               color: AppColors.mathRed,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
           Text(
             '오답을 불러올 수 없습니다',
             style: AppTextStyles.headlineSmall.copyWith(
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacing8),
           Text(
             state.error!,
             style: AppTextStyles.bodySmall.copyWith(
@@ -127,14 +128,14 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacing24),
           ElevatedButton(
             onPressed: _onRefresh,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
               ),
             ),
             child: const Text('다시 시도'),
@@ -187,7 +188,10 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing20, AppDimensions.spacing16,
+        AppDimensions.spacing20, AppDimensions.spacing8,
+      ),
       child: Row(
         children: [
           Container(
@@ -195,7 +199,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             height: 40,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
             child: const Icon(
               Icons.error_outline_rounded,
@@ -203,7 +207,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Text(
             '오답 노트',
             style: AppTextStyles.headlineMedium.copyWith(
@@ -217,12 +221,15 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
   Widget _buildPillTabBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing20,
+        vertical: AppDimensions.spacing8,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(AppDimensions.spacing4),
         decoration: BoxDecoration(
           color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radius12),
         ),
         child: Row(
           children: [
@@ -245,10 +252,10 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
           decoration: BoxDecoration(
             color: isActive ? AppColors.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppDimensions.radius8),
             boxShadow: isActive
                 ? [
                     BoxShadow(
@@ -275,7 +282,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacing32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -355,7 +362,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
             Text(
               '아직 오답이 없어요!',
               style: AppTextStyles.headlineSmall.copyWith(
@@ -363,7 +370,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               '완벽한 학습을 이어가세요',
               style: AppTextStyles.bodyMedium.copyWith(
@@ -442,7 +449,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) => items[index],
@@ -454,7 +461,10 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
 
   Widget _buildGroupHeader(String title, int count) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      padding: const EdgeInsets.only(
+        top: AppDimensions.spacing16,
+        bottom: AppDimensions.spacing8,
+      ),
       child: Row(
         children: [
           Container(
@@ -462,10 +472,10 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             height: 20,
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.spacing2),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppDimensions.spacing8),
           Expanded(
             child: Text(
               title,
@@ -475,10 +485,13 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing8,
+              vertical: AppDimensions.spacing4,
+            ),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
             child: Text(
               '$count개',
