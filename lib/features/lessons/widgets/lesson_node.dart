@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/models/lesson/lesson_progress_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 
 class LessonNode extends StatelessWidget {
   final LessonModel lesson;
@@ -82,7 +84,7 @@ class LessonNode extends StatelessWidget {
           ),
 
           // Lesson title
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           SizedBox(
             width: 100,
             child: Text(
@@ -90,8 +92,7 @@ class LessonNode extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
+              style: AppTextStyles.labelMedium.copyWith(
                 fontWeight: isUnlocked ? FontWeight.w600 : FontWeight.normal,
                 color: isUnlocked ? AppColors.textPrimary : AppColors.textTertiary,
               ),
@@ -99,19 +100,18 @@ class LessonNode extends StatelessWidget {
           ),
 
           // XP reward badge
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacing4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing2),
             decoration: BoxDecoration(
               color: isUnlocked
                   ? AppColors.mathOrange.withValues(alpha: 0.15)
                   : AppColors.borderLight,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
             child: Text(
               '${lesson.xpReward} XP',
-              style: TextStyle(
-                fontSize: 11,
+              style: AppTextStyles.labelSmall.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isUnlocked ? AppColors.mathOrange : AppColors.textTertiary,
               ),
@@ -152,7 +152,7 @@ class LessonNode extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.mathOrange,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radius8),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
@@ -194,7 +194,7 @@ class LessonNode extends StatelessWidget {
       case LessonType.challenge:
         return AppColors.mathRed;
       case LessonType.boss:
-        return const Color(0xFF8B5CF6); // Dark purple for boss
+        return AppColors.nodeBoss; // Dark purple for boss
       default:
         return AppColors.mathBlue;
     }

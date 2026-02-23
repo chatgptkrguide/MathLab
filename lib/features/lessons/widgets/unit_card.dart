@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../data/models/lesson/unit_model.dart';
 import '../../../data/models/lesson/lesson_progress_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 import 'lesson_node.dart';
 
 class UnitCard extends StatelessWidget {
@@ -31,10 +33,10 @@ class UnitCard extends StatelessWidget {
     final progressPercentage = totalLessons > 0 ? (completedCount / totalLessons) : 0.0;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppDimensions.radius20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -48,12 +50,12 @@ class UnitCard extends StatelessWidget {
         children: [
           // Unit header
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.spacing20),
             decoration: BoxDecoration(
               color: _getUnitThemeColor().withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+                topLeft: Radius.circular(AppDimensions.radius20),
+                topRight: Radius.circular(AppDimensions.radius20),
               ),
             ),
             child: Column(
@@ -67,7 +69,7 @@ class UnitCard extends StatelessWidget {
                       height: 50,
                       decoration: BoxDecoration(
                         color: _getUnitThemeColor().withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppDimensions.radius12),
                       ),
                       child: Center(
                         child: Text(
@@ -76,25 +78,22 @@ class UnitCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppDimensions.spacing16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Unit ${unit.order}',
-                            style: TextStyle(
-                              fontSize: 13,
+                            style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.w600,
                               color: _getUnitThemeColor(),
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacing4),
                           Text(
                             unit.title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                            style: AppTextStyles.headlineSmall.copyWith(
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -103,22 +102,21 @@ class UnitCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
                 Text(
                   unit.description,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
 
                 // Progress bar
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 Row(
                   children: [
                     Expanded(
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.radius8),
                         child: LinearProgressIndicator(
                           value: progressPercentage,
                           minHeight: 8,
@@ -129,13 +127,12 @@ class UnitCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacing12),
                     Text(
                       '$completedCount/$totalLessons',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                      style: AppTextStyles.labelMedium.copyWith(
                         color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -146,7 +143,7 @@ class UnitCard extends StatelessWidget {
 
           // Lessons tree
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing24),
             child: _buildLessonsTree(context),
           ),
         ],
@@ -156,14 +153,13 @@ class UnitCard extends StatelessWidget {
 
   Widget _buildLessonsTree(BuildContext context) {
     if (unit.lessons.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppDimensions.spacing24),
           child: Text(
             '레슨이 준비 중입니다',
-            style: TextStyle(
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 14,
             ),
           ),
         ),
@@ -179,7 +175,7 @@ class UnitCard extends StatelessWidget {
           final isFirst = index == 0;
 
           return Padding(
-            padding: const EdgeInsets.only(bottom: 32),
+            padding: const EdgeInsets.only(bottom: AppDimensions.spacing32),
             child: Column(
               children: [
                 // Connection line from previous lesson
@@ -227,7 +223,7 @@ class UnitCard extends StatelessWidget {
       case UnitTheme.red:
         return AppColors.mathRed;
       case UnitTheme.yellow:
-        return const Color(0xFFFFC107);
+        return AppColors.mathYellow;
     }
   }
 }
