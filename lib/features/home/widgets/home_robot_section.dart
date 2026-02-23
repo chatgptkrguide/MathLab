@@ -4,6 +4,8 @@ import '../../../shared/widgets/indicators/circular_progress_ring.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/game_constants.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
+import '../../../shared/constants/app_text_styles.dart';
 
 /// 홈 화면 로봇 섹션 (2026-01-25 업데이트 - 실시간 데이터 연동)
 ///
@@ -54,15 +56,13 @@ class HomeRobotSection extends ConsumerWidget {
                     children: [
                       Text(
                         '$progressPercent%',
-                        style: const TextStyle(
-                          fontSize: 24,
+                        style: AppTextStyles.headlineMedium.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         progressPercent >= 100 ? '목표 달성!' : '진행 중',
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: AppTextStyles.bodySmall.copyWith(
                           color: Colors.grey,
                         ),
                       ),
@@ -150,7 +150,7 @@ class HomeRobotSection extends ConsumerWidget {
         content: Row(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacing12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +163,7 @@ class HomeRobotSection extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacing4),
                   Text(
                     detail,
                     style: const TextStyle(fontSize: 13),
@@ -176,7 +176,7 @@ class HomeRobotSection extends ConsumerWidget {
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radius12),
         ),
         duration: const Duration(seconds: 4),
       ),

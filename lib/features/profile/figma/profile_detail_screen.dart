@@ -196,7 +196,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppDimensions.radius20),
               ),
               child: Text(
-                'Edit Profile',
+                '프로필 수정',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.royalBlue,
                   fontWeight: FontWeight.w600,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
 /// 학년 선택 카드 위젯
@@ -32,10 +33,10 @@ class GradeSelectionCard extends StatelessWidget {
           context: context,
           builder: (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppDimensions.radius24),
             ),
             child: Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppDimensions.spacing24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -47,7 +48,7 @@ class GradeSelectionCard extends StatelessWidget {
                         icon,
                         style: const TextStyle(fontSize: 40),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppDimensions.spacing12),
                       Text(
                         title,
                         style: AppTextStyles.headlineMedium.copyWith(
@@ -57,11 +58,11 @@ class GradeSelectionCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacing24),
                   // 세부 학년 선택
                   Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
+                    spacing: AppDimensions.spacing12,
+                    runSpacing: AppDimensions.spacing12,
                     alignment: WrapAlignment.center,
                     children: grades.map((grade) {
                       final isSelected = selectedGrade == grade;
@@ -75,7 +76,7 @@ class GradeSelectionCard extends StatelessWidget {
                           height: 80,
                           decoration: BoxDecoration(
                             color: isSelected ? color : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius16),
                             border: Border.all(
                               color: isSelected ? color : AppColors.borderLight,
                               width: 2,
@@ -117,10 +118,10 @@ class GradeSelectionCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
-            horizontal: 20, vertical: 16), // Reduced padding
+            horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16), // Reduced padding
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppDimensions.radius20),
           border: Border.all(
             color: grades.contains(selectedGrade)
                 ? color
@@ -145,7 +146,7 @@ class GradeSelectionCard extends StatelessWidget {
               height: 50,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
               ),
               child: Center(
                 child: Text(
@@ -154,7 +155,7 @@ class GradeSelectionCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing16),
             // 텍스트
             Expanded(
               child: Column(
@@ -167,7 +168,7 @@ class GradeSelectionCard extends StatelessWidget {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacing4),
                   Text(
                     grades.contains(selectedGrade)
                         ? selectedGrade

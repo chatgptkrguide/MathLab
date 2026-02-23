@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/league_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
 class LeaderboardList extends StatelessWidget {
@@ -35,7 +36,7 @@ class LeaderboardList extends StatelessWidget {
       return const SliverToBoxAdapter(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.all(32),
+            padding: EdgeInsets.all(AppDimensions.spacing32),
             child: Text('순위표가 비어있습니다'),
           ),
         ),
@@ -91,10 +92,10 @@ class _LeagueEntryTile extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16, vertical: 3),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radius12),
         border: isCurrentUser
             ? Border.all(color: AppColors.mathBlue, width: 2)
             : isPromotion
@@ -106,7 +107,7 @@ class _LeagueEntryTile extends StatelessWidget {
                     : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: AppDimensions.spacing12),
         child: Row(
           children: [
             // Zone indicator (arrow)
@@ -157,7 +158,7 @@ class _LeagueEntryTile extends StatelessWidget {
                   : null,
             ),
 
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacing12),
 
             // Username
             Expanded(
@@ -182,10 +183,10 @@ class _LeagueEntryTile extends StatelessWidget {
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                              horizontal: 6, vertical: AppDimensions.spacing2),
                           decoration: BoxDecoration(
                             color: AppColors.mathBlue,
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(AppDimensions.radius6),
                           ),
                           child: const Text(
                             '나',
@@ -202,10 +203,9 @@ class _LeagueEntryTile extends StatelessWidget {
                   if (isPromotion || isRelegation)
                     Text(
                       isPromotion ? '승급권' : '강등권',
-                      style: AppTextStyles.bodySmall.copyWith(
+                      style: AppTextStyles.labelSmall.copyWith(
                         color: isPromotion ? Colors.green : Colors.red,
                         fontWeight: FontWeight.w600,
-                        fontSize: 11,
                       ),
                     ),
                 ],
@@ -227,9 +227,8 @@ class _LeagueEntryTile extends StatelessWidget {
                 ),
                 Text(
                   'XP',
-                  style: AppTextStyles.bodySmall.copyWith(
+                  style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 11,
                   ),
                 ),
               ],
@@ -250,10 +249,9 @@ class _LeagueEntryTile extends StatelessWidget {
                   ),
                   Text(
                     '${entry.rankChange!.abs()}',
-                    style: AppTextStyles.bodySmall.copyWith(
+                    style: AppTextStyles.labelSmall.copyWith(
                       color: entry.isPromotion ? Colors.green : Colors.red,
                       fontWeight: FontWeight.w600,
-                      fontSize: 11,
                     ),
                   ),
                 ],

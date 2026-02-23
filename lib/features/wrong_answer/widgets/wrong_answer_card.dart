@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/wrong_answer_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
 class WrongAnswerCard extends StatelessWidget {
@@ -59,7 +60,7 @@ class WrongAnswerCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -69,7 +70,7 @@ class WrongAnswerCard extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -79,22 +80,22 @@ class WrongAnswerCard extends StatelessWidget {
                 width: 5,
                 decoration: BoxDecoration(
                   color: _statusColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(AppDimensions.radius16),
+                    bottomLeft: Radius.circular(AppDimensions.radius16),
                   ),
                 ),
               ),
               // Card content
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Top row: type badge + status + difficulty
                       _buildTopRow(),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacing12),
                       // Problem text preview
                       Text(
                         wrongAnswer.problemText,
@@ -105,7 +106,7 @@ class WrongAnswerCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacing12),
                       // Answer comparison (compact)
                       _buildAnswerComparison(),
                       // Explanation
@@ -132,10 +133,10 @@ class WrongAnswerCard extends StatelessWidget {
       children: [
         // Problem type badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: AppDimensions.spacing4),
           decoration: BoxDecoration(
             color: _typeBadgeColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppDimensions.radius10),
           ),
           child: Text(
             _typeLabel,
@@ -145,14 +146,14 @@ class WrongAnswerCard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppDimensions.spacing8),
         // Status badge
         if (wrongAnswer.isResolved)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing4),
             decoration: BoxDecoration(
               color: AppColors.mathGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.radius10),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -175,10 +176,10 @@ class WrongAnswerCard extends StatelessWidget {
           )
         else if (wrongAnswer.shouldReview())
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing4),
             decoration: BoxDecoration(
               color: AppColors.mathOrange.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.radius10),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -228,10 +229,10 @@ class WrongAnswerCard extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: AppDimensions.spacing8),
             decoration: BoxDecoration(
               color: AppColors.mathRed.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.radius10),
               border: Border.all(
                 color: AppColors.mathRed.withValues(alpha: 0.15),
               ),
@@ -269,10 +270,10 @@ class WrongAnswerCard extends StatelessWidget {
         ),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: AppDimensions.spacing8),
             decoration: BoxDecoration(
               color: AppColors.mathGreen.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.radius10),
               border: Border.all(
                 color: AppColors.mathGreen.withValues(alpha: 0.15),
               ),
@@ -309,7 +310,7 @@ class WrongAnswerCard extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.radius10),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +320,7 @@ class WrongAnswerCard extends StatelessWidget {
             color: AppColors.primary.withValues(alpha: 0.6),
             size: 16,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacing8),
           Expanded(
             child: Text(
               wrongAnswer.explanation!,
@@ -361,9 +362,9 @@ class WrongAnswerCard extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary, width: 1.5),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius10),
                 ),
                 textStyle: AppTextStyles.labelSmall.copyWith(
                   fontWeight: FontWeight.w600,
@@ -371,7 +372,7 @@ class WrongAnswerCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacing8),
           // Resolve button
           SizedBox(
             height: 34,
@@ -383,9 +384,9 @@ class WrongAnswerCard extends StatelessWidget {
                 backgroundColor: AppColors.mathGreen,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppDimensions.radius10),
                 ),
                 textStyle: AppTextStyles.labelSmall.copyWith(
                   fontWeight: FontWeight.w600,
