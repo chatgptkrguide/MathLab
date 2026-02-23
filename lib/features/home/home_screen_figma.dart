@@ -16,6 +16,7 @@ import 'widgets/home_stats_cards.dart';
 import 'widgets/home_daily_challenge.dart';
 import 'widgets/home_action_buttons.dart';
 import 'widgets/home_subject_cards.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 
 /// Figma 디자인 "00 home" 화면
 /// 스카이블루(#61A1D8) 배경 + 과목 카드 + 데일리 챌린지 + CTA 3개
@@ -58,13 +59,20 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
       }
     });
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: AppColors.homeGradient,
-      ),
-      child: SafeArea(
+    return Stack(
+      children: [
+        // Background gradient
+        Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: AppColors.homeGradient,
+          ),
+        ),
+        // Subtle grain texture for organic feel
+        const NoiseTexture(opacity: 0.025, color: Colors.white),
+        // Content
+        SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.only(bottom: 100),
@@ -125,6 +133,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           ),
         ),
       ),
+      ],
     );
   }
 

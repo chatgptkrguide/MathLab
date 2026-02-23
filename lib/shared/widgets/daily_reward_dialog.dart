@@ -129,10 +129,20 @@ class DailyRewardDialog extends ConsumerWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        color: isClaimed
-            ? AppColors.tealGreen.withValues(alpha: 0.1)
-            : isCurrentDay
-                ? AppColors.gold.withValues(alpha: 0.15)
+        gradient: isCurrentDay
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.gold.withValues(alpha: 0.2),
+                  AppColors.gold.withValues(alpha: 0.08),
+                ],
+              )
+            : null,
+        color: isCurrentDay
+            ? null
+            : isClaimed
+                ? AppColors.tealGreen.withValues(alpha: 0.1)
                 : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(AppDimensions.radius16),
         border: Border.all(

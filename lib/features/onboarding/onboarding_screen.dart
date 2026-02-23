@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/constants.dart';
 import '../../shared/utils/haptic_feedback.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 import '../../data/services/local_storage_service.dart';
 import '../../data/services/analytics_service.dart';
 import '../../core/utils/app_logger.dart';
@@ -100,6 +101,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
+          // Subtle grain texture
+          const NoiseTexture(opacity: 0.02),
           // 페이지 뷰
           PageView.builder(
             controller: _pageController,

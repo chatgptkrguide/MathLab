@@ -394,7 +394,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(AppDimensions.radius8),
                     ),
                     child: Text(
-                      'Premium',
+                      '프리미엄',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

@@ -9,6 +9,7 @@ import '../legal/privacy_policy_screen.dart';
 import '../legal/terms_of_service_screen.dart';
 import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 
 /// Auth screen based on Figma design
 /// Blue background + robot character + login buttons
@@ -141,6 +142,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       body: SafeArea(
         child: Stack(
           children: [
+            // Subtle grain texture
+            const NoiseTexture(opacity: 0.02, color: Colors.white),
             // Main content
             SingleChildScrollView(
               child: Container(

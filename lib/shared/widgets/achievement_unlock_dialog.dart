@@ -2,9 +2,11 @@
 //
 // Dialog shown when a new achievement is unlocked
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../../data/models/achievement_model.dart';
+import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 import '../constants/app_text_styles.dart';
 
@@ -99,17 +101,25 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
           scale: _scaleAnimation,
           child: Dialog(
             backgroundColor: Colors.transparent,
-            child: Container(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppDimensions.radius20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(widget.achievement.rarityColor).withValues(alpha: 0.9),
-                    Color(widget.achievement.rarityColor).withValues(alpha: 0.7),
+                    Color(widget.achievement.rarityColor).withValues(alpha: 0.85),
+                    Color(widget.achievement.rarityColor).withValues(alpha: 0.6),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(AppDimensions.radius20),
+                border: Border.all(
+                  color: AppColors.glassBorder,
+                  width: 1.5,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Color(widget.achievement.rarityColor).withValues(alpha: 0.5),
@@ -214,6 +224,8 @@ class _AchievementUnlockDialogState extends State<AchievementUnlockDialog>
                     ),
                   ),
                 ],
+              ),
+            ),
               ),
             ),
           ),
