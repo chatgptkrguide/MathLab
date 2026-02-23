@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/daily_reward_model.dart';
 import '../../data/providers/daily_reward_provider.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/app_text_styles.dart';
 
 /// 일일 보상 다이얼로그
 class DailyRewardDialog extends ConsumerWidget {
@@ -29,52 +31,48 @@ class DailyRewardDialog extends ConsumerWidget {
 
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppDimensions.radius24),
       ),
       backgroundColor: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimensions.spacing24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // 타이틀
-            const Text(
+            Text(
               '🔥 일일 보상',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              style: AppTextStyles.headlineMedium.copyWith(
                 color: AppColors.textDark,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               'Day ${rewardState.currentDay} / 7',
-              style: const TextStyle(
-                fontSize: 14,
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
 
             // 7일 보상 그리드
             _buildRewardGrid(rewardState),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
 
             // 보상 받기 버튼
             _buildClaimButton(context, ref, rewardState),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
 
             // 닫기 버튼 (이미 수령한 경우)
             if (rewardState.hasClaimedToday)
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
+                child: Text(
                   '닫기',
-                  style: TextStyle(
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 14,
                   ),
                 ),
               ),
@@ -136,7 +134,7 @@ class DailyRewardDialog extends ConsumerWidget {
             : isCurrentDay
                 ? AppColors.gold.withValues(alpha: 0.15)
                 : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
         border: Border.all(
           color: isCurrentDay
               ? AppColors.gold
@@ -163,7 +161,7 @@ class DailyRewardDialog extends ConsumerWidget {
             child: Opacity(
               opacity: isFuture ? 0.4 : 1.0,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing4, horizontal: AppDimensions.spacing2),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Column(
@@ -241,17 +239,15 @@ class DailyRewardDialog extends ConsumerWidget {
       // 이미 수령 완료
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing16),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
         ),
-        child: const Text(
+        child: Text(
           '오늘의 보상을 받았습니다!',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+          style: AppTextStyles.titleMedium.copyWith(
             color: AppColors.textSecondary,
           ),
         ),
@@ -289,9 +285,9 @@ class DailyRewardDialog extends ConsumerWidget {
           backgroundColor: AppColors.gold,
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey.shade300,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radius16),
           ),
           elevation: 2,
         ),
@@ -314,7 +310,7 @@ class DailyRewardDialog extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   if (rewardState.rewards.isNotEmpty)
                     Text(
                       rewardState.rewards

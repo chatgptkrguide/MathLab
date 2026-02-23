@@ -8,6 +8,7 @@ import '../../data/models/concept_card_model.dart';
 import '../../data/providers/concept_card/concept_card_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_dimensions.dart';
 import '../constants/app_text_styles.dart';
 
 class ConceptCardDialog extends ConsumerStatefulWidget {
@@ -59,7 +60,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
 
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppDimensions.radius20),
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
@@ -67,7 +68,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppDimensions.spacing20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -78,7 +79,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+                  top: Radius.circular(AppDimensions.radius20),
                 ),
               ),
               child: Column(
@@ -96,7 +97,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                                 color: Colors.white.withValues(alpha: 0.9),
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacing4),
                             Text(
                               widget.conceptCard.title,
                               style: AppTextStyles.headlineSmall.copyWith(
@@ -127,18 +128,18 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacing12),
                   Row(
                     children: [
                       // Difficulty badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: AppDimensions.spacing8,
+                          vertical: AppDimensions.spacing4,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radius12),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -147,7 +148,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                               widget.conceptCard.difficultyIcon,
                               style: const TextStyle(fontSize: 14),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppDimensions.spacing4),
                             Text(
                               widget.conceptCard.difficultyLabel,
                               style: AppTextStyles.bodySmall.copyWith(
@@ -158,18 +159,18 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacing8),
                       // Tags
                       ...widget.conceptCard.tags.take(2).map((tag) => Padding(
-                            padding: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.only(right: AppDimensions.spacing8),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
+                                horizontal: AppDimensions.spacing8,
+                                vertical: AppDimensions.spacing4,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(AppDimensions.radius12),
                               ),
                               child: Text(
                                 tag,
@@ -214,7 +215,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
             // Related concepts footer
             if (widget.conceptCard.relatedConcepts.isNotEmpty)
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing16),
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
                   border: Border(
@@ -230,10 +231,10 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: AppDimensions.spacing8,
+                      runSpacing: AppDimensions.spacing8,
                       children: widget.conceptCard.relatedConcepts
                           .map((concept) => Chip(
                                 label: Text(
@@ -255,7 +256,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
 
   Widget _buildDescriptionTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacing20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -265,9 +266,9 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
             style: AppTextStyles.bodyLarge,
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacing24),
           const Divider(),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacing24),
 
           // Key points
           Text(
@@ -276,9 +277,9 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           ...widget.conceptCard.keyPoints.map((point) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: AppDimensions.spacing12),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -291,7 +292,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacing12),
                     Expanded(
                       child: Text(
                         point,
@@ -304,18 +305,18 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
 
           // Visualization (if available)
           if (widget.conceptCard.visualizationUrl != null) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
             const Divider(),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
             Text(
               '시각화',
               style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
               child: Image.network(
                 widget.conceptCard.visualizationUrl!,
                 fit: BoxFit.cover,
@@ -351,7 +352,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
               size: 64,
               color: Colors.grey[300],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
             Text(
               '예제가 없습니다',
               style: AppTextStyles.bodyLarge.copyWith(
@@ -364,19 +365,19 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacing20),
       itemCount: widget.conceptCard.examples.length,
       itemBuilder: (context, index) {
         final example = widget.conceptCard.examples[index];
 
         return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          elevation: 2,
+          margin: const EdgeInsets.only(bottom: AppDimensions.spacing16),
+          elevation: AppDimensions.elevationLow,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.radius12),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -385,12 +386,12 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: AppDimensions.spacing8,
+                        vertical: AppDimensions.spacing4,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppDimensions.radius12),
                       ),
                       child: Text(
                         '예제 ${index + 1}',
@@ -403,14 +404,14 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
 
                 // Question
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.spacing12),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius8),
                   ),
                   child: Text(
                     example.question,
@@ -418,14 +419,14 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
 
                 // Solution
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.spacing12),
                   decoration: BoxDecoration(
                     color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius8),
                     border: Border.all(color: Colors.green.shade200),
                   ),
                   child: Column(
@@ -438,7 +439,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                             size: 20,
                             color: Colors.green.shade700,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacing8),
                           Text(
                             '풀이',
                             style: AppTextStyles.bodySmall.copyWith(
@@ -448,7 +449,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacing8),
                       Text(
                         example.solution,
                         style: AppTextStyles.bodyMedium,
@@ -459,12 +460,12 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
 
                 // Explanation (if available)
                 if (example.explanation != null) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacing12),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppDimensions.spacing12),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radius8),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +477,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                               size: 20,
                               color: Colors.orange.shade700,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spacing8),
                             Text(
                               '설명',
                               style: AppTextStyles.bodySmall.copyWith(
@@ -486,7 +487,7 @@ class _ConceptCardDialogState extends ConsumerState<ConceptCardDialog>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                         Text(
                           example.explanation!,
                           style: AppTextStyles.bodyMedium,

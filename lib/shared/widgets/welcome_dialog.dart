@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/app_dimensions.dart';
+import '../../shared/constants/app_text_styles.dart';
 
 class WelcomeDialog extends StatelessWidget {
   final UserModel user;
@@ -22,10 +24,10 @@ class WelcomeDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppDimensions.radius24),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppDimensions.spacing24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -44,7 +46,7 @@ class WelcomeDialog extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
 
             // Welcome Message
             Text(
@@ -55,7 +57,7 @@ class WelcomeDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
 
             // User Name
             Text(
@@ -67,29 +69,28 @@ class WelcomeDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
 
             // Login Method
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing12, vertical: 6),
               decoration: BoxDecoration(
                 color: _getAuthMethodColor(authMethod).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
                 border: Border.all(
                   color: _getAuthMethodColor(authMethod).withValues(alpha: 0.3),
                 ),
               ),
               child: Text(
                 _getAuthMethodText(authMethod),
-                style: TextStyle(
+                style: AppTextStyles.bodySmall.copyWith(
                   color: _getAuthMethodColor(authMethod),
-                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
 
             // Success Message
             Text(
@@ -100,7 +101,7 @@ class WelcomeDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacing24),
 
             // Start Button
             SizedBox(
@@ -114,14 +115,13 @@ class WelcomeDialog extends StatelessWidget {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius12),
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   '시작하기',
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -136,9 +136,9 @@ class WelcomeDialog extends StatelessWidget {
   Color _getAuthMethodColor(String method) {
     switch (method) {
       case 'google':
-        return const Color(0xFF4285F4); // Google Blue
+        return AppColors.googleBlue; // Google Blue
       case 'kakao':
-        return const Color(0xFFFEE500); // Kakao Yellow
+        return AppColors.kakaoYellow; // Kakao Yellow
       case 'email':
         return AppColors.mathBlue;
       case 'guest':

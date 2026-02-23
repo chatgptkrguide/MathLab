@@ -17,6 +17,7 @@ class AppColors {
   // ============================================================
   static const mathBlue = Color(0xFF1CB0F6); // Duolingo blue
   static const mathGreen = Color(0xFF58CC02); // Duolingo green
+  static const mathGreenLight = Color(0xFF89E219); // Light green (gradient)
   static const mathOrange = Color(0xFFFF9600); // Math orange
   static const mathYellow = Color(0xFFFFC800); // Math yellow
   static const mathPurple = Color(0xFFCE82FF); // Math purple
@@ -140,6 +141,7 @@ class AppColors {
   // ============================================================
   // === Social Login ===
   // ============================================================
+  static const googleBlue = Color(0xFF4285F4); // Google brand blue
   static const kakaoYellow = Color(0xFFFEE500);
   static const kakaoBrown = Color(0xFF3C1E1E);
 
