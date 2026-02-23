@@ -32,7 +32,6 @@ class SecureStorageService {
   // Secure storage instance with encryption
   final _storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
       resetOnError: true,
     ),
     iOptions: IOSOptions(
