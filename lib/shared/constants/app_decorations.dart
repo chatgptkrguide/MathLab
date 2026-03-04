@@ -61,4 +61,58 @@ class AppDecorations {
         borderRadius: BorderRadius.circular(12),
         boxShadow: cardShadow,
       );
+
+  // ========================================
+  // Anti-AI: Varied Card Styles
+  // ========================================
+
+  /// Card with left border accent
+  static BoxDecoration cardWithLeftBorder({
+    Color borderColor = const Color(0xFF4575F6),
+    double borderWidth = 4.0,
+  }) =>
+      BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border(
+          left: BorderSide(color: borderColor, width: borderWidth),
+        ),
+        boxShadow: cardShadow,
+      );
+
+  /// Featured card with stronger shadow and subtle top border
+  static const featuredCard = BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+    boxShadow: [
+      BoxShadow(
+        color: Color(0x14000000),
+        blurRadius: 16,
+        offset: Offset(0, 6),
+      ),
+    ],
+  );
+
+  /// Outlined card (no fill, border only)
+  static BoxDecoration outlinedCard({
+    Color borderColor = const Color(0xFF4575F6),
+  }) =>
+      BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+        border: Border.all(color: borderColor, width: 1.5),
+      );
+
+  /// Card with subtle bottom border accent
+  static BoxDecoration cardWithBottomBorder({
+    Color borderColor = const Color(0xFF4575F6),
+  }) =>
+      BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+        border: Border(
+          bottom: BorderSide(color: borderColor, width: 2),
+        ),
+        boxShadow: cardShadow,
+      );
 }

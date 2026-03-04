@@ -16,6 +16,12 @@ class AppDimensions {
   static const double spacing40 = 40.0;
   static const double spacing48 = 48.0;
 
+  // === Anti-AI: Organic Spacing (non-round numbers) ===
+  static const double spacing14 = 14.0;
+  static const double spacing18 = 18.0;
+  static const double spacing28 = 28.0;
+  static const double spacing36 = 36.0;
+
   // === Spacing aliases (semantic) ===
   static const double spacingXXS = spacing2;
   static const double spacingXS = spacing4;

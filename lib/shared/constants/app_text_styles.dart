@@ -128,4 +128,25 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: Colors.white,
   );
+
+  // ============================================================
+  // === Anti-AI: Dramatic Contrast Styles ===
+  // ============================================================
+
+  /// Extra large display for hero numbers/text
+  static const displayXL = TextStyle(
+    fontSize: 56,
+    fontWeight: FontWeight.w800,
+    color: AppColors.textPrimary,
+    height: 1.0,
+    letterSpacing: -1.0,
+  );
+
+  /// Section divider label (small, uppercase-like, spaced)
+  static const sectionLabel = TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textTertiary,
+    letterSpacing: 2.0,
+  );
 }

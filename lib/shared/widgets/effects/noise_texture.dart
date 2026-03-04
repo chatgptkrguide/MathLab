@@ -16,6 +16,12 @@ class NoiseTexture extends StatelessWidget {
     this.color = Colors.black,
   });
 
+  /// Card-level noise texture with reduced opacity
+  const NoiseTexture.card({
+    super.key,
+  })  : opacity = 0.015,
+        color = const Color(0xFF000000);
+
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
