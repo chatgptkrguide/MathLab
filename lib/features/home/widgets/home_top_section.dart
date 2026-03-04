@@ -105,6 +105,7 @@ class HomeTopSection extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   height: 1.2,
                                 ),
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 4),

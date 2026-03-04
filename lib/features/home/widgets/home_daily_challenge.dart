@@ -70,6 +70,8 @@ class HomeDailyChallenge extends StatelessWidget {
                         style: AppTextStyles.labelMedium.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: AppDimensions.spacing8),
                       // 진행률 바

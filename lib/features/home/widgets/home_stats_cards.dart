@@ -112,6 +112,8 @@ class _XpStatCard extends StatelessWidget {
                     fontSize: 20,
                     color: AppColors.textPrimary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppDimensions.spacing2),
                 Text(
@@ -119,6 +121,8 @@ class _XpStatCard extends StatelessWidget {
                   style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -187,6 +191,8 @@ class _LevelStatCard extends StatelessWidget {
               fontSize: 20,
               color: AppColors.textPrimary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppDimensions.spacing2),
           Text(
@@ -194,6 +200,8 @@ class _LevelStatCard extends StatelessWidget {
             style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -253,6 +261,8 @@ class _StreakStatCard extends StatelessWidget {
               fontSize: 20,
               color: AppColors.textPrimary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppDimensions.spacing2),
           Text(
@@ -260,6 +270,8 @@ class _StreakStatCard extends StatelessWidget {
             style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
