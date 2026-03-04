@@ -15,6 +15,7 @@ import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 
 class ChallengeHistoryScreen extends ConsumerStatefulWidget {
   const ChallengeHistoryScreen({super.key});
@@ -138,28 +139,35 @@ class _ChallengeHistoryScreenState
       decoration: const BoxDecoration(
         gradient: AppColors.tealGradient,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing24),
-      child: Column(
+      child: Stack(
         children: [
-          Text(
-            'UNIT $unitOrder',
-            style: AppTextStyles.bodySmall.copyWith(
-              fontWeight: FontWeight.w700,
-              color: Colors.white70,
-              letterSpacing: 1.2,
+          const Positioned.fill(child: NoiseTexture(opacity: 0.025)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing24),
+            child: Column(
+              children: [
+                Text(
+                  'UNIT $unitOrder',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white70,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacing4),
+                Text(
+                  unitTitle,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacing20),
+                _buildPathNodes(lessons, progressMap),
+              ],
             ),
           ),
-          const SizedBox(height: AppDimensions.spacing4),
-          Text(
-            unitTitle,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacing20),
-          _buildPathNodes(lessons, progressMap),
         ],
       ),
     );
@@ -304,11 +312,11 @@ class _ChallengeHistoryScreenState
               totalLessons: totalLessons,
               streak: user.streak,
             ),
-            const SizedBox(height: AppDimensions.spacing24),
+            const SizedBox(height: AppDimensions.spacing28),
             _buildCalendarSection(),
-            const SizedBox(height: AppDimensions.spacing24),
+            const SizedBox(height: AppDimensions.spacing20),
             _buildLevelProgress(user),
-            const SizedBox(height: AppDimensions.spacing24),
+            const SizedBox(height: AppDimensions.spacing18),
             _buildSubjectInfo(
               unitTitle: activeUnitTitle,
               streak: user.streak,
@@ -329,15 +337,13 @@ class _ChallengeHistoryScreenState
     required int totalLessons,
     required int streak,
   }) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: _buildChallengeDoneCard(completedLessons, totalLessons),
-        ),
-        const SizedBox(width: AppDimensions.spacing12),
-        Expanded(
-          child: _buildRemainingCard(completedLessons, totalLessons, streak),
-        ),
+        // Featured card: horizontal layout, larger
+        _buildChallengeDoneCard(completedLessons, totalLessons),
+        const SizedBox(height: AppDimensions.spacing12),
+        // Compact secondary card
+        _buildRemainingCard(completedLessons, totalLessons, streak),
       ],
     );
   }
@@ -347,63 +353,71 @@ class _ChallengeHistoryScreenState
     final percent = (progress * 100).toInt();
 
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.gold.withValues(alpha: 0.12),
+        color: AppColors.gold.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        border: const Border(
+          left: BorderSide(color: AppColors.gold, width: 3.5),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing16, AppDimensions.spacing14, AppDimensions.spacing16, AppDimensions.spacing14),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(AppDimensions.radius8),
-                ),
-                child: const Icon(
-                  Icons.emoji_events_rounded,
-                  size: 18,
-                  color: AppColors.gold,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                'Challenge Done',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+          // Left: icon + label
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.22),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
+            ),
+            child: const Icon(
+              Icons.emoji_events_rounded,
+              size: 22,
+              color: AppColors.gold,
+            ),
           ),
-          const SizedBox(height: AppDimensions.spacing12),
+          const SizedBox(width: AppDimensions.spacing14),
+          // Center: text + progress bar
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '챌린지 완료',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacing4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppDimensions.radius4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: AppColors.gold.withValues(alpha: 0.2),
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(AppColors.gold),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$percent% 달성',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppDimensions.spacing12),
+          // Right: big number
           Text(
             '$completed/$total',
             style: AppTextStyles.headlineSmall.copyWith(
               fontWeight: FontWeight.w800,
               color: AppColors.textDark,
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacing4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppDimensions.radius4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-              backgroundColor: AppColors.gold.withValues(alpha: 0.2),
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(AppColors.gold),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '$percent% completed',
-            style: AppTextStyles.labelSmall.copyWith(
-              fontWeight: FontWeight.normal,
-              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -415,51 +429,62 @@ class _ChallengeHistoryScreenState
     final remaining = total - completed;
 
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.tealGreen.withValues(alpha: 0.10),
+        color: AppColors.tealGreen.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        border: const Border(
+          left: BorderSide(color: AppColors.tealGreen, width: 3.5),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing16, AppDimensions.spacing12, AppDimensions.spacing16, AppDimensions.spacing12),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.tealGreen.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppDimensions.radius8),
-                ),
-                child: const Icon(
-                  Icons.timer_outlined,
-                  size: 18,
-                  color: AppColors.tealGreen,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                'Remaining',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.tealGreen.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(AppDimensions.radius8),
+            ),
+            child: const Icon(
+              Icons.timer_outlined,
+              size: 18,
+              color: AppColors.tealGreen,
+            ),
           ),
-          const SizedBox(height: AppDimensions.spacing12),
+          const SizedBox(width: AppDimensions.spacing12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '남은 챌린지',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '남은 레슨 $remaining개',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.tealGreen,
+                  ),
+                ),
+              ],
+            ),
+          ),
           RichText(
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: '$streak ',
-                  style: AppTextStyles.headlineSmall.copyWith(
+                  text: '$streak',
+                  style: AppTextStyles.titleLarge.copyWith(
                     fontWeight: FontWeight.w800,
                     color: AppColors.textDark,
                   ),
                 ),
                 TextSpan(
-                  text: 'Days',
+                  text: '일',
                   style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -467,18 +492,11 @@ class _ChallengeHistoryScreenState
               ],
             ),
           ),
-          const SizedBox(height: AppDimensions.spacing8),
+          const SizedBox(width: AppDimensions.spacing8),
           Text(
-            '/ $total Lessons',
+            '/ $total 레슨',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '$remaining lessons left',
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.tealGreen,
             ),
           ),
         ],
@@ -550,7 +568,7 @@ class _ChallengeHistoryScreenState
   }
 
   Widget _buildDayHeaders() {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = ['월', '화', '수', '목', '금', '토', '일'];
     return Row(
       children: days
           .map(
@@ -747,7 +765,7 @@ class _ChallengeHistoryScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '$leagueDisplay Rank',
+                      '$leagueDisplay 랭크',
                       style: AppTextStyles.titleSmall.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.textDark,
@@ -774,7 +792,7 @@ class _ChallengeHistoryScreenState
                 ),
                 const SizedBox(height: AppDimensions.spacing4),
                 Text(
-                  '$totalXp / $nextXp XP to $nextLeague',
+                  '$totalXp / $nextXp XP ($nextLeague까지)',
                   style: AppTextStyles.labelSmall.copyWith(
                     fontWeight: FontWeight.normal,
                     color: AppColors.textSecondary,

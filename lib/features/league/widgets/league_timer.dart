@@ -66,8 +66,12 @@ class _LeagueTimerState extends State<LeagueTimer> {
 
   @override
   Widget build(BuildContext context) {
+    final accentColor = _timeRemaining.inHours < 24
+        ? Colors.red
+        : AppColors.primary;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -78,6 +82,9 @@ class _LeagueTimerState extends State<LeagueTimer> {
             offset: const Offset(0, 2),
           ),
         ],
+        border: Border(
+          left: BorderSide(color: accentColor, width: 3),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

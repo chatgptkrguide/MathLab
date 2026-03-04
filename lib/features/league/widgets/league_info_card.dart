@@ -33,20 +33,22 @@ class LeagueInfoCard extends StatelessWidget {
     final statusColor = _getStatusColor();
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(18, 20, 20, 18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
         ],
-        border: Border.all(
-          color: statusColor.withValues(alpha: 0.2),
-          width: 1.5,
+        border: Border(
+          left: BorderSide(color: statusColor, width: 4),
+          top: BorderSide(color: statusColor.withValues(alpha: 0.15), width: 1),
+          right: BorderSide(color: statusColor.withValues(alpha: 0.15), width: 1),
+          bottom: BorderSide(color: statusColor.withValues(alpha: 0.15), width: 1),
         ),
       ),
       child: Column(
@@ -87,12 +89,12 @@ class LeagueInfoCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Progress to promotion
           if (!status.isPromotionZone) ...[
             _buildProgressSection(statusColor),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
           ],
 
           // Stats row

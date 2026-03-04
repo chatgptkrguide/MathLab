@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../data/models/league_model.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
+import '../../../shared/widgets/effects/noise_texture.dart';
 
 class LeagueHeader extends StatelessWidget {
   final UserLeagueStatus status;
@@ -59,6 +60,10 @@ class LeagueHeader extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
+      child: Stack(
+        children: [
+          const Positioned.fill(child: NoiseTexture(opacity: 0.02)),
+          Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
       child: Column(
         children: [
@@ -172,6 +177,9 @@ class LeagueHeader extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w600,
             ),
+          ),
+        ],
+      ),
           ),
         ],
       ),

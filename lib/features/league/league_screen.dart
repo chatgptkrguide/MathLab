@@ -177,26 +177,26 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
           child: LeagueHeader(status: status),
         ),
 
-        // League Timer
+        // League Timer — tighter to header
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
             child: LeagueTimer(endDate: status.league.endDate),
           ),
         ),
 
-        // League Info Card
+        // League Info Card — more breathing room
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: LeagueInfoCard(status: status),
           ),
         ),
 
-        // Leaderboard Section Header
+        // Leaderboard Section Header — asymmetric spacing
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -225,7 +225,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
 
         // Bottom padding
         const SliverToBoxAdapter(
-          child: SizedBox(height: 24),
+          child: SizedBox(height: 28),
         ),
       ],
     );
