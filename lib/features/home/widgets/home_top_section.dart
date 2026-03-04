@@ -44,7 +44,7 @@ class HomeTopSection extends StatelessWidget {
                 ),
               ),
               const Text(
-                'Home',
+                '홈',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -83,22 +83,41 @@ class HomeTopSection extends StatelessWidget {
                   children: [
                     Text(
                       '안녕하세요,',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontWeight: FontWeight.w400,
-                          ),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.3,
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Row(
                       children: [
                         Flexible(
-                          child: Text(
-                            '${user?.displayName ?? '학습자'}님',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${user?.displayName ?? '학습자'}님',
+                                style: const TextStyle(
                                   color: Colors.white,
+                                  fontSize: 26,
                                   fontWeight: FontWeight.bold,
+                                  height: 1.2,
                                 ),
-                            overflow: TextOverflow.ellipsis,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              // Subtle hand-written feel underline
+                              Container(
+                                width: 40,
+                                height: 2,
+                                decoration: BoxDecoration(
+                                  color: AppColors.skyBlue.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 8),

@@ -83,32 +83,48 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               // 1. 상단 인사 + 스트릭
               HomeTopSection(user: user),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // 1.5. 상태 바 (현재 레슨명 + 스트릭 + XP + 레벨)
               _buildStatusBar(user),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
               // 2. 로봇 캐릭터 + 진행률 링
               const HomeRobotSection(),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // 3. 오늘의 목표 카드
               _buildTodayGoalCard(context, user),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // 4. 학습 시작하기 버튼
               const HomeStartButton(),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 36),
 
               // 5. 스탯 카드 3개 (XP, 레벨, 연속)
               HomeStatsCards(user: user),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
+
+              // 과목 섹션 구분선
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Expanded(child: Container(height: 1, color: Colors.white.withValues(alpha: 0.2))),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('과목', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 1)),
+                    ),
+                    Expanded(child: Container(height: 1, color: Colors.white.withValues(alpha: 0.2))),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
 
               // 6. 과목 선택 카드 (피그마: 공통수학 1, 공통수학 2)
               HomeSubjectCards(
@@ -118,12 +134,12 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                 },
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // 7. 데일리 챌린지 카드
               const HomeDailyChallenge(),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               // 8. 하단 CTA 3개 (과제 확인, AI 튜터, 멤버 채팅)
               const HomeActionButtons(),
