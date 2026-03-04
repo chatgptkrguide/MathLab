@@ -25,7 +25,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     with SingleTickerProviderStateMixin {
   // 과목 선택 상태
   int _selectedSubjectIndex = 0;
-  final List<String> _subjects = ['공통수학 1', '공통수학 2'];
+  final List<String> _subjects = ['공통수학 1', '공통수학 2', '수학 I', '수학 II', '확률과 통계', '미적분', '기하'];
 
   // 배너 슬라이드업 애니메이션
   late AnimationController _bannerController;
@@ -95,13 +95,35 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     super.dispose();
   }
 
-  String get _currentSubject =>
-      _selectedSubjectIndex == 0 ? '공통수학1' : '공통수학2';
+  String get _currentSubject {
+    const subjectKeys = ['공통수학1', '공통수학2', '수학I', '수학II', '확률과통계', '미적분', '기하'];
+    return subjectKeys[_selectedSubjectIndex];
+  }
+
+  Color get _currentAccentColor {
+    const colors = [
+      AppColors.skyBlue,
+      AppColors.tealGreen,
+      Color(0xFF6B5CE7), // 수학I
+      Color(0xFFE74C6B), // 수학II
+      Color(0xFF43A047), // 확률과통계
+      Color(0xFFFF7043), // 미적분
+      Color(0xFF5C6BC0), // 기하
+    ];
+    return colors[_selectedSubjectIndex];
+  }
 
   LinearGradient get _currentGradient {
-    return _selectedSubjectIndex == 0
-        ? AppColors.skyBlueGradient
-        : AppColors.tealGradient;
+    const gradients = [
+      AppColors.skyBlueGradient,   // 공통수학1
+      AppColors.tealGradient,       // 공통수학2
+      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF6B5CE7), Color(0xFF5A4BD6)]), // 수학I (purple)
+      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFE74C6B), Color(0xFFD6384E)]), // 수학II (red-pink)
+      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF43A047), Color(0xFF2E7D32)]), // 확률과통계 (green)
+      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFF7043), Color(0xFFE64A19)]), // 미적분 (orange)
+      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF5C6BC0), Color(0xFF3949AB)]), // 기하 (indigo)
+    ];
+    return gradients[_selectedSubjectIndex];
   }
 
   @override
@@ -208,46 +230,48 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
             children: [
               // 과목 선택 탭
               Expanded(
-                child: Row(
-                  children: List.generate(_subjects.length, (index) {
-                    final isSelected = _selectedSubjectIndex == index;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: AppDimensions.spacing8),
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_selectedSubjectIndex != index) {
-                            HapticFeedback.selectionClick();
-                            setState(() => _selectedSubjectIndex = index);
-                          }
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: AppDimensions.spacing8),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(AppDimensions.radius20),
-                          ),
-                          child: AnimatedDefaultTextStyle(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: List.generate(_subjects.length, (index) {
+                      final isSelected = _selectedSubjectIndex == index;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: AppDimensions.spacing8),
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_selectedSubjectIndex != index) {
+                              HapticFeedback.selectionClick();
+                              setState(() => _selectedSubjectIndex = index);
+                            }
+                          },
+                          child: AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
-                            style: AppTextStyles.labelMedium.copyWith(
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: AppDimensions.spacing8),
+                            decoration: BoxDecoration(
                               color: isSelected
-                                  ? (_selectedSubjectIndex == 0
-                                      ? AppColors.skyBlue
-                                      : AppColors.tealGreen)
-                                  : Colors.white,
-                              fontWeight:
-                                  isSelected ? FontWeight.bold : FontWeight.w500,
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(AppDimensions.radius20),
                             ),
-                            child: Text(_subjects[index]),
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 300),
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: isSelected
+                                    ? _currentAccentColor
+                                    : Colors.white,
+                                fontWeight:
+                                    isSelected ? FontWeight.bold : FontWeight.w500,
+                              ),
+                              child: Text(_subjects[index]),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
               ),
 
