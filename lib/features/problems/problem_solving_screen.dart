@@ -25,6 +25,7 @@ import '../../shared/widgets/zoomable_image_viewer.dart';
 import '../../shared/utils/answer_validator.dart';
 import '../../data/models/learning/problem.dart' show Problem;
 import '../../data/providers/learning/hint_provider_optimized.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 import 'widgets/hint_button.dart';
 import 'widgets/hint_popup.dart';
 
@@ -355,7 +356,22 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      body: SafeArea(
+      body: Stack(
+        children: [
+          // Anti-AI: subtle background gradient instead of flat color
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFF8F9FA), Color(0xFFF3F4F6), Colors.white],
+                stops: [0.0, 0.4, 1.0],
+              ),
+            ),
+          ),
+          // Anti-AI: noise texture overlay
+          const NoiseTexture(opacity: 0.02),
+          SafeArea(
         child: Stack(
           children: [
             // 메인 콘텐츠
@@ -370,19 +386,24 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                 // Question area
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppDimensions.spacing18,
+                      AppDimensions.spacing14,
+                      AppDimensions.spacing18,
+                      AppDimensions.paddingMedium,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Question card
                         _buildQuestionCard(currentProblem),
 
-                        const SizedBox(height: AppDimensions.spacing24),
+                        const SizedBox(height: AppDimensions.spacing20),
 
                         // Answer input (varies by problem type)
                         _buildAnswerInput(currentProblem),
 
-                        const SizedBox(height: AppDimensions.spacing24),
+                        const SizedBox(height: AppDimensions.spacing18),
 
                         // 잠금 해제된 힌트 표시
                         _buildUnlockedHintsSection(currentProblem),
@@ -401,6 +422,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
           ],
         ),
       ),
+        ], // Close outer Stack
+      ), // Close outer Stack
     );
   }
 
@@ -695,7 +718,13 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
   Widget _buildQuestionCard(ProblemModel problem) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacing24),
+      // Anti-AI: asymmetric padding for organic feel
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing20,
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        AppDimensions.spacing20,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radius16),
@@ -753,10 +782,23 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
   }
 
   Widget _buildAnswerOptions(ProblemModel problem) {
+    // Anti-AI: index-based spacing variation for organic rhythm
+    const optionSpacing = [12.0, 10.0, 14.0, 10.0, 12.0];
+    // Anti-AI: slight radius variation per option
+    const optionRadius = [
+      AppDimensions.radius12,
+      AppDimensions.radius10,
+      AppDimensions.radius12,
+      AppDimensions.radius10,
+    ];
+
     return Column(
-      children: problem.options.map((option) {
+      children: problem.options.asMap().entries.map((entry) {
+        final index = entry.key;
+        final option = entry.value;
         final isSelected = selectedAnswer == option;
         final isThisCorrect = option == problem.correctAnswer;
+        final isFirst = index == 0;
 
         Color backgroundColor = Colors.white;
         Color borderColor = AppColors.borderLight;
@@ -788,8 +830,11 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
           textColor = AppColors.primary;
         }
 
+        final radius = optionRadius[index % optionRadius.length];
+        final bottomSpacing = optionSpacing[index % optionSpacing.length];
+
         return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.only(bottom: bottomSpacing),
           child: GestureDetector(
             onTap: () => _selectAnswer(option),
             child: AnimatedContainer(
@@ -797,11 +842,16 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
               padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16),
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(AppDimensions.radius12),
-                border: Border.all(
-                  color: borderColor,
-                  width: borderWidth,
-                ),
+                borderRadius: BorderRadius.circular(radius),
+                border: isFirst && !isSelected && !isAnswerChecked
+                    // Anti-AI: first option gets a left accent border
+                    ? Border(
+                        left: BorderSide(color: AppColors.skyBlue.withValues(alpha: 0.4), width: 3),
+                        top: BorderSide(color: borderColor, width: borderWidth),
+                        right: BorderSide(color: borderColor, width: borderWidth),
+                        bottom: BorderSide(color: borderColor, width: borderWidth),
+                      )
+                    : Border.all(color: borderColor, width: borderWidth),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.04),

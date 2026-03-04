@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/security/input_validator.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 import 'logic/auth_handler.dart';
 
 class EmailLoginScreen extends ConsumerStatefulWidget {
@@ -88,15 +89,34 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SafeArea(
+      body: Stack(
+        children: [
+          // Subtle background gradient (Anti-AI: not pure white)
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFF8F9FA), Colors.white],
+              ),
+            ),
+          ),
+          // Noise texture overlay
+          const NoiseTexture(opacity: 0.025),
+          SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spacing24),
+          padding: const EdgeInsets.fromLTRB(
+            AppDimensions.spacing24,
+            AppDimensions.spacing20,
+            AppDimensions.spacing24,
+            AppDimensions.spacing24,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: AppDimensions.spacing36),
 
                 // Title
                 Text(
@@ -107,7 +127,21 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppDimensions.spacing36),
+
+                // Form card with left border accent (Anti-AI: handcrafted detail)
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: AppColors.skyBlue,
+                        width: 3,
+                      ),
+                    ),
+                  ),
+                  padding: const EdgeInsets.only(left: AppDimensions.spacing14),
+                  child: Column(
+                    children: [
 
                 // Email Field
                 TextFormField(
@@ -116,7 +150,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: '이메일',
-                    hintText: 'example@email.com',
+                    hintText: '이메일을 입력하세요',
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimensions.radius12),
@@ -142,7 +176,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   },
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing14),
 
                 // Password Field
                 TextFormField(
@@ -151,7 +185,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: '비밀번호',
-                    hintText: _isLogin ? '비밀번호' : '최소 6자 이상',
+                    hintText: _isLogin ? '비밀번호를 입력하세요' : '최소 6자 이상 입력하세요',
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -190,7 +224,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                 ),
 
                 if (!_isLogin) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing8),
                   Text(
                     '비밀번호는 최소 6자 이상이어야 합니다',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -199,37 +233,57 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   ),
                 ],
 
-                const SizedBox(height: 24),
+                    ], // Close left-border Column children
+                  ), // Close left-border Container
+                ), // Close left-border padding
 
-                // Submit Button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSubmit,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radius12),
+                const SizedBox(height: AppDimensions.spacing28),
+
+                // Submit Button (Anti-AI: gradient filled main CTA)
+                SizedBox(
+                  width: double.infinity,
+                  height: AppDimensions.buttonHeightLarge,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: _isLoading ? null : AppColors.deepBlueCTA,
+                      color: _isLoading ? AppColors.nodeLockedBg : null,
+                      borderRadius: BorderRadius.circular(AppDimensions.radius16),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _handleSubmit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimensions.radius16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              _isLogin ? '로그인' : '가입하기',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          _isLogin ? '로그인' : '가입하기',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing18),
 
-                // Toggle Login/Signup
+                // Toggle Login/Signup (Anti-AI: text-only tertiary button)
                 TextButton(
                   onPressed: _isLoading
                       ? null
@@ -248,16 +302,19 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                 ),
 
                 if (_isLogin) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing4),
 
-                  // Forgot Password
+                  // Forgot Password (Anti-AI: text-only, subtle)
                   TextButton(
                     onPressed: _isLoading ? null : _handleForgotPassword,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.textSecondary,
+                    ),
                     child: const Text('비밀번호를 잊으셨나요?'),
                   ),
                 ],
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppDimensions.spacing32),
 
                 // Divider
                 Row(
@@ -276,9 +333,9 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacing20),
 
-                // Social Login Buttons
+                // Social Login Buttons (Anti-AI: outlined secondary style, different from main CTA)
                 OutlinedButton.icon(
                   onPressed: _isLoading
                       ? null
@@ -303,7 +360,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
 
                 OutlinedButton.icon(
                   onPressed: _isLoading
@@ -331,7 +388,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppDimensions.spacing36),
 
                 // Terms and Privacy
                 if (!_isLogin)
@@ -347,6 +404,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
           ),
         ),
       ),
+        ], // Close Stack children
+      ), // Close Stack
     );
   }
 
@@ -369,7 +428,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
                 labelText: '이메일',
-                hintText: 'example@email.com',
+                hintText: '가입한 이메일을 입력하세요',
                 border: OutlineInputBorder(),
               ),
             ),

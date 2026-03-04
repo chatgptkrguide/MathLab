@@ -8,6 +8,7 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../shared/widgets/math/math_renderer.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 import '../../shared/utils/answer_validator.dart';
 
 /// 레벨 테스트 화면 (피그마 08 프레임)
@@ -50,18 +51,31 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     }
 
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildProgressBar(),
-              Expanded(child: _buildQuestionArea()),
-              _buildBottomSection(),
-            ],
+      body: Stack(
+        children: [
+          // Anti-AI: subtle background gradient instead of pure white
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFF8F9FA), Colors.white],
+              ),
+            ),
           ),
-        ),
+          // Anti-AI: noise texture overlay
+          const NoiseTexture(opacity: 0.02),
+          SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                _buildProgressBar(),
+                Expanded(child: _buildQuestionArea()),
+                _buildBottomSection(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -126,7 +140,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     final progress = session.progress;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing20, AppDimensions.spacing12, AppDimensions.spacing20, AppDimensions.spacing8),
+      // Anti-AI: slightly varied padding
+      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing20, AppDimensions.spacing14, AppDimensions.spacing20, AppDimensions.spacing8),
       child: Column(
         children: [
           Row(
@@ -167,8 +182,24 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     final problem = currentProblem;
     if (problem == null) return const SizedBox.shrink();
 
+    // Anti-AI: index-based spacing variation
+    const optionSpacing = [12.0, 10.0, 14.0, 10.0, 12.0];
+    // Anti-AI: slight radius variation per option
+    const optionRadii = [
+      AppDimensions.radius24,
+      AppDimensions.radius20,
+      AppDimensions.radius24,
+      AppDimensions.radius20,
+    ];
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppDimensions.spacing24),
+      // Anti-AI: asymmetric padding
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.spacing20,
+        AppDimensions.spacing24,
+        AppDimensions.spacing24,
+        AppDimensions.spacing20,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -199,12 +230,16 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
               ],
             ),
           ),
-          const SizedBox(height: AppDimensions.spacing24),
+          const SizedBox(height: AppDimensions.spacing20),
 
-          // 선택지 (chip 스타일)
+          // 선택지 (chip 스타일) — Anti-AI: index-based variation
           if (problem.type == ProblemType.multipleChoice)
-            ...problem.options.map((option) {
+            ...problem.options.asMap().entries.map((entry) {
+              final index = entry.key;
+              final option = entry.value;
               final isSelected = selectedAnswer == option;
+              final isFirst = index == 0;
+              final isLast = index == problem.options.length - 1;
               Color bgColor = AppColors.chipBg;
               Color textColor = AppColors.textDark;
               Color borderColor = Colors.transparent;
@@ -225,8 +260,11 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                 borderColor = AppColors.skyBlue;
               }
 
+              final radius = optionRadii[index % optionRadii.length];
+              final bottomSpacing = optionSpacing[index % optionSpacing.length];
+
               return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.only(bottom: bottomSpacing),
                 child: GestureDetector(
                   onTap: isAnswerChecked
                       ? null
@@ -236,11 +274,19 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16),
                     decoration: BoxDecoration(
                       color: bgColor,
-                      borderRadius: BorderRadius.circular(AppDimensions.radius24),
-                      border: Border.all(
-                        color: borderColor,
-                        width: isSelected ? 2 : 0,
-                      ),
+                      borderRadius: BorderRadius.circular(radius),
+                      border: isFirst && !isSelected && !isAnswerChecked
+                          // Anti-AI: first option gets subtle left accent
+                          ? Border(
+                              left: BorderSide(color: AppColors.skyBlue.withValues(alpha: 0.35), width: 3),
+                              top: BorderSide(color: borderColor, width: isSelected ? 2 : 0),
+                              right: BorderSide(color: borderColor, width: isSelected ? 2 : 0),
+                              bottom: BorderSide(color: borderColor, width: isSelected ? 2 : 0),
+                            )
+                          : isLast && !isSelected && !isAnswerChecked
+                              // Anti-AI: last option gets slightly different radius (already handled via optionRadii)
+                              ? Border.all(color: borderColor, width: isSelected ? 2 : 0)
+                              : Border.all(color: borderColor, width: isSelected ? 2 : 0),
                     ),
                     child: MathRenderer(
                       latex: option,
@@ -262,7 +308,8 @@ class _LevelTestScreenState extends ConsumerState<LevelTestScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing24, AppDimensions.spacing12, AppDimensions.spacing24, AppDimensions.spacing24),
+      // Anti-AI: varied padding
+      padding: const EdgeInsets.fromLTRB(AppDimensions.spacing24, AppDimensions.spacing14, AppDimensions.spacing24, AppDimensions.spacing20),
       child: SizedBox(
         width: double.infinity,
         height: AppDimensions.buttonHeightLarge,
