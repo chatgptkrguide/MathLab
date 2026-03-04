@@ -3,9 +3,9 @@ import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
-/// Home screen subject cards with asymmetric layout:
-/// - "공통수학 1" takes flex:3 with a "학습 중" tag and bottom border
-/// - "공통수학 2" takes flex:2 with a different border radius
+/// Home screen subject cards — horizontal scrollable list of 7 Korean math subjects.
+/// The first card (currently studying) gets an accent "학습 중" badge and bottom border
+/// for natural visual variety (Anti-AI design touch).
 class HomeSubjectCards extends StatelessWidget {
   final void Function(String subjectId) onSubjectTap;
 
@@ -13,6 +13,65 @@ class HomeSubjectCards extends StatelessWidget {
     super.key,
     required this.onSubjectTap,
   });
+
+  static final List<_SubjectData> _subjects = [
+    const _SubjectData(
+      id: 'common_math_1',
+      title: '공통수학 1',
+      subtitle: '다항식, 방정식',
+      icon: Icons.functions_rounded,
+      color: Color(0xFF4575F6),
+      progress: 0.45,
+    ),
+    const _SubjectData(
+      id: 'common_math_2',
+      title: '공통수학 2',
+      subtitle: '집합, 함수, 도형',
+      icon: Icons.show_chart_rounded,
+      color: Color(0xFF45A6AD),
+      progress: 0.12,
+    ),
+    const _SubjectData(
+      id: 'math_1',
+      title: '수학 I',
+      subtitle: '지수, 삼각, 수열',
+      icon: Icons.trending_up_rounded,
+      color: Color(0xFF6B5CE7),
+      progress: 0.0,
+    ),
+    const _SubjectData(
+      id: 'math_2',
+      title: '수학 II',
+      subtitle: '극한, 미분, 적분',
+      icon: Icons.auto_graph_rounded,
+      color: Color(0xFFE74C6B),
+      progress: 0.0,
+    ),
+    const _SubjectData(
+      id: 'prob_stat',
+      title: '확률과 통계',
+      subtitle: '확률, 분포, 추정',
+      icon: Icons.pie_chart_rounded,
+      color: Color(0xFF43A047),
+      progress: 0.0,
+    ),
+    const _SubjectData(
+      id: 'calculus',
+      title: '미적분',
+      subtitle: '급수, 미분법, 적분법',
+      icon: Icons.timeline_rounded,
+      color: Color(0xFFFF7043),
+      progress: 0.0,
+    ),
+    const _SubjectData(
+      id: 'geometry',
+      title: '기하',
+      subtitle: '이차곡선, 벡터, 공간',
+      icon: Icons.hexagon_rounded,
+      color: Color(0xFF5C6BC0),
+      progress: 0.0,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,34 +88,33 @@ class HomeSubjectCards extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppDimensions.spacing12),
-          Row(
-            children: [
-              // Primary subject card: larger, with tag and bottom border
-              Expanded(
-                flex: 3,
-                child: _PrimarySubjectCard(
-                  title: '공통수학 1',
-                  subtitle: '다항식, 방정식, 부등식',
-                  icon: Icons.functions_rounded,
-                  progress: 0.45,
-                  color: AppColors.royalBlue,
-                  onTap: () => onSubjectTap('common_math_1'),
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing12),
-              // Secondary subject card: smaller, different radius
-              Expanded(
-                flex: 2,
-                child: _SecondarySubjectCard(
-                  title: '공통수학 2',
-                  subtitle: '함수, 수열, 통계',
-                  icon: Icons.show_chart_rounded,
-                  progress: 0.12,
-                  color: AppColors.tealGreen,
-                  onTap: () => onSubjectTap('common_math_2'),
-                ),
-              ),
-            ],
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.zero,
+              clipBehavior: Clip.none,
+              itemCount: _subjects.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(width: AppDimensions.spacing12),
+              itemBuilder: (context, index) {
+                final subject = _subjects[index];
+                final isActive = index == 0;
+                return SizedBox(
+                  width: 140,
+                  child: _SubjectCard(
+                    title: subject.title,
+                    subtitle: subject.subtitle,
+                    icon: subject.icon,
+                    progress: subject.progress,
+                    color: subject.color,
+                    isActive: isActive,
+                    onTap: () => onSubjectTap(subject.id),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -64,21 +122,25 @@ class HomeSubjectCards extends StatelessWidget {
   }
 }
 
-/// Primary subject card with "학습 중" tag and bottom border accent
-class _PrimarySubjectCard extends StatelessWidget {
+/// Individual subject card widget.
+/// When [isActive] is true, shows a "학습 중" badge and a colored bottom border
+/// with a slightly stronger shadow — giving the first card natural emphasis.
+class _SubjectCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
   final double progress;
   final Color color;
+  final bool isActive;
   final VoidCallback onTap;
 
-  const _PrimarySubjectCard({
+  const _SubjectCard({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.progress,
     required this.color,
+    required this.isActive,
     required this.onTap,
   });
 
@@ -87,22 +149,24 @@ class _PrimarySubjectCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppDimensions.spacing16),
+            padding: const EdgeInsets.all(AppDimensions.spacing12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppDimensions.radius16),
-              border: Border(
-                bottom: BorderSide(
-                  color: color,
-                  width: 2,
-                ),
-              ),
+              border: isActive
+                  ? Border(
+                      bottom: BorderSide(color: color, width: 2),
+                    )
+                  : null,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 12,
+                  color: isActive
+                      ? color.withValues(alpha: 0.15)
+                      : Colors.black.withValues(alpha: 0.06),
+                  blurRadius: isActive ? 14 : 10,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -110,37 +174,38 @@ class _PrimarySubjectCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icon
+                // Icon container
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.12),
                     borderRadius:
-                        BorderRadius.circular(AppDimensions.radius12),
+                        BorderRadius.circular(AppDimensions.radius10),
                   ),
-                  child: Icon(icon, color: color, size: 22),
+                  child: Icon(icon, color: color, size: 20),
                 ),
-                const SizedBox(height: AppDimensions.spacing12),
+                const SizedBox(height: AppDimensions.spacing8),
 
-                // Subject title
+                // Title
                 Text(
                   title,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontSize: 15,
+                  style: AppTextStyles.titleSmall.copyWith(
                     color: AppColors.textDark,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppDimensions.spacing4),
+                const SizedBox(height: AppDimensions.spacing2),
 
-                // Description
+                // Subtitle
                 Text(
                   subtitle,
                   style: AppTextStyles.labelSmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppDimensions.spacing12),
+                const Spacer(),
 
                 // Progress bar
                 ClipRRect(
@@ -148,7 +213,7 @@ class _PrimarySubjectCard extends StatelessWidget {
                       BorderRadius.circular(AppDimensions.radius4),
                   child: LinearProgressIndicator(
                     value: progress,
-                    minHeight: 6,
+                    minHeight: 5,
                     backgroundColor: color.withValues(alpha: 0.12),
                     valueColor: AlwaysStoppedAnimation<Color>(color),
                   ),
@@ -161,132 +226,59 @@ class _PrimarySubjectCard extends StatelessWidget {
                   style: AppTextStyles.labelSmall.copyWith(
                     fontWeight: FontWeight.w600,
                     color: color,
+                    fontSize: 10,
                   ),
                 ),
               ],
             ),
           ),
-          // "학습 중" tag positioned at top-right
-          Positioned(
-            top: AppDimensions.spacing8,
-            right: AppDimensions.spacing8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing8,
-                vertical: AppDimensions.spacing4,
-              ),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppDimensions.radius8),
-              ),
-              child: Text(
-                '학습 중',
-                style: AppTextStyles.labelSmall.copyWith(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: color,
+
+          // "학습 중" badge — only on active card
+          if (isActive)
+            Positioned(
+              top: AppDimensions.spacing8,
+              right: AppDimensions.spacing8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing8,
+                  vertical: AppDimensions.spacing2,
+                ),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radius8),
+                ),
+                child: Text(
+                  '학습 중',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 }
 
-/// Secondary subject card with different border radius (radius12)
-class _SecondarySubjectCard extends StatelessWidget {
+/// Internal data class for subject card information.
+class _SubjectData {
+  final String id;
   final String title;
   final String subtitle;
   final IconData icon;
-  final double progress;
   final Color color;
-  final VoidCallback onTap;
+  final double progress;
 
-  const _SecondarySubjectCard({
+  const _SubjectData({
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.progress,
     required this.color,
-    required this.onTap,
+    required this.progress,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacing16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimensions.radius12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppDimensions.radius12),
-              ),
-              child: Icon(icon, color: color, size: 22),
-            ),
-            const SizedBox(height: AppDimensions.spacing12),
-
-            // Subject title
-            Text(
-              title,
-              style: AppTextStyles.titleMedium.copyWith(
-                fontSize: 15,
-                color: AppColors.textDark,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing4),
-
-            // Description
-            Text(
-              subtitle,
-              style: AppTextStyles.labelSmall,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: AppDimensions.spacing12),
-
-            // Progress bar
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppDimensions.radius4),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 6,
-                backgroundColor: color.withValues(alpha: 0.12),
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing4),
-
-            // Progress text
-            Text(
-              '${(progress * 100).toInt()}% 완료',
-              style: AppTextStyles.labelSmall.copyWith(
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
