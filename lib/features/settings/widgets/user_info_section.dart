@@ -20,11 +20,27 @@ class UserInfoSection extends StatelessWidget {
         horizontal: AppDimensions.paddingLarge,
         vertical: AppDimensions.paddingMedium,
       ),
-      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+      padding: const EdgeInsets.all(AppDimensions.paddingLarge),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.mathBlue.withValues(alpha: 0.08),
+            AppColors.mathPurple.withValues(alpha: 0.06),
+          ],
+        ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(
+          color: AppColors.mathBlue.withValues(alpha: 0.15),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mathBlue.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -39,7 +55,10 @@ class UserInfoSection extends StatelessWidget {
               children: [
                 Text(
                   user?.displayName ?? '사용자',
-                  style: AppTextStyles.titleMedium,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -47,15 +66,24 @@ class UserInfoSection extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     user!.email!,
-                    style: AppTextStyles.bodySmall,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 _buildLevelBadge(),
               ],
             ),
+          ),
+
+          // Chevron to indicate tappability
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.mathBlue,
+            size: 24,
           ),
         ],
       ),

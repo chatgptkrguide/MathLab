@@ -76,7 +76,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: AppDimensions.spacing12),
 
                     // 계정 섹션
-                    const SectionHeader(title: '계정'),
+                    const SectionHeader(
+                      title: '계정',
+                      accentColor: AppColors.mathBlue,
+                    ),
                     const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
@@ -139,7 +142,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: AppDimensions.spacing20),
 
                     // 알림 섹션
-                    const SectionHeader(title: '알림'),
+                    const SectionHeader(
+                      title: '알림',
+                      accentColor: AppColors.mathOrange,
+                    ),
                     const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
@@ -175,7 +181,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: AppDimensions.spacing20),
 
                     // 언어 및 테마 섹션
-                    const SectionHeader(title: '언어 및 테마'),
+                    const SectionHeader(
+                      title: '언어 및 테마',
+                      accentColor: AppColors.mathPurple,
+                    ),
                     const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
@@ -215,7 +224,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     // 관리자 섹션 (admin만 표시)
                     if (user?.isAdmin == true) ...[
                       const SizedBox(height: AppDimensions.spacing20),
-                      const SectionHeader(title: '관리자'),
+                      const SectionHeader(
+                        title: '관리자',
+                        accentColor: AppColors.mathGreen,
+                      ),
                       const SizedBox(height: AppDimensions.spacing8),
                       _buildSettingsCard(
                         children: [
@@ -240,7 +252,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: AppDimensions.spacing20),
 
                     // 정보 섹션
-                    const SectionHeader(title: '정보'),
+                    const SectionHeader(
+                      title: '정보',
+                      accentColor: AppColors.tealGreen,
+                    ),
                     const SizedBox(height: AppDimensions.spacing8),
                     _buildSettingsCard(
                       children: [
@@ -286,7 +301,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: AppDimensions.spacing20),
 
                     // 위험 영역 - 학습 초기화, 로그아웃, 계정 탈퇴
-                    const SectionHeader(title: '계정 관리'),
+                    const SectionHeader(
+                      title: '계정 관리',
+                      accentColor: AppColors.mathRed,
+                    ),
                     const SizedBox(height: AppDimensions.spacing8),
                     Container(
                       decoration: BoxDecoration(

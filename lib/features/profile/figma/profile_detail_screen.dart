@@ -150,16 +150,18 @@ class ProfileDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppDimensions.spacing12),
 
-          // Name
+          // Name - large and bold for dramatic contrast
           Text(
             user.displayName ?? '사용자',
             style: AppTextStyles.titleLarge.copyWith(
               color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 24,
             ),
           ),
           const SizedBox(height: AppDimensions.spacing4),
 
-          // Level badge
+          // Level badge - Korean label
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 14,
@@ -170,7 +172,7 @@ class ProfileDetailScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(AppDimensions.radius12),
             ),
             child: Text(
-              'Level ${user.level}',
+              'Lv.${user.level}',
               style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -265,7 +267,32 @@ class ProfileDetailScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // Row 1
+          // Row 1: Featured stats (XP + Streak) - larger, 2 columns
+          Row(
+            children: [
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.bolt_rounded,
+                  iconColor: AppColors.streakGold,
+                  label: 'XP',
+                  value: '${user.xp}',
+                  featured: true,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacing12),
+              Expanded(
+                child: _StatBox(
+                  icon: Icons.local_fire_department_rounded,
+                  iconColor: AppColors.badgeOrange,
+                  label: '연속학습',
+                  value: '${user.streak}일',
+                  featured: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacing12),
+          // Row 2: Secondary stats - smaller, 4 columns
           Row(
             children: [
               Expanded(
@@ -276,39 +303,16 @@ class ProfileDetailScreen extends ConsumerWidget {
                   value: '$studyDays일',
                 ),
               ),
-              const SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.bolt_rounded,
-                  iconColor: AppColors.streakGold,
-                  label: 'XP',
-                  value: '${user.xp}',
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.local_fire_department_rounded,
-                  iconColor: AppColors.badgeOrange,
-                  label: '연속학습',
-                  value: '${user.streak}일',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacing12),
-          // Row 2
-          Row(
-            children: [
+              const SizedBox(width: AppDimensions.spacing8),
               Expanded(
                 child: _StatBox(
                   icon: Icons.emoji_events_rounded,
                   iconColor: AppColors.tealGreen,
                   label: '랭크',
-                  value: 'H Lv${user.level}',
+                  value: 'Lv${user.level}',
                 ),
               ),
-              const SizedBox(width: AppDimensions.spacing12),
+              const SizedBox(width: AppDimensions.spacing8),
               Expanded(
                 child: _StatBox(
                   icon: Icons.check_circle_rounded,
@@ -317,7 +321,7 @@ class ProfileDetailScreen extends ConsumerWidget {
                   value: '${user.totalXp ~/ 10}',
                 ),
               ),
-              const SizedBox(width: AppDimensions.spacing12),
+              const SizedBox(width: AppDimensions.spacing8),
               Expanded(
                 child: _StatBox(
                   icon: Icons.diamond_rounded,
@@ -862,48 +866,107 @@ class _StatBox extends StatelessWidget {
   final Color iconColor;
   final String label;
   final String value;
+  final bool featured;
 
   const _StatBox({
     required this.icon,
     required this.iconColor,
     required this.label,
     required this.value,
+    this.featured = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Featured stats: larger with accent left border
+    if (featured) {
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: AppDimensions.spacing20,
+          horizontal: AppDimensions.spacing16,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppDimensions.radius16),
+          border: Border(
+            left: BorderSide(
+              color: iconColor,
+              width: 4,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: iconColor.withValues(alpha: 0.1),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius12),
+              ),
+              child: Icon(icon, color: iconColor, size: 28),
+            ),
+            const SizedBox(width: AppDimensions.spacing12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: AppTextStyles.titleLarge.copyWith(
+                      color: AppColors.textDark,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing2),
+                  Text(
+                    label,
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Regular stats: compact vertical layout
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: AppDimensions.spacing16,
-        horizontal: AppDimensions.spacing8,
+        vertical: AppDimensions.spacing12,
+        horizontal: AppDimensions.spacing4,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radius12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radius12),
-            ),
-            child: Icon(icon, color: iconColor, size: 28),
-          ),
-          const SizedBox(height: AppDimensions.spacing8),
+          Icon(icon, color: iconColor, size: 22),
+          const SizedBox(height: AppDimensions.spacing4),
           Text(
             value,
-            style: AppTextStyles.titleMedium.copyWith(
+            style: AppTextStyles.titleSmall.copyWith(
               color: AppColors.textDark,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: AppDimensions.spacing2),
@@ -911,6 +974,7 @@ class _StatBox extends StatelessWidget {
             label,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.textSecondary,
+              fontSize: 10,
             ),
           ),
         ],

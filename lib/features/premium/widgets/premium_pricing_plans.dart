@@ -44,7 +44,7 @@ class PremiumPricingPlans extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // 연간 플랜 (추천)
+          // 연간 플랜 (추천) - visually larger card
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -56,6 +56,7 @@ class PremiumPricingPlans extends StatelessWidget {
                 description:
                     '${PremiumTier.yearly.formattedMonthlyEquivalent}/월 (${PremiumTier.yearly.discountPercentage.toStringAsFixed(0)}% 절약)',
                 isSelected: selectedTier == PremiumTier.yearly,
+                isRecommended: true,
                 onTap: () => onTierSelected(PremiumTier.yearly),
               ),
 
@@ -101,6 +102,7 @@ class PremiumPricingPlans extends StatelessWidget {
 }
 
 /// 개별 가격 카드 위젯
+/// isRecommended: makes the card visually larger with accent styling
 class _PricingCard extends StatelessWidget {
   final PremiumTier tier;
   final String title;
@@ -108,6 +110,7 @@ class _PricingCard extends StatelessWidget {
   final String period;
   final String description;
   final bool isSelected;
+  final bool isRecommended;
   final VoidCallback onTap;
 
   const _PricingCard({
@@ -117,6 +120,7 @@ class _PricingCard extends StatelessWidget {
     required this.period,
     required this.description,
     required this.isSelected,
+    this.isRecommended = false,
     required this.onTap,
   });
 
@@ -127,10 +131,10 @@ class _PricingCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(isRecommended ? 20 : 16),
           border: Border.all(
             color: isSelected ? AppColors.premiumGold : Colors.transparent,
-            width: 3,
+            width: isSelected ? 3 : 1,
           ),
           boxShadow: isSelected
               ? [
@@ -140,9 +144,21 @@ class _PricingCard extends StatelessWidget {
                     offset: const Offset(0, 10),
                   ),
                 ]
-              : [],
+              : isRecommended
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : [],
         ),
-        padding: const EdgeInsets.all(20),
+        // Recommended plan gets more padding for larger visual weight
+        padding: EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: isRecommended ? 24 : 16,
+        ),
         child: Row(
           children: [
             // 선택 라디오
@@ -177,15 +193,23 @@ class _PricingCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.titleLarge.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: isRecommended
+                        ? AppTextStyles.headlineSmall.copyWith(
+                            fontWeight: FontWeight.w800,
+                          )
+                        : AppTextStyles.titleLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: isRecommended
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
+                      fontWeight:
+                          isRecommended ? FontWeight.w500 : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -201,7 +225,10 @@ class _PricingCard extends StatelessWidget {
                   children: [
                     Text(
                       price,
-                      style: AppTextStyles.headlineSmall.copyWith(
+                      style: (isRecommended
+                              ? AppTextStyles.headlineMedium
+                              : AppTextStyles.headlineSmall)
+                          .copyWith(
                         fontWeight: FontWeight.bold,
                         color: isSelected
                             ? AppColors.premiumGold

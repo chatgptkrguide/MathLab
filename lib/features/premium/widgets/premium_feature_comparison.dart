@@ -97,17 +97,21 @@ class PremiumFeatureComparison extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Feature rows
+            // Feature rows with alternating backgrounds for visual rhythm
             ...features.asMap().entries.map((entry) {
               final idx = entry.key;
               final feature = entry.value;
               final isLast = idx == features.length - 1;
+              final hasAltBg = idx.isEven;
 
               return Column(
                 children: [
-                  Padding(
+                  Container(
+                    color: hasAltBg
+                        ? AppColors.backgroundLight.withValues(alpha: 0.5)
+                        : Colors.transparent,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 10),
+                        horizontal: 24, vertical: 12),
                     child: Row(
                       children: [
                         // Feature icon & name
@@ -152,12 +156,12 @@ class PremiumFeatureComparison extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (!isLast)
+                  if (!isLast && !hasAltBg)
                     Divider(
                       height: 1,
                       indent: 24,
                       endIndent: 24,
-                      color: AppColors.borderLight.withValues(alpha: 0.5),
+                      color: AppColors.borderLight.withValues(alpha: 0.3),
                     ),
                 ],
               );
