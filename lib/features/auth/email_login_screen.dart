@@ -351,7 +351,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                           }
                         },
                   icon: const Icon(Icons.g_mobiledata),
-                  label: const Text('Google로 계속하기'),
+                  label: const Text('Google로 계속하기',
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -377,7 +378,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                           }
                         },
                   icon: const Icon(Icons.chat_bubble),
-                  label: const Text('Kakao로 계속하기'),
+                  label: const Text('Kakao로 계속하기',
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     backgroundColor: AppColors.kakaoYellow,

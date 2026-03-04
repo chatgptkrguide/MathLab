@@ -276,48 +276,62 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               ),
 
               // 스트릭 (실제 데이터)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.local_fire_department_rounded,
-                        color: Color(0xFFFF9600), size: 18),
-                    const SizedBox(width: AppDimensions.spacing4),
-                    Text('$streak',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 80),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.local_fire_department_rounded,
+                          color: Color(0xFFFF9600), size: 18),
+                      const SizedBox(width: AppDimensions.spacing4),
+                      Flexible(
+                        child: Text('$streak',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
               const SizedBox(width: AppDimensions.spacing8),
 
               // XP (실제 데이터)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.star_rounded,
-                        color: Color(0xFFFFC800), size: 18),
-                    const SizedBox(width: AppDimensions.spacing4),
-                    Text('$xp',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 80),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radius16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded,
+                          color: Color(0xFFFFC800), size: 18),
+                      const SizedBox(width: AppDimensions.spacing4),
+                      Flexible(
+                        child: Text('$xp',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
