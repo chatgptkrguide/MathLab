@@ -1,7 +1,7 @@
 // Profile Detail Screen (Figma "05" Design)
 //
 // Profile header with follower/following + 6 stat grid (2x3)
-// + Premium card + Subject cards + Badge collection + Weekly streak + Logout
+// + Subject cards + Badge collection + Weekly streak + Logout
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,9 +32,6 @@ class ProfileDetailScreen extends ConsumerWidget {
 
                 // 6 stat boxes in 2 rows of 3
                 SliverToBoxAdapter(child: _buildStatsGrid(user)),
-
-                // Premium card
-                SliverToBoxAdapter(child: _buildPremiumCard()),
 
                 // Subject cards
                 SliverToBoxAdapter(child: _buildSubjectCards()),
@@ -333,108 +330,6 @@ class ProfileDetailScreen extends ConsumerWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // Premium Card
-  // ──────────────────────────────────────────────
-
-  Widget _buildPremiumCard() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        0,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacing20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF4A7CF7), AppColors.mathPurple],
-          ),
-          borderRadius: BorderRadius.circular(AppDimensions.radius16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.royalBlue.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Crown icon
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(AppDimensions.radius16),
-              ),
-              child: const Icon(
-                Icons.auto_awesome_rounded,
-                color: Colors.white,
-                size: 32,
-              ),
-            ),
-            const SizedBox(width: AppDimensions.spacing16),
-            // Text content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(AppDimensions.radius8),
-                    ),
-                    child: Text(
-                      '프리미엄',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.spacing8),
-                  Text(
-                    '광고 없이 무제한 학습을 시작하세요',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.spacing12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.spacing16,
-                      vertical: AppDimensions.spacing8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppDimensions.radius20),
-                    ),
-                    child: Text(
-                      '자세히 보기',
-                      style: AppTextStyles.titleSmall.copyWith(
-                        color: AppColors.royalBlue,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
