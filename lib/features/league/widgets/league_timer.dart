@@ -89,22 +89,30 @@ class _LeagueTimerState extends State<LeagueTimer> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.timer_outlined,
-                color: AppColors.primary,
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '리그 종료까지',
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: Colors.grey[700],
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.timer_outlined,
+                  color: AppColors.primary,
+                  size: 24,
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    '리그 종료까지',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: Colors.grey[700],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Text(
             _formatDuration(_timeRemaining),
             style: AppTextStyles.titleMedium.copyWith(
@@ -113,6 +121,8 @@ class _LeagueTimerState extends State<LeagueTimer> {
                   ? Colors.red
                   : AppColors.primary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

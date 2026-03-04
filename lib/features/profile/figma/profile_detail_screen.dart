@@ -155,6 +155,8 @@ class ProfileDetailScreen extends ConsumerWidget {
               fontWeight: FontWeight.w800,
               fontSize: 24,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppDimensions.spacing4),
 
@@ -422,6 +424,8 @@ class ProfileDetailScreen extends ConsumerWidget {
                   style: AppTextStyles.titleMedium.copyWith(
                     color: AppColors.textDark,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppDimensions.spacing2),
                 Text(
@@ -429,6 +433,8 @@ class ProfileDetailScreen extends ConsumerWidget {
                   style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppDimensions.spacing8),
                 // Progress bar
@@ -659,6 +665,8 @@ class ProfileDetailScreen extends ConsumerWidget {
               color: AppColors.textDark,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -690,6 +698,8 @@ class ProfileDetailScreen extends ConsumerWidget {
                   color: AppColors.textLight,
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -820,6 +830,8 @@ class _StatBox extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       fontSize: 22,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppDimensions.spacing2),
                   Text(
@@ -827,6 +839,8 @@ class _StatBox extends StatelessWidget {
                     style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -863,6 +877,8 @@ class _StatBox extends StatelessWidget {
               color: AppColors.textDark,
               fontWeight: FontWeight.w700,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppDimensions.spacing2),
           Text(
@@ -871,6 +887,8 @@ class _StatBox extends StatelessWidget {
               color: AppColors.textSecondary,
               fontSize: 10,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

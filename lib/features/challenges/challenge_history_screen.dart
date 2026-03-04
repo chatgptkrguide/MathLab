@@ -162,6 +162,8 @@ class _ChallengeHistoryScreenState
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppDimensions.spacing20),
                 _buildPathNodes(lessons, progressMap),
@@ -419,6 +421,8 @@ class _ChallengeHistoryScreenState
               fontWeight: FontWeight.w800,
               color: AppColors.textDark,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -469,6 +473,8 @@ class _ChallengeHistoryScreenState
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.tealGreen,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -764,11 +770,15 @@ class _ChallengeHistoryScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '$leagueDisplay 랭크',
-                      style: AppTextStyles.titleSmall.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
+                    Flexible(
+                      child: Text(
+                        '$leagueDisplay 랭크',
+                        style: AppTextStyles.titleSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Text(
@@ -797,6 +807,8 @@ class _ChallengeHistoryScreenState
                     fontWeight: FontWeight.normal,
                     color: AppColors.textSecondary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -846,17 +858,21 @@ class _ChallengeHistoryScreenState
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.tealGreen.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppDimensions.radius8),
-            ),
-            child: Text(
-              unitTitle,
-              style: AppTextStyles.labelMedium.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.tealGreen,
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.tealGreen.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(AppDimensions.radius8),
+              ),
+              child: Text(
+                unitTitle,
+                style: AppTextStyles.labelMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.tealGreen,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
