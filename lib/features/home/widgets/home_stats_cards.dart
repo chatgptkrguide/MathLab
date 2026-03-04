@@ -15,8 +15,10 @@ class HomeStatsCards extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
       child: Row(
         children: [
+          // XP card: takes more space with horizontal layout
           Expanded(
-            child: _StatCard(
+            flex: 2,
+            child: _XpStatCard(
               icon: Icons.bolt_rounded,
               iconColor: AppColors.xpGold,
               iconBg: AppColors.beigOrange,
@@ -25,8 +27,10 @@ class HomeStatsCards extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppDimensions.spacing12),
+          // Level card: vertical with left border accent
           Expanded(
-            child: _StatCard(
+            flex: 1,
+            child: _LevelStatCard(
               icon: Icons.shield_rounded,
               iconColor: AppColors.royalBlue,
               iconBg: AppColors.beigBlue,
@@ -35,8 +39,10 @@ class HomeStatsCards extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppDimensions.spacing12),
+          // Streak card: vertical with different radius
           Expanded(
-            child: _StatCard(
+            flex: 1,
+            child: _StreakStatCard(
               icon: Icons.local_fire_department_rounded,
               iconColor: AppColors.streakOrange,
               iconBg: AppColors.beigOrange,
@@ -50,14 +56,88 @@ class HomeStatsCards extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
+/// XP card with horizontal layout (icon left, text right) and larger flex
+class _XpStatCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final Color iconBg;
   final String label;
   final String value;
 
-  const _StatCard({
+  const _XpStatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacing16,
+        horizontal: AppDimensions.spacing16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
+            ),
+            child: Icon(icon, color: iconColor, size: AppDimensions.iconMedium),
+          ),
+          const SizedBox(width: AppDimensions.spacing12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: AppTextStyles.headlineSmall.copyWith(
+                    fontSize: 20,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacing2),
+                Text(
+                  label,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Level card with subtle left border accent
+class _LevelStatCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final String label;
+  final String value;
+
+  const _LevelStatCard({
     required this.icon,
     required this.iconColor,
     required this.iconBg,
@@ -75,6 +155,78 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        border: const Border(
+          left: BorderSide(
+            color: AppColors.royalBlue,
+            width: 4,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
+            ),
+            child: Icon(icon, color: iconColor, size: AppDimensions.iconMedium),
+          ),
+          const SizedBox(height: AppDimensions.spacing8),
+          Text(
+            value,
+            style: AppTextStyles.headlineSmall.copyWith(
+              fontSize: 20,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacing2),
+          Text(
+            label,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Streak card with different border radius for visual variation
+class _StreakStatCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final String label;
+  final String value;
+
+  const _StreakStatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacing16,
+        horizontal: AppDimensions.spacing12,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radius20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
