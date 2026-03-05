@@ -6,6 +6,7 @@ import '../../shared/constants/app_durations.dart';
 import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
+import '../onboarding/demo_lesson_screen.dart';
 
 /// Auth screen based on Figma design
 /// Blue background + robot character + login buttons
@@ -233,6 +234,27 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             backgroundColor: Colors.white.withValues(alpha: 0.2),
                             textColor: Colors.white,
                             onPressed: _handleEmailLogin,
+                          ),
+                          const SizedBox(height: 12),
+                          // Demo lesson link
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const DemoLessonScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              '먼저 체험해보기 →',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.white.withValues(alpha: 0.4),
+                              ),
+                            ),
                           ),
                         ],
                       ),

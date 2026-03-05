@@ -165,8 +165,9 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       );
     }
 
-    // 프로필이 완성되지 않은 경우 프로필 설정 화면으로
-    if (!user.isProfileComplete) {
+    // Show profile setup for incomplete profiles or guest users with default name
+    if (!user.isProfileComplete ||
+        (user.isGuest && user.displayName == '게스트')) {
       AppLogger.info('프로필 미완성, 프로필 설정 화면으로 이동', tag: 'AuthWrapper');
       return const OnboardingProfileSetupScreen();
     }
