@@ -135,335 +135,228 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: AppColors.skyBlue,
       body: SafeArea(
         child: Stack(
           children: [
-            // Subtle grain texture
             const NoiseTexture(opacity: 0.02, color: Colors.white),
-            // Main content
-            SingleChildScrollView(
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: size.height - MediaQuery.of(context).padding.top,
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.screenHorizontalPadding,
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: AppDimensions.spacing40),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.screenHorizontalPadding,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
 
-                    // Robot character
-                    FadeTransition(
+                  // Robot character - fills available space
+                  Expanded(
+                    child: FadeTransition(
                       opacity: _fadeAnimation,
-                      child: Image.asset(
-                        'assets/images/login/chatbot.png',
-                        width: AppDimensions.chatbotImageSize,
-                        height: AppDimensions.chatbotImageSize,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.2),
-                            ),
-                            child: const Icon(
-                              Icons.smart_toy_rounded,
-                              size: 100,
-                              color: Colors.white,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: AppDimensions.spacing24),
-
-                    // Goal card
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(AppDimensions.spacing20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: AppDimensions.iconXLarge,
-                                  height: AppDimensions.iconXLarge,
+                      child: Center(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final imageSize = constraints.maxHeight * 0.85;
+                            return Image.asset(
+                              'assets/images/login/chatbot.png',
+                              width: imageSize,
+                              height: imageSize,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 140,
+                                  height: 140,
                                   decoration: BoxDecoration(
-                                    color: AppColors.skyBlue.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(AppDimensions.radius12),
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withValues(alpha: 0.2),
                                   ),
                                   child: const Icon(
-                                    Icons.flag_rounded,
-                                    color: AppColors.skyBlue,
-                                    size: 28,
-                                  ),
-                                ),
-                                const SizedBox(width: AppDimensions.spacing16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '수학 학습을 시작하세요!',
-                                        style: AppTextStyles.titleLarge.copyWith(
-                                          fontSize: 18,
-                                          color: AppColors.textDark,
-                                        ),
-                                      ),
-                                      const SizedBox(height: AppDimensions.spacing4),
-                                      Text(
-                                        '매일 조금씩, 재미있게 배워요',
-                                        style: AppTextStyles.bodyMedium.copyWith(
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppDimensions.spacing16),
-                            // Progress bar
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(AppDimensions.radius8),
-                              child: const LinearProgressIndicator(
-                                value: 0.0,
-                                backgroundColor: AppColors.cardBg,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.mathGreen,
-                                ),
-                                minHeight: 8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: AppDimensions.spacing32),
-
-                    // Buttons with animation
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Column(
-                          children: [
-                            // Main start button (green)
-                            SizedBox(
-                              width: double.infinity,
-                              height: AppDimensions.buttonHeightLarge,
-                              child: ElevatedButton(
-                                onPressed: _handleGuestStart,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.mathGreen,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shadowColor: AppColors.mathGreen.withValues(alpha: 0.4),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                                  ),
-                                ),
-                                child: Text(
-                                  '학습 시작하기',
-                                  style: AppTextStyles.titleLarge.copyWith(
-                                    fontSize: 18,
+                                    Icons.smart_toy_rounded,
+                                    size: 80,
                                     color: Colors.white,
                                   ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: AppDimensions.spacing16),
-
-                            // Divider
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    color: Colors.white.withValues(alpha: 0.4),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppDimensions.spacing16,
-                                  ),
-                                  child: Text(
-                                    '또는',
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    color: Colors.white.withValues(alpha: 0.4),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: AppDimensions.spacing16),
-
-                            // Google login
-                            _buildSocialButton(
-                              text: 'Google로 계속하기',
-                              icon: null,
-                              fallbackIcon: Icons.g_mobiledata,
-                              backgroundColor: Colors.white,
-                              textColor: AppColors.textDark,
-                              onPressed: _handleGoogleLogin,
-                            ),
-
-                            const SizedBox(height: AppDimensions.spacing12),
-
-                            // Apple login (iOS only)
-                            if (defaultTargetPlatform == TargetPlatform.iOS) ...[
-                              _buildSocialButton(
-                                text: 'Apple로 계속하기',
-                                icon: null,
-                                fallbackIcon: Icons.apple,
-                                backgroundColor: Colors.black,
-                                textColor: Colors.white,
-                                onPressed: _handleAppleLogin,
-                              ),
-                              const SizedBox(height: AppDimensions.spacing12),
-                            ],
-
-                            // Kakao login
-                            _buildSocialButton(
-                              text: 'Kakao로 계속하기',
-                              icon: null,
-                              fallbackIcon: Icons.chat_bubble,
-                              backgroundColor: AppColors.kakaoYellow,
-                              textColor: AppColors.kakaoBrown,
-                              onPressed: _handleKakaoLogin,
-                            ),
-
-                            const SizedBox(height: AppDimensions.spacing12),
-
-                            // Email login
-                            _buildSocialButton(
-                              text: '이메일로 계속하기',
-                              icon: null,
-                              fallbackIcon: Icons.email_outlined,
-                              backgroundColor: Colors.white.withValues(alpha: 0.2),
-                              textColor: Colors.white,
-                              onPressed: _handleEmailLogin,
-                            ),
-                          ],
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: AppDimensions.spacing40),
+                  const SizedBox(height: 12),
 
-                    // Bottom logo
-                    FadeTransition(
+                  // Buttons with animation
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
                       opacity: _fadeAnimation,
-                      child: Image.asset(
-                        'assets/icons/gomath_logo.png',
-                        height: AppDimensions.logoHeight,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text(
-                            'MathLab',
-                            style: AppTextStyles.headlineMedium.copyWith(
-                              color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Main start button (green)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: _handleGuestStart,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.mathGreen,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shadowColor: AppColors.mathGreen.withValues(alpha: 0.4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
+                                ),
+                              ),
+                              child: Text(
+                                '학습 시작하기',
+                                style: AppTextStyles.titleLarge.copyWith(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
+                          ),
 
-                    // Terms & privacy section
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppDimensions.spacing16,
-                        ),
-                        child: Text.rich(
-                          TextSpan(
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              height: 1.5,
-                            ),
+                          const SizedBox(height: 12),
+
+                          // Divider
+                          Row(
                             children: [
-                              const TextSpan(text: '계속 진행하면 '),
-                              WidgetSpan(
-                                child: GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const TermsOfServiceScreen()),
-                                  ),
-                                  child: Text(
-                                    '이용약관',
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.95),
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Colors.white.withValues(alpha: 0.7),
-                                    ),
+                              Expanded(
+                                child: Container(
+                                  height: 1,
+                                  color: Colors.white.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
+                                child: Text(
+                                  '또는',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
-                              const TextSpan(text: ' 및 '),
-                              WidgetSpan(
-                                child: GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
-                                  ),
-                                  child: Text(
-                                    '개인정보처리방침',
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.95),
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Colors.white.withValues(alpha: 0.7),
-                                    ),
-                                  ),
+                              Expanded(
+                                child: Container(
+                                  height: 1,
+                                  color: Colors.white.withValues(alpha: 0.4),
                                 ),
                               ),
-                              const TextSpan(text: '에 동의하게 됩니다.'),
                             ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
+
+                          const SizedBox(height: 12),
+
+                          // Google login
+                          _buildSocialButton(
+                            text: 'Google로 계속하기',
+                            icon: null,
+                            fallbackIcon: Icons.g_mobiledata,
+                            backgroundColor: Colors.white,
+                            textColor: AppColors.textDark,
+                            onPressed: _handleGoogleLogin,
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Apple login (iOS only)
+                          if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+                            _buildSocialButton(
+                              text: 'Apple로 계속하기',
+                              icon: null,
+                              fallbackIcon: Icons.apple,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              onPressed: _handleAppleLogin,
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+
+                          // Kakao login
+                          _buildSocialButton(
+                            text: 'Kakao로 계속하기',
+                            icon: null,
+                            fallbackIcon: Icons.chat_bubble,
+                            backgroundColor: AppColors.kakaoYellow,
+                            textColor: AppColors.kakaoBrown,
+                            onPressed: _handleKakaoLogin,
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Email login
+                          _buildSocialButton(
+                            text: '이메일로 계속하기',
+                            icon: null,
+                            fallbackIcon: Icons.email_outlined,
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                            textColor: Colors.white,
+                            onPressed: _handleEmailLogin,
+                          ),
+                        ],
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: AppDimensions.spacing32),
-                  ],
-                ),
+                  const SizedBox(height: 12),
+
+                  // Terms & privacy
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Text.rich(
+                      TextSpan(
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          height: 1.5,
+                        ),
+                        children: [
+                          const TextSpan(text: '계속 진행하면 '),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const TermsOfServiceScreen()),
+                              ),
+                              child: Text(
+                                '이용약관',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.white.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const TextSpan(text: ' 및 '),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                              ),
+                              child: Text(
+                                '개인정보처리방침',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.white.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const TextSpan(text: '에 동의하게 됩니다.'),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+                ],
               ),
             ),
 
@@ -493,7 +386,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }) {
     return SizedBox(
       width: double.infinity,
-      height: AppDimensions.buttonHeightMedium,
+      height: 44,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
