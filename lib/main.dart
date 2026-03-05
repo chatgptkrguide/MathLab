@@ -142,6 +142,15 @@ void main() async {
   }
 }
 
+/// Android 오버스크롤 스트레치 효과 제거
+class _NoStretchScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // 오버스크롤 인디케이터 제거
+  }
+}
+
 class MathLabApp extends StatelessWidget {
   const MathLabApp({super.key});
 
@@ -150,6 +159,7 @@ class MathLabApp extends StatelessWidget {
     return MaterialApp(
       title: 'MathLab',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: _NoStretchScrollBehavior(),
 
       // Theme
       theme: ThemeData(

@@ -53,16 +53,18 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     final dailyGoal = GameConstants.dailyGoalXP;
     final progress = (dailyXP / dailyGoal).clamp(0.0, 1.0);
 
-    return Stack(
-      children: [
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(gradient: AppColors.homeGradient),
-        ),
-        const NoiseTexture(opacity: 0.025, color: Colors.white),
-        SafeArea(
-          child: Padding(
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(gradient: AppColors.homeGradient),
+          ),
+          const NoiseTexture(opacity: 0.025, color: Colors.white),
+          SafeArea(
+            bottom: false,
+            child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
@@ -297,7 +299,8 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
             ),
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 }

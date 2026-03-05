@@ -134,6 +134,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     return Scaffold(
       backgroundColor: AppColors.skyBlue,
       body: SafeArea(
+        bottom: false,
         child: Stack(
           children: [
             const NoiseTexture(opacity: 0.02, color: Colors.white),
