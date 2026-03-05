@@ -112,20 +112,16 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                 const SizedBox(height: 24),
                 // White card area
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      width: double.infinity,
-                      constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * 0.7,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
                       ),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -324,7 +320,6 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

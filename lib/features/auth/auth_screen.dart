@@ -2,11 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_durations.dart';
-import '../../shared/constants/app_text_styles.dart';
-import '../legal/privacy_policy_screen.dart';
-import '../legal/terms_of_service_screen.dart';
 import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
@@ -142,13 +138,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           children: [
             const NoiseTexture(opacity: 0.02, color: Colors.white),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.screenHorizontalPadding,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  const SizedBox(height: 12),
-
                   // Robot character - fills available space
                   Expanded(
                     child: FadeTransition(
@@ -156,27 +148,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       child: Center(
                         child: LayoutBuilder(
                           builder: (context, constraints) {
-                            final imageSize = constraints.maxHeight * 0.85;
+                            final imageSize = (constraints.maxHeight * 0.8).clamp(100.0, 220.0);
                             return Image.asset(
                               'assets/images/login/chatbot.png',
                               width: imageSize,
                               height: imageSize,
                               fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: 140,
-                                  height: 140,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                  ),
-                                  child: const Icon(
-                                    Icons.smart_toy_rounded,
-                                    size: 80,
-                                    color: Colors.white,
-                                  ),
-                                );
-                              },
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                ),
+                                child: const Icon(Icons.smart_toy_rounded, size: 60, color: Colors.white),
+                              ),
                             );
                           },
                         ),
@@ -184,9 +170,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 12),
-
-                  // Buttons with animation
+                  // Buttons
                   SlideTransition(
                     position: _slideAnimation,
                     child: FadeTransition(
@@ -194,104 +178,56 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Main start button (green)
+                          // Main start button
                           SizedBox(
                             width: double.infinity,
-                            height: 48,
+                            height: 46,
                             child: ElevatedButton(
                               onPressed: _handleGuestStart,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.mathGreen,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
-                                shadowColor: AppColors.mathGreen.withValues(alpha: 0.4),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              child: Text(
-                                '학습 시작하기',
-                                style: AppTextStyles.titleLarge.copyWith(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              child: const Text('학습 시작하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             ),
                           ),
-
-                          const SizedBox(height: 12),
-
-                          // Divider
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 1,
-                                  color: Colors.white.withValues(alpha: 0.4),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
-                                child: Text(
-                                  '또는',
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  height: 1,
-                                  color: Colors.white.withValues(alpha: 0.4),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Google login
+                          const SizedBox(height: 10),
+                          // Google
                           _buildSocialButton(
                             text: 'Google로 계속하기',
-                            icon: null,
                             fallbackIcon: Icons.g_mobiledata,
                             backgroundColor: Colors.white,
                             textColor: AppColors.textDark,
                             onPressed: _handleGoogleLogin,
                           ),
-
-                          const SizedBox(height: 8),
-
-                          // Apple login (iOS only)
+                          const SizedBox(height: 6),
+                          // Apple (iOS only)
                           if (defaultTargetPlatform == TargetPlatform.iOS) ...[
                             _buildSocialButton(
                               text: 'Apple로 계속하기',
-                              icon: null,
                               fallbackIcon: Icons.apple,
                               backgroundColor: Colors.black,
                               textColor: Colors.white,
                               onPressed: _handleAppleLogin,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                           ],
-
-                          // Kakao login
+                          // Kakao
                           _buildSocialButton(
                             text: 'Kakao로 계속하기',
-                            icon: null,
                             fallbackIcon: Icons.chat_bubble,
                             backgroundColor: AppColors.kakaoYellow,
                             textColor: AppColors.kakaoBrown,
                             onPressed: _handleKakaoLogin,
                           ),
-
-                          const SizedBox(height: 8),
-
-                          // Email login
+                          const SizedBox(height: 6),
+                          // Email
                           _buildSocialButton(
                             text: '이메일로 계속하기',
-                            icon: null,
                             fallbackIcon: Icons.email_outlined,
                             backgroundColor: Colors.white.withValues(alpha: 0.2),
                             textColor: Colors.white,
@@ -302,57 +238,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
-                  // Terms & privacy
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Text.rich(
-                      TextSpan(
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          height: 1.5,
-                        ),
-                        children: [
-                          const TextSpan(text: '계속 진행하면 '),
-                          WidgetSpan(
-                            child: GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const TermsOfServiceScreen()),
-                              ),
-                              child: Text(
-                                '이용약관',
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.95),
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const TextSpan(text: ' 및 '),
-                          WidgetSpan(
-                            child: GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
-                              ),
-                              child: Text(
-                                '개인정보처리방침',
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.95),
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const TextSpan(text: '에 동의하게 됩니다.'),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                  // Terms (한 줄)
+                  Text(
+                    '계속 진행하면 이용약관 및 개인정보처리방침에 동의합니다.',
+                    style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.6)),
+                    textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: 8),
@@ -365,9 +257,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               Container(
                 color: Colors.black54,
                 child: const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
+                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                 ),
               ),
           ],
@@ -378,7 +268,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Widget _buildSocialButton({
     required String text,
-    required String? icon,
     required IconData fallbackIcon,
     required Color backgroundColor,
     required Color textColor,
@@ -386,39 +275,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }) {
     return SizedBox(
       width: double.infinity,
-      height: 44,
+      height: 42,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radius12),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null)
-              Image.asset(
-                icon,
-                width: AppDimensions.iconMedium,
-                height: AppDimensions.iconMedium,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(fallbackIcon, size: AppDimensions.iconMedium, color: textColor);
-                },
-              )
-            else
-              Icon(fallbackIcon, size: AppDimensions.iconMedium, color: textColor),
-            const SizedBox(width: AppDimensions.spacing12),
-            Text(
-              text,
-              style: AppTextStyles.titleMedium.copyWith(
-                color: textColor,
-              ),
-            ),
+            Icon(fallbackIcon, size: 22, color: textColor),
+            const SizedBox(width: 8),
+            Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
           ],
         ),
       ),
