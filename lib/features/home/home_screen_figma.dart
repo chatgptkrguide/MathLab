@@ -12,6 +12,8 @@ import '../lessons/figma/lessons_screen_figma.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
 import '../../data/providers/gamification/heart_regen_provider.dart';
+import '../../data/providers/gamification/streak_provider.dart';
+import '../shop/shop_screen.dart';
 
 /// 피그마 "00 home" 디자인 — 한 화면, 로봇 중심
 class HomeScreenFigma extends ConsumerStatefulWidget {
@@ -52,6 +54,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     });
 
     final streak = user?.streak ?? 0;
+    final streakState = ref.watch(streakProvider);
     final hearts = user?.hearts ?? GameConstants.maxHearts;
     final maxHearts = user?.maxHearts ?? GameConstants.maxHearts;
     final heartRegen = ref.watch(heartRegenProvider);
@@ -104,36 +107,41 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(16),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ShopScreen()),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.favorite, color: Color(0xFFFF4B6E), size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$hearts',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (hearts < maxHearts && heartRegen.nextRegenSeconds > 0) ...[
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.favorite, color: Color(0xFFFF4B6E), size: 16),
                             const SizedBox(width: 4),
                             Text(
-                              '(${_formatRegenTime(heartRegen.nextRegenSeconds)})',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 12,
+                              '$hearts',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                            if (hearts < maxHearts && heartRegen.nextRegenSeconds > 0) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '(${_formatRegenTime(heartRegen.nextRegenSeconds)})',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -160,6 +168,10 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                            if (streakState.freezesRemaining > 0) ...[
+                              const SizedBox(width: 4),
+                              const Icon(Icons.shield, color: Color(0xFF64FFDA), size: 14),
+                            ],
                           ],
                         ),
                       ),

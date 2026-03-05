@@ -37,11 +37,23 @@ class UserModel {
   final String league;
   final List<String> achievements;
 
+  // Streak Protection
+  final int streakFreezes;
+  final DateTime? lastFreezeUsedAt;
+
   // Settings
   final String preferredLanguage;
   final bool notificationsEnabled;
   final bool soundEnabled;
   final int dailyGoalMinutes;
+
+  // Notification Settings
+  final bool dailyReminderEnabled;
+  final int reminderHour;
+  final int reminderMinute;
+  final bool streakReminderEnabled;
+  final bool achievementAlertEnabled;
+  final bool weeklyReportEnabled;
 
   const UserModel({
     required this.uid,
@@ -69,10 +81,18 @@ class UserModel {
     this.gems = 0,
     this.league = 'Bronze',
     this.achievements = const [],
+    this.streakFreezes = 0,
+    this.lastFreezeUsedAt,
     this.preferredLanguage = 'ko',
     this.notificationsEnabled = true,
     this.soundEnabled = true,
     this.dailyGoalMinutes = 10,
+    this.dailyReminderEnabled = true,
+    this.reminderHour = 20,
+    this.reminderMinute = 0,
+    this.streakReminderEnabled = true,
+    this.achievementAlertEnabled = true,
+    this.weeklyReportEnabled = true,
   });
 
   // ========================================
@@ -155,10 +175,20 @@ class UserModel {
       gems: data['gems'] ?? 0,
       league: data['league'] ?? 'Bronze',
       achievements: List<String>.from(data['achievements'] ?? []),
+      streakFreezes: data['streakFreezes'] ?? 0,
+      lastFreezeUsedAt: data['lastFreezeUsedAt'] != null
+          ? (data['lastFreezeUsedAt'] as Timestamp).toDate()
+          : null,
       preferredLanguage: data['preferredLanguage'] ?? 'ko',
       notificationsEnabled: data['notificationsEnabled'] ?? true,
       soundEnabled: data['soundEnabled'] ?? true,
       dailyGoalMinutes: data['dailyGoalMinutes'] ?? 10,
+      dailyReminderEnabled: data['dailyReminderEnabled'] ?? true,
+      reminderHour: data['reminderHour'] ?? 20,
+      reminderMinute: data['reminderMinute'] ?? 0,
+      streakReminderEnabled: data['streakReminderEnabled'] ?? true,
+      achievementAlertEnabled: data['achievementAlertEnabled'] ?? true,
+      weeklyReportEnabled: data['weeklyReportEnabled'] ?? true,
     );
   }
 
@@ -193,10 +223,18 @@ class UserModel {
       'gems': gems,
       'league': league,
       'achievements': achievements,
+      'streakFreezes': streakFreezes,
+      'lastFreezeUsedAt': lastFreezeUsedAt != null ? Timestamp.fromDate(lastFreezeUsedAt!) : null,
       'preferredLanguage': preferredLanguage,
       'notificationsEnabled': notificationsEnabled,
       'soundEnabled': soundEnabled,
       'dailyGoalMinutes': dailyGoalMinutes,
+      'dailyReminderEnabled': dailyReminderEnabled,
+      'reminderHour': reminderHour,
+      'reminderMinute': reminderMinute,
+      'streakReminderEnabled': streakReminderEnabled,
+      'achievementAlertEnabled': achievementAlertEnabled,
+      'weeklyReportEnabled': weeklyReportEnabled,
     };
   }
 
@@ -228,10 +266,18 @@ class UserModel {
       'gems': gems,
       'league': league,
       'achievements': achievements,
+      'streakFreezes': streakFreezes,
+      'lastFreezeUsedAt': lastFreezeUsedAt?.toIso8601String(),
       'preferredLanguage': preferredLanguage,
       'notificationsEnabled': notificationsEnabled,
       'soundEnabled': soundEnabled,
       'dailyGoalMinutes': dailyGoalMinutes,
+      'dailyReminderEnabled': dailyReminderEnabled,
+      'reminderHour': reminderHour,
+      'reminderMinute': reminderMinute,
+      'streakReminderEnabled': streakReminderEnabled,
+      'achievementAlertEnabled': achievementAlertEnabled,
+      'weeklyReportEnabled': weeklyReportEnabled,
     };
   }
 
@@ -265,10 +311,18 @@ class UserModel {
     int? gems,
     String? league,
     List<String>? achievements,
+    int? streakFreezes,
+    DateTime? lastFreezeUsedAt,
     String? preferredLanguage,
     bool? notificationsEnabled,
     bool? soundEnabled,
     int? dailyGoalMinutes,
+    bool? dailyReminderEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    bool? streakReminderEnabled,
+    bool? achievementAlertEnabled,
+    bool? weeklyReportEnabled,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -296,10 +350,18 @@ class UserModel {
       gems: gems ?? this.gems,
       league: league ?? this.league,
       achievements: achievements ?? this.achievements,
+      streakFreezes: streakFreezes ?? this.streakFreezes,
+      lastFreezeUsedAt: lastFreezeUsedAt ?? this.lastFreezeUsedAt,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
+      dailyReminderEnabled: dailyReminderEnabled ?? this.dailyReminderEnabled,
+      reminderHour: reminderHour ?? this.reminderHour,
+      reminderMinute: reminderMinute ?? this.reminderMinute,
+      streakReminderEnabled: streakReminderEnabled ?? this.streakReminderEnabled,
+      achievementAlertEnabled: achievementAlertEnabled ?? this.achievementAlertEnabled,
+      weeklyReportEnabled: weeklyReportEnabled ?? this.weeklyReportEnabled,
     );
   }
 

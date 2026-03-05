@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../shared/constants/constants.dart';
+import '../../data/providers/user/user_provider.dart';
 
-/// 알림 설정 화면
-/// - 알림 유형별 ON/OFF 설정
-/// - 알림 시간 설정
+/// Notification settings screen
+/// - Per-type ON/OFF toggles
+/// - Reminder time picker
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
   const NotificationSettingsScreen({super.key});
 
@@ -24,6 +25,43 @@ class _NotificationSettingsScreenState
   TimeOfDay _reminderTime = const TimeOfDay(hour: 20, minute: 0);
 
   @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  void _loadSettings() {
+    final user = ref.read(userProvider);
+    if (user != null) {
+      setState(() {
+        _dailyReminder = user.dailyReminderEnabled;
+        _streakReminder = user.streakReminderEnabled;
+        _achievementAlert = user.achievementAlertEnabled;
+        _weeklyReport = user.weeklyReportEnabled;
+        _reminderTime = TimeOfDay(hour: user.reminderHour, minute: user.reminderMinute);
+      });
+    }
+  }
+
+  void _saveSettings({
+    bool? dailyReminderEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    bool? streakReminderEnabled,
+    bool? achievementAlertEnabled,
+    bool? weeklyReportEnabled,
+  }) {
+    ref.read(userProvider.notifier).updateNotificationSettings(
+      dailyReminderEnabled: dailyReminderEnabled,
+      reminderHour: reminderHour,
+      reminderMinute: reminderMinute,
+      streakReminderEnabled: streakReminderEnabled,
+      achievementAlertEnabled: achievementAlertEnabled,
+      weeklyReportEnabled: weeklyReportEnabled,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -40,7 +78,6 @@ class _NotificationSettingsScreenState
           children: [
             const SizedBox(height: AppDimensions.paddingMedium),
 
-            // 학습 알림 섹션
             _buildSectionHeader('학습 알림'),
             _buildSwitchTile(
               icon: Icons.access_alarm,
@@ -49,6 +86,7 @@ class _NotificationSettingsScreenState
               value: _dailyReminder,
               onChanged: (value) {
                 setState(() => _dailyReminder = value);
+                _saveSettings(dailyReminderEnabled: value);
               },
             ),
             if (_dailyReminder)
@@ -60,12 +98,12 @@ class _NotificationSettingsScreenState
               value: _streakReminder,
               onChanged: (value) {
                 setState(() => _streakReminder = value);
+                _saveSettings(streakReminderEnabled: value);
               },
             ),
 
             const Divider(height: 32),
 
-            // 성과 알림 섹션
             _buildSectionHeader('성과 알림'),
             _buildSwitchTile(
               icon: Icons.emoji_events,
@@ -74,6 +112,7 @@ class _NotificationSettingsScreenState
               value: _achievementAlert,
               onChanged: (value) {
                 setState(() => _achievementAlert = value);
+                _saveSettings(achievementAlertEnabled: value);
               },
             ),
             _buildSwitchTile(
@@ -88,7 +127,6 @@ class _NotificationSettingsScreenState
 
             const Divider(height: 32),
 
-            // 리포트 섹션
             _buildSectionHeader('리포트'),
             _buildSwitchTile(
               icon: Icons.bar_chart,
@@ -97,6 +135,7 @@ class _NotificationSettingsScreenState
               value: _weeklyReport,
               onChanged: (value) {
                 setState(() => _weeklyReport = value);
+                _saveSettings(weeklyReportEnabled: value);
               },
             ),
 
@@ -174,6 +213,7 @@ class _NotificationSettingsScreenState
           );
           if (time != null) {
             setState(() => _reminderTime = time);
+            _saveSettings(reminderHour: time.hour, reminderMinute: time.minute);
           }
         },
         child: Text(

@@ -14,6 +14,7 @@ import 'dialogs/dialogs.dart';
 import '../admin/admin_shell_screen.dart';
 import '../../core/config/env_config.dart';
 import '../../data/providers/infrastructure/feature_flag_provider.dart';
+import '../shop/shop_screen.dart';
 
 /// 설정 화면
 /// - 계정 관리
@@ -175,6 +176,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             setState(() {
                               _soundEnabled = value;
                             });
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppDimensions.spacing20),
+
+                    // 상점 섹션
+                    const SectionHeader(
+                      title: '상점',
+                      accentColor: Color(0xFF6B5CE7),
+                    ),
+                    const SizedBox(height: AppDimensions.spacing8),
+                    _buildSettingsCard(
+                      children: [
+                        SettingTile(
+                          icon: Icons.diamond_rounded,
+                          title: '젬 상점',
+                          subtitle: '하트, 스트릭 보호 등 아이템 구매',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ShopScreen(),
+                              ),
+                            );
                           },
                         ),
                       ],

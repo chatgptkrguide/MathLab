@@ -431,10 +431,18 @@ class User extends _$User {
           gems: state!.gems,
           league: state!.league,
           achievements: state!.achievements,
+          streakFreezes: state!.streakFreezes,
+          lastFreezeUsedAt: state!.lastFreezeUsedAt,
           preferredLanguage: state!.preferredLanguage,
           notificationsEnabled: state!.notificationsEnabled,
           soundEnabled: state!.soundEnabled,
           dailyGoalMinutes: state!.dailyGoalMinutes,
+          dailyReminderEnabled: state!.dailyReminderEnabled,
+          reminderHour: state!.reminderHour,
+          reminderMinute: state!.reminderMinute,
+          streakReminderEnabled: state!.streakReminderEnabled,
+          achievementAlertEnabled: state!.achievementAlertEnabled,
+          weeklyReportEnabled: state!.weeklyReportEnabled,
         );
       }
     } catch (e, st) {
@@ -627,6 +635,91 @@ class User extends _$User {
         originalError: e,
         stackTrace: st,
       );
+    }
+  }
+
+  // ========================================
+  // Notification Settings
+  // ========================================
+
+  /// Update notification settings
+  Future<void> updateNotificationSettings({
+    bool? dailyReminderEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    bool? streakReminderEnabled,
+    bool? achievementAlertEnabled,
+    bool? weeklyReportEnabled,
+  }) async {
+    if (state == null) return;
+
+    try {
+      AppLogger.info('Updating notification settings', tag: 'User');
+
+      final now = DateTime.now();
+      final updatedUser = state!.copyWith(
+        dailyReminderEnabled: dailyReminderEnabled,
+        reminderHour: reminderHour,
+        reminderMinute: reminderMinute,
+        streakReminderEnabled: streakReminderEnabled,
+        achievementAlertEnabled: achievementAlertEnabled,
+        weeklyReportEnabled: weeklyReportEnabled,
+        updatedAt: now,
+      );
+
+      final updates = <String, dynamic>{
+        'updatedAt': Timestamp.fromDate(now),
+      };
+
+      if (dailyReminderEnabled != null) updates['dailyReminderEnabled'] = dailyReminderEnabled;
+      if (reminderHour != null) updates['reminderHour'] = reminderHour;
+      if (reminderMinute != null) updates['reminderMinute'] = reminderMinute;
+      if (streakReminderEnabled != null) updates['streakReminderEnabled'] = streakReminderEnabled;
+      if (achievementAlertEnabled != null) updates['achievementAlertEnabled'] = achievementAlertEnabled;
+      if (weeklyReportEnabled != null) updates['weeklyReportEnabled'] = weeklyReportEnabled;
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update(updates);
+
+      state = updatedUser;
+      AppLogger.info('Notification settings updated', tag: 'User');
+    } catch (e, st) {
+      AppLogger.error('Failed to update notification settings', tag: 'User', error: e, stackTrace: st);
+    }
+  }
+
+  // ========================================
+  // Streak Freeze
+  // ========================================
+
+  /// Update streak freeze count in Firestore
+  Future<void> updateStreakFreezes(int freezes, {DateTime? lastUsedAt}) async {
+    if (state == null) return;
+
+    try {
+      final now = DateTime.now();
+      final updates = <String, dynamic>{
+        'streakFreezes': freezes,
+        'updatedAt': Timestamp.fromDate(now),
+      };
+      if (lastUsedAt != null) {
+        updates['lastFreezeUsedAt'] = Timestamp.fromDate(lastUsedAt);
+      }
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update(updates);
+
+      state = state!.copyWith(
+        streakFreezes: freezes,
+        lastFreezeUsedAt: lastUsedAt,
+        updatedAt: now,
+      );
+    } catch (e, st) {
+      AppLogger.error('Failed to update streak freezes', tag: 'User', error: e, stackTrace: st);
     }
   }
 
