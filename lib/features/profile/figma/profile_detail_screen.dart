@@ -1,724 +1,285 @@
-// Profile Detail Screen (Figma "05" Design)
-//
-// Profile header with follower/following + 6 stat grid (2x3)
-// + Subject cards + Badge collection + Weekly streak + Logout
+// Profile Detail Screen — Figma "03" 디자인
+// 챌린지 진행률 + 레벨 + 캘린더를 한 화면에 표시
+// 스크롤 없이 한 화면에 모든 정보 표시
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../shared/constants/app_dimensions.dart';
-import '../../../shared/constants/app_text_styles.dart';
+import '../../../shared/widgets/effects/noise_texture.dart';
 import '../edit_profile_screen.dart';
 
-class ProfileDetailScreen extends ConsumerWidget {
+class ProfileDetailScreen extends ConsumerStatefulWidget {
   const ProfileDetailScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileDetailScreen> createState() =>
+      _ProfileDetailScreenState();
+}
+
+class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
+  Set<int> _studiedDays = {};
+  DateTime _displayMonth = DateTime.now();
+  bool _isLoadingCalendar = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStudyDates();
+  }
+
+  Future<void> _loadStudyDates() async {
+    final authState = ref.read(authProvider);
+    if (!authState.isAuthenticated) return;
+
+    final userNotifier = ref.read(userProvider.notifier);
+    final now = _displayMonth;
+    final dates =
+        await userNotifier.getStudyDatesForMonth(now.year, now.month);
+
+    if (mounted) {
+      setState(() {
+        _studiedDays = dates;
+        _isLoadingCalendar = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      body: user == null
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
-                // Profile header with avatar, name, level, follower/following
-                SliverToBoxAdapter(child: _buildProfileHeader(context, user)),
+    if (user == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-                // 6 stat boxes in 2 rows of 3
-                SliverToBoxAdapter(child: _buildStatsGrid(user)),
-
-                // Subject cards
-                SliverToBoxAdapter(child: _buildSubjectCards()),
-
-                // Weekly streak history
-                SliverToBoxAdapter(child: _buildStreakHistory()),
-
-                // Badge collection
-                SliverToBoxAdapter(child: _buildBadgeCollection()),
-
-                // Logout
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.spacing24,
-                      vertical: AppDimensions.spacing16,
-                    ),
-                    child: OutlinedButton.icon(
-                      onPressed: () => _handleLogout(context, ref),
-                      icon: const Icon(Icons.logout),
-                      label: const Text('로그아웃'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppDimensions.spacing12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radius12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              ],
-            ),
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // Section Header
-  // ──────────────────────────────────────────────
-
-  Widget _buildSectionHeader(String title, {String? actionText, VoidCallback? onAction}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Stack(
       children: [
-        Text(
-          title,
-          style: AppTextStyles.titleLarge.copyWith(
-            fontSize: 18,
-            color: AppColors.textDark,
-          ),
+        // Background gradient
+        Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(gradient: AppColors.skyBlueGradient),
         ),
-        if (actionText != null)
-          GestureDetector(
-            onTap: onAction,
-            child: Text(
-              actionText,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.royalBlue,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // Profile Header
-  // ──────────────────────────────────────────────
-
-  Widget _buildProfileHeader(BuildContext context, UserModel user) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + AppDimensions.spacing20,
-        bottom: AppDimensions.spacing24,
-        left: AppDimensions.spacing24,
-        right: AppDimensions.spacing24,
-      ),
-      decoration: const BoxDecoration(
-        gradient: AppColors.skyBlueGradient,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Avatar
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.2),
-              border: Border.all(color: Colors.white, width: 3),
-            ),
-            child: user.photoUrl != null
-                ? ClipOval(
-                    child: Image.network(
-                      user.photoUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.person_rounded,
-                        size: AppDimensions.iconXLarge,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-                : const Icon(Icons.person_rounded, size: AppDimensions.iconXLarge, color: Colors.white),
-          ),
-          const SizedBox(height: AppDimensions.spacing12),
-
-          // Name - large and bold for dramatic contrast
-          Text(
-            user.displayName ?? '사용자',
-            style: AppTextStyles.titleLarge.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 24,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppDimensions.spacing4),
-
-          // Level badge - Korean label
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: AppDimensions.spacing4,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(AppDimensions.radius12),
-            ),
-            child: Text(
-              'Lv.${user.level}',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacing12),
-
-          // Edit Profile button
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing20,
-                vertical: AppDimensions.spacing8,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppDimensions.radius20),
-              ),
-              child: Text(
-                '프로필 수정',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.royalBlue,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacing16),
-
-          // Follower / Following counts
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        const NoiseTexture(opacity: 0.025, color: Colors.white),
+        SafeArea(
+          child: Column(
             children: [
-              _buildFollowStat('팔로워', '0'),
-              Container(
-                width: 1,
-                height: 20,
-                margin: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacing24,
-                ),
-                color: Colors.white.withValues(alpha: 0.4),
-              ),
-              _buildFollowStat('팔로잉', '0'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+              const SizedBox(height: 12),
 
-  Widget _buildFollowStat(String label, String count) {
-    return Column(
-      children: [
-        Text(
-          count,
-          style: AppTextStyles.titleLarge.copyWith(
-            fontSize: 18,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacing2),
-        Text(
-          label,
-          style: AppTextStyles.labelMedium.copyWith(
-            color: Colors.white.withValues(alpha: 0.8),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // 6 Stats Grid (2 rows x 3 columns)
-  // ──────────────────────────────────────────────
-
-  Widget _buildStatsGrid(UserModel user) {
-    // Calculate study days from createdAt
-    final studyDays = DateTime.now().difference(user.createdAt).inDays + 1;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing24,
-        AppDimensions.spacing20,
-        AppDimensions.spacing24,
-        0,
-      ),
-      child: Column(
-        children: [
-          // Row 1: Featured stats (XP + Streak) - larger, 2 columns
-          Row(
-            children: [
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.bolt_rounded,
-                  iconColor: AppColors.streakGold,
-                  label: 'XP',
-                  value: '${user.xp}',
-                  featured: true,
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.local_fire_department_rounded,
-                  iconColor: AppColors.badgeOrange,
-                  label: '연속학습',
-                  value: '${user.streak}일',
-                  featured: true,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacing12),
-          // Row 2: Secondary stats - smaller, 4 columns
-          Row(
-            children: [
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.calendar_today_rounded,
-                  iconColor: AppColors.royalBlue,
-                  label: '학습일',
-                  value: '$studyDays일',
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing8),
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.emoji_events_rounded,
-                  iconColor: AppColors.tealGreen,
-                  label: '랭크',
-                  value: 'Lv${user.level}',
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing8),
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.check_circle_rounded,
-                  iconColor: AppColors.nodeGreen,
-                  label: '문제 수',
-                  value: '${user.totalXp ~/ 10}',
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing8),
-              Expanded(
-                child: _StatBox(
-                  icon: Icons.diamond_rounded,
-                  iconColor: AppColors.royalBlue,
-                  label: '포인트',
-                  value: '${user.gems}',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // Subject Cards
-  // ──────────────────────────────────────────────
-
-  Widget _buildSubjectCards() {
-    final subjects = [
-      _SubjectCardData(
-        name: '공통수학 1',
-        subtitle: '기초 산술 / 대수',
-        progress: 0.65,
-        completedLessons: 13,
-        totalLessons: 20,
-        color: AppColors.royalBlue,
-        icon: Icons.functions_rounded,
-      ),
-      _SubjectCardData(
-        name: '공통수학 2',
-        subtitle: '기하학 / 통계',
-        progress: 0.25,
-        completedLessons: 5,
-        totalLessons: 20,
-        color: AppColors.tealGreen,
-        icon: Icons.auto_graph_rounded,
-      ),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionHeader('학습 과목', actionText: '더보기 >'),
-          const SizedBox(height: AppDimensions.spacing16),
-          ...subjects.map((subject) => Padding(
-                padding: const EdgeInsets.only(bottom: AppDimensions.spacing12),
-                child: _buildSubjectCard(subject),
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubjectCard(_SubjectCardData subject) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacing16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radius16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Subject icon
-          Container(
-            width: AppDimensions.iconXLarge,
-            height: AppDimensions.iconXLarge,
-            decoration: BoxDecoration(
-              color: subject.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radius12),
-            ),
-            child: Icon(
-              subject.icon,
-              color: subject.color,
-              size: 26,
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  subject.name,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.textDark,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppDimensions.spacing2),
-                Text(
-                  subject.subtitle,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppDimensions.spacing8),
-                // Progress bar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(AppDimensions.radius4),
-                  child: LinearProgressIndicator(
-                    value: subject.progress,
-                    minHeight: 6,
-                    backgroundColor: AppColors.cardBg,
-                    valueColor: AlwaysStoppedAnimation<Color>(subject.color),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacing12),
-          // Progress text
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${(subject.progress * 100).toInt()}%',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: subject.color,
-                ),
-              ),
-              const SizedBox(height: AppDimensions.spacing2),
-              Text(
-                '${subject.completedLessons}/${subject.totalLessons}',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // Weekly Streak History
-  // ──────────────────────────────────────────────
-
-  Widget _buildStreakHistory() {
-    final days = ['월', '화', '수', '목', '금', '토', '일'];
-    final studied = [true, true, true, false, true, true, false];
-    // Assume today is the 6th day (Saturday, index 5) for demo
-    const todayIndex = 5;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        0,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacing20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimensions.radius16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionHeader('이번 주 학습'),
-            const SizedBox(height: AppDimensions.spacing16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(7, (i) {
-                final isCompleted = studied[i];
-                final isToday = i == todayIndex;
-                final isFuture = i > todayIndex;
-
-                return Column(
+              // ── 헤더: 프로필 + 레벨 ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
                   children: [
+                    // Avatar
                     Container(
-                      width: 38,
-                      height: 38,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        gradient: isCompleted
-                            ? const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [AppColors.nodeGreen, AppColors.mathGreenDark],
-                              )
-                            : null,
-                        color: isCompleted
-                            ? null
-                            : isFuture
-                                ? AppColors.cardBg
-                                : AppColors.cardBg,
                         shape: BoxShape.circle,
-                        border: isToday && !isCompleted
-                            ? Border.all(color: AppColors.nodeGreen, width: 2.5)
-                            : null,
+                        color: Colors.white.withValues(alpha: 0.3),
+                        border: Border.all(color: Colors.white, width: 2),
                       ),
-                      child: Icon(
-                        isCompleted
-                            ? Icons.check_rounded
-                            : isFuture
-                                ? Icons.remove_rounded
-                                : Icons.close_rounded,
-                        color: isCompleted
-                            ? Colors.white
-                            : isFuture
-                                ? AppColors.textLight
-                                : AppColors.textLight,
-                        size: 18,
+                      child: user.photoUrl != null
+                          ? ClipOval(
+                              child: Image.network(
+                                user.photoUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.person_rounded,
+                                  size: 24,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Icon(Icons.person_rounded,
+                              size: 24, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.displayName ?? '사용자',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'Lv.${user.level}',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: AppDimensions.spacing8),
-                    Text(
-                      days[i],
-                      style: AppTextStyles.labelSmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: isCompleted
-                            ? AppColors.textDark
-                            : isToday
-                                ? AppColors.nodeGreen
-                                : AppColors.textLight,
+                    // Settings / Edit button
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => const EditProfileScreen()),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Text(
+                          '수정',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ],
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ──────────────────────────────────────────────
-  // Badge Collection
-  // ──────────────────────────────────────────────
-
-  Widget _buildBadgeCollection() {
-    final badges = [
-      _BadgeData('첫 레슨', Icons.star_rounded, AppColors.gold, true),
-      _BadgeData('3일 연속', Icons.local_fire_department_rounded, AppColors.badgeOrange, true),
-      _BadgeData('100 XP', Icons.bolt_rounded, AppColors.streakGold, true),
-      _BadgeData('완벽한 점수', Icons.emoji_events_rounded, AppColors.nodeGreen, false),
-      _BadgeData('7일 연속', Icons.calendar_month_rounded, AppColors.royalBlue, false),
-      _BadgeData('산술 마스터', Icons.calculate_rounded, AppColors.nodePurple, false),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        0,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacing20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimensions.radius16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionHeader('뱃지 컬렉션', actionText: '더보기 >'),
-            const SizedBox(height: AppDimensions.spacing16),
-            GridView.count(
-              crossAxisCount: 3,
-              crossAxisSpacing: AppDimensions.spacing12,
-              mainAxisSpacing: AppDimensions.spacing12,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: badges.map((badge) {
-                return badge.unlocked
-                    ? _buildUnlockedBadge(badge)
-                    : _buildLockedBadge(badge);
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUnlockedBadge(_BadgeData badge) {
-    return Container(
-      decoration: BoxDecoration(
-        color: badge.color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppDimensions.radius16),
-        border: Border.all(
-          color: badge.color.withValues(alpha: 0.3),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: badge.color.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            badge.icon,
-            color: badge.color,
-            size: AppDimensions.iconLarge,
-          ),
-          const SizedBox(height: AppDimensions.spacing4),
-          Text(
-            badge.name,
-            style: AppTextStyles.labelSmall.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textDark,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLockedBadge(_BadgeData badge) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(AppDimensions.radius16),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                badge.icon,
-                color: AppColors.textLight,
-                size: AppDimensions.iconLarge,
-              ),
-              const SizedBox(height: AppDimensions.spacing4),
-              Text(
-                badge.name,
-                style: AppTextStyles.labelSmall.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textLight,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              ),
+
+              const SizedBox(height: 12),
+
+              // ── 상태 뱃지 Row ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    _buildStatusBadge(
+                        Icons.local_fire_department_rounded,
+                        '${user.streak}',
+                        const Color(0xFFFF9600)),
+                    const SizedBox(width: 8),
+                    _buildStatusBadge(
+                        Icons.bolt_rounded, '${user.xp}', Colors.white),
+                    const SizedBox(width: 8),
+                    _buildStatusBadge(Icons.diamond_rounded,
+                        '${user.gems}', const Color(0xFF64B5F6)),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // ── 메인 콘텐츠 (흰색 카드) ──
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 챌린지 헤더
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              '챌린지',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF333333),
+                              ),
+                            ),
+                            Text(
+                              '${user.streak}/30',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF333333),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // 레벨 진행률
+                        _buildLevelProgress(user),
+
+                        const SizedBox(height: 12),
+
+                        // 챌린지 Done / Remaining
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                icon: Icons.local_fire_department_rounded,
+                                iconColor: const Color(0xFFFF9600),
+                                label: '완료',
+                                value: '${user.streak}일',
+                                bgColor:
+                                    const Color(0xFFFF9600).withValues(alpha: 0.08),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatCard(
+                                icon: Icons.calendar_today_rounded,
+                                iconColor: AppColors.skyBlue,
+                                label: '남은 목표',
+                                value: '${(30 - user.streak).clamp(0, 30)}일',
+                                bgColor:
+                                    AppColors.skyBlue.withValues(alpha: 0.08),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // 캘린더
+                        Expanded(child: _buildCalendar()),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-          // Lock overlay
-          Positioned(
-            right: 6,
-            top: 6,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: AppColors.nodeLocked,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.lock_rounded,
-                color: Colors.white,
-                size: 12,
-              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusBadge(IconData icon, String value, Color iconColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: iconColor),
+          const SizedBox(width: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -726,9 +287,293 @@ class ProfileDetailScreen extends ConsumerWidget {
     );
   }
 
-  // ──────────────────────────────────────────────
-  // Logout
-  // ──────────────────────────────────────────────
+  Widget _buildLevelProgress(UserModel user) {
+    final league = user.league.toLowerCase();
+    final leagueDisplay = league[0].toUpperCase() + league.substring(1);
+
+    final thresholds = {
+      'bronze': [0, 500],
+      'silver': [500, 1100],
+      'gold': [1100, 2500],
+      'diamond': [2500, 5000],
+      'master': [5000, 10000],
+    };
+
+    final t = thresholds[league] ?? [0, 500];
+    final xpInTier = user.totalXp - t[0];
+    final xpNeeded = t[1] - t[0];
+    final progress = xpNeeded > 0 ? (xpInTier / xpNeeded).clamp(0.0, 1.0) : 1.0;
+    final percent = (progress * 100).toInt();
+
+    Color barColor;
+    switch (league) {
+      case 'gold':
+        barColor = AppColors.gold;
+        break;
+      case 'silver':
+        barColor = const Color(0xFF90A4AE);
+        break;
+      case 'diamond':
+        barColor = const Color(0xFF42A5F5);
+        break;
+      case 'master':
+        barColor = const Color(0xFF7E57C2);
+        break;
+      default:
+        barColor = const Color(0xFFCD7F32);
+    }
+
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: barColor.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              league[0].toUpperCase(),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: barColor,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '$leagueDisplay Lv${user.level}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF333333),
+                    ),
+                  ),
+                  Text(
+                    '$percent%',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 6,
+                  backgroundColor: barColor.withValues(alpha: 0.15),
+                  valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String value,
+    required Color bgColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF333333),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendar() {
+    final now = _displayMonth;
+    final monthName = DateFormat('yyyy년 M월').format(now);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Month header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              monthName,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF333333),
+              ),
+            ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _displayMonth = DateTime(now.year, now.month - 1);
+                      _isLoadingCalendar = true;
+                    });
+                    _loadStudyDates();
+                  },
+                  child: const Icon(Icons.chevron_left, size: 20),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _displayMonth = DateTime(now.year, now.month + 1);
+                      _isLoadingCalendar = true;
+                    });
+                    _loadStudyDates();
+                  },
+                  child: const Icon(Icons.chevron_right, size: 20),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Day headers
+        Row(
+          children: ['월', '화', '수', '목', '금', '토', '일']
+              .map((d) => Expanded(
+                    child: Center(
+                      child: Text(
+                        d,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ),
+                  ))
+              .toList(),
+        ),
+        const SizedBox(height: 6),
+
+        // Date grid
+        if (_isLoadingCalendar)
+          const Expanded(
+            child: Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        else
+          Expanded(child: _buildDateGrid()),
+      ],
+    );
+  }
+
+  Widget _buildDateGrid() {
+    final year = _displayMonth.year;
+    final month = _displayMonth.month;
+    final firstDay = DateTime(year, month, 1);
+    final totalDays = DateTime(year, month + 1, 0).day;
+    final startOffset = firstDay.weekday - 1;
+    final today = DateTime.now();
+    final isCurrentMonth = today.year == year && today.month == month;
+
+    final totalCells = startOffset + totalDays;
+    final rowCount = (totalCells / 7).ceil();
+
+    return Column(
+      children: List.generate(rowCount, (row) {
+        return Expanded(
+          child: Row(
+            children: List.generate(7, (col) {
+              final cellIndex = row * 7 + col;
+              final dayNum = cellIndex - startOffset + 1;
+
+              if (dayNum < 1 || dayNum > totalDays) {
+                return const Expanded(child: SizedBox());
+              }
+
+              final isStudied = _studiedDays.contains(dayNum);
+              final isToday = isCurrentMonth && dayNum == today.day;
+
+              return Expanded(
+                child: Center(
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: isStudied
+                        ? BoxDecoration(
+                            color: AppColors.skyBlue,
+                            borderRadius: BorderRadius.circular(10),
+                          )
+                        : isToday
+                            ? BoxDecoration(
+                                border: Border.all(
+                                  color: AppColors.skyBlue,
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              )
+                            : null,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$dayNum',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isStudied || isToday
+                            ? FontWeight.w700
+                            : FontWeight.w400,
+                        color: isStudied
+                            ? Colors.white
+                            : isToday
+                                ? AppColors.skyBlue
+                                : const Color(0xFF333333),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        );
+      }),
+    );
+  }
 
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
@@ -737,7 +582,7 @@ class ProfileDetailScreen extends ConsumerWidget {
         title: const Text('로그아웃'),
         content: const Text('정말 로그아웃하시겠습니까?'),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radius16),
+          borderRadius: BorderRadius.circular(16),
         ),
         actions: [
           TextButton(
@@ -747,7 +592,7 @@ class ProfileDetailScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
             child: const Text('로그아웃'),
@@ -760,170 +605,4 @@ class ProfileDetailScreen extends ConsumerWidget {
       await ref.read(authProvider.notifier).signOut();
     }
   }
-}
-
-// ──────────────────────────────────────────────
-// Private Widget: Stat Box
-// ──────────────────────────────────────────────
-
-class _StatBox extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final String value;
-  final bool featured;
-
-  const _StatBox({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.value,
-    this.featured = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Featured stats: larger with accent left border
-    if (featured) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppDimensions.spacing20,
-          horizontal: AppDimensions.spacing16,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimensions.radius16),
-          border: Border(
-            left: BorderSide(
-              color: iconColor,
-              width: 4,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: iconColor.withValues(alpha: 0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppDimensions.radius12),
-              ),
-              child: Icon(icon, color: iconColor, size: 28),
-            ),
-            const SizedBox(width: AppDimensions.spacing12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: AppTextStyles.titleLarge.copyWith(
-                      color: AppColors.textDark,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 22,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppDimensions.spacing2),
-                  Text(
-                    label,
-                    style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Regular stats: compact vertical layout
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: AppDimensions.spacing12,
-        horizontal: AppDimensions.spacing4,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radius12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: iconColor, size: 22),
-          const SizedBox(height: AppDimensions.spacing4),
-          Text(
-            value,
-            style: AppTextStyles.titleSmall.copyWith(
-              color: AppColors.textDark,
-              fontWeight: FontWeight.w700,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppDimensions.spacing2),
-          Text(
-            label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.textSecondary,
-              fontSize: 10,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ──────────────────────────────────────────────
-// Data Classes
-// ──────────────────────────────────────────────
-
-class _SubjectCardData {
-  final String name;
-  final String subtitle;
-  final double progress;
-  final int completedLessons;
-  final int totalLessons;
-  final Color color;
-  final IconData icon;
-
-  _SubjectCardData({
-    required this.name,
-    required this.subtitle,
-    required this.progress,
-    required this.completedLessons,
-    required this.totalLessons,
-    required this.color,
-    required this.icon,
-  });
-}
-
-class _BadgeData {
-  final String name;
-  final IconData icon;
-  final Color color;
-  final bool unlocked;
-  _BadgeData(this.name, this.icon, this.color, this.unlocked);
 }

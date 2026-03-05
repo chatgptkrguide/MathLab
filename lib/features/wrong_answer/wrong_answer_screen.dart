@@ -1,7 +1,6 @@
-// Wrong Answer Screen
-//
-// Displays wrong answers with filtering and retry functionality
-// Redesigned with gradient background, pill tabs, and staggered animations
+// Wrong Answer Screen — Figma "02" 디자인
+// 파란 헤더 + 카테고리 카드 형태
+// 한 화면에 모든 정보 표시 (스크롤 최소화)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +8,8 @@ import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/models/wrong_answer_model.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_dimensions.dart';
-import '../../shared/constants/app_text_styles.dart';
+import '../../shared/widgets/effects/noise_texture.dart';
 import 'widgets/wrong_answer_card.dart';
-import 'widgets/wrong_answer_stats.dart';
-import 'widgets/wrong_answer_filter_chips.dart';
 
 class WrongAnswerScreen extends ConsumerStatefulWidget {
   const WrongAnswerScreen({super.key});
@@ -22,80 +18,217 @@ class WrongAnswerScreen extends ConsumerStatefulWidget {
   ConsumerState<WrongAnswerScreen> createState() => _WrongAnswerScreenState();
 }
 
-class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  int _selectedTabIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        setState(() {
-          _selectedTabIndex = _tabController.index;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onRefresh() async {
-    final userState = ref.read(userProvider);
-    if (userState != null) {
-      await ref
-          .read(wrongAnswerProvider(userState.uid).notifier)
-          .loadWrongAnswers();
-    }
-  }
+class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
+  String? _selectedCategory;
 
   @override
   Widget build(BuildContext context) {
-    final userState = ref.watch(userProvider);
-    final user = userState;
+    final user = ref.watch(userProvider);
 
     if (user == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('오답 노트')),
-        body: const Center(
-          child: Text('사용자 정보를 불러올 수 없습니다'),
-        ),
+      return const Scaffold(
+        body: Center(child: Text('사용자 정보를 불러올 수 없습니다')),
       );
     }
 
     final state = ref.watch(wrongAnswerProvider(user.uid));
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.skyBlue.withValues(alpha: 0.15),
-              Colors.white,
-            ],
-            stops: const [0.0, 0.4],
-          ),
+    return Stack(
+      children: [
+        // Background gradient
+        Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(gradient: AppColors.skyBlueGradient),
         ),
-        child: SafeArea(
+        const NoiseTexture(opacity: 0.025, color: Colors.white),
+        SafeArea(
           child: state.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : state.error != null
-                  ? _buildErrorState(state)
-                  : _buildMainContent(user.uid, state),
+              ? const Center(
+                  child: CircularProgressIndicator(color: Colors.white))
+              : Column(
+                  children: [
+                    const SizedBox(height: 12),
+
+                    // ── 헤더 ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.error_outline_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              '오답 노트',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          // 총 오답 수
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Text(
+                              '${state.filteredAnswers.length}개',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ── 카테고리 카드 ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _buildCategoryCards(user.uid, state),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ── 오답 목록 (흰색 카드) ──
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(24)),
+                        ),
+                        child: state.filteredAnswers.isEmpty
+                            ? _buildEmptyState()
+                            : _buildAnswerList(user.uid, state),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryCards(String userId, WrongAnswerState state) {
+    final grouped =
+        ref.read(wrongAnswerProvider(userId).notifier).groupByUnit();
+    final categories = grouped.keys.take(3).toList();
+
+    // 카테고리가 비어있으면 기본 카테고리 표시
+    if (categories.isEmpty) {
+      return Row(
+        children: [
+          Expanded(child: _buildCategoryCard('전체', 0, true)),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        for (int i = 0; i < categories.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(
+            child: _buildCategoryCard(
+              categories[i],
+              grouped[categories[i]]?.length ?? 0,
+              _selectedCategory == categories[i] ||
+                  (_selectedCategory == null && i == 0),
+            ),
+          ),
+        ],
+        if (categories.length < 3) ...[
+          const SizedBox(width: 10),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() => _selectedCategory = null);
+              },
+              child: Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(Icons.add, color: Colors.white, size: 28),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCategoryCard(String title, int count, bool isActive) {
+    return GestureDetector(
+      onTap: () => setState(() => _selectedCategory = title),
+      child: Container(
+        height: 80,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isActive
+              ? Colors.white
+              : Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (count > 0)
+              Text(
+                '$count개',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isActive ? AppColors.skyBlue : Colors.white70,
+                ),
+              ),
+            const Spacer(),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isActive ? const Color(0xFF333333) : Colors.white,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildErrorState(WrongAnswerState state) {
+  Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -104,114 +237,30 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.mathRed.withValues(alpha: 0.1),
+              color: AppColors.skyBlue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.error_outline_rounded,
+              Icons.check_circle_outline_rounded,
               size: 40,
-              color: AppColors.mathRed,
+              color: AppColors.skyBlue,
             ),
           ),
-          const SizedBox(height: AppDimensions.spacing16),
-          Text(
-            '오답을 불러올 수 없습니다',
-            style: AppTextStyles.headlineSmall.copyWith(
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacing8),
-          Text(
-            state.error!,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppDimensions.spacing24),
-          ElevatedButton(
-            onPressed: _onRefresh,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radius12),
-              ),
-            ),
-            child: const Text('다시 시도'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainContent(String userId, WrongAnswerState state) {
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      child: CustomScrollView(
-        slivers: [
-          // Header
-          SliverToBoxAdapter(child: _buildHeader()),
-
-          // Stats cards
-          SliverToBoxAdapter(
-            child: WrongAnswerStats(statistics: state.statistics),
-          ),
-
-          // Pill tab bar
-          SliverToBoxAdapter(child: _buildPillTabBar()),
-
-          // Filter chips
-          SliverToBoxAdapter(
-            child: WrongAnswerFilterChips(
-              currentFilter: state.currentFilter,
-              onFilterChanged: (filter) {
-                ref
-                    .read(wrongAnswerProvider(userId).notifier)
-                    .setFilter(filter);
-              },
-            ),
-          ),
-
-          // Content
-          if (state.filteredAnswers.isEmpty)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: _buildEmptyState(),
-            )
-          else
-            _buildCardList(userId, state),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing20, AppDimensions.spacing16,
-        AppDimensions.spacing20, AppDimensions.spacing8,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radius12),
-            ),
-            child: const Icon(
-              Icons.error_outline_rounded,
-              size: 22,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacing12),
-          Text(
-            '오답 노트',
-            style: AppTextStyles.headlineMedium.copyWith(
+          const SizedBox(height: 16),
+          const Text(
+            '아직 오답이 없어요!',
+            style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.bold,
+              color: Color(0xFF333333),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '완벽한 학습을 이어가세요',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
             ),
           ),
         ],
@@ -219,355 +268,53 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen>
     );
   }
 
-  Widget _buildPillTabBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing20,
-        vertical: AppDimensions.spacing8,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacing4),
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(AppDimensions.radius12),
-        ),
-        child: Row(
-          children: [
-            _buildPillTab(0, '레슨별'),
-            _buildPillTab(1, '단원별'),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget _buildAnswerList(String userId, WrongAnswerState state) {
+    final answers = state.filteredAnswers;
 
-  Widget _buildPillTab(int index, String label) {
-    final isActive = _selectedTabIndex == index;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          _tabController.animateTo(index);
-          setState(() => _selectedTabIndex = index);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppDimensions.radius8),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: isActive ? Colors.white : AppColors.textSecondary,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimensions.spacing32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Math-themed icon composition
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: AppColors.mathGreen.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      physics: const BouncingScrollPhysics(),
+      itemCount: answers.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final answer = answers[index];
+        return WrongAnswerCard(
+          wrongAnswer: answer,
+          onRetry: () async {
+            await ref
+                .read(wrongAnswerProvider(userId).notifier)
+                .retryWrongAnswer(answer.id);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('문제를 다시 풀어보세요'),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: AppColors.mathGreen.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.check_circle_outline_rounded,
-                      size: 40,
-                      color: AppColors.mathGreen,
-                    ),
+                ),
+              );
+            }
+          },
+          onMarkResolved: () async {
+            await ref
+                .read(wrongAnswerProvider(userId).notifier)
+                .markAsResolved(answer.id);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('해결 완료!'),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  // Small decorative math icons
-                  Positioned(
-                    top: 5,
-                    right: 10,
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '+',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    left: 5,
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: AppColors.mathPurple.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'x',
-                          style: TextStyle(
-                            color: AppColors.mathPurple,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing24),
-            Text(
-              '아직 오답이 없어요!',
-              style: AppTextStyles.headlineSmall.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing8),
-            Text(
-              '완벽한 학습을 이어가세요',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardList(String userId, WrongAnswerState state) {
-    final Map<String, List<WrongAnswerModel>> grouped;
-    if (_selectedTabIndex == 0) {
-      grouped = ref.read(wrongAnswerProvider(userId).notifier).groupByLesson();
-    } else {
-      grouped = ref.read(wrongAnswerProvider(userId).notifier).groupByUnit();
-    }
-
-    if (grouped.isEmpty) {
-      return SliverFillRemaining(
-        hasScrollBody: false,
-        child: _buildEmptyState(),
-      );
-    }
-
-    // Flatten grouped entries into a list of widgets for the sliver
-    final items = <Widget>[];
-    int cardIndex = 0;
-
-    for (final entry in grouped.entries) {
-      items.add(_buildGroupHeader(entry.key, entry.value.length));
-      for (final answer in entry.value) {
-        items.add(_StaggeredCard(
-          index: cardIndex,
-          child: WrongAnswerCard(
-            wrongAnswer: answer,
-            onRetry: () async {
-              await ref
-                  .read(wrongAnswerProvider(userId).notifier)
-                  .retryWrongAnswer(answer.id);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('문제를 다시 풀어보세요'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              }
-            },
-            onMarkResolved: () async {
-              await ref
-                  .read(wrongAnswerProvider(userId).notifier)
-                  .markAsResolved(answer.id);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('해결 완료로 표시되었습니다'),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: AppColors.mathGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ));
-        cardIndex++;
-      }
-    }
-
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => items[index],
-          childCount: items.length,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGroupHeader(String title, int count) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: AppDimensions.spacing16,
-        bottom: AppDimensions.spacing8,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 20,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(AppDimensions.spacing2),
-            ),
-          ),
-          const SizedBox(width: AppDimensions.spacing8),
-          Expanded(
-            child: Text(
-              title,
-              style: AppTextStyles.titleMedium.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacing8,
-              vertical: AppDimensions.spacing4,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radius12),
-            ),
-            child: Text(
-              '$count개',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Staggered entrance animation for cards
-class _StaggeredCard extends StatefulWidget {
-  final int index;
-  final Widget child;
-
-  const _StaggeredCard({
-    required this.index,
-    required this.child,
-  });
-
-  @override
-  State<_StaggeredCard> createState() => _StaggeredCardState();
-}
-
-class _StaggeredCardState extends State<_StaggeredCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnim;
-  late Animation<Offset> _slideAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    // Stagger by index, capped at 5 to avoid long delays
-    final delay = Duration(milliseconds: (widget.index.clamp(0, 5)) * 60);
-    Future.delayed(delay, () {
-      if (mounted) _controller.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnim,
-      child: SlideTransition(
-        position: _slideAnim,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: widget.child,
-        ),
-      ),
+                ),
+              );
+            }
+          },
+        );
+      },
     );
   }
 }
