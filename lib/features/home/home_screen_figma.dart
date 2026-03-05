@@ -11,8 +11,6 @@ import '../settings/settings_screen.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
-import '../../data/providers/gamification/heart_regen_provider.dart';
-import '../../data/providers/gamification/streak_provider.dart';
 import '../shop/shop_screen.dart';
 
 /// 피그마 "00 home" 디자인 — 한 화면, 로봇 중심
@@ -54,10 +52,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     });
 
     final streak = user?.streak ?? 0;
-    final streakState = ref.watch(streakProvider);
     final hearts = user?.hearts ?? GameConstants.maxHearts;
-    final maxHearts = user?.maxHearts ?? GameConstants.maxHearts;
-    final heartRegen = ref.watch(heartRegenProvider);
     final dailyXP = user?.dailyXP ?? 0;
     final dailyGoal = GameConstants.dailyGoalXP;
     final progress = (dailyXP / dailyGoal).clamp(0.0, 1.0);
@@ -79,101 +74,66 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               children: [
                 const SizedBox(height: 12),
 
-                // ── 상단: 인사 + 스트릭 ──
+                // ── 상단: 인사 + 간결한 상태 ──
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '안녕하세요!',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            '${user?.displayName ?? '학습자'}의 수학 학습',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      child: Text(
+                        '${user?.displayName ?? '학습자'}님',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const ShopScreen()),
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.favorite, color: Color(0xFFFF4B6E), size: 16),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$hearts',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.favorite, color: Color(0xFFFF4B6E), size: 16),
+                          const SizedBox(width: 3),
+                          Text(
+                            '$hearts',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
                             ),
-                            if (hearts < maxHearts && heartRegen.nextRegenSeconds > 0) ...[
-                              const SizedBox(width: 4),
-                              Text(
-                                '(${_formatRegenTime(heartRegen.nextRegenSeconds)})',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 14),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🔥', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 3),
+                        Text(
+                          '$streak',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 14),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const SettingsScreen()),
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('🔥', style: TextStyle(fontSize: 16)),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$streak',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            if (streakState.freezesRemaining > 0) ...[
-                              const SizedBox(width: 4),
-                              const Icon(Icons.shield, color: Color(0xFF64FFDA), size: 14),
-                            ],
-                          ],
-                        ),
+                      child: Icon(
+                        Icons.settings_rounded,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        size: 22,
                       ),
                     ),
                   ],
@@ -223,36 +183,29 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                                   ),
                                 ),
                               ),
-                              // 하단 목표 뱃지
+                              // 하단 XP 뱃지
                               Positioned(
                                 bottom: 0,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(14),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
+                                        color: Colors.black.withValues(alpha: 0.08),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.emoji_events_rounded, size: 16, color: Color(0xFFFFB800)),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '오늘의 목표  $dailyXP / $dailyGoal XP',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF333333),
-                                        ),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    '$dailyXP / $dailyGoal XP',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF333333),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -302,53 +255,12 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
-                // ── Review reminder badge ──
+                // ── 리뷰 알림 (있을 때만) ──
                 if (user != null) _buildReviewBadge(ref, user.uid),
 
-                // ── 데일리 챌린지 (간결) ──
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.goldGradient,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 20),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: Text(
-                          '데일리 챌린지',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Text(
-                          '도전',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
               ],
             ),
           ),
@@ -358,12 +270,6 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     );
   }
 
-  String _formatRegenTime(int totalSeconds) {
-    final minutes = totalSeconds ~/ 60;
-    final seconds = totalSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-  }
-
   Widget _buildReviewBadge(WidgetRef ref, String userId) {
     final wrongState = ref.watch(wrongAnswerProvider(userId));
     final reviewCount =
@@ -371,68 +277,36 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
 
     if (reviewCount == 0) return const SizedBox.shrink();
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
-        onTap: () {
-          // Navigate to wrong answer tab (index 1)
-          ref.read(navigationProvider.notifier).goToWrongAnswer();
-        },
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF5B6ABF).withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: const Color(0xFF5B6ABF).withValues(alpha: 0.3),
+    return GestureDetector(
+      onTap: () {
+        ref.read(navigationProvider.notifier).goToWrongAnswer();
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.refresh_rounded, size: 18, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              '복습 $reviewCount개',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5B6ABF).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.assignment_rounded,
-                    size: 18,
-                    color: Color(0xFF5B6ABF),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '복습할 문제 ${reviewCount}개',
-                  style: const TextStyle(
-                    color: Color(0xFF5B6ABF),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5B6ABF),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Text(
-                  '복습하기',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            const Spacer(),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
+          ],
         ),
       ),
     );

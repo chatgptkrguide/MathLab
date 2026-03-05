@@ -20,6 +20,7 @@ class AuthScreen extends ConsumerStatefulWidget {
 class _AuthScreenState extends ConsumerState<AuthScreen>
     with SingleTickerProviderStateMixin {
   bool _isLoading = false;
+  bool _showMoreLogin = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -180,10 +181,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Main start button
+                          // Primary CTA
                           SizedBox(
                             width: double.infinity,
-                            height: 46,
+                            height: 48,
                             child: ElevatedButton(
                               onPressed: _handleGuestStart,
                               style: ElevatedButton.styleFrom(
@@ -194,11 +195,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              child: const Text('학습 시작하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              child: const Text('시작하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             ),
                           ),
                           const SizedBox(height: 10),
-                          // Google
+                          // Google (primary social)
                           _buildSocialButton(
                             text: 'Google로 계속하기',
                             fallbackIcon: Icons.g_mobiledata,
@@ -206,9 +207,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             textColor: AppColors.textDark,
                             onPressed: _handleGoogleLogin,
                           ),
-                          const SizedBox(height: 6),
-                          // Apple (iOS only)
+                          // Apple (iOS only, primary social)
                           if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+                            const SizedBox(height: 6),
                             _buildSocialButton(
                               text: 'Apple로 계속하기',
                               fallbackIcon: Icons.apple,
@@ -216,58 +217,65 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               textColor: Colors.white,
                               onPressed: _handleAppleLogin,
                             ),
-                            const SizedBox(height: 6),
                           ],
-                          // Kakao
-                          _buildSocialButton(
-                            text: 'Kakao로 계속하기',
-                            fallbackIcon: Icons.chat_bubble,
-                            backgroundColor: AppColors.kakaoYellow,
-                            textColor: AppColors.kakaoBrown,
-                            onPressed: _handleKakaoLogin,
-                          ),
-                          const SizedBox(height: 6),
-                          // Email
-                          _buildSocialButton(
-                            text: '이메일로 계속하기',
-                            fallbackIcon: Icons.email_outlined,
-                            backgroundColor: Colors.white.withValues(alpha: 0.2),
-                            textColor: Colors.white,
-                            onPressed: _handleEmailLogin,
-                          ),
-                          const SizedBox(height: 12),
-                          // Demo lesson link
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const DemoLessonScreen(),
+                          // More login options (collapsed)
+                          if (!_showMoreLogin) ...[
+                            const SizedBox(height: 12),
+                            GestureDetector(
+                              onTap: () => setState(() => _showMoreLogin = true),
+                              child: Text(
+                                '다른 방법으로 로그인',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              );
-                            },
-                            child: Text(
-                              '먼저 체험해보기 →',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white.withValues(alpha: 0.4),
                               ),
                             ),
-                          ),
+                          ] else ...[
+                            const SizedBox(height: 6),
+                            _buildSocialButton(
+                              text: 'Kakao로 계속하기',
+                              fallbackIcon: Icons.chat_bubble,
+                              backgroundColor: AppColors.kakaoYellow,
+                              textColor: AppColors.kakaoBrown,
+                              onPressed: _handleKakaoLogin,
+                            ),
+                            const SizedBox(height: 6),
+                            _buildSocialButton(
+                              text: '이메일로 계속하기',
+                              fallbackIcon: Icons.email_outlined,
+                              backgroundColor: Colors.white.withValues(alpha: 0.2),
+                              textColor: Colors.white,
+                              onPressed: _handleEmailLogin,
+                            ),
+                          ],
                         ],
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
-                  // Terms (한 줄)
-                  Text(
-                    '계속 진행하면 이용약관 및 개인정보처리방침에 동의합니다.',
-                    style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.6)),
-                    textAlign: TextAlign.center,
+                  // Demo + Terms combined
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const DemoLessonScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      '먼저 체험해보기',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white.withValues(alpha: 0.4),
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 8),

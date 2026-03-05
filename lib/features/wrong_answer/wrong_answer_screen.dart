@@ -99,15 +99,15 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
-                    // ── 카테고리 카드 ──
+                    // ── 카테고리 필터 (칩) ──
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: _buildCategoryCards(user.uid, state),
+                      child: _buildCategoryChips(user.uid),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // ── 오답 목록 (흰색 카드) ──
                     Expanded(
@@ -130,98 +130,45 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
     );
   }
 
-  Widget _buildCategoryCards(String userId, WrongAnswerState state) {
+  Widget _buildCategoryChips(String userId) {
     final grouped =
         ref.read(wrongAnswerProvider(userId).notifier).groupByUnit();
-    final categories = grouped.keys.take(3).toList();
+    final categories = grouped.keys.toList();
 
-    // 카테고리가 비어있으면 기본 카테고리 표시
-    if (categories.isEmpty) {
-      return Row(
+    return SizedBox(
+      height: 34,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
         children: [
-          Expanded(child: _buildCategoryCard('전체', 0, true)),
+          _buildChip('전체', _selectedCategory == null),
+          for (final cat in categories) ...[
+            const SizedBox(width: 8),
+            _buildChip(cat, _selectedCategory == cat),
+          ],
         ],
-      );
-    }
-
-    return Row(
-      children: [
-        for (int i = 0; i < categories.length; i++) ...[
-          if (i > 0) const SizedBox(width: 10),
-          Expanded(
-            child: _buildCategoryCard(
-              categories[i],
-              grouped[categories[i]]?.length ?? 0,
-              _selectedCategory == categories[i] ||
-                  (_selectedCategory == null && i == 0),
-            ),
-          ),
-        ],
-        if (categories.length < 3) ...[
-          const SizedBox(width: 10),
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedCategory = null);
-              },
-              child: Container(
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: const Center(
-                  child: Icon(Icons.add, color: Colors.white, size: 28),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 
-  Widget _buildCategoryCard(String title, int count, bool isActive) {
+  Widget _buildChip(String label, bool isActive) {
     return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = title),
+      onTap: () => setState(() =>
+          _selectedCategory = (label == '전체') ? null : label),
       child: Container(
-        height: 80,
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isActive
               ? Colors.white
               : Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(17),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            if (count > 0)
-              Text(
-                '$count개',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isActive ? AppColors.skyBlue : Colors.white70,
-                ),
-              ),
-            const Spacer(),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: isActive ? const Color(0xFF333333) : Colors.white,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isActive ? const Color(0xFF333333) : Colors.white,
+          ),
         ),
       ),
     );
