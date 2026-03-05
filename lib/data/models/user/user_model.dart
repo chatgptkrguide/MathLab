@@ -32,6 +32,7 @@ class UserModel {
   // Gamification
   final int hearts;
   final int maxHearts;
+  final DateTime? lastHeartLostAt;
   final int gems;
   final String league;
   final List<String> achievements;
@@ -64,6 +65,7 @@ class UserModel {
     this.lastStudyDate,
     this.hearts = 5,
     this.maxHearts = 5,
+    this.lastHeartLostAt,
     this.gems = 0,
     this.league = 'Bronze',
     this.achievements = const [],
@@ -147,6 +149,9 @@ class UserModel {
           : null,
       hearts: data['hearts'] ?? 5,
       maxHearts: data['maxHearts'] ?? 5,
+      lastHeartLostAt: data['lastHeartLostAt'] != null
+          ? (data['lastHeartLostAt'] as Timestamp).toDate()
+          : null,
       gems: data['gems'] ?? 0,
       league: data['league'] ?? 'Bronze',
       achievements: List<String>.from(data['achievements'] ?? []),
@@ -184,6 +189,7 @@ class UserModel {
       'lastStudyDate': lastStudyDate != null ? Timestamp.fromDate(lastStudyDate!) : null,
       'hearts': hearts,
       'maxHearts': maxHearts,
+      'lastHeartLostAt': lastHeartLostAt != null ? Timestamp.fromDate(lastHeartLostAt!) : null,
       'gems': gems,
       'league': league,
       'achievements': achievements,
@@ -218,6 +224,7 @@ class UserModel {
       'lastStudyDate': lastStudyDate?.toIso8601String(),
       'hearts': hearts,
       'maxHearts': maxHearts,
+      'lastHeartLostAt': lastHeartLostAt?.toIso8601String(),
       'gems': gems,
       'league': league,
       'achievements': achievements,
@@ -254,6 +261,7 @@ class UserModel {
     DateTime? lastStudyDate,
     int? hearts,
     int? maxHearts,
+    DateTime? lastHeartLostAt,
     int? gems,
     String? league,
     List<String>? achievements,
@@ -284,6 +292,7 @@ class UserModel {
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
       hearts: hearts ?? this.hearts,
       maxHearts: maxHearts ?? this.maxHearts,
+      lastHeartLostAt: lastHeartLostAt ?? this.lastHeartLostAt,
       gems: gems ?? this.gems,
       league: league ?? this.league,
       achievements: achievements ?? this.achievements,

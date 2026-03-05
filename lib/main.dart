@@ -14,6 +14,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'core/config/env_config.dart';
 import 'core/utils/app_logger.dart';
+import 'data/services/remote_config_service.dart';
 import 'app/auth_wrapper.dart';
 import 'app/main_navigation.dart';
 import 'features/auth/auth_screen.dart';
@@ -64,6 +65,9 @@ void main() async {
       // Register FCM background message handler
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       AppLogger.info('FCM background handler registered', tag: 'App');
+
+      // Initialize Remote Config
+      await RemoteConfigService.initialize();
     } catch (e) {
       AppLogger.error(
         'Firebase initialization failed',

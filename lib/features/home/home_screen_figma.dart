@@ -9,6 +9,9 @@ import '../../shared/widgets/effects/noise_texture.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';
 import '../settings/settings_screen.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
+import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
+import '../../data/providers/infrastructure/navigation_provider.dart';
+import '../../data/providers/gamification/heart_regen_provider.dart';
 
 /// 피그마 "00 home" 디자인 — 한 화면, 로봇 중심
 class HomeScreenFigma extends ConsumerStatefulWidget {
@@ -49,6 +52,9 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     });
 
     final streak = user?.streak ?? 0;
+    final hearts = user?.hearts ?? GameConstants.maxHearts;
+    final maxHearts = user?.maxHearts ?? GameConstants.maxHearts;
+    final heartRegen = ref.watch(heartRegenProvider);
     final dailyXP = user?.dailyXP ?? 0;
     final dailyGoal = GameConstants.dailyGoalXP;
     final progress = (dailyXP / dailyGoal).clamp(0.0, 1.0);
@@ -98,6 +104,39 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                         ],
                       ),
                     ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.favorite, color: Color(0xFFFF4B6E), size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$hearts',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (hearts < maxHearts && heartRegen.nextRegenSeconds > 0) ...[
+                            const SizedBox(width: 4),
+                            Text(
+                              '(${_formatRegenTime(heartRegen.nextRegenSeconds)})',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.7),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const SettingsScreen()),
@@ -253,6 +292,9 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
 
                 const SizedBox(height: 16),
 
+                // ── Review reminder badge ──
+                if (user != null) _buildReviewBadge(ref, user.uid),
+
                 // ── 데일리 챌린지 (간결) ──
                 Container(
                   width: double.infinity,
@@ -300,6 +342,86 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           ),
         ),
         ],
+      ),
+    );
+  }
+
+  String _formatRegenTime(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  Widget _buildReviewBadge(WidgetRef ref, String userId) {
+    final wrongState = ref.watch(wrongAnswerProvider(userId));
+    final reviewCount =
+        wrongState.wrongAnswers.where((w) => w.shouldReview()).length;
+
+    if (reviewCount == 0) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to wrong answer tab (index 1)
+          ref.read(navigationProvider.notifier).goToWrongAnswer();
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF5B6ABF).withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFF5B6ABF).withValues(alpha: 0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF5B6ABF).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.assignment_rounded,
+                    size: 18,
+                    color: Color(0xFF5B6ABF),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '복습할 문제 ${reviewCount}개',
+                  style: const TextStyle(
+                    color: Color(0xFF5B6ABF),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF5B6ABF),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  '복습하기',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

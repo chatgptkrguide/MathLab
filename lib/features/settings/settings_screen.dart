@@ -12,6 +12,8 @@ import '../legal/privacy_policy_screen.dart';
 import 'widgets/widgets.dart';
 import 'dialogs/dialogs.dart';
 import '../admin/admin_shell_screen.dart';
+import '../../core/config/env_config.dart';
+import '../../data/providers/infrastructure/feature_flag_provider.dart';
 
 /// 설정 화면
 /// - 계정 관리
@@ -249,6 +251,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ],
 
+                    // Feature Flags debug section (development only)
+                    if (!EnvConfig.isProduction) ...[
+                      const SizedBox(height: AppDimensions.spacing20),
+                      const SectionHeader(
+                        title: 'Feature Flags',
+                        accentColor: AppColors.mathOrange,
+                      ),
+                      const SizedBox(height: AppDimensions.spacing8),
+                      _buildFeatureFlagsSection(),
+                    ],
+
                     const SizedBox(height: AppDimensions.spacing20),
 
                     // 정보 섹션
@@ -376,6 +389,87 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Feature flags debug section (development only)
+  Widget _buildFeatureFlagsSection() {
+    final flags = ref.watch(featureFlagProvider);
+    final notifier = ref.read(featureFlagProvider.notifier);
+
+    final flagItems = <String, String>{
+      'hearts_enabled': flags.heartsEnabled ? 'ON' : 'OFF',
+      'srs_enabled': flags.srsEnabled ? 'ON' : 'OFF',
+      'league_enabled': flags.leagueEnabled ? 'ON' : 'OFF',
+      'daily_challenge_enabled': flags.dailyChallengeEnabled ? 'ON' : 'OFF',
+      'premium_enabled': flags.premiumEnabled ? 'ON' : 'OFF',
+      'max_hearts': '${flags.maxHearts}',
+      'heart_regen_minutes': '${flags.heartRegenMinutes}',
+      'daily_goal_xp': '${flags.dailyGoalXP}',
+      'maintenance_message':
+          flags.maintenanceMessage.isEmpty ? '(none)' : flags.maintenanceMessage,
+      'min_app_version': flags.minAppVersion,
+      'onboarding_v2_enabled': flags.onboardingV2Enabled ? 'ON' : 'OFF',
+    };
+
+    return _buildSettingsCard(
+      children: [
+        ...flagItems.entries.map((entry) => Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      entry.key,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'monospace',
+                        color: Colors.black87,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    entry.value,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: entry.value == 'ON'
+                          ? AppColors.mathGreen
+                          : entry.value == 'OFF'
+                              ? AppColors.mathRed
+                              : AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            )),
+        const _SettingDivider(),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+              onPressed: () async {
+                await notifier.refresh();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Feature flags refreshed'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Refresh'),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

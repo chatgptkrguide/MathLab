@@ -292,7 +292,20 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     });
   }
 
+  /// Sync session heart losses to Firestore.
+  void _syncHeartsToFirestore() {
+    if (session == null) return;
+    final heartsLost = 5 - session!.hearts; // session starts with 5
+    if (heartsLost <= 0) return;
+
+    final userNotifier = ref.read(userProvider.notifier);
+    for (int i = 0; i < heartsLost; i++) {
+      userNotifier.useHeart();
+    }
+  }
+
   void _showCompletionScreen() {
+    _syncHeartsToFirestore();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => ProblemCompletionScreen(
@@ -305,6 +318,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
   }
 
   void _showFailureScreen() {
+    _syncHeartsToFirestore();
     showDialog(
       context: context,
       barrierDismissible: false,

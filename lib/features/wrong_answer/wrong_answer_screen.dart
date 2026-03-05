@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/user/user_provider.dart';
-import '../../data/models/wrong_answer_model.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
 import 'widgets/wrong_answer_card.dart';

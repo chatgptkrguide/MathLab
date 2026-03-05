@@ -20,6 +20,11 @@ class WrongAnswerModel {
   final bool isRetried;
   final bool isResolved;
   final DateTime? resolvedDate;
+  final double easeFactor;
+  final int interval;
+  final int repetition;
+  final DateTime? nextReviewDate;
+  final int difficulty;
 
   const WrongAnswerModel({
     required this.id,
@@ -37,6 +42,11 @@ class WrongAnswerModel {
     this.isRetried = false,
     this.isResolved = false,
     this.resolvedDate,
+    this.easeFactor = 2.5,
+    this.interval = 1,
+    this.repetition = 0,
+    this.nextReviewDate,
+    this.difficulty = 0,
   });
 
   /// 레거시 필드 호환용 (기존 코드와 호환)
@@ -63,6 +73,13 @@ class WrongAnswerModel {
       resolvedDate: json['resolvedDate'] != null
           ? DateTime.parse(json['resolvedDate'] as String)
           : null,
+      easeFactor: (json['easeFactor'] as num?)?.toDouble() ?? 2.5,
+      interval: json['interval'] as int? ?? 1,
+      repetition: json['repetition'] as int? ?? 0,
+      nextReviewDate: json['nextReviewDate'] != null
+          ? DateTime.parse(json['nextReviewDate'] as String)
+          : null,
+      difficulty: json['difficulty'] as int? ?? 0,
     );
   }
 
@@ -89,6 +106,13 @@ class WrongAnswerModel {
       resolvedDate: data['resolvedDate'] != null
           ? (data['resolvedDate'] as Timestamp).toDate()
           : null,
+      easeFactor: (data['easeFactor'] as num?)?.toDouble() ?? 2.5,
+      interval: data['interval'] as int? ?? 1,
+      repetition: data['repetition'] as int? ?? 0,
+      nextReviewDate: data['nextReviewDate'] != null
+          ? (data['nextReviewDate'] as Timestamp).toDate()
+          : null,
+      difficulty: data['difficulty'] as int? ?? 0,
     );
   }
 
@@ -109,6 +133,12 @@ class WrongAnswerModel {
         'isResolved': isResolved,
         'resolvedDate':
             resolvedDate != null ? Timestamp.fromDate(resolvedDate!) : null,
+        'easeFactor': easeFactor,
+        'interval': interval,
+        'repetition': repetition,
+        'nextReviewDate':
+            nextReviewDate != null ? Timestamp.fromDate(nextReviewDate!) : null,
+        'difficulty': difficulty,
       };
 
   Map<String, dynamic> toJson() => {
@@ -127,6 +157,11 @@ class WrongAnswerModel {
         'isRetried': isRetried,
         'isResolved': isResolved,
         'resolvedDate': resolvedDate?.toIso8601String(),
+        'easeFactor': easeFactor,
+        'interval': interval,
+        'repetition': repetition,
+        'nextReviewDate': nextReviewDate?.toIso8601String(),
+        'difficulty': difficulty,
       };
 
   WrongAnswerModel copyWith({
@@ -145,6 +180,11 @@ class WrongAnswerModel {
     bool? isRetried,
     bool? isResolved,
     DateTime? resolvedDate,
+    double? easeFactor,
+    int? interval,
+    int? repetition,
+    DateTime? nextReviewDate,
+    int? difficulty,
   }) {
     return WrongAnswerModel(
       id: id ?? this.id,
@@ -162,6 +202,11 @@ class WrongAnswerModel {
       isRetried: isRetried ?? this.isRetried,
       isResolved: isResolved ?? this.isResolved,
       resolvedDate: resolvedDate ?? this.resolvedDate,
+      easeFactor: easeFactor ?? this.easeFactor,
+      interval: interval ?? this.interval,
+      repetition: repetition ?? this.repetition,
+      nextReviewDate: nextReviewDate ?? this.nextReviewDate,
+      difficulty: difficulty ?? this.difficulty,
     );
   }
 
@@ -174,12 +219,21 @@ class WrongAnswerModel {
   bool shouldReview() {
     if (isResolved) return false;
 
-    // Review intervals: 1, 3, 7, 14 days
+    // Use SRS nextReviewDate if available
+    if (nextReviewDate != null) {
+      final now = DateTime.now();
+      return now.isAfter(nextReviewDate!) ||
+          now.year == nextReviewDate!.year &&
+              now.month == nextReviewDate!.month &&
+              now.day == nextReviewDate!.day;
+    }
+
+    // Fallback: legacy interval logic
     final intervals = [1, 3, 7, 14];
     final daysSince = daysSinceAttempt;
 
-    for (var interval in intervals) {
-      if (daysSince >= interval && attemptCount <= intervals.indexOf(interval) + 1) {
+    for (var i in intervals) {
+      if (daysSince >= i && attemptCount <= intervals.indexOf(i) + 1) {
         return true;
       }
     }

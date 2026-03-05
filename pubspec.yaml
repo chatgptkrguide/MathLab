@@ -31,6 +31,7 @@ dependencies:
   firebase_messaging: ^15.1.7
   firebase_analytics: ^11.3.12
   firebase_crashlytics: ^4.1.11
+  firebase_remote_config: ^5.1.6
 
   # ========================================
   # 보안 및 환경 관리 (필수)

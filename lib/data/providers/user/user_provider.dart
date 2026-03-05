@@ -344,18 +344,20 @@ class User extends _$User {
   // Gamification
   // ========================================
 
-  /// Use a heart
+  /// Use a heart (decrements by 1 and sets lastHeartLostAt)
   Future<bool> useHeart() async {
     if (state == null || !state!.hasHearts) return false;
 
     try {
       AppLogger.info('Using heart', tag: 'User');
 
+      final now = DateTime.now();
       final newHearts = state!.hearts - 1;
 
       final updatedUser = state!.copyWith(
         hearts: newHearts,
-        updatedAt: DateTime.now(),
+        lastHeartLostAt: now,
+        updatedAt: now,
       );
 
       await _firestore
@@ -363,7 +365,8 @@ class User extends _$User {
           .doc(state!.uid)
           .update({
         'hearts': newHearts,
-        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+        'lastHeartLostAt': Timestamp.fromDate(now),
+        'updatedAt': Timestamp.fromDate(now),
       });
 
       state = updatedUser;
@@ -371,6 +374,71 @@ class User extends _$User {
     } catch (e, st) {
       AppLogger.error('Failed to use heart', tag: 'User', error: e, stackTrace: st);
       return false;
+    }
+  }
+
+  /// Update hearts count directly (used by heart regen system)
+  Future<void> updateHearts(int newHearts, {bool clearLastHeartLostAt = false}) async {
+    if (state == null) return;
+
+    try {
+      final now = DateTime.now();
+      final clamped = newHearts.clamp(0, state!.maxHearts);
+
+      final updates = <String, dynamic>{
+        'hearts': clamped,
+        'updatedAt': Timestamp.fromDate(now),
+      };
+      if (clearLastHeartLostAt) {
+        updates['lastHeartLostAt'] = null;
+      }
+
+      await _firestore
+          .collection('users')
+          .doc(state!.uid)
+          .update(updates);
+
+      state = state!.copyWith(
+        hearts: clamped,
+        updatedAt: now,
+      );
+
+      if (clearLastHeartLostAt) {
+        // copyWith can't set nullable to null, so rebuild
+        state = UserModel(
+          uid: state!.uid,
+          email: state!.email,
+          displayName: state!.displayName,
+          photoUrl: state!.photoUrl,
+          phoneNumber: state!.phoneNumber,
+          authProvider: state!.authProvider,
+          isGuest: state!.isGuest,
+          isEmailVerified: state!.isEmailVerified,
+          role: state!.role,
+          createdAt: state!.createdAt,
+          updatedAt: now,
+          lastLoginAt: state!.lastLoginAt,
+          level: state!.level,
+          xp: state!.xp,
+          totalXp: state!.totalXp,
+          dailyXP: state!.dailyXP,
+          streak: state!.streak,
+          longestStreak: state!.longestStreak,
+          lastStudyDate: state!.lastStudyDate,
+          hearts: clamped,
+          maxHearts: state!.maxHearts,
+          lastHeartLostAt: null,
+          gems: state!.gems,
+          league: state!.league,
+          achievements: state!.achievements,
+          preferredLanguage: state!.preferredLanguage,
+          notificationsEnabled: state!.notificationsEnabled,
+          soundEnabled: state!.soundEnabled,
+          dailyGoalMinutes: state!.dailyGoalMinutes,
+        );
+      }
+    } catch (e, st) {
+      AppLogger.error('Failed to update hearts', tag: 'User', error: e, stackTrace: st);
     }
   }
 

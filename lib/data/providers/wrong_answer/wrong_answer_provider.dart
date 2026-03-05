@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/error/app_error.dart';
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/srs_engine.dart';
 import '../../models/wrong_answer_model.dart';
 
 /// Wrong Answer State
@@ -146,20 +147,40 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
     }
   }
 
-  /// Retry a wrong answer
+  /// Retry a wrong answer (incorrect again — resets SRS)
   Future<void> retryWrongAnswer(String wrongAnswerId) async {
     try {
-      await _collection.doc(wrongAnswerId).update({
+      final answer = state.wrongAnswers.firstWhere((w) => w.id == wrongAnswerId);
+
+      final srsResult = SrsEngine.calculate(
+        quality: SrsEngine.wrongAnswerQuality(),
+        repetition: answer.repetition,
+        easeFactor: answer.easeFactor,
+        interval: answer.interval,
+      );
+
+      final updates = {
         'isRetried': true,
         'attemptCount': FieldValue.increment(1),
-      });
+        'attemptDate': Timestamp.now(),
+        'easeFactor': srsResult.nextEaseFactor,
+        'interval': srsResult.nextInterval,
+        'repetition': srsResult.nextRepetition,
+        'nextReviewDate': Timestamp.fromDate(srsResult.nextReviewDate),
+      };
 
-      // Update local state
+      await _collection.doc(wrongAnswerId).update(updates);
+
       final updatedAnswers = state.wrongAnswers.map((w) {
         if (w.id == wrongAnswerId) {
           return w.copyWith(
             isRetried: true,
             attemptCount: w.attemptCount + 1,
+            attemptDate: DateTime.now(),
+            easeFactor: srsResult.nextEaseFactor,
+            interval: srsResult.nextInterval,
+            repetition: srsResult.nextRepetition,
+            nextReviewDate: srsResult.nextReviewDate,
           );
         }
         return w;
@@ -175,6 +196,65 @@ class WrongAnswerNotifier extends StateNotifier<WrongAnswerState> {
       final appError = AppErrorHandler.handle(e, stackTrace);
       state = state.copyWith(error: appError.userMessage);
     }
+  }
+
+  /// Rate difficulty and update SRS after a correct review
+  /// [quality] SM-2 quality (0-5), or use [difficulty] (1=easy, 2=normal, 3=hard)
+  Future<void> rateAndUpdateSrs(String answerId, {int? quality, int? difficulty}) async {
+    try {
+      final answer = state.wrongAnswers.firstWhere((w) => w.id == answerId);
+
+      final q = quality ?? SrsEngine.difficultyToQuality(difficulty ?? 2);
+
+      final srsResult = SrsEngine.calculate(
+        quality: q,
+        repetition: answer.repetition,
+        easeFactor: answer.easeFactor,
+        interval: answer.interval,
+      );
+
+      final updates = <String, dynamic>{
+        'attemptDate': Timestamp.now(),
+        'attemptCount': FieldValue.increment(1),
+        'easeFactor': srsResult.nextEaseFactor,
+        'interval': srsResult.nextInterval,
+        'repetition': srsResult.nextRepetition,
+        'nextReviewDate': Timestamp.fromDate(srsResult.nextReviewDate),
+        'difficulty': difficulty ?? 0,
+      };
+
+      await _collection.doc(answerId).update(updates);
+
+      final updatedAnswers = state.wrongAnswers.map((w) {
+        if (w.id == answerId) {
+          return w.copyWith(
+            attemptDate: DateTime.now(),
+            attemptCount: w.attemptCount + 1,
+            easeFactor: srsResult.nextEaseFactor,
+            interval: srsResult.nextInterval,
+            repetition: srsResult.nextRepetition,
+            nextReviewDate: srsResult.nextReviewDate,
+            difficulty: difficulty ?? 0,
+          );
+        }
+        return w;
+      }).toList();
+
+      state = state.copyWith(
+        wrongAnswers: updatedAnswers,
+        filteredAnswers: _applyFilter(updatedAnswers, state.currentFilter),
+      );
+
+      AppLogger.info('SRS updated for answer: $answerId (quality=$q)');
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
+    }
+  }
+
+  /// Get items due for review today
+  List<WrongAnswerModel> getReviewDueItems() {
+    return state.wrongAnswers.where((w) => w.shouldReview()).toList();
   }
 
   /// Mark wrong answer as resolved
