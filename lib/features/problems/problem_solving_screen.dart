@@ -25,7 +25,6 @@ import '../../shared/widgets/zoomable_image_viewer.dart';
 import '../../shared/utils/answer_validator.dart';
 import '../../data/models/learning/problem.dart' show Problem;
 import '../../data/providers/learning/hint_provider_optimized.dart';
-import '../../shared/widgets/effects/noise_texture.dart';
 import 'widgets/hint_button.dart';
 import 'widgets/hint_popup.dart';
 import '../shop/shop_screen.dart';
@@ -437,22 +436,10 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     }
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: const Color(0xFFFAFAFA),
       body: Stack(
         children: [
-          // Anti-AI: subtle background gradient instead of flat color
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFFF8F9FA), Color(0xFFF3F4F6), Colors.white],
-                stops: [0.0, 0.4, 1.0],
-              ),
-            ),
-          ),
-          // Anti-AI: noise texture overlay
-          const NoiseTexture(opacity: 0.02),
+          Container(color: const Color(0xFFFAFAFA)),
           SafeArea(
         child: Stack(
           children: [
@@ -511,116 +498,92 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
   Widget _buildProgressBar() {
     final progress = (session!.currentProblemIndex + 1) / session!.totalProblems;
-    final percentText = '${(progress * 100).toInt()}%';
+    final problemNumber = '${session!.currentProblemIndex + 1}'.padLeft(2, '0');
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingMedium,
-        vertical: AppDimensions.spacing12,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
       decoration: const BoxDecoration(
-        color: AppColors.skyBlue,
+        color: Color(0xFF61A1D8),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(AppDimensions.radius16),
-          bottomRight: Radius.circular(AppDimensions.radius16),
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
         ),
       ),
       child: Column(
         children: [
+          // Top row: back arrow, centered title
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close_rounded, color: Colors.white, size: AppDimensions.iconMedium),
-                  ),
-                  const SizedBox(width: AppDimensions.spacing12),
-                  Text(
-                    widget.lessonTitle,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 22),
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    '문제 $problemNumber',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
+                      fontSize: 18,
                     ),
                   ),
-                ],
+                ),
               ),
-              Row(
-                children: [
-                  // XP badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(AppDimensions.radius8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.bolt_rounded, color: Colors.amber, size: AppDimensions.iconSmall),
-                        const SizedBox(width: AppDimensions.spacing2),
-                        Consumer(
-                          builder: (context, ref, _) {
-                            final user = ref.watch(userProvider);
-                            return Text(
-                              '${user?.xp ?? 0}',
-                              style: AppTextStyles.caption.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.spacing8),
-                  Text(
-                    '${session!.currentProblemIndex + 1}/${session!.totalProblems}',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ),
+              // Spacer to balance the back arrow
+              const SizedBox(width: 22),
             ],
           ),
-          const SizedBox(height: AppDimensions.spacing8),
-          // Gradient progress bar with percentage label
-          Stack(
+          const SizedBox(height: 16),
+          // Progress bar + XP display
+          Row(
             children: [
-              Container(
-                height: AppDimensions.spacing8,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(AppDimensions.radius4),
+              Expanded(
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    FractionallySizedBox(
+                      widthFactor: progress.clamp(0.0, 1.0),
+                      child: Container(
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              FractionallySizedBox(
-                widthFactor: progress.clamp(0.0, 1.0),
-                child: Container(
-                  height: AppDimensions.spacing8,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.tealGreen, AppColors.mathGreen],
-                    ),
-                    borderRadius: BorderRadius.circular(AppDimensions.radius4),
-                  ),
-                ),
+              const SizedBox(width: 12),
+              // XP display with crystal icon
+              Consumer(
+                builder: (context, ref, _) {
+                  final user = ref.watch(userProvider);
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.diamond_rounded, color: Colors.white, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${user?.xp ?? 0}',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
-          ),
-          const SizedBox(height: AppDimensions.spacing4),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              percentText,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ),
         ],
       ),
@@ -800,41 +763,19 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
   Widget _buildQuestionCard(ProblemModel problem) {
     return Container(
-      // Anti-AI: asymmetric padding for organic feel
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.spacing20,
-        AppDimensions.spacing24,
-        AppDimensions.spacing24,
-        AppDimensions.spacing20,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radius16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '문제',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacing12),
           MathRichText(
             text: problem.question,
-            textStyle: AppTextStyles.heading2.copyWith(
-              fontSize: 24,
+            textStyle: AppTextStyles.bodyLarge.copyWith(
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF3D4543),
+              height: 1.6,
             ),
-            mathFontSize: 28.0,
+            mathFontSize: 20.0,
           ),
           if (problem.allImages.isNotEmpty) ...[
             const SizedBox(height: AppDimensions.spacing16),
@@ -864,28 +805,17 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
   }
 
   Widget _buildAnswerOptions(ProblemModel problem) {
-    // Anti-AI: index-based spacing variation for organic rhythm
-    const optionSpacing = [12.0, 10.0, 14.0, 10.0, 12.0];
-    // Anti-AI: slight radius variation per option
-    const optionRadius = [
-      AppDimensions.radius12,
-      AppDimensions.radius10,
-      AppDimensions.radius12,
-      AppDimensions.radius10,
-    ];
-
-    return Column(
-      children: problem.options.asMap().entries.map((entry) {
-        final index = entry.key;
-        final option = entry.value;
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: problem.options.map((option) {
         final isSelected = selectedAnswer == option;
         final isThisCorrect = option == problem.correctAnswer;
-        final isFirst = index == 0;
 
         Color backgroundColor = Colors.white;
-        Color borderColor = AppColors.borderLight;
-        double borderWidth = 1.0;
-        Color textColor = AppColors.textDark;
+        Color borderColor = const Color(0xFFE7EEEC);
+        double borderWidth = 1.5;
+        Color textColor = const Color(0xFF7E8381);
         IconData? trailingIcon;
         Color? trailingIconColor;
 
@@ -906,59 +836,42 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
             trailingIconColor = AppColors.mathRed;
           }
         } else if (isSelected) {
-          backgroundColor = AppColors.primary.withValues(alpha: 0.08);
-          borderColor = AppColors.primary;
+          backgroundColor = const Color(0xFFF1F2F1);
+          borderColor = const Color(0xFF61A1D8);
           borderWidth = 2.0;
-          textColor = AppColors.primary;
+          textColor = const Color(0xFF3D4543);
         }
 
-        final radius = optionRadius[index % optionRadius.length];
-        final bottomSpacing = optionSpacing[index % optionSpacing.length];
-
-        return Padding(
-          padding: EdgeInsets.only(bottom: bottomSpacing),
-          child: GestureDetector(
-            onTap: () => _selectAnswer(option),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(radius),
-                border: isFirst && !isSelected && !isAnswerChecked
-                    // Anti-AI: first option gets a left accent border
-                    ? Border(
-                        left: BorderSide(color: AppColors.skyBlue.withValues(alpha: 0.4), width: 3),
-                        top: BorderSide(color: borderColor, width: borderWidth),
-                        right: BorderSide(color: borderColor, width: borderWidth),
-                        bottom: BorderSide(color: borderColor, width: borderWidth),
-                      )
-                    : Border.all(color: borderColor, width: borderWidth),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      option,
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        fontWeight: isSelected || (isAnswerChecked && isThisCorrect)
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: textColor,
-                      ),
+        return GestureDetector(
+          onTap: () => _selectAnswer(option),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: borderColor, width: borderWidth),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    option,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: isSelected || (isAnswerChecked && isThisCorrect)
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      color: textColor,
+                      fontSize: 15,
                     ),
                   ),
-                  if (trailingIcon != null)
-                    Icon(trailingIcon, color: trailingIconColor, size: 22),
+                ),
+                if (trailingIcon != null) ...[
+                  const SizedBox(width: 6),
+                  Icon(trailingIcon, color: trailingIconColor, size: 20),
                 ],
-              ),
+              ],
             ),
           ),
         );
@@ -1165,25 +1078,21 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     if (currentProblem == null) return const SizedBox();
 
     bool hasAnswer = false;
-    String buttonText = '답을 입력하세요';
 
     // Check if user has provided an answer based on problem type
     switch (currentProblem.type) {
       case ProblemType.multipleChoice:
       case ProblemType.trueFalse:
         hasAnswer = selectedAnswer != null;
-        buttonText = hasAnswer ? '확인' : '답을 선택하세요';
         break;
 
       case ProblemType.fillInBlank:
         hasAnswer = _textController.text.trim().isNotEmpty;
-        buttonText = hasAnswer ? '확인' : '답을 입력하세요';
         break;
 
       case ProblemType.matching:
       case ProblemType.dragAndDrop:
         hasAnswer = _dragDropPlacements.isNotEmpty;
-        buttonText = hasAnswer ? '확인' : '항목을 배치하세요';
         break;
     }
 
@@ -1191,66 +1100,38 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     final canContinue = isAnswerChecked;
 
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      color: const Color(0xFFFAFAFA),
       child: SizedBox(
         width: double.infinity,
-        height: AppDimensions.buttonHeightLarge,
-        child: canCheck || canContinue
-            ? DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: AppColors.deepBlueCTA,
-                  borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                ),
-                child: ElevatedButton(
-                  onPressed: canCheck
-                      ? _checkAnswer
-                      : canContinue
-                          ? _nextProblem
-                          : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    canContinue ? '계속' : '정답 확인',
-                    style: AppTextStyles.button.copyWith(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              )
-            : ElevatedButton(
-                onPressed: null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.borderLight,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  buttonText,
-                  style: AppTextStyles.button.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
+        height: 54,
+        child: ElevatedButton(
+          onPressed: canCheck
+              ? _checkAnswer
+              : canContinue
+                  ? _nextProblem
+                  : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: (canCheck || canContinue)
+                ? const Color(0xFF61A1D8)
+                : const Color(0xFFE0E0E0),
+            foregroundColor: (canCheck || canContinue)
+                ? Colors.white
+                : const Color(0xFFAAAAAA),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            elevation: 0,
+          ),
+          child: Text(
+            canContinue ? '계속' : '정답 확인',
+            style: AppTextStyles.button.copyWith(
+              color: (canCheck || canContinue) ? Colors.white : const Color(0xFFAAAAAA),
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       ),
     );
   }
