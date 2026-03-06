@@ -1,17 +1,14 @@
-// Profile Detail Screen — Figma "03" 디자인
-// 챌린지 진행률 + 레벨 + 캘린더를 한 화면에 표시
-// 스크롤 없이 한 화면에 모든 정보 표시
+// Profile Detail Screen — Figma "05" 디자인
+// 프로필 카드 + 통계 + 스트릭 + 과목 + 뱃지 + 통계 그리드 + 프리미엄 배너
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
-import '../../../data/providers/auth/auth_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../shared/widgets/effects/noise_texture.dart';
 import '../edit_profile_screen.dart';
+import '../../settings/settings_screen.dart';
 
 class ProfileDetailScreen extends ConsumerStatefulWidget {
   const ProfileDetailScreen({super.key});
@@ -22,264 +19,56 @@ class ProfileDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
-  Set<int> _studiedDays = {};
-  DateTime _displayMonth = DateTime.now();
-  bool _isLoadingCalendar = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStudyDates();
-  }
-
-  Future<void> _loadStudyDates() async {
-    final authState = ref.read(authProvider);
-    if (!authState.isAuthenticated) return;
-
-    final userNotifier = ref.read(userProvider.notifier);
-    final now = _displayMonth;
-    final dates =
-        await userNotifier.getStudyDatesForMonth(now.year, now.month);
-
-    if (mounted) {
-      setState(() {
-        _studiedDays = dates;
-        _isLoadingCalendar = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
 
     if (user == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        backgroundColor: Color(0xFFFAFAFA),
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
-    return Stack(
-      children: [
-        // Background gradient
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(gradient: AppColors.skyBlueGradient),
-        ),
-        const NoiseTexture(opacity: 0.025, color: Colors.white),
-        SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-
-              // ── 헤더: 프로필 + 레벨 ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    // Avatar
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.3),
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: user.photoUrl != null
-                          ? ClipOval(
-                              child: Image.network(
-                                user.photoUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.person_rounded,
-                                  size: 24,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
-                          : const Icon(Icons.person_rounded,
-                              size: 24, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user.displayName ?? '사용자',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'Lv.${user.level}',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Settings / Edit button
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (_) => const EditProfileScreen()),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Text(
-                          '수정',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // ── 상태 뱃지 Row ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    _buildStatusBadge(
-                        Icons.local_fire_department_rounded,
-                        '${user.streak}',
-                        const Color(0xFFFF9600)),
-                    const SizedBox(width: 8),
-                    _buildStatusBadge(
-                        Icons.bolt_rounded, '${user.xp}', Colors.white),
-                    const SizedBox(width: 8),
-                    _buildStatusBadge(Icons.diamond_rounded,
-                        '${user.gems}', const Color(0xFF64B5F6)),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // ── 메인 콘텐츠 (흰색 카드) ──
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 챌린지 헤더
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              '챌린지',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF333333),
-                              ),
-                            ),
-                            Text(
-                              '${user.streak}/30',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF333333),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // 레벨 진행률
-                        _buildLevelProgress(user),
-
-                        const SizedBox(height: 12),
-
-                        // 챌린지 Done / Remaining
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard(
-                                icon: Icons.local_fire_department_rounded,
-                                iconColor: const Color(0xFFFF9600),
-                                label: '완료',
-                                value: '${user.streak}일',
-                                bgColor:
-                                    const Color(0xFFFF9600).withValues(alpha: 0.08),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildStatCard(
-                                icon: Icons.calendar_today_rounded,
-                                iconColor: AppColors.skyBlue,
-                                label: '남은 목표',
-                                value: '${(30 - user.streak).clamp(0, 30)}일',
-                                bgColor:
-                                    AppColors.skyBlue.withValues(alpha: 0.08),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // 캘린더
-                        Expanded(child: _buildCalendar()),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusBadge(IconData icon, String value, Color iconColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
+      body: Column(
         children: [
-          Icon(icon, size: 16, color: iconColor),
-          const SizedBox(width: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+          // -- Blue Header with Profile Card --
+          _buildHeader(context, user),
+
+          // -- Scrollable Content --
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Stats Row
+                  _buildStatsRow(user),
+                  const SizedBox(height: 16),
+
+                  // Streak Card
+                  _buildStreakCard(user),
+                  const SizedBox(height: 20),
+
+                  // Subject Cards
+                  _buildSubjectSection(),
+                  const SizedBox(height: 24),
+
+                  // Badges Section
+                  _buildBadgesSection(user),
+                  const SizedBox(height: 24),
+
+                  // Statistics Section
+                  _buildStatisticsSection(user),
+                  const SizedBox(height: 24),
+
+                  // Premium Banner
+                  _buildPremiumBanner(),
+                ],
+              ),
             ),
           ),
         ],
@@ -287,10 +76,14 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     );
   }
 
-  Widget _buildLevelProgress(UserModel user) {
+  // ============================================================
+  // HEADER
+  // ============================================================
+  Widget _buildHeader(BuildContext context, UserModel user) {
     final league = user.league.toLowerCase();
-    final leagueDisplay = league[0].toUpperCase() + league.substring(1);
+    final leagueInitial = league[0].toUpperCase();
 
+    // Level progress calculation
     final thresholds = {
       'bronze': [0, 500],
       'silver': [500, 1100],
@@ -298,123 +91,304 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
       'diamond': [2500, 5000],
       'master': [5000, 10000],
     };
-
     final t = thresholds[league] ?? [0, 500];
     final xpInTier = user.totalXp - t[0];
     final xpNeeded = t[1] - t[0];
-    final progress = xpNeeded > 0 ? (xpInTier / xpNeeded).clamp(0.0, 1.0) : 1.0;
+    final progress =
+        xpNeeded > 0 ? (xpInTier / xpNeeded).clamp(0.0, 1.0) : 1.0;
     final percent = (progress * 100).toInt();
 
-    Color barColor;
-    switch (league) {
-      case 'gold':
-        barColor = AppColors.gold;
-        break;
-      case 'silver':
-        barColor = const Color(0xFF90A4AE);
-        break;
-      case 'diamond':
-        barColor = const Color(0xFF42A5F5);
-        break;
-      case 'master':
-        barColor = const Color(0xFF7E57C2);
-        break;
-      default:
-        barColor = const Color(0xFFCD7F32);
-    }
-
-    return Row(
-      children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: barColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: Text(
-              league[0].toUpperCase(),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: barColor,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF61A1D8),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Top bar: back + title + settings
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '$leagueDisplay Lv${user.level}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF333333),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).maybePop(),
+                    child: const Icon(Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white, size: 22),
+                  ),
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        '프로필',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
-                  Text(
-                    '$percent%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[500],
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const SettingsScreen()),
                     ),
+                    child: const Icon(Icons.settings_outlined,
+                        color: Colors.white, size: 24),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 6,
-                  backgroundColor: barColor.withValues(alpha: 0.15),
-                  valueColor: AlwaysStoppedAnimation<Color>(barColor),
+              const SizedBox(height: 18),
+
+              // Profile Card
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE4F5FF),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: const Color(0xFF2B59FF).withValues(alpha: 0.3),
+                      width: 1.5),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // Avatar
+                        Container(
+                          width: 92,
+                          height: 92,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDEB67),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: user.photoUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.network(
+                                    user.photoUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                      Icons.person_rounded,
+                                      size: 48,
+                                      color: Color(0xFFE0C84A),
+                                    ),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.person_rounded,
+                                  size: 48,
+                                  color: Color(0xFFE0C84A),
+                                ),
+                        ),
+                        const SizedBox(width: 16),
+
+                        // Name, username, buttons
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user.displayName ?? '사용자',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1A1A1A),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                user.email != null
+                                    ? '@${user.email!.split('@').first}'
+                                    : '@guest',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF777777),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 10),
+
+                              // Edit Profile + Share buttons
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const EditProfileScreen()),
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withValues(alpha: 0.06),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Text(
+                                        'Edit Profile',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF333333),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.06),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.share_outlined,
+                                      size: 18,
+                                      color: Color(0xFF555555),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Level badge + progress bar
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF61A1D8),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '$leagueInitial Lv${user.level}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              // Background track
+                              Container(
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                              ),
+                              // Gradient progress
+                              FractionallySizedBox(
+                                widthFactor: progress,
+                                child: Container(
+                                  height: 14,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFFFF48EE),
+                                        Color(0xFFFDB232),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(7),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '$percent%',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF555555),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildStatCard({
-    required IconData icon,
-    required Color iconColor,
-    required String label,
-    required String value,
-    required Color bgColor,
-  }) {
+  // ============================================================
+  // STATS ROW
+  // ============================================================
+  Widget _buildStatsRow(UserModel user) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: const Color(0xFFF1F2F1),
         borderRadius: BorderRadius.circular(14),
       ),
+      child: Row(
+        children: [
+          _buildStatItem('팔로워', _formatNumber(user.longestStreak)),
+          Container(width: 1, height: 32, color: const Color(0xFFD9D9D9)),
+          _buildStatItem('XP', _formatNumber(user.totalXp)),
+          Container(width: 1, height: 32, color: const Color(0xFFD9D9D9)),
+          _buildStatItem('팔로잉', user.gems.toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Expanded(
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 24),
-          const SizedBox(height: 6),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[600],
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF999999),
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w800,
               color: Color(0xFF333333),
             ),
@@ -424,185 +398,439 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     );
   }
 
-  Widget _buildCalendar() {
-    final now = _displayMonth;
-    final monthName = DateFormat('yyyy년 M월').format(now);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Month header
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              monthName,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF333333),
-              ),
+  // ============================================================
+  // STREAK CARD
+  // ============================================================
+  Widget _buildStreakCard(UserModel user) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE4F5FF),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          // Fire icon
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF9600).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            Row(
+            child: const Icon(
+              Icons.local_fire_department_rounded,
+              color: Color(0xFFFF9600),
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          // Text
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _displayMonth = DateTime(now.year, now.month - 1);
-                      _isLoadingCalendar = true;
-                    });
-                    _loadStudyDates();
-                  },
-                  child: const Icon(Icons.chevron_left, size: 20),
+                const Text(
+                  '연속 학습 이력',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF333333),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _displayMonth = DateTime(now.year, now.month + 1);
-                      _isLoadingCalendar = true;
-                    });
-                    _loadStudyDates();
-                  },
-                  child: const Icon(Icons.chevron_right, size: 20),
+                const SizedBox(height: 3),
+                Text(
+                  '수학은 꾸준한 학습이 가장 중요해요!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        // Day headers
-        Row(
-          children: ['월', '화', '수', '목', '금', '토', '일']
-              .map((d) => Expanded(
-                    child: Center(
-                      child: Text(
-                        d,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ),
-                  ))
-              .toList(),
-        ),
-        const SizedBox(height: 6),
-
-        // Date grid
-        if (_isLoadingCalendar)
-          const Expanded(
+          ),
+          // Big streak number in circle
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(
+                  color: const Color(0xFFFF9600).withValues(alpha: 0.3),
+                  width: 2),
+            ),
             child: Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          )
-        else
-          Expanded(child: _buildDateGrid()),
-      ],
-    );
-  }
-
-  Widget _buildDateGrid() {
-    final year = _displayMonth.year;
-    final month = _displayMonth.month;
-    final firstDay = DateTime(year, month, 1);
-    final totalDays = DateTime(year, month + 1, 0).day;
-    final startOffset = firstDay.weekday - 1;
-    final today = DateTime.now();
-    final isCurrentMonth = today.year == year && today.month == month;
-
-    final totalCells = startOffset + totalDays;
-    final rowCount = (totalCells / 7).ceil();
-
-    return Column(
-      children: List.generate(rowCount, (row) {
-        return Expanded(
-          child: Row(
-            children: List.generate(7, (col) {
-              final cellIndex = row * 7 + col;
-              final dayNum = cellIndex - startOffset + 1;
-
-              if (dayNum < 1 || dayNum > totalDays) {
-                return const Expanded(child: SizedBox());
-              }
-
-              final isStudied = _studiedDays.contains(dayNum);
-              final isToday = isCurrentMonth && dayNum == today.day;
-
-              return Expanded(
-                child: Center(
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: isStudied
-                        ? BoxDecoration(
-                            color: AppColors.skyBlue,
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                        : isToday
-                            ? BoxDecoration(
-                                border: Border.all(
-                                  color: AppColors.skyBlue,
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              )
-                            : null,
-                    alignment: Alignment.center,
-                    child: Text(
-                      '$dayNum',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isStudied || isToday
-                            ? FontWeight.w700
-                            : FontWeight.w400,
-                        color: isStudied
-                            ? Colors.white
-                            : isToday
-                                ? AppColors.skyBlue
-                                : const Color(0xFF333333),
-                      ),
-                    ),
-                  ),
+              child: Text(
+                user.streak.toString().padLeft(2, '0'),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFFF9600),
                 ),
-              );
-            }),
-          ),
-        );
-      }),
-    );
-  }
-
-  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('로그아웃'),
-        content: const Text('정말 로그아웃하시겠습니까?'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              ),
             ),
-            child: const Text('로그아웃'),
           ),
         ],
       ),
     );
+  }
 
-    if (confirmed == true && context.mounted) {
-      await ref.read(authProvider.notifier).signOut();
+  // ============================================================
+  // SUBJECT CARDS
+  // ============================================================
+  Widget _buildSubjectSection() {
+    final subjects = [
+      {'name': '대수', 'tasks': 12, 'icon': Icons.functions_rounded},
+      {'name': '공통수학 1', 'tasks': 8, 'icon': Icons.calculate_rounded},
+      {'name': '공통수학 2', 'tasks': 6, 'icon': Icons.auto_graph_rounded},
+    ];
+
+    return SizedBox(
+      height: 130,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: subjects.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final subject = subjects[index];
+          return Container(
+            width: 120,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF6F6F6),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.skyBlue.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    subject['icon'] as IconData,
+                    size: 20,
+                    color: AppColors.skyBlue,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  subject['name'] as String,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF333333),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${subject['tasks']} Task',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================
+  // BADGES SECTION
+  // ============================================================
+  Widget _buildBadgesSection(UserModel user) {
+    final badges = [
+      {
+        'name': '첫번째 챌린지 완성',
+        'icon': Icons.emoji_events_rounded,
+        'color': const Color(0xFFFFB53E),
+      },
+      {
+        'name': '연속학습 달성',
+        'icon': Icons.local_fire_department_rounded,
+        'color': const Color(0xFFFF6B35),
+      },
+      {
+        'name': '챌린지 마스터',
+        'icon': Icons.workspace_premium_rounded,
+        'color': const Color(0xFF7E57C2),
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Badges',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF333333),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: badges.map((badge) {
+            final achieved = user.achievements.isNotEmpty;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    right: badge != badges.last ? 10.0 : 0.0),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: achieved
+                            ? (badge['color'] as Color)
+                                .withValues(alpha: 0.15)
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        badge['icon'] as IconData,
+                        size: 28,
+                        color: achieved
+                            ? badge['color'] as Color
+                            : const Color(0xFFCCCCCC),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      badge['name'] as String,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: achieved
+                            ? const Color(0xFF555555)
+                            : const Color(0xFFAAAAAA),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  // ============================================================
+  // STATISTICS SECTION
+  // ============================================================
+  Widget _buildStatisticsSection(UserModel user) {
+    final stats = [
+      {
+        'label': 'Challenges',
+        'value': (user.achievements.isNotEmpty ? 235 : 0).toString(),
+        'icon': Icons.flag_rounded,
+        'color': const Color(0xFFFF6B35),
+      },
+      {
+        'label': 'Lessons Passed',
+        'value': (user.level > 1 ? 138 : 0).toString(),
+        'icon': Icons.check_circle_rounded,
+        'color': const Color(0xFF58CC02),
+      },
+      {
+        'label': 'Total Diamonds',
+        'value': _formatNumber(user.gems),
+        'icon': Icons.diamond_rounded,
+        'color': const Color(0xFF42A5F5),
+      },
+      {
+        'label': 'Total Lifetime',
+        'value': _formatNumber(user.totalXp),
+        'icon': Icons.bolt_rounded,
+        'color': const Color(0xFFFFC800),
+      },
+      {
+        'label': 'Correct Practices',
+        'value': '${user.totalXp > 0 ? _formatNumber(user.totalXp ~/ 10) : 0}',
+        'icon': Icons.task_alt_rounded,
+        'color': const Color(0xFF26A69A),
+      },
+      {
+        'label': 'Top 3 Position',
+        'value': '${user.league != 'Bronze' ? 43 : 0}',
+        'icon': Icons.leaderboard_rounded,
+        'color': const Color(0xFFCE82FF),
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Your Statistics',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF333333),
+          ),
+        ),
+        const SizedBox(height: 14),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.7,
+          ),
+          itemCount: stats.length,
+          itemBuilder: (context, index) {
+            final stat = stats[index];
+            return Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        stat['icon'] as IconData,
+                        size: 18,
+                        color: stat['color'] as Color,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          stat['label'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    stat['value'] as String,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF333333),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // ============================================================
+  // PREMIUM BANNER
+  // ============================================================
+  Widget _buildPremiumBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD3E9FF),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          // Premium icon
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E90FA).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.workspace_premium_rounded,
+              color: Color(0xFF2E90FA),
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Upgrade to Premium',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF333333),
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  '광고 없이 모든 기능을 이용하세요',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF777777),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E90FA),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+              'Upgrade',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+  String _formatNumber(int number) {
+    if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(number % 1000 == 0 ? 0 : 1)}k'
+          .replaceAll('.0k', 'k');
     }
+    return number.toString();
   }
 }
