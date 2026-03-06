@@ -82,48 +82,140 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  /// 로고 이미지 위젯 (로드 실패 시 π 심볼 폴백)
-  Widget _buildLogo() {
-    return Image.asset(
-      'assets/icons/logo_main.png',
-      width: 160,
-      height: 160,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        // 이미지 로드 실패 시 기존 π 심볼 폴백
-        return Container(
-          width: 160,
-          height: 160,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.surface.withValues(alpha: 0.3),
-                AppColors.surface.withValues(alpha: 0.1),
-              ],
-            ),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.surface.withValues(alpha: 0.5),
-              width: 3,
+  /// "Math is Fun!!!" 텍스트 위젯
+  Widget _buildMathIsFunText() {
+    return SizedBox(
+      height: 120,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // "Math is" - 회전된 이탤릭 텍스트
+          Positioned(
+            top: 0,
+            left: 40,
+            child: Transform.rotate(
+              angle: -0.15,
+              child: Text(
+                'Math is',
+                style: AppTextStyles.titleLarge.copyWith(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w300,
+                  fontSize: 28,
+                  letterSpacing: 1,
+                ),
+              ),
             ),
           ),
-          child: Center(
+          // "Fun!!!" - 굵은 텍스트
+          Positioned(
+            bottom: 0,
             child: Text(
-              'π',
-              style: TextStyle(
-                fontSize: 80,
-                fontWeight: FontWeight.bold,
-                color: AppColors.surface,
+              'Fun!!!',
+              style: AppTextStyles.displayLarge.copyWith(
+                color: AppColors.mathYellow,
+                fontWeight: FontWeight.w900,
+                fontSize: 48,
+                letterSpacing: 2,
                 shadows: [
                   Shadow(
-                    color: AppColors.mathButtonBlue.withValues(alpha: 0.5),
-                    blurRadius: 15,
+                    color: AppColors.mathYellow.withValues(alpha: 0.3),
+                    blurRadius: 20,
                   ),
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 로봇 캐릭터 이미지 위젯
+  Widget _buildRobotImage() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // 로봇 이미지
+        Image.asset(
+          'assets/images/robot_3d.png',
+          width: 220,
+          height: 220,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            // 이미지 로드 실패 시 폴백
+            return Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.smart_toy_rounded,
+                size: 120,
+                color: Colors.white70,
+              ),
+            );
+          },
+        ),
+        // 말풍선 아이콘
+        Positioned(
+          top: 10,
+          right: 10,
+          child: Container(
+            width: 44,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.mathYellow,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.menu_rounded,
+              color: AppColors.darkNavy,
+              size: 22,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// GoMath Lab 텍스트
+  Widget _buildGoMathLabText() {
+    return Text(
+      'GoMath Lab',
+      style: AppTextStyles.displayLarge.copyWith(
+        color: AppColors.surface,
+        fontWeight: FontWeight.w900,
+        fontSize: 32,
+        letterSpacing: 2,
+        shadows: [
+          Shadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            offset: const Offset(0, 3),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// GoMath 로고 위젯
+  Widget _buildBottomLogo() {
+    return Image.asset(
+      'assets/icons/gomath_logo.png',
+      width: 80,
+      height: 80,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        // 로고 로드 실패 시 텍스트 폴백
+        return Text(
+          'GoMath',
+          style: AppTextStyles.titleSmall.copyWith(
+            color: Colors.white.withValues(alpha: 0.5),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.5,
           ),
         );
       },
@@ -133,52 +225,34 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkNavy,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.homeGradient,
-        ),
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
+        width: double.infinity,
+        height: double.infinity,
+        color: AppColors.darkNavy,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: SafeArea(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 로고 이미지 (실패 시 π 폴백)
-                  _buildLogo(),
-
                   const SizedBox(height: AppDimensions.spacingXXL),
 
-                  // 앱 이름
-                  Text(
-                    'MathLab',
-                    style: AppTextStyles.displayLarge.copyWith(
-                      color: AppColors.surface,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          offset: const Offset(0, 3),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                  ),
+                  // "Math is Fun!!!" 텍스트
+                  _buildMathIsFunText(),
 
-                  const SizedBox(height: AppDimensions.spacingS),
+                  const Spacer(),
 
-                  // 서브 타이틀
-                  Text(
-                    '매일 5분, 수학이 쉬워진다',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.surface.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  // 로봇 캐릭터
+                  _buildRobotImage(),
 
-                  const SizedBox(height: AppDimensions.spacingXXL * 2),
+                  const SizedBox(height: AppDimensions.spacingXL),
+
+                  // "GoMath Lab" 텍스트
+                  _buildGoMathLabText(),
+
+                  const Spacer(),
 
                   // 로딩 인디케이터
                   const SizedBox(
@@ -186,10 +260,17 @@ class _SplashScreenState extends State<SplashScreen>
                     height: AppDimensions.spacing40,
                     child: CircularProgressIndicator(
                       valueColor:
-                          AlwaysStoppedAnimation<Color>(AppColors.surface),
+                          AlwaysStoppedAnimation<Color>(Colors.white),
                       strokeWidth: 3,
                     ),
                   ),
+
+                  const SizedBox(height: AppDimensions.spacingXL),
+
+                  // GoMath 로고
+                  _buildBottomLogo(),
+
+                  const SizedBox(height: AppDimensions.spacingXXL),
                 ],
               ),
             ),
