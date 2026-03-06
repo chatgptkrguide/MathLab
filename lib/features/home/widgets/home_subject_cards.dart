@@ -75,21 +75,21 @@ class HomeSubjectCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
-      child: Column(
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '과목 선택',
+            '과목',
             style: AppTextStyles.titleLarge.copyWith(
-              color: Colors.white,
-              fontSize: 18,
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: AppDimensions.spacing12),
+          const SizedBox(height: 8),
           SizedBox(
-            height: 140,
+            height: 100,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -97,12 +97,12 @@ class HomeSubjectCards extends StatelessWidget {
               clipBehavior: Clip.none,
               itemCount: _subjects.length,
               separatorBuilder: (_, __) =>
-                  const SizedBox(width: AppDimensions.spacing12),
+                  const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 final subject = _subjects[index];
                 final isActive = index == 0;
                 return SizedBox(
-                  width: 140,
+                  width: 120,
                   child: _SubjectCard(
                     title: subject.title,
                     subtitle: subject.subtitle,
@@ -117,7 +117,6 @@ class HomeSubjectCards extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }
@@ -152,10 +151,10 @@ class _SubjectCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppDimensions.spacing12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(AppDimensions.radius16),
+              borderRadius: BorderRadius.circular(AppDimensions.radius12),
               border: isActive
                   ? Border(
                       bottom: BorderSide(color: color, width: 2),
@@ -166,8 +165,8 @@ class _SubjectCard extends StatelessWidget {
                   color: isActive
                       ? color.withValues(alpha: 0.15)
                       : Colors.black.withValues(alpha: 0.06),
-                  blurRadius: isActive ? 14 : 10,
-                  offset: const Offset(0, 4),
+                  blurRadius: isActive ? 12 : 8,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -176,32 +175,32 @@ class _SubjectCard extends StatelessWidget {
               children: [
                 // Icon container
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.12),
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.radius10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: Icon(icon, color: color, size: 16),
                 ),
-                const SizedBox(height: AppDimensions.spacing8),
+                const SizedBox(height: 6),
 
                 // Title
                 Text(
                   title,
                   style: AppTextStyles.titleSmall.copyWith(
                     color: AppColors.textDark,
+                    fontSize: 12,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppDimensions.spacing2),
+                const SizedBox(height: 2),
 
                 // Subtitle
                 Text(
                   subtitle,
-                  style: AppTextStyles.labelSmall,
+                  style: AppTextStyles.labelSmall.copyWith(fontSize: 9),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -209,24 +208,12 @@ class _SubjectCard extends StatelessWidget {
 
                 // Progress bar
                 ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radius4),
+                  borderRadius: BorderRadius.circular(3),
                   child: LinearProgressIndicator(
                     value: progress,
-                    minHeight: 5,
+                    minHeight: 3,
                     backgroundColor: color.withValues(alpha: 0.12),
                     valueColor: AlwaysStoppedAnimation<Color>(color),
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.spacing4),
-
-                // Progress text
-                Text(
-                  '${(progress * 100).toInt()}% 완료',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                    fontSize: 10,
                   ),
                 ),
               ],
@@ -236,25 +223,14 @@ class _SubjectCard extends StatelessWidget {
           // "학습 중" badge — only on active card
           if (isActive)
             Positioned(
-              top: AppDimensions.spacing8,
-              right: AppDimensions.spacing8,
+              top: 6,
+              right: 6,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacing8,
-                  vertical: AppDimensions.spacing2,
-                ),
+                width: 6,
+                height: 6,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radius8),
-                ),
-                child: Text(
-                  '학습 중',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
+                  color: color,
+                  shape: BoxShape.circle,
                 ),
               ),
             ),

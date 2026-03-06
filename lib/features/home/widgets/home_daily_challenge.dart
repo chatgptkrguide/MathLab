@@ -9,13 +9,11 @@ class HomeDailyChallenge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing20),
-      child: Stack(
+    return Stack(
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(AppDimensions.spacing20),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               gradient: AppColors.goldGradient,
               borderRadius: BorderRadius.circular(AppDimensions.radius16),
@@ -33,24 +31,21 @@ class HomeDailyChallenge extends StatelessWidget {
             child: Row(
               children: [
                 // 왼쪽: 아이콘 (playful rotation)
-                Transform.rotate(
-                  angle: -0.1,
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(AppDimensions.radius16),
-                    ),
-                    child: const Icon(
-                      Icons.emoji_events_rounded,
-                      color: Colors.white,
-                      size: AppDimensions.iconLarge,
-                    ),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.emoji_events_rounded,
+                    color: Colors.white,
+                    size: 22,
                   ),
                 ),
 
-                const SizedBox(width: AppDimensions.spacing16),
+                const SizedBox(width: 12),
 
                 // 중앙: 텍스트
                 Expanded(
@@ -61,19 +56,20 @@ class HomeDailyChallenge extends StatelessWidget {
                         '오늘의 챌린지',
                         style: AppTextStyles.titleLarge.copyWith(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 15,
                         ),
                       ),
-                      const SizedBox(height: AppDimensions.spacing4),
+                      const SizedBox(height: 2),
                       Text(
                         '5문제 연속 정답 달성하기!',
                         style: AppTextStyles.labelMedium.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 12,
                         ),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: AppDimensions.spacing8),
+                      const SizedBox(height: 6),
                       // 진행률 바
                       ClipRRect(
                         borderRadius: BorderRadius.circular(AppDimensions.radius4),
@@ -143,7 +139,6 @@ class HomeDailyChallenge extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }

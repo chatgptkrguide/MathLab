@@ -11,9 +11,7 @@ import '../settings/settings_screen.dart';
 import '../lessons/figma/lessons_screen_figma.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
-import '../shop/shop_screen.dart';
 
-/// 피그마 "00 home" 디자인 — 한 화면, 로봇 중심
 class HomeScreenFigma extends ConsumerStatefulWidget {
   const HomeScreenFigma({super.key});
 
@@ -52,7 +50,6 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     });
 
     final streak = user?.streak ?? 0;
-    final hearts = user?.hearts ?? GameConstants.maxHearts;
     final dailyXP = user?.dailyXP ?? 0;
     final dailyGoal = GameConstants.dailyGoalXP;
     final progress = (dailyXP / dailyGoal).clamp(0.0, 1.0);
@@ -68,208 +65,528 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           const NoiseTexture(opacity: 0.025, color: Colors.white),
           SafeArea(
             bottom: false,
-            child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+              child: Column(
+                children: [
+                  // 1. Top: greeting + streak badge
+                  _buildTopBar(user?.displayName, streak),
+                  const SizedBox(height: 16),
 
-                // ── 상단: 인사 + 간결한 상태 ──
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${user?.displayName ?? '학습자'}님',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ShopScreen()),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.favorite, color: Color(0xFFFF4B6E), size: 16),
-                          const SizedBox(width: 3),
-                          Text(
-                            '$hearts',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('🔥', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 3),
-                        Text(
-                          '$streak',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 14),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                      ),
-                      child: Icon(
-                        Icons.settings_rounded,
-                        color: Colors.white.withValues(alpha: 0.7),
-                        size: 22,
-                      ),
-                    ),
-                  ],
-                ),
+                  // 2. Robot + circular progress
+                  _buildRobotSection(progress),
+                  const SizedBox(height: 16),
 
-                // ── 로봇 + 진행률 링 (화면 중앙, 크게) ──
-                Expanded(
-                  child: Center(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final maxSize = constraints.maxHeight * 0.85;
-                        final size = maxSize.clamp(160.0, 280.0);
-                        return SizedBox(
-                          width: size,
-                          height: size + 30,
-                          child: Stack(
-                            alignment: Alignment.topCenter,
-                            children: [
-                              CircularProgressRing(
-                                progress: progress,
-                                size: size,
-                                strokeWidth: 14,
-                                child: const SizedBox.shrink(),
-                              ),
-                              Container(
-                                width: size * 0.68,
-                                height: size * 0.68,
-                                margin: EdgeInsets.only(top: size * 0.16),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                ),
-                                child: Center(
-                                  child: Image.asset(
-                                    'assets/icons/robot_character.png',
-                                    width: size * 0.55,
-                                    height: size * 0.55,
-                                    errorBuilder: (_, __, ___) => Image.asset(
-                                      'assets/icons/character_design.png',
-                                      width: size * 0.55,
-                                      height: size * 0.55,
-                                      errorBuilder: (_, __, ___) => Text(
-                                        '🤖',
-                                        style: TextStyle(fontSize: size * 0.3),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // 하단 XP 뱃지
-                              Positioned(
-                                bottom: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(14),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.08),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Text(
-                                    '$dailyXP / $dailyGoal XP',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF333333),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                  // 3. Today's goal card
+                  _buildTodayGoal(dailyXP, dailyGoal, progress),
+                  const SizedBox(height: 12),
 
-                // ── 학습 시작하기 버튼 ──
-                GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LessonsScreenFigma()),
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.deepBlueCTA,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.deepBlue.withValues(alpha: 0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                        SizedBox(width: 8),
-                        Text(
-                          '학습 시작하기',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                  // 4. Start button
+                  _buildStartButton(),
+                  const SizedBox(height: 12),
 
-                const SizedBox(height: 12),
+                  // 5. Stats: XP, Level, Streak (3 squares)
+                  _buildStatsRow(user?.xp ?? 0, user?.level ?? 1, streak),
+                  const SizedBox(height: 16),
 
-                // ── 리뷰 알림 (있을 때만) ──
-                if (user != null) _buildReviewBadge(ref, user.uid),
+                  // 6. Subject cards (horizontal row)
+                  _buildSubjectRow(),
+                  const SizedBox(height: 12),
 
-                const SizedBox(height: 12),
-              ],
+                  // 7. Daily challenge card
+                  _buildDailyChallenge(),
+                  const SizedBox(height: 6),
+
+                  // 8. Review badge
+                  if (user != null) _buildReviewBadge(ref, user.uid),
+                  const SizedBox(height: 16),
+
+                  // 9. Action buttons (stacked full-width)
+                  _buildActionButtons(),
+                  const SizedBox(height: 24),
+
+                  // 10. Logo
+                  _buildLogo(),
+                ],
+              ),
             ),
           ),
-        ),
         ],
       ),
     );
   }
 
+  // === 1. Top Bar: Greeting + Streak Badge ===
+  Widget _buildTopBar(String? name, int streak) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Left: greeting
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '안녕하세요!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${name ?? '학습자'}의 수학 학습',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 10,
+                  letterSpacing: 1,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        // Right: streak badge
+        GestureDetector(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8E8E8),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🔥', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 4),
+                Text(
+                  '$streak',
+                  style: const TextStyle(
+                    color: Color(0xFF0D061F),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // === 2. Robot + Circular Progress ===
+  Widget _buildRobotSection(double progress) {
+    return SizedBox(
+      width: 190,
+      height: 190,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressRing(
+            progress: progress,
+            size: 190,
+            strokeWidth: 8,
+            child: const SizedBox.shrink(),
+          ),
+          Container(
+            width: 130,
+            height: 130,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.15),
+            ),
+            child: Center(
+              child: Image.asset(
+                'assets/icons/robot_character.png',
+                width: 100,
+                height: 100,
+                errorBuilder: (_, __, ___) => Image.asset(
+                  'assets/icons/character_design.png',
+                  width: 100,
+                  height: 100,
+                  errorBuilder: (_, __, ___) => const Text(
+                    '🤖',
+                    style: TextStyle(fontSize: 56),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // === 3. Today's Goal Card ===
+  Widget _buildTodayGoal(int dailyXP, int dailyGoal, double progress) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          // Book icon
+          Image.asset(
+            'assets/icons/book_pencil.png',
+            width: 58,
+            height: 58,
+            errorBuilder: (_, __, ___) => Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F4FF),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.menu_book_rounded, size: 32, color: AppColors.royalBlue),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '오늘의 목표',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$dailyXP / $dailyGoal XP',
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4.5),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 9,
+                    backgroundColor: const Color(0xFFE0E0E0),
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.tealGreen),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // === 4. Start Button ===
+  Widget _buildStartButton() {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LessonsScreenFigma()),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0015F8),
+          borderRadius: BorderRadius.circular(26.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0015F8).withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+            SizedBox(width: 6),
+            Text(
+              '학습 시작하기',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // === 5. Stats Row (3 squares: XP, Level, Streak) ===
+  Widget _buildStatsRow(int xp, int level, int streak) {
+    return Row(
+      children: [
+        _buildStatSquare(
+          icon: 'assets/icons/xp_icon.png',
+          fallbackIcon: Icons.bolt_rounded,
+          fallbackColor: AppColors.xpGold,
+          label: 'XP',
+          value: '$xp',
+        ),
+        const SizedBox(width: 10),
+        _buildStatSquare(
+          icon: 'assets/icons/level_icon.png',
+          fallbackIcon: Icons.shield_rounded,
+          fallbackColor: AppColors.royalBlue,
+          label: '레벨',
+          value: 'H Lv$level',
+        ),
+        const SizedBox(width: 10),
+        _buildStatSquare(
+          icon: 'assets/icons/streak_icon.png',
+          fallbackIcon: Icons.local_fire_department_rounded,
+          fallbackColor: AppColors.streakOrange,
+          label: '연속',
+          value: '$streak일',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatSquare({
+    required String icon,
+    required IconData fallbackIcon,
+    required Color fallbackColor,
+    required String label,
+    required String value,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Image.asset(
+              icon,
+              width: 42,
+              height: 42,
+              errorBuilder: (_, __, ___) => Icon(
+                fallbackIcon,
+                color: fallbackColor,
+                size: 42,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // === 6. Subject Cards (horizontal row) ===
+  Widget _buildSubjectRow() {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          // Subject 1
+          Expanded(
+            child: GestureDetector(
+              onTap: () => ref.read(navigationProvider.notifier).goToLessons(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF6F6F6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE8EEFF),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.functions_rounded, size: 18, color: AppColors.royalBlue),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      '공통수학 1',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF18181B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Arrow divider
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.grey.withValues(alpha: 0.5),
+            ),
+          ),
+          // Subject 2
+          Expanded(
+            child: GestureDetector(
+              onTap: () => ref.read(navigationProvider.notifier).goToLessons(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF6F6F6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE0F5F6),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.show_chart_rounded, size: 18, color: AppColors.tealGreen),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      '공통수학 2',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF18181B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // === 7. Daily Challenge Card ===
+  Widget _buildDailyChallenge() {
+    return GestureDetector(
+      onTap: () => ref.read(navigationProvider.notifier).goToHistory(),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3C283),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '데일리 챌린지',
+                    style: TextStyle(
+                      color: Color(0xFF18181B),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '오늘의 챌린지 미션을 완료해 보세요',
+                    style: TextStyle(
+                      color: Color(0xFF18181B),
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFB5523),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0xFF921B7A),
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      '데일리 챌린지 미션',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Character illustration placeholder
+            Image.asset(
+              'assets/icons/challenge_character.png',
+              width: 94,
+              height: 95,
+              errorBuilder: (_, __, ___) => const SizedBox(
+                width: 94,
+                height: 95,
+                child: Icon(Icons.emoji_events_rounded, size: 48, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // === 8. Review Badge ===
   Widget _buildReviewBadge(WidgetRef ref, String userId) {
     final wrongState = ref.watch(wrongAnswerProvider(userId));
     final reviewCount =
@@ -277,37 +594,159 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
 
     if (reviewCount == 0) return const SizedBox.shrink();
 
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: GestureDetector(
+        onTap: () => ref.read(navigationProvider.notifier).goToWrongAnswer(),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.refresh_rounded, size: 16, color: Colors.white),
+              const SizedBox(width: 6),
+              Text(
+                '복습할 문제 $reviewCount개',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // === 9. Action Buttons (Figma: stacked full-width) ===
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        // Blue: Assignments & Weekly Tests
+        _buildActionItem(
+          color: const Color(0xFF3195FF),
+          shadowColor: const Color(0xFF1C7CE2),
+          icon: Icons.assignment_rounded,
+          iconBgOpacity: 0.5,
+          label: '과제  및 주간테스트 확인 & 제출',
+          borderRadius: 8,
+          onTap: () => ref.read(navigationProvider.notifier).goToLessons(),
+        ),
+        const SizedBox(height: 16),
+        // Light purple: AI Tutor
+        _buildActionItem(
+          color: const Color(0xFFA2B6FF),
+          shadowColor: const Color(0xFF499609),
+          icon: Icons.smart_toy_rounded,
+          label: 'AI 튜터에게 물어보세요',
+          borderRadius: 14,
+          onTap: () => _showComingSoon('AI 튜터'),
+        ),
+        const SizedBox(height: 16),
+        // Dark blue: Chat
+        _buildActionItem(
+          color: const Color(0xFF0F31AC),
+          shadowColor: const Color(0xFFD27312),
+          icon: Icons.chat_rounded,
+          label: '맴버들 채팅하기',
+          borderRadius: 14,
+          onTap: () => _showComingSoon('채팅'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionItem({
+    required Color color,
+    required Color shadowColor,
+    required IconData icon,
+    required String label,
+    required double borderRadius,
+    double iconBgOpacity = 0.12,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
-      onTap: () {
-        ref.read(navigationProvider.notifier).goToWrongAnswer();
-      },
+      onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.refresh_rounded, size: 18, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(
-              '복습 $reviewCount개',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 14,
-              color: Colors.white.withValues(alpha: 0.6),
+          color: color,
+          borderRadius: BorderRadius.circular(borderRadius),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: iconBgOpacity),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: Colors.white, size: 28),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // === 10. Logo ===
+  Widget _buildLogo() {
+    return Center(
+      child: Image.asset(
+        'assets/icons/gomath_logo.png',
+        width: 144,
+        height: 56,
+        errorBuilder: (_, __, ___) => const Text(
+          'GoMath Lab',
+          style: TextStyle(
+            color: Colors.white54,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // === Coming Soon Snackbar ===
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature 기능은 곧 출시됩니다!'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

@@ -32,13 +32,14 @@ class HomeRobotSection extends ConsumerWidget {
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // 화면 크기에 따라 동적으로 크기 조절
-          final screenWidth = MediaQuery.of(context).size.width;
-          final maxWidth = screenWidth * 0.8; // 화면의 80%
-          final containerSize = maxWidth > 300 ? 300.0 : maxWidth;
-          final ringSize = containerSize * 0.93; // 280/300
-          final characterContainerSize = containerSize * 0.67; // 200/300
-          final characterSize = containerSize * 0.6; // 180/300
+          // 부모 Flexible에 맞춰 크기 결정
+          final available = constraints.maxHeight.isFinite
+              ? constraints.maxHeight
+              : 140.0;
+          final containerSize = available.clamp(80.0, 160.0);
+          final ringSize = containerSize * 0.93;
+          final characterContainerSize = containerSize * 0.67;
+          final characterSize = containerSize * 0.6;
 
           return SizedBox(
             width: containerSize,
@@ -50,7 +51,7 @@ class HomeRobotSection extends ConsumerWidget {
                 CircularProgressRing(
                   progress: progress,
                   size: ringSize,
-                  strokeWidth: 16,
+                  strokeWidth: 10,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

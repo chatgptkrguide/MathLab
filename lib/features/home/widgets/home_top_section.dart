@@ -71,7 +71,7 @@ class HomeTopSection extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           // Welcome message with user name
           Row(
