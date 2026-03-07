@@ -219,84 +219,103 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       ),
       child: SafeArea(
         bottom: false,
-        child: Container(
-          height: 90,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              // Subject selector (scrollable)
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Row(
-                    children: List.generate(_subjects.length, (index) {
-                      final isSelected = _selectedSubjectIndex == index;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () {
-                            if (_selectedSubjectIndex != index) {
-                              HapticFeedback.selectionClick();
-                              setState(() => _selectedSubjectIndex = index);
-                            }
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 250),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
+        child: Column(
+          children: [
+            // Top row: hamburger menu + "Home" title + GoMath logo
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.menu, color: Colors.white, size: 24),
+                  const Spacer(),
+                  const Text(
+                    'Home',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const Spacer(),
+                  Image.asset(
+                    'assets/icons/gomath_logo_small.png',
+                    width: 60,
+                    height: 28,
+                    errorBuilder: (_, __, ___) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'GoMath',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Subject selector row (scrollable)
+            SizedBox(
+              height: 44,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: List.generate(_subjects.length, (index) {
+                    final isSelected = _selectedSubjectIndex == index;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_selectedSubjectIndex != index) {
+                            HapticFeedback.selectionClick();
+                            setState(() => _selectedSubjectIndex = index);
+                          }
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            _subjects[index],
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                               color: isSelected
-                                  ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              _subjects[index],
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                color: isSelected
-                                    ? const Color(0xFF61A1D8)
-                                    : Colors.white,
-                              ),
+                                  ? const Color(0xFF61A1D8)
+                                  : Colors.white,
                             ),
                           ),
                         ),
-                      );
-                    }),
-                  ),
+                      ),
+                    );
+                  }),
                 ),
               ),
-
-              const SizedBox(width: 8),
-
-              // GoMath logo placeholder
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'GoMath',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
       ),
     );
@@ -489,87 +508,100 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       color: const Color(0xFFFAFAFA),
       child: Row(
         children: [
-          // Unit name
-          Expanded(
+          // Unit name chip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(4),
+            ),
             child: Text(
               unitName,
               style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
+                letterSpacing: 1,
               ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
 
-          // Streak
-          _buildStatChip(
-            icon: Icons.local_fire_department_rounded,
-            iconColor: const Color(0xFFFF9600),
-            value: '$streak',
+          const SizedBox(width: 12),
+
+          // Streak (fire icon + number)
+          const Icon(
+            Icons.local_fire_department_rounded,
+            color: Color(0xFFFF9600),
+            size: 20,
+          ),
+          const SizedBox(width: 2),
+          Text(
+            '$streak',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              letterSpacing: 1,
+            ),
           ),
 
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
 
-          // XP
-          _buildStatChip(
-            icon: Icons.bolt_rounded,
-            iconColor: const Color(0xFFFFC800),
-            value: '$xp',
+          // XP (graphene icon + number)
+          Image.asset(
+            'assets/icons/xp_icon.png',
+            width: 23,
+            height: 23,
+            errorBuilder: (_, __, ___) => const Icon(
+              Icons.bolt_rounded,
+              color: Color(0xFFFFC800),
+              size: 20,
+            ),
           ),
-
-          const SizedBox(width: 8),
-
-          // Level
-          _buildStatChip(
-            icon: Icons.shield_rounded,
-            iconColor: const Color(0xFF61A1D8),
-            value: 'Lv$level',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatChip({
-    required IconData icon,
-    required Color iconColor,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: iconColor, size: 16),
           const SizedBox(width: 4),
           Text(
-            value,
+            '$xp',
             style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
+              letterSpacing: 1,
+            ),
+          ),
+
+          const Spacer(),
+
+          // Level (shield icon + text)
+          Image.asset(
+            'assets/icons/level_icon.png',
+            width: 20,
+            height: 20,
+            errorBuilder: (_, __, ___) => const Icon(
+              Icons.shield_rounded,
+              color: Color(0xFF61A1D8),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'HLv$level',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              letterSpacing: 1,
             ),
           ),
         ],
       ),
     );
   }
+
 
   // ============================================================
   // === Zigzag Lesson Path ===
@@ -639,26 +671,32 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
         final isCurrent = index == currentIndex && !isCompleted;
 
         // Zigzag alignment: center, left, right, left, right...
-        final alignment = _getZigzagAlignment(index);
+        final zigzagAlign = _getZigzagAlignment(index);
+
+        final Alignment nodeAlignment;
+        switch (zigzagAlign) {
+          case _ZigzagAlign.left:
+            nodeAlignment = const Alignment(-0.55, 0);
+          case _ZigzagAlign.right:
+            nodeAlignment = const Alignment(0.55, 0);
+          case _ZigzagAlign.center:
+            nodeAlignment = Alignment.center;
+        }
 
         return Padding(
-          padding: EdgeInsets.only(
-            left: alignment == _ZigzagAlign.left
-                ? 40
-                : alignment == _ZigzagAlign.right
-                    ? MediaQuery.of(context).size.width - 40 - 72
-                    : (MediaQuery.of(context).size.width - 72) / 2,
-            bottom: 28,
-          ),
-          child: _buildLessonNode(
-            index: index,
-            lesson: lesson,
-            status: status,
-            isActive: isActive,
-            isCompleted: isCompleted,
-            isCurrent: isCurrent,
-            allUnits: allUnits,
-            progressState: progressState,
+          padding: const EdgeInsets.only(bottom: 28),
+          child: Align(
+            alignment: nodeAlignment,
+            child: _buildLessonNode(
+              index: index,
+              lesson: lesson,
+              status: status,
+              isActive: isActive,
+              isCompleted: isCompleted,
+              isCurrent: isCurrent,
+              allUnits: allUnits,
+              progressState: progressState,
+            ),
           ),
         );
       }),
@@ -740,11 +778,11 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
           // Node: rounded square
           Container(
-            width: 72,
-            height: 72,
+            width: 84,
+            height: 84,
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: isActive
                   ? [
                       BoxShadow(
@@ -756,8 +794,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   : null,
               border: isLocked
                   ? Border.all(
-                      color: const Color(0xFFD6F0FF),
-                      width: 2,
+                      color: const Color(0xFFE4F5FF),
+                      width: 0,
                     )
                   : null,
             ),
@@ -779,7 +817,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
           // Lesson title
           SizedBox(
-            width: 90,
+            width: 100,
             child: Text(
               lesson.title,
               textAlign: TextAlign.center,

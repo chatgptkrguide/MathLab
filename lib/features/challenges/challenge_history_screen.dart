@@ -156,7 +156,7 @@ class ChallengeHistoryScreen extends ConsumerWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.skyBlue,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
       child: SafeArea(
         bottom: false,

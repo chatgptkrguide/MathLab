@@ -74,8 +74,8 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   _buildTopBar(user?.displayName, streak),
                   const SizedBox(height: 16),
 
-                  // 2. Robot + circular progress
-                  _buildRobotSection(progress),
+                  // 2. Robot + circular progress (centered)
+                  Center(child: _buildRobotSection(progress)),
                   const SizedBox(height: 16),
 
                   // 3. Today's goal card
@@ -120,7 +120,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 1. Top Bar: Greeting + Streak Badge ===
   Widget _buildTopBar(String? name, int streak) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Left: greeting
         Expanded(
@@ -139,8 +139,8 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               const SizedBox(height: 2),
               Text(
                 '${name ?? '학습자'}의 수학 학습',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
+                style: const TextStyle(
+                  color: Colors.white,
                   fontSize: 10,
                   letterSpacing: 1,
                 ),
@@ -164,10 +164,14 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('🔥', style: TextStyle(fontSize: 14)),
+                const Icon(
+                  Icons.local_fire_department_rounded,
+                  color: Color(0xFFFF9600),
+                  size: 20,
+                ),
                 const SizedBox(width: 4),
                 Text(
-                  '$streak',
+                  streak.toString().padLeft(2, '0'),
                   style: const TextStyle(
                     color: Color(0xFF0D061F),
                     fontSize: 18,
@@ -258,16 +262,16 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                 const Text(
                   '오늘의 목표',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Color(0xFF0D061F),
                     fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '$dailyXP / $dailyGoal XP',
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: Color(0xFF18181B),
                     fontSize: 12,
                   ),
                 ),
@@ -400,8 +404,10 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 12,
+                fontWeight: FontWeight.w500,
                 letterSpacing: 1,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 2),
             Text(
@@ -409,8 +415,10 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 12,
+                fontWeight: FontWeight.w600,
                 letterSpacing: 1,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -462,13 +470,13 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               ),
             ),
           ),
-          // Arrow divider
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+          // Arrow divider (Figma: 24x24)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
             child: Icon(
               Icons.arrow_forward_ios_rounded,
-              size: 16,
-              color: Colors.grey.withValues(alpha: 0.5),
+              size: 24,
+              color: Color(0xFF18181B),
             ),
           ),
           // Subject 2
@@ -531,7 +539,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   const Text(
                     '데일리 챌린지',
                     style: TextStyle(
-                      color: Color(0xFF18181B),
+                      color: Color(0xFF0D061F),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -540,7 +548,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   const Text(
                     '오늘의 챌린지 미션을 완료해 보세요',
                     style: TextStyle(
-                      color: Color(0xFF18181B),
+                      color: Color(0xFF0D061F),
                       fontSize: 12,
                     ),
                   ),
@@ -723,16 +731,19 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 10. Logo ===
   Widget _buildLogo() {
     return Center(
-      child: Image.asset(
-        'assets/icons/gomath_logo.png',
-        width: 144,
-        height: 56,
-        errorBuilder: (_, __, ___) => const Text(
-          'GoMath Lab',
-          style: TextStyle(
-            color: Colors.white54,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+      child: Opacity(
+        opacity: 0.7,
+        child: Image.asset(
+          'assets/icons/gomath_logo.png',
+          width: 144,
+          height: 56,
+          errorBuilder: (_, __, ___) => const Text(
+            'GoMath Lab',
+            style: TextStyle(
+              color: Colors.white54,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
