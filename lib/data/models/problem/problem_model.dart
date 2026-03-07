@@ -96,6 +96,7 @@ class ProblemModel {
 /// Problem Type
 enum ProblemType {
   multipleChoice, // Multiple choice (4 options)
+  shortAnswer, // Short answer
   trueFalse, // True/False
   fillInBlank, // Fill in the blank
   matching, // Matching pairs
@@ -107,4 +108,5 @@ enum ProblemDifficulty {
   easy,
   medium,
   hard,
+  expert,
 }

@@ -195,7 +195,7 @@ export default function CurriculumPage() {
       };
 
       if (editingLesson) {
-        await updateLesson(editingLesson.id, data);
+        await updateLesson(showLessonForm!, editingLesson.id, data);
       } else {
         await createLesson(data as Omit<Lesson, "id">);
       }
@@ -207,10 +207,10 @@ export default function CurriculumPage() {
     }
   };
 
-  const handleDeleteLesson = async (id: string) => {
+  const handleDeleteLesson = async (unitId: string, id: string) => {
     if (!confirm("이 레슨을 삭제하시겠습니까?")) return;
     try {
-      await deleteLesson(id);
+      await deleteLesson(unitId, id);
       await loadData();
     } catch (error) {
       console.error(error);
@@ -346,7 +346,7 @@ export default function CurriculumPage() {
                                 <Edit2 className="h-3.5 w-3.5" />
                               </button>
                               <button
-                                onClick={() => handleDeleteLesson(lesson.id)}
+                                onClick={() => handleDeleteLesson(unit.id, lesson.id)}
                                 className="flex h-7 w-7 items-center justify-center rounded text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />

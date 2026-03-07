@@ -32,7 +32,8 @@ service firebase.storage {
 
     function isAdmin() {
       return isSignedIn() &&
-             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+             (firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+              firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true);
     }
 
     // User Profile Images
@@ -99,6 +100,15 @@ service firebase.storage {
                      isValidImageType() &&
                      isValidFileSize(10);
       allow delete: if isAdmin();
+    }
+
+    // Problem Images - flat path (admin web upload)
+    match /problem_images/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() &&
+                     isValidImageType() &&
+                     isValidFileSize(10);
+      allow delete: if isSignedIn();
     }
 
     // Lesson Images (Read-only for authenticated users)

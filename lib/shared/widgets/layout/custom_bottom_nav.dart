@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
 
 /// 피그마 디자인 하단 네비게이션 바
 /// 5탭: 학습(0), 오답(1), Home(2, 가운데 강조), 프로필(3), 학습이력(4)
@@ -21,26 +20,26 @@ class CustomBottomNavigation extends StatelessWidget {
       container: true,
       label: '하단 네비게이션',
       child: Container(
-        height: 68 + bottomPadding,
+        height: 60 + bottomPadding,
         padding: EdgeInsets.only(
-          left: 1,
-          right: 1,
-          top: 4,
-          bottom: bottomPadding + 8,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: bottomPadding,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: const Border(
+          border: Border(
             top: BorderSide(
-              color: AppColors.borderLight,
-              width: 0.5,
+              color: const Color(0xFFEEEEEE),
+              width: 0.2,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 28,
+              offset: const Offset(0, -12),
             ),
           ],
         ),
@@ -55,13 +54,13 @@ class CustomBottomNavigation extends StatelessWidget {
             ),
             _buildNavItem(
               index: 1,
-              icon: Icons.error_outline_rounded,
+              icon: Icons.star_border_rounded,
               label: '오답',
             ),
             _buildNavItem(
               index: 2,
               icon: Icons.home_rounded,
-              label: 'GoMath',
+              label: 'Home',
               isSpecial: true,
             ),
             _buildNavItem(
@@ -90,53 +89,52 @@ class CustomBottomNavigation extends StatelessWidget {
 
     if (isSpecial) {
       return Expanded(
-        child: Center(
-          child: GestureDetector(
-            onTap: () => onTap(index),
-            behavior: HitTestBehavior.opaque,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isSelected
-                      ? const [AppColors.mathGreen, AppColors.mathGreenDark]
-                      : [
-                          AppColors.skyBlue.withValues(alpha: 0.85),
-                          AppColors.skyBlue.withValues(alpha: 0.7),
-                        ],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.skyBlue
-                        .withValues(alpha: isSelected ? 0.35 : 0.2),
-                    blurRadius: isSelected ? 10 : 6,
-                    offset: Offset(0, isSelected ? 4 : 3),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: AnimatedScale(
-                  duration: const Duration(milliseconds: 200),
-                  scale: isSelected ? 1.05 : 1.0,
-                  child: Image.asset(
-                    'assets/icons/gomath_logo_small.png',
-                    width: isSelected ? 26 : 24,
-                    height: isSelected ? 26 : 24,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      icon,
-                      color: Colors.white,
-                      size: isSelected ? 26 : 24,
+        child: GestureDetector(
+          onTap: () => onTap(index),
+          behavior: HitTestBehavior.opaque,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2B59FF),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8925CF)
+                          .withValues(alpha: 0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 4),
                     ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                    size: isSelected ? 24 : 22,
                   ),
                 ),
               ),
-            ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected
+                      ? const Color(0xFF2B59FF)
+                      : const Color(0xFFAAAAAA),
+                  fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontSize: 10,
+                  height: 1.0,
+                ),
+              ),
+            ],
           ),
         ),
       );
@@ -153,26 +151,14 @@ class CustomBottomNavigation extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Pill-shaped background indicator
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.skyBlue.withValues(alpha: 0.12)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  icon,
-                  color: isSelected
-                      ? AppColors.skyBlue
-                      : AppColors.textTertiary,
-                  size: 24,
-                ),
+              Icon(
+                icon,
+                color: isSelected
+                    ? const Color(0xFF030204)
+                    : const Color(0xFFAAAAAA),
+                size: 22,
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 2),
               Text(
                 label,
                 overflow: TextOverflow.ellipsis,
@@ -180,13 +166,12 @@ class CustomBottomNavigation extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: isSelected
-                      ? AppColors.skyBlue
-                      : AppColors.textTertiary,
+                      ? const Color(0xFF030204)
+                      : const Color(0xFFAAAAAA),
                   fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.w500,
-                  fontSize: 11,
+                      isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontSize: 10,
                   height: 1.0,
-                  letterSpacing: 0.2,
                 ),
               ),
             ],

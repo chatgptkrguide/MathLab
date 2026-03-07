@@ -19,7 +19,7 @@ final problemsForLessonProvider =
     final snapshot = await firestore
         .collection('problems')
         .where('lessonId', isEqualTo: lessonId)
-        .orderBy('order')
+        .orderBy('createdAt')
         .get();
 
     if (snapshot.docs.isEmpty) {

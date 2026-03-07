@@ -97,8 +97,17 @@ export async function getProblem(id: string): Promise<Problem | null> {
 export async function createProblem(
   data: Omit<Problem, "id" | "createdAt" | "updatedAt">
 ): Promise<string> {
+  // Get current problem count for this lesson to set order
+  const countQuery = query(
+    collection(db, "problems"),
+    where("lessonId", "==", data.lessonId)
+  );
+  const countSnap = await getDocs(countQuery);
+  const order = countSnap.size;
+
   const docRef = await addDoc(collection(db, "problems"), {
     ...data,
+    order,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });

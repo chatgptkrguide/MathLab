@@ -24,7 +24,8 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
     }
 
     // Users Collection
@@ -113,10 +114,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Lessons Collection (Read-only for all authenticated users)
+    // Lessons Collection (Read for authenticated, Write for admin)
     match /lessons/{lessonId} {
       allow read: if isSignedIn();
-      allow write: if false; // Only admins via backend
+      allow write: if isAdmin();
     }
 
     // Achievements Collection (Read for authenticated, Write for admin)

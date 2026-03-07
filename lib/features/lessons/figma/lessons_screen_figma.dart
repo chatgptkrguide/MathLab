@@ -155,14 +155,24 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   ),
                 ),
               ),
-              error: (_, __) => const Expanded(
+              error: (_, __) => Expanded(
                 child: Center(
-                  child: Text(
-                    '커리큘럼을 불러오는데 실패했습니다',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '커리큘럼을 불러오는데 실패했습니다',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => ref.invalidate(curriculumProvider),
+                        child: const Text('다시 시도'),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -182,20 +192,28 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 }
 
                 return Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(
-                      top: 24,
-                      bottom: 100,
-                    ),
-                    child: SlideTransition(
-                      position: _bannerSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _bannerFadeAnimation,
-                        child: _buildLessonPath(
-                          allLessons,
-                          progressState,
-                          allUnits,
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      ref.invalidate(curriculumProvider);
+                    },
+                    color: AppColors.skyBlue,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      padding: const EdgeInsets.only(
+                        top: 24,
+                        bottom: 100,
+                      ),
+                      child: SlideTransition(
+                        position: _bannerSlideAnimation,
+                        child: FadeTransition(
+                          opacity: _bannerFadeAnimation,
+                          child: _buildLessonPath(
+                            allLessons,
+                            progressState,
+                            allUnits,
+                          ),
                         ),
                       ),
                     ),
