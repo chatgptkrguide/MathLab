@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Problem, ProblemType, ProblemDifficulty, Unit, Lesson, DIFFICULTY_LABELS } from "@/lib/types";
-import { getUnits, getLessons, getProblemCountsByLesson, createProblem } from "@/lib/firestore";
+import { getUnits, getLessons, getProblemCountsByLesson, createProblem, updateProblem } from "@/lib/firestore";
 import { uploadProblemImage } from "@/lib/storage";
 import {
   X, Check, ChevronRight, ChevronLeft,
@@ -49,9 +49,24 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
   useEffect(() => {
     if (open) {
       loadCurriculum();
-      if (!editData) resetForm();
+      if (editData) {
+        setStep(0);
+        setLessonId(editData.lessonId || "");
+        setType(editData.type || "multipleChoice");
+        setDifficulty(editData.difficulty || "easy");
+        setQuestion(editData.question || "");
+        setImageUrls(editData.imageUrls || []);
+        setQuestionMode(editData.imageUrls?.length ? "image" : "text");
+        setOptions(editData.options?.length ? editData.options : ["", "", "", ""]);
+        setCorrectAnswer(editData.correctAnswer || "");
+        setHints(editData.hints?.length ? editData.hints : [""]);
+        setExplanation(editData.explanation || "");
+        setPoints(editData.points || 10);
+      } else {
+        resetForm();
+      }
     }
-  }, [open]);
+  }, [open, editData]);
 
   const loadCurriculum = async () => {
     try {
@@ -125,7 +140,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
     if (!canProceed()) return;
     setSaving(true);
     try {
-      await createProblem({
+      const problemData = {
         lessonId,
         question: question || "(이미지 문제)",
         type,
@@ -136,12 +151,18 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
         explanation: explanation.trim() || undefined,
         points,
         imageUrls,
-      });
+      };
+
+      if (editData) {
+        await updateProblem(editData.id, problemData);
+      } else {
+        await createProblem(problemData);
+      }
       onCreated();
       onClose();
     } catch (error) {
       console.error(error);
-      alert("문제 등록에 실패했습니다.");
+      alert(editData ? "문제 수정에 실패했습니다." : "문제 등록에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -160,7 +181,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">문제 등록</h2>
+            <h2 className="text-lg font-bold text-gray-900">{editData ? "문제 수정" : "문제 등록"}</h2>
             <p className="text-xs text-gray-500 mt-0.5">{STEPS[step].desc}</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -480,7 +501,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <Sparkles className="h-4 w-4" />
-                {saving ? "등록 중..." : "문제 등록"}
+                {saving ? (editData ? "수정 중..." : "등록 중...") : (editData ? "수정 완료" : "문제 등록")}
               </button>
             )}
           </div>

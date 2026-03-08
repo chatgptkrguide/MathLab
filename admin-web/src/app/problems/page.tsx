@@ -8,7 +8,8 @@ import LatexRenderer from "@/components/ui/latex-renderer";
 import CreateProblemModal from "@/components/problems/create-problem-modal";
 import Link from "next/link";
 import { DocumentSnapshot } from "firebase/firestore";
-import { Search, Trash2, Edit2, Plus, Filter, FileSpreadsheet } from "lucide-react";
+import ProblemPreviewModal from "@/components/problems/problem-preview-modal";
+import { Search, Trash2, Edit2, Plus, Filter, FileSpreadsheet, Eye } from "lucide-react";
 
 export default function ProblemsPage() {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -19,6 +20,8 @@ export default function ProblemsPage() {
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
+  const [previewProblem, setPreviewProblem] = useState<Problem | null>(null);
 
   // Filters
   const [selectedUnitId, setSelectedUnitId] = useState("");
@@ -250,15 +253,24 @@ export default function ProblemsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Link
-                    href={`/problems/${problem.id}/edit`}
+                  <button
+                    onClick={() => setPreviewProblem(problem)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                    title="미리보기"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => { setEditingProblem(problem); setShowCreateModal(true); }}
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    title="수정"
                   >
                     <Edit2 className="h-4 w-4" />
-                  </Link>
+                  </button>
                   <button
                     onClick={() => handleDelete(problem.id)}
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="삭제"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -282,13 +294,21 @@ export default function ProblemsPage() {
         )}
       </div>
 
-      {/* Create Problem Modal */}
+      {/* Create/Edit Problem Modal */}
       <CreateProblemModal
         open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={() => { setShowCreateModal(false); setEditingProblem(null); }}
         onCreated={() => {
           loadProblems(false);
+          setEditingProblem(null);
         }}
+        editData={editingProblem || undefined}
+      />
+
+      {/* Problem Preview Modal */}
+      <ProblemPreviewModal
+        problem={previewProblem}
+        onClose={() => setPreviewProblem(null)}
       />
     </AdminLayout>
   );

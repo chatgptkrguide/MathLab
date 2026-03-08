@@ -19,10 +19,22 @@ import {
   Edit2,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Save,
   X,
   GripVertical,
+  Check,
 } from "lucide-react";
+
+const UNIT_STEPS = [
+  { label: "기본 정보", desc: "단원 제목과 과목을 입력하세요" },
+  { label: "디자인 설정", desc: "아이콘과 테마 색상을 선택하세요" },
+];
+
+const LESSON_STEPS = [
+  { label: "기본 정보", desc: "레슨 제목과 설명을 입력하세요" },
+  { label: "학습 설정", desc: "유형, 난이도, 보상을 설정하세요" },
+];
 
 export default function CurriculumPage() {
   const [units, setUnits] = useState<Unit[]>([]);
@@ -33,6 +45,7 @@ export default function CurriculumPage() {
   // Unit form
   const [showUnitForm, setShowUnitForm] = useState(false);
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
+  const [unitStep, setUnitStep] = useState(0);
   const [unitForm, setUnitForm] = useState({
     title: "",
     description: "",
@@ -45,6 +58,7 @@ export default function CurriculumPage() {
   // Lesson form
   const [showLessonForm, setShowLessonForm] = useState<string | null>(null);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [lessonStep, setLessonStep] = useState(0);
   const [lessonForm, setLessonForm] = useState({
     title: "",
     description: "",
@@ -104,6 +118,7 @@ export default function CurriculumPage() {
         theme: "blue",
       });
     }
+    setUnitStep(0);
     setShowUnitForm(true);
   };
 
@@ -170,6 +185,7 @@ export default function CurriculumPage() {
         estimatedMinutes: 5,
       });
     }
+    setLessonStep(0);
     setShowLessonForm(unitId);
   };
 
@@ -221,6 +237,33 @@ export default function CurriculumPage() {
   const subjects = ["공통수학1", "공통수학2", "수학I", "수학II", "미적분", "확률과 통계", "기하"];
   const themeOptions: UnitTheme[] = ["blue", "green", "orange", "purple", "red", "yellow"];
   const emojiOptions = ["📐", "📊", "📈", "🔢", "🧮", "📏", "📝", "🎯", "🔺", "🔵", "⭐", "🧩"];
+
+  // Stepper component
+  const Stepper = ({ steps, currentStep }: { steps: { label: string; desc: string }[]; currentStep: number }) => (
+    <div className="px-6 py-3 border-b border-gray-50 bg-gray-50/50">
+      <div className="flex items-center gap-1">
+        {steps.map((s, i) => (
+          <div key={i} className="flex items-center gap-1 flex-1">
+            <div className={`flex items-center gap-2 ${i <= currentStep ? "" : "opacity-40"}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
+                i < currentStep ? "bg-green-500 text-white" :
+                i === currentStep ? "bg-blue-600 text-white ring-2 ring-blue-200" :
+                "bg-gray-200 text-gray-500"
+              }`}>
+                {i < currentStep ? <Check className="h-3.5 w-3.5" /> : i + 1}
+              </div>
+              <span className={`text-xs font-medium hidden sm:inline ${
+                i === currentStep ? "text-blue-700" : i < currentStep ? "text-green-700" : "text-gray-400"
+              }`}>{s.label}</span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`flex-1 h-px mx-2 ${i < currentStep ? "bg-green-400" : "bg-gray-200"}`} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <AdminLayout>
@@ -377,118 +420,174 @@ export default function CurriculumPage() {
 
       {/* Unit Form Modal */}
       {showUnitForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 mx-4 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {editingUnit ? "단원 수정" : "단원 추가"}
-              </h3>
-              <button onClick={() => setShowUnitForm(false)}>
-                <X className="h-5 w-5 text-gray-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowUnitForm(false)}>
+          <div
+            className="relative w-full max-w-2xl mx-4 rounded-2xl bg-white shadow-2xl max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  {editingUnit ? "단원 수정" : "단원 추가"}
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">{UNIT_STEPS[unitStep].desc}</p>
+              </div>
+              <button onClick={() => setShowUnitForm(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">제목</label>
-                <input
-                  value={unitForm.title}
-                  onChange={(e) => setUnitForm({ ...unitForm, title: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                  placeholder="예: 다항식"
-                />
-              </div>
+            {/* Stepper */}
+            <Stepper steps={UNIT_STEPS} currentStep={unitStep} />
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">설명</label>
-                <input
-                  value={unitForm.description}
-                  onChange={(e) => setUnitForm({ ...unitForm, description: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                  placeholder="단원 설명"
-                />
-              </div>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {unitStep === 0 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">제목</label>
+                    <input
+                      value={unitForm.title}
+                      onChange={(e) => setUnitForm({ ...unitForm, title: e.target.value })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                      placeholder="예: 다항식"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">과목</label>
-                  <select
-                    value={unitForm.subject}
-                    onChange={(e) => setUnitForm({ ...unitForm, subject: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  >
-                    {subjects.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">순서</label>
-                  <input
-                    type="number"
-                    value={unitForm.order}
-                    onChange={(e) => setUnitForm({ ...unitForm, order: parseInt(e.target.value) || 0 })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    min={1}
-                  />
-                </div>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">설명</label>
+                    <textarea
+                      value={unitForm.description}
+                      onChange={(e) => setUnitForm({ ...unitForm, description: e.target.value })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors resize-none"
+                      placeholder="단원에 대한 간략한 설명을 입력하세요"
+                      rows={3}
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">아이콘</label>
-                  <div className="flex flex-wrap gap-2">
-                    {emojiOptions.map((e) => (
-                      <button
-                        key={e}
-                        type="button"
-                        onClick={() => setUnitForm({ ...unitForm, emoji: e })}
-                        className={`h-9 w-9 rounded-lg text-lg flex items-center justify-center transition-colors ${
-                          unitForm.emoji === e
-                            ? "bg-blue-100 border-2 border-blue-500"
-                            : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
-                        }`}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">과목</label>
+                      <select
+                        value={unitForm.subject}
+                        onChange={(e) => setUnitForm({ ...unitForm, subject: e.target.value })}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                       >
-                        {e}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">테마 색상</label>
-                  <div className="flex flex-wrap gap-2">
-                    {themeOptions.map((t) => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => setUnitForm({ ...unitForm, theme: t })}
-                        className={`h-9 w-9 rounded-lg flex items-center justify-center transition-all ${
-                          unitForm.theme === t ? "ring-2 ring-offset-2 ring-blue-500" : ""
-                        }`}
-                        style={{ backgroundColor: UNIT_THEME_COLORS[t] }}
+                        {subjects.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">순서</label>
+                      <input
+                        type="number"
+                        value={unitForm.order}
+                        onChange={(e) => setUnitForm({ ...unitForm, order: parseInt(e.target.value) || 0 })}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        min={1}
                       />
-                    ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {unitStep === 1 && (
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">아이콘 선택</label>
+                    <div className="flex flex-wrap gap-2">
+                      {emojiOptions.map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() => setUnitForm({ ...unitForm, emoji: e })}
+                          className={`h-11 w-11 rounded-xl text-xl flex items-center justify-center transition-all ${
+                            unitForm.emoji === e
+                              ? "bg-blue-100 border-2 border-blue-500 shadow-sm scale-110"
+                              : "bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:scale-105"
+                          }`}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">테마 색상</label>
+                    <div className="flex flex-wrap gap-3">
+                      {themeOptions.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setUnitForm({ ...unitForm, theme: t })}
+                          className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all ${
+                            unitForm.theme === t ? "ring-2 ring-offset-2 ring-blue-500 scale-110 shadow-sm" : "hover:scale-105"
+                          }`}
+                          style={{ backgroundColor: UNIT_THEME_COLORS[t] }}
+                        >
+                          {unitForm.theme === t && <Check className="h-5 w-5 text-white" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <p className="text-xs font-medium text-gray-500 mb-3">미리보기</p>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-4 w-4 rounded-full"
+                        style={{ backgroundColor: UNIT_THEME_COLORS[unitForm.theme] }}
+                      />
+                      <span className="text-xl">{unitForm.emoji}</span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {unitForm.order}. {unitForm.title || "단원 제목"}
+                        </p>
+                        <p className="text-xs text-gray-400">{unitForm.subject}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            {/* Footer */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
               <button
-                onClick={() => setShowUnitForm(false)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => unitStep > 0 ? setUnitStep(unitStep - 1) : setShowUnitForm(false)}
+                className="flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
               >
-                취소
+                <ChevronLeft className="h-4 w-4" />
+                {unitStep > 0 ? "이전" : "취소"}
               </button>
-              <button
-                onClick={saveUnit}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-              >
-                <Save className="h-4 w-4" />
-                저장
-              </button>
+
+              <div className="flex items-center gap-2">
+                {unitStep < 1 ? (
+                  <button
+                    onClick={() => setUnitStep(unitStep + 1)}
+                    disabled={!unitForm.title.trim()}
+                    className="flex items-center gap-1 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    다음
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={saveUnit}
+                    disabled={!unitForm.title.trim()}
+                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Save className="h-4 w-4" />
+                    {editingUnit ? "수정 완료" : "단원 추가"}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -496,127 +595,174 @@ export default function CurriculumPage() {
 
       {/* Lesson Form Modal */}
       {showLessonForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 mx-4 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {editingLesson ? "레슨 수정" : "레슨 추가"}
-              </h3>
-              <button onClick={() => setShowLessonForm(null)}>
-                <X className="h-5 w-5 text-gray-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowLessonForm(null)}>
+          <div
+            className="relative w-full max-w-2xl mx-4 rounded-2xl bg-white shadow-2xl max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  {editingLesson ? "레슨 수정" : "레슨 추가"}
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">{LESSON_STEPS[lessonStep].desc}</p>
+              </div>
+              <button onClick={() => setShowLessonForm(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">제목</label>
-                <input
-                  value={lessonForm.title}
-                  onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                  placeholder="예: 다항식의 덧셈과 뺄셈"
-                />
-              </div>
+            {/* Stepper */}
+            <Stepper steps={LESSON_STEPS} currentStep={lessonStep} />
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">설명</label>
-                <input
-                  value={lessonForm.description}
-                  onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                  placeholder="레슨 설명"
-                />
-              </div>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {lessonStep === 0 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">제목</label>
+                    <input
+                      value={lessonForm.title}
+                      onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                      placeholder="예: 다항식의 덧셈과 뺄셈"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">순서</label>
-                  <input
-                    type="number"
-                    value={lessonForm.order}
-                    onChange={(e) => setLessonForm({ ...lessonForm, order: parseInt(e.target.value) || 0 })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    min={1}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">XP 보상</label>
-                  <input
-                    type="number"
-                    value={lessonForm.xpReward}
-                    onChange={(e) => setLessonForm({ ...lessonForm, xpReward: parseInt(e.target.value) || 0 })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    min={1}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">예상 시간(분)</label>
-                  <input
-                    type="number"
-                    value={lessonForm.estimatedMinutes}
-                    onChange={(e) => setLessonForm({ ...lessonForm, estimatedMinutes: parseInt(e.target.value) || 0 })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    min={1}
-                  />
-                </div>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">설명</label>
+                    <textarea
+                      value={lessonForm.description}
+                      onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors resize-none"
+                      placeholder="레슨에 대한 간략한 설명을 입력하세요"
+                      rows={3}
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">유형</label>
-                  <select
-                    value={lessonForm.type}
-                    onChange={(e) => setLessonForm({ ...lessonForm, type: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  >
-                    <option value="standard">일반</option>
-                    <option value="story">스토리</option>
-                    <option value="practice">연습</option>
-                    <option value="review">복습</option>
-                    <option value="challenge">챌린지</option>
-                    <option value="boss">보스</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">순서</label>
+                    <input
+                      type="number"
+                      value={lessonForm.order}
+                      onChange={(e) => setLessonForm({ ...lessonForm, order: parseInt(e.target.value) || 0 })}
+                      className="w-full max-w-[120px] rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                      min={1}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">난이도</label>
-                  <select
-                    value={lessonForm.difficulty}
-                    onChange={(e) => setLessonForm({ ...lessonForm, difficulty: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  >
-                    <option value="beginner">초급</option>
-                    <option value="intermediate">중급</option>
-                    <option value="advanced">고급</option>
-                    <option value="expert">전문가</option>
-                  </select>
-                </div>
-              </div>
+              )}
 
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">개념 (쉼표로 구분)</label>
-                <input
-                  value={lessonForm.concepts}
-                  onChange={(e) => setLessonForm({ ...lessonForm, concepts: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                  placeholder="예: 다항식, 덧셈, 뺄셈"
-                />
-              </div>
+              {lessonStep === 1 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">유형</label>
+                      <select
+                        value={lessonForm.type}
+                        onChange={(e) => setLessonForm({ ...lessonForm, type: e.target.value })}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                      >
+                        <option value="standard">일반</option>
+                        <option value="story">스토리</option>
+                        <option value="practice">연습</option>
+                        <option value="review">복습</option>
+                        <option value="challenge">챌린지</option>
+                        <option value="boss">보스</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">난이도</label>
+                      <select
+                        value={lessonForm.difficulty}
+                        onChange={(e) => setLessonForm({ ...lessonForm, difficulty: e.target.value })}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                      >
+                        <option value="beginner">초급</option>
+                        <option value="intermediate">중급</option>
+                        <option value="advanced">고급</option>
+                        <option value="expert">전문가</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">XP 보상</label>
+                      <input
+                        type="number"
+                        value={lessonForm.xpReward}
+                        onChange={(e) => setLessonForm({ ...lessonForm, xpReward: parseInt(e.target.value) || 0 })}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        min={1}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">예상 시간 (분)</label>
+                      <input
+                        type="number"
+                        value={lessonForm.estimatedMinutes}
+                        onChange={(e) => setLessonForm({ ...lessonForm, estimatedMinutes: parseInt(e.target.value) || 0 })}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        min={1}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">개념 (쉼표로 구분)</label>
+                    <input
+                      value={lessonForm.concepts}
+                      onChange={(e) => setLessonForm({ ...lessonForm, concepts: e.target.value })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                      placeholder="예: 다항식, 덧셈, 뺄셈"
+                    />
+                    {lessonForm.concepts && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {lessonForm.concepts.split(",").map((c, i) => c.trim()).filter(Boolean).map((concept, i) => (
+                          <span key={i} className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                            {concept}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            {/* Footer */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
               <button
-                onClick={() => setShowLessonForm(null)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => lessonStep > 0 ? setLessonStep(lessonStep - 1) : setShowLessonForm(null)}
+                className="flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
               >
-                취소
+                <ChevronLeft className="h-4 w-4" />
+                {lessonStep > 0 ? "이전" : "취소"}
               </button>
-              <button
-                onClick={saveLesson}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-              >
-                <Save className="h-4 w-4" />
-                저장
-              </button>
+
+              <div className="flex items-center gap-2">
+                {lessonStep < 1 ? (
+                  <button
+                    onClick={() => setLessonStep(lessonStep + 1)}
+                    disabled={!lessonForm.title.trim()}
+                    className="flex items-center gap-1 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    다음
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={saveLesson}
+                    disabled={!lessonForm.title.trim()}
+                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Save className="h-4 w-4" />
+                    {editingLesson ? "수정 완료" : "레슨 추가"}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

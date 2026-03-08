@@ -240,11 +240,17 @@ export async function getProblemCountsByLesson(): Promise<Record<string, number>
 
 // ==================== STATS ====================
 
+export async function getUserCount(): Promise<number> {
+  const snapshot = await getDocs(collection(db, "users"));
+  return snapshot.size;
+}
+
 export async function getDashboardStats() {
-  const [problemsSnap, unitsSnap, lessonsSnap] = await Promise.all([
+  const [problemsSnap, unitsSnap, lessonsSnap, userCount] = await Promise.all([
     getDocs(collection(db, "problems")),
     getDocs(collection(db, "units")),
     getDocs(collection(db, "lessons")),
+    getUserCount(),
   ]);
 
   const totalLessons = lessonsSnap.size;
@@ -262,13 +268,61 @@ export async function getDashboardStats() {
     byLesson[p.lessonId] = (byLesson[p.lessonId] || 0) + 1;
   });
 
+  // Weekly activity data (last 7 days)
+  const now = new Date();
+  const weeklyData: { date: string; count: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split("T")[0]; // YYYY-MM-DD
+    weeklyData.push({ date: dateStr, count: 0 });
+  }
+
+  // Today count
+  const todayStr = now.toISOString().split("T")[0];
+  let todayCount = 0;
+
+  problemsSnap.docs.forEach((d) => {
+    const data = d.data();
+    const createdAt = data.createdAt as { seconds?: number } | undefined;
+    if (createdAt?.seconds) {
+      const createdDate = new Date(createdAt.seconds * 1000);
+      const dateStr = createdDate.toISOString().split("T")[0];
+      const entry = weeklyData.find((w) => w.date === dateStr);
+      if (entry) {
+        entry.count++;
+      }
+      if (dateStr === todayStr) {
+        todayCount++;
+      }
+    }
+  });
+
+  // Lesson coverage: merge lesson titles with problem counts
+  const lessonMap = new Map<string, string>();
+  lessonsSnap.docs.forEach((d) => {
+    const data = d.data();
+    lessonMap.set(d.id, data.title || d.id);
+  });
+
+  const lessonCoverage = Array.from(lessonMap.entries()).map(([lessonId, lessonTitle]) => ({
+    lessonId,
+    lessonTitle,
+    count: byLesson[lessonId] || 0,
+  }));
+  lessonCoverage.sort((a, b) => b.count - a.count);
+
   return {
     totalProblems: problemsSnap.size,
     totalUnits: unitsSnap.size,
     totalLessons,
+    userCount,
+    todayCount,
     byDifficulty,
     byType,
     byLesson,
+    weeklyData,
+    lessonCoverage,
     recentProblems: problemsSnap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
       .sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
