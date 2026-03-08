@@ -7,16 +7,13 @@ import {
   LayoutDashboard,
   FileText,
   BookOpen,
-  Upload,
   LogOut,
   GraduationCap,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
-  { href: "/problems", label: "문제 목록", icon: FileText },
-  { href: "/problems/new", label: "문제 등록", icon: Upload },
-  { href: "/problems/bulk", label: "대량 등록", icon: Upload },
+  { href: "/problems", label: "문제 관리", icon: FileText },
   { href: "/curriculum", label: "커리큘럼 관리", icon: BookOpen },
 ];
 
@@ -38,8 +35,7 @@ export default function Sidebar() {
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href) && item.href !== "/problems/new" && item.href !== "/problems/bulk") ||
-              (item.href === "/problems" && pathname === "/problems");
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
             const Icon = item.icon;
 
             return (

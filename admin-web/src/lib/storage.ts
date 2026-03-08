@@ -14,7 +14,15 @@ export async function uploadProblemImage(file: File): Promise<string> {
 
 export async function deleteProblemImage(url: string): Promise<void> {
   try {
-    const storageRef = ref(storage, url);
+    // Extract storage path from download URL
+    const decodedUrl = decodeURIComponent(url);
+    const match = decodedUrl.match(/\/o\/(.+?)\?/);
+    if (!match) {
+      console.error("Failed to extract path from URL:", url);
+      return;
+    }
+    const path = match[1];
+    const storageRef = ref(storage, path);
     await deleteObject(storageRef);
   } catch (error) {
     console.error("Failed to delete image:", error);

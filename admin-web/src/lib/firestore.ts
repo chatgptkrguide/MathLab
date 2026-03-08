@@ -187,56 +187,41 @@ export async function deleteUnit(id: string): Promise<void> {
   await deleteDoc(doc(db, "units", id));
 }
 
-// ==================== LESSONS (stored as subcollections: units/{unitId}/lessons/{id}) ====================
+// ==================== LESSONS (top-level collection matching Flutter app) ====================
 
 export async function getLessons(unitId?: string): Promise<Lesson[]> {
+  const constraints: QueryConstraint[] = [];
   if (unitId) {
-    // Get lessons from subcollection
-    const q = query(collection(db, "units", unitId, "lessons"), orderBy("order", "asc"));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => ({
-      id: d.id,
-      unitId,
-      ...d.data(),
-    })) as Lesson[];
+    constraints.push(where("unitId", "==", unitId));
   }
+  constraints.push(orderBy("order", "asc"));
 
-  // Get all lessons from all units
-  const unitsSnap = await getDocs(collection(db, "units"));
-  const allLessons: Lesson[] = [];
-  for (const unitDoc of unitsSnap.docs) {
-    const lessonsSnap = await getDocs(
-      query(collection(db, "units", unitDoc.id, "lessons"), orderBy("order", "asc"))
-    );
-    lessonsSnap.docs.forEach((d) => {
-      allLessons.push({ id: d.id, unitId: unitDoc.id, ...d.data() } as Lesson);
-    });
-  }
-  return allLessons;
+  const q = query(collection(db, "lessons"), ...constraints);
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  })) as Lesson[];
 }
 
 export async function getLesson(unitId: string, id: string): Promise<Lesson | null> {
-  const docSnap = await getDoc(doc(db, "units", unitId, "lessons", id));
+  const docSnap = await getDoc(doc(db, "lessons", id));
   if (!docSnap.exists()) return null;
-  return { id: docSnap.id, unitId, ...docSnap.data() } as Lesson;
+  return { id: docSnap.id, ...docSnap.data() } as Lesson;
 }
 
 export async function createLesson(data: Omit<Lesson, "id">): Promise<string> {
   if (!data.unitId) throw new Error("unitId is required");
-  const lessonData = { ...data } as Record<string, unknown>;
-  delete lessonData.unitId; // don't store unitId inside subcollection doc
-  const docRef = await addDoc(collection(db, "units", data.unitId, "lessons"), lessonData);
+  const docRef = await addDoc(collection(db, "lessons"), data);
   return docRef.id;
 }
 
 export async function updateLesson(unitId: string, id: string, data: Partial<Omit<Lesson, "id">>): Promise<void> {
-  const updateData = { ...data } as Record<string, unknown>;
-  delete updateData.unitId;
-  await updateDoc(doc(db, "units", unitId, "lessons", id), updateData);
+  await updateDoc(doc(db, "lessons", id), data);
 }
 
 export async function deleteLesson(unitId: string, id: string): Promise<void> {
-  await deleteDoc(doc(db, "units", unitId, "lessons", id));
+  await deleteDoc(doc(db, "lessons", id));
 }
 
 // ==================== PROBLEM COUNTS ====================
@@ -256,17 +241,13 @@ export async function getProblemCountsByLesson(): Promise<Record<string, number>
 // ==================== STATS ====================
 
 export async function getDashboardStats() {
-  const [problemsSnap, unitsSnap] = await Promise.all([
+  const [problemsSnap, unitsSnap, lessonsSnap] = await Promise.all([
     getDocs(collection(db, "problems")),
     getDocs(collection(db, "units")),
+    getDocs(collection(db, "lessons")),
   ]);
 
-  // Count lessons from subcollections
-  let totalLessons = 0;
-  for (const unitDoc of unitsSnap.docs) {
-    const lessonsSnap = await getDocs(collection(db, "units", unitDoc.id, "lessons"));
-    totalLessons += lessonsSnap.size;
-  }
+  const totalLessons = lessonsSnap.size;
 
   const problems = problemsSnap.docs.map((d) => d.data());
 

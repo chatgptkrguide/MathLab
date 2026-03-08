@@ -5,9 +5,10 @@ import AdminLayout from "@/components/layout/admin-layout";
 import { getProblems, deleteProblem, getUnits, getLessons, ProblemFilters } from "@/lib/firestore";
 import { Problem, Unit, Lesson, ProblemType, ProblemDifficulty, PROBLEM_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/types";
 import LatexRenderer from "@/components/ui/latex-renderer";
+import CreateProblemModal from "@/components/problems/create-problem-modal";
 import Link from "next/link";
 import { DocumentSnapshot } from "firebase/firestore";
-import { Search, Trash2, Edit2, Plus, Filter } from "lucide-react";
+import { Search, Trash2, Edit2, Plus, Filter, FileSpreadsheet } from "lucide-react";
 
 export default function ProblemsPage() {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -17,6 +18,7 @@ export default function ProblemsPage() {
   const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Filters
   const [selectedUnitId, setSelectedUnitId] = useState("");
@@ -96,16 +98,25 @@ export default function ProblemsPage() {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">문제 목록</h1>
+          <h1 className="text-2xl font-bold text-gray-900">문제 관리</h1>
           <p className="text-sm text-gray-500 mt-1">총 {total}개의 문제</p>
         </div>
-        <Link
-          href="/problems/new"
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          문제 등록
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/problems/bulk"
+            className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            엑셀 등록
+          </Link>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            문제 등록
+          </button>
+        </div>
       </div>
 
       {/* Search & Filters */}
@@ -203,8 +214,14 @@ export default function ProblemsPage() {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
           </div>
         ) : problems.length === 0 ? (
-          <div className="py-20 text-center text-sm text-gray-500">
-            등록된 문제가 없습니다.
+          <div className="py-20 text-center">
+            <p className="text-sm text-gray-500 mb-3">등록된 문제가 없습니다.</p>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              첫 문제 등록하기
+            </button>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -264,6 +281,15 @@ export default function ProblemsPage() {
           </div>
         )}
       </div>
+
+      {/* Create Problem Modal */}
+      <CreateProblemModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={() => {
+          loadProblems(false);
+        }}
+      />
     </AdminLayout>
   );
 }

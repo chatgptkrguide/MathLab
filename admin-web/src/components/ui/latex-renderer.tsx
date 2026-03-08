@@ -2,6 +2,7 @@
 
 import "katex/dist/katex.min.css";
 import katex from "katex";
+import DOMPurify from "dompurify";
 import { useMemo } from "react";
 
 interface LatexRendererProps {
@@ -40,7 +41,7 @@ export default function LatexRenderer({ text, className = "" }: LatexRendererPro
   return (
     <span
       className={className}
-      dangerouslySetInnerHTML={{ __html: rendered }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rendered) }}
     />
   );
 }

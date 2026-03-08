@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
@@ -212,6 +213,31 @@ class AdminShellScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: AppDimensions.spacing24),
+
+                    // Admin Web Link
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final url = Uri.parse('https://admin-web-bice.vercel.app');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        icon: const Icon(Icons.open_in_new_rounded, size: 20),
+                        label: const Text('관리자 웹 대시보드 열기'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.mathBlue,
+                          side: const BorderSide(color: AppColors.mathBlue),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: AppDimensions.spacing32),
                   ],
                 ),

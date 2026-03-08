@@ -97,10 +97,7 @@ service cloud.firestore {
 
       match /subscriptions/{subscriptionId} {
         allow read: if isOwner(userId);
-        allow write: if isOwner(userId) &&
-                       request.resource.data.startDate is timestamp &&
-                       request.resource.data.endDate is timestamp &&
-                       request.resource.data.endDate > request.resource.data.startDate;
+        allow write: if false; // backend only
       }
 
       match /fcmTokens/{tokenId} {

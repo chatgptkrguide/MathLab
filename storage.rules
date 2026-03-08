@@ -105,10 +105,10 @@ service firebase.storage {
     // Problem Images - flat path (admin web upload)
     match /problem_images/{fileName} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn() &&
+      allow write: if isAdmin() &&
                      isValidImageType() &&
                      isValidFileSize(10);
-      allow delete: if isSignedIn();
+      allow delete: if isAdmin();
     }
 
     // Lesson Images (Read-only for authenticated users)
