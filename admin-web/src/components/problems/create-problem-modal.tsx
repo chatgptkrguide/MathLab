@@ -3,11 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Problem, ProblemType, ProblemDifficulty, Unit, Lesson, DIFFICULTY_LABELS } from "@/lib/types";
 import { getUnits, getLessons, getProblemCountsByLesson, createProblem, updateProblem } from "@/lib/firestore";
-import { uploadProblemImage } from "@/lib/storage";
 import {
   X, Check, ChevronRight, ChevronLeft,
-  Upload, Plus, Lightbulb, BookOpen, Sparkles,
-  FileSpreadsheet,
+  Plus, Lightbulb, BookOpen, Sparkles,
 } from "lucide-react";
 
 interface CreateProblemModalProps {
@@ -20,7 +18,7 @@ interface CreateProblemModalProps {
 const STEPS = [
   { label: "위치 선택", desc: "단원과 레슨을 선택하세요" },
   { label: "문제 작성", desc: "문제 유형과 내용을 입력하세요" },
-  { label: "정답 & 부가정보", desc: "정답, 힌트, 풀이를 입력하세요" },
+  { label: "정답 & 힌트", desc: "정답, 힌트, 풀이를 입력하세요" },
 ];
 
 export default function CreateProblemModal({ open, onClose, onCreated, editData }: CreateProblemModalProps) {
@@ -30,16 +28,13 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
   const [filteredLessons, setFilteredLessons] = useState<Lesson[]>([]);
   const [problemCounts, setProblemCounts] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
-  const [imageUploading, setImageUploading] = useState(false);
 
   // Form state
-  const [selectedUnitId, setSelectedUnitId] = useState(editData ? "" : "");
+  const [selectedUnitId, setSelectedUnitId] = useState("");
   const [lessonId, setLessonId] = useState(editData?.lessonId || "");
   const [type, setType] = useState<ProblemType>(editData?.type || "multipleChoice");
   const [difficulty, setDifficulty] = useState<ProblemDifficulty>(editData?.difficulty || "easy");
-  const [questionMode, setQuestionMode] = useState<"text" | "image">("text");
   const [question, setQuestion] = useState(editData?.question || "");
-  const [imageUrls, setImageUrls] = useState<string[]>(editData?.imageUrls || []);
   const [options, setOptions] = useState<string[]>(editData?.options?.length ? editData.options : ["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState(editData?.correctAnswer || "");
   const [hints, setHints] = useState<string[]>(editData?.hints?.length ? editData.hints : [""]);
@@ -55,8 +50,6 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
         setType(editData.type || "multipleChoice");
         setDifficulty(editData.difficulty || "easy");
         setQuestion(editData.question || "");
-        setImageUrls(editData.imageUrls || []);
-        setQuestionMode(editData.imageUrls?.length ? "image" : "text");
         setOptions(editData.options?.length ? editData.options : ["", "", "", ""]);
         setCorrectAnswer(editData.correctAnswer || "");
         setHints(editData.hints?.length ? editData.hints : [""]);
@@ -92,9 +85,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
     setLessonId("");
     setType("multipleChoice");
     setDifficulty("easy");
-    setQuestionMode("text");
     setQuestion("");
-    setImageUrls([]);
     setOptions(["", "", "", ""]);
     setCorrectAnswer("");
     setHints([""]);
@@ -108,33 +99,16 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
     setLessonId("");
   };
 
-  const handleImageUpload = async (files: FileList) => {
-    setImageUploading(true);
-    try {
-      const uploadPromises = Array.from(files).map((file) => uploadProblemImage(file));
-      const urls = await Promise.all(uploadPromises);
-      setImageUrls((prev) => [...prev, ...urls]);
-    } catch {
-      alert("이미지 업로드 실패");
-    } finally {
-      setImageUploading(false);
-    }
-  };
-
   const canProceed = useCallback((): boolean => {
     if (step === 0) return !!lessonId;
-    if (step === 1) {
-      if (questionMode === "text" && !question.trim()) return false;
-      if (questionMode === "image" && imageUrls.length === 0) return false;
-      return true;
-    }
+    if (step === 1) return !!question.trim();
     if (step === 2) {
       if (!correctAnswer.trim()) return false;
       if (type === "multipleChoice" && options.some((o) => !o.trim())) return false;
       return true;
     }
     return false;
-  }, [step, lessonId, questionMode, question, imageUrls, correctAnswer, type, options]);
+  }, [step, lessonId, question, correctAnswer, type, options]);
 
   const handleSubmit = async () => {
     if (!canProceed()) return;
@@ -142,7 +116,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
     try {
       const problemData = {
         lessonId,
-        question: question || "(이미지 문제)",
+        question,
         type,
         difficulty,
         options: type === "multipleChoice" ? options : [],
@@ -150,7 +124,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
         hints: hints.filter((h) => h.trim()),
         explanation: explanation.trim() || undefined,
         points,
-        imageUrls,
+        imageUrls: [],
       };
 
       if (editData) {
@@ -219,7 +193,6 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
           {/* STEP 0: 위치 선택 */}
           {step === 0 && (
             <div className="space-y-5">
-              {/* 단원 선택 */}
               <div>
                 <label className="text-sm font-semibold text-gray-900 mb-3 block">단원 선택</label>
                 <div className="grid grid-cols-1 gap-2">
@@ -248,9 +221,8 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 </div>
               </div>
 
-              {/* 레슨 선택 */}
               {selectedUnitId && (
-                <div className="animate-in fade-in slide-in-from-top-2">
+                <div>
                   <label className="text-sm font-semibold text-gray-900 mb-3 block">
                     레슨 선택
                     <span className="ml-2 text-xs font-normal text-gray-400">{selectedUnit?.emoji} {selectedUnit?.title}</span>
@@ -295,7 +267,6 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
           {/* STEP 1: 문제 작성 */}
           {step === 1 && (
             <div className="space-y-5">
-              {/* 문제 유형 + 난이도 */}
               <div>
                 <label className="text-sm font-semibold text-gray-900 mb-3 block">문제 설정</label>
                 <div className="flex gap-2 flex-wrap items-center">
@@ -326,63 +297,18 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 </div>
               </div>
 
-              {/* 문제 내용 */}
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-gray-900">문제 내용</label>
-                  <div className="flex rounded-lg border border-gray-200 overflow-hidden">
-                    <button type="button" onClick={() => setQuestionMode("text")}
-                      className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                        questionMode === "text" ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-50"}`}>
-                      텍스트
-                    </button>
-                    <button type="button" onClick={() => setQuestionMode("image")}
-                      className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                        questionMode === "image" ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-50"}`}>
-                      이미지
-                    </button>
-                  </div>
-                </div>
-
-                {questionMode === "text" ? (
-                  <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none"
-                    placeholder="문제를 입력하세요 (LaTeX: $수식$)" />
-                ) : (
-                  <div className="space-y-3">
-                    {imageUrls.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {imageUrls.map((url, i) => (
-                          <div key={i} className="relative inline-block group">
-                            <img src={url} alt={`이미지 ${i + 1}`} className="max-h-36 rounded-lg border border-gray-200" />
-                            <button type="button" onClick={() => setImageUrls(prev => prev.filter((_, idx) => idx !== i))}
-                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <label className={`flex flex-col items-center gap-2 rounded-xl border-2 border-dashed py-8 cursor-pointer transition-colors ${
-                      imageUploading ? "border-blue-300 bg-blue-50" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50/30"
-                    }`}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => { e.preventDefault(); if (e.dataTransfer.files.length) handleImageUpload(e.dataTransfer.files); }}>
-                      <Upload className="h-6 w-6 text-gray-400" />
-                      <span className="text-sm text-gray-500">{imageUploading ? "업로드 중..." : "클릭 또는 드래그 (여러 장 가능)"}</span>
-                      <input type="file" accept="image/*" multiple className="hidden"
-                        onChange={(e) => { if (e.target.files) handleImageUpload(e.target.files); }} />
-                    </label>
-                  </div>
-                )}
+                <label className="text-sm font-semibold text-gray-900 mb-3 block">문제 내용</label>
+                <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={4}
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none"
+                  placeholder="문제를 입력하세요 (LaTeX: $수식$)" />
               </div>
             </div>
           )}
 
-          {/* STEP 2: 정답 & 부가정보 */}
+          {/* STEP 2: 정답 & 힌트 */}
           {step === 2 && (
             <div className="space-y-5">
-              {/* 정답 */}
               <div>
                 <label className="text-sm font-semibold text-gray-900 mb-3 block">정답 입력</label>
 
@@ -431,7 +357,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 <div className="flex items-center gap-2 mb-3">
                   <Lightbulb className="h-4 w-4 text-amber-500" />
                   <span className="text-sm font-semibold text-gray-900">힌트</span>
-                  <span className="text-xs text-gray-400">(선택사항)</span>
+                  <span className="text-xs text-gray-400">(선택)</span>
                 </div>
                 <div className="space-y-2">
                   {hints.map((hint, i) => (
@@ -464,7 +390,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 <div className="flex items-center gap-2 mb-3">
                   <BookOpen className="h-4 w-4 text-green-600" />
                   <span className="text-sm font-semibold text-gray-900">풀이 설명</span>
-                  <span className="text-xs text-gray-400">(선택사항)</span>
+                  <span className="text-xs text-gray-400">(선택)</span>
                 </div>
                 <textarea value={explanation} onChange={(e) => setExplanation(e.target.value)} rows={2}
                   className="w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm resize-none focus:border-green-400 focus:outline-none"

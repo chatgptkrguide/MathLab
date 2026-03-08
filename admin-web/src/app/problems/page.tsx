@@ -6,10 +6,8 @@ import { getProblems, deleteProblem, getUnits, getLessons, ProblemFilters } from
 import { Problem, Unit, Lesson, ProblemType, ProblemDifficulty, PROBLEM_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/types";
 import LatexRenderer from "@/components/ui/latex-renderer";
 import CreateProblemModal from "@/components/problems/create-problem-modal";
-import Link from "next/link";
 import { DocumentSnapshot } from "firebase/firestore";
-import ProblemPreviewModal from "@/components/problems/problem-preview-modal";
-import { Search, Trash2, Edit2, Plus, Filter, FileSpreadsheet, Eye } from "lucide-react";
+import { Search, Trash2, Edit2, Plus, Filter } from "lucide-react";
 
 export default function ProblemsPage() {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -21,7 +19,6 @@ export default function ProblemsPage() {
   const [hasMore, setHasMore] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
-  const [previewProblem, setPreviewProblem] = useState<Problem | null>(null);
 
   // Filters
   const [selectedUnitId, setSelectedUnitId] = useState("");
@@ -104,22 +101,13 @@ export default function ProblemsPage() {
           <h1 className="text-2xl font-bold text-gray-900">문제 관리</h1>
           <p className="text-sm text-gray-500 mt-1">총 {total}개의 문제</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/problems/bulk"
-            className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <FileSpreadsheet className="h-4 w-4" />
-            엑셀 등록
-          </Link>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            문제 등록
-          </button>
-        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="h-4 w-4" />
+          문제 등록
+        </button>
       </div>
 
       {/* Search & Filters */}
@@ -254,13 +242,6 @@ export default function ProblemsPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <button
-                    onClick={() => setPreviewProblem(problem)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                    title="미리보기"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                  <button
                     onClick={() => { setEditingProblem(problem); setShowCreateModal(true); }}
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     title="수정"
@@ -305,11 +286,6 @@ export default function ProblemsPage() {
         editData={editingProblem || undefined}
       />
 
-      {/* Problem Preview Modal */}
-      <ProblemPreviewModal
-        problem={previewProblem}
-        onClose={() => setPreviewProblem(null)}
-      />
     </AdminLayout>
   );
 }
