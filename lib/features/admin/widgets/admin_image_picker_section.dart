@@ -1,12 +1,14 @@
-import 'dart:io';
+import 'dart:io' show File;
 
+import 'package:flutter/foundation.dart' show Uint8List, kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/constants/constants.dart';
 
 class AdminImagePickerSection extends StatelessWidget {
   final List<String> existingUrls;
-  final List<File> newFiles;
+  final List<XFile> newFiles;
   final List<String> deletedUrls;
   final VoidCallback onPickFromGallery;
   final VoidCallback onPickFromCamera;
@@ -151,7 +153,7 @@ class _ExistingImageTile extends StatelessWidget {
 }
 
 class _NewImageTile extends StatelessWidget {
-  final File file;
+  final XFile file;
   final VoidCallback onRemove;
 
   const _NewImageTile({required this.file, required this.onRemove});
@@ -164,12 +166,31 @@ class _NewImageTile extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.file(
-              file,
-              width: 120,
-              height: 120,
-              fit: BoxFit.cover,
-            ),
+            child: kIsWeb
+                ? FutureBuilder<Uint8List>(
+                    future: file.readAsBytes(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Image.memory(
+                          snapshot.data!,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      return const SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      );
+                    },
+                  )
+                : Image.file(
+                    File(file.path),
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ),
           ),
           Positioned(
             top: 4,

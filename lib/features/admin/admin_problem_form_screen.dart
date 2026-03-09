@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
@@ -45,7 +43,7 @@ class _AdminProblemFormScreenState
 
   // Images
   List<String> _existingImageUrls = [];
-  final List<File> _newImageFiles = [];
+  final List<XFile> _newImageFiles = [];
   final List<String> _deletedImageUrls = [];
 
   bool _isSaving = false;
@@ -572,10 +570,10 @@ class _AdminProblemFormScreenState
 
   Future<void> _pickImage(ImageSource source) async {
     final imageService = ref.read(problemImageServiceProvider);
-    final file = await imageService.pickImage(source: source);
-    if (file != null) {
+    final xFile = await imageService.pickXFile(source: source);
+    if (xFile != null) {
       setState(() {
-        _newImageFiles.add(file);
+        _newImageFiles.add(xFile);
       });
     }
   }
@@ -600,8 +598,8 @@ class _AdminProblemFormScreenState
 
       // Upload new images
       final newImageUrls = <String>[];
-      for (final file in _newImageFiles) {
-        final url = await imageService.uploadImage(problemId, file);
+      for (final xFile in _newImageFiles) {
+        final url = await imageService.uploadXFile(problemId, xFile);
         newImageUrls.add(url);
       }
 
@@ -655,8 +653,8 @@ class _AdminProblemFormScreenState
         if (newImageUrls.isNotEmpty) {
           // Re-upload images with correct problemId
           final correctedUrls = <String>[];
-          for (final file in _newImageFiles) {
-            final url = await imageService.uploadImage(docId, file);
+          for (final xFile in _newImageFiles) {
+            final url = await imageService.uploadXFile(docId, xFile);
             correctedUrls.add(url);
           }
           // Delete temp images
@@ -716,6 +714,8 @@ class _AdminProblemFormScreenState
         return '빈칸 채우기';
       case ProblemType.matching:
         return '매칭';
+      case ProblemType.shortAnswer:
+        return '단답형';
       case ProblemType.dragAndDrop:
         return '드래그 앤 드롭';
     }
@@ -729,6 +729,8 @@ class _AdminProblemFormScreenState
         return '보통';
       case ProblemDifficulty.hard:
         return '어려움';
+      case ProblemDifficulty.expert:
+        return '전문가';
     }
   }
 }

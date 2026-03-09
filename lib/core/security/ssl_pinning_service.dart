@@ -78,6 +78,12 @@ class SSLPinningService {
     int timeout = 60,
     SHA sha = SHA.SHA256,
   }) async {
+    // SSL pinning is not supported on web platform
+    if (kIsWeb) {
+      debugPrint('⚠️ SSL Pinning: Skipped on web platform for $serverURL');
+      return true;
+    }
+
     // Skip SSL pinning in debug mode for easier development
     if (kDebugMode) {
       debugPrint('⚠️ SSL Pinning: Skipped in debug mode for $serverURL');
@@ -141,7 +147,14 @@ class SSLPinningService {
   // ========================================
 
   /// Get custom HttpClient with SSL pinning for Dio
-  static HttpClient getSecureHttpClient() {
+  /// Returns null on web platform (HttpClient not available)
+  static HttpClient? getSecureHttpClient() {
+    // HttpClient is not available on web
+    if (kIsWeb) {
+      debugPrint('⚠️ SSL Pinning: HttpClient not available on web');
+      return null;
+    }
+
     final httpClient = HttpClient();
 
     // Skip in debug mode

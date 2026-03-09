@@ -1,6 +1,7 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -366,16 +367,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (user == null) return;
 
       // Firebase Storage에 업로드
-      final file = File(pickedFile.path);
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('profile_photos')
           .child('${user.uid}.jpg');
 
-      await storageRef.putFile(
-        file,
-        SettableMetadata(contentType: 'image/jpeg'),
-      );
+      if (kIsWeb) {
+        final bytes = await pickedFile.readAsBytes();
+        await storageRef.putData(
+          bytes,
+          SettableMetadata(contentType: 'image/jpeg'),
+        );
+      } else {
+        final file = File(pickedFile.path);
+        await storageRef.putFile(
+          file,
+          SettableMetadata(contentType: 'image/jpeg'),
+        );
+      }
 
       final downloadUrl = await storageRef.getDownloadURL();
 

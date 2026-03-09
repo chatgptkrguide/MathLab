@@ -1,5 +1,6 @@
-import 'dart:io';
+import 'dart:io' show File;
 
+import 'package:flutter/foundation.dart' show Uint8List, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,7 +39,7 @@ class _AdminAchievementFormScreenState
 
   // Image handling
   String? _existingIconUrl;
-  File? _newIconFile;
+  XFile? _newIconFile;
   bool _iconDeleted = false;
 
   bool _isSaving = false;
@@ -469,12 +470,31 @@ class _AdminAchievementFormScreenState
                 ClipRRect(
                   borderRadius: BorderRadius.circular(AppDimensions.radius8),
                   child: hasNewFile
-                      ? Image.file(
-                          _newIconFile!,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        )
+                      ? (kIsWeb
+                          ? FutureBuilder<Uint8List>(
+                              future: _newIconFile!.readAsBytes(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Image.memory(
+                                    snapshot.data!,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  );
+                                }
+                                return const SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                );
+                              },
+                            )
+                          : Image.file(
+                              File(_newIconFile!.path),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ))
                       : Image.network(
                           _existingIconUrl!,
                           width: 100,
@@ -572,10 +592,10 @@ class _AdminAchievementFormScreenState
 
   Future<void> _pickIconImage(ImageSource source) async {
     final imageService = ref.read(adminImageServiceProvider);
-    final file = await imageService.pickImage(source: source);
-    if (file != null) {
+    final xFile = await imageService.pickXFile(source: source);
+    if (xFile != null) {
       setState(() {
-        _newIconFile = file;
+        _newIconFile = xFile;
         _iconDeleted = true; // Mark existing as deleted since we have a new one
       });
     }
@@ -603,7 +623,7 @@ class _AdminAchievementFormScreenState
           if (_existingIconUrl != null && _existingIconUrl!.isNotEmpty) {
             await imageService.deleteImage(_existingIconUrl!);
           }
-          iconUrl = await imageService.uploadImage(
+          iconUrl = await imageService.uploadXFile(
               'achievements/$achievementId', _newIconFile!);
         } else if (_iconDeleted) {
           // Icon was deleted but no new one picked
@@ -627,7 +647,7 @@ class _AdminAchievementFormScreenState
         // Upload icon if picked
         if (_newIconFile != null) {
           try {
-            iconUrl = await imageService.uploadImage(
+            iconUrl = await imageService.uploadXFile(
                 'achievements/$docId', _newIconFile!);
             // Update the achievement with the icon URL
             final updatedAchievement = _buildAchievementModel(iconUrl);
