@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/error/app_error.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../models/concept_card_model.dart';
-import '../api_provider.dart';
+import '../infrastructure/api_provider.dart';
 
 /// Concept Card State
 class ConceptCardState {

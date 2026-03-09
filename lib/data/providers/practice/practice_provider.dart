@@ -7,7 +7,7 @@ import '../../../core/error/app_error.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../models/practice_session_model.dart';
 import '../../models/problem/problem_model.dart';
-import '../api_provider.dart';
+import '../infrastructure/api_provider.dart';
 
 /// Practice State
 class PracticeState {

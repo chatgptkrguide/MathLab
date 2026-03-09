@@ -20,7 +20,6 @@ export 'problem/problem_session_model.dart';
 export 'achievement_model.dart';
 export 'league_model.dart';
 export 'friend_model.dart';
-export 'rank/rank_model.dart';
 export '../providers/gamification/leaderboard_provider.dart' show LeaderboardPeriod;
 
 // Other Models

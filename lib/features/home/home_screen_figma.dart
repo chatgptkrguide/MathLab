@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/game_constants.dart';
 import '../../data/providers/user/user_provider.dart';
-import '../../data/providers/daily_reward_provider.dart';
+import '../../data/providers/gamification/daily_reward_provider.dart';
 import '../../shared/widgets/daily_reward_dialog.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';

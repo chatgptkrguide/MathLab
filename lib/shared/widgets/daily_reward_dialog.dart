@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/daily_reward_model.dart';
-import '../../data/providers/daily_reward_provider.dart';
+import '../../data/providers/gamification/daily_reward_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';

@@ -7,7 +7,7 @@ import '../../../core/error/app_error.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../models/league_model.dart';
 import '../../services/league_management_service.dart';
-import '../api_provider.dart';
+import '../infrastructure/api_provider.dart';
 
 /// League Management Service Provider
 final leagueManagementServiceProvider = Provider<LeagueManagementService>((ref) {

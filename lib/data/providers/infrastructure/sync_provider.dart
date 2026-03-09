@@ -4,10 +4,10 @@
 
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/error/app_error.dart';
-import '../../core/utils/app_logger.dart';
-import '../services/connectivity_service.dart';
-import '../services/sync_queue_service.dart';
+import '../../../core/error/app_error.dart';
+import '../../../core/utils/app_logger.dart';
+import '../../services/connectivity_service.dart';
+import '../../services/sync_queue_service.dart';
 import 'api_provider.dart';
 
 /// Connectivity Service Provider

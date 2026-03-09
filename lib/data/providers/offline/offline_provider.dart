@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../services/connectivity_service.dart';
 import '../../services/offline_cache_service.dart';
-import '../sync_provider.dart';
+import '../infrastructure/sync_provider.dart';
 
 /// Offline cache service singleton provider
 final offlineCacheServiceProvider = Provider<OfflineCacheService>((ref) {

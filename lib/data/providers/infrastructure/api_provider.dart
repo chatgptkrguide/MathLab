@@ -4,7 +4,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../services/api/api_client.dart';
+import '../../services/api/api_client.dart';
 
 /// API Client Provider (singleton)
 final apiClientProvider = Provider<ApiClient>((ref) {
