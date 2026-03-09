@@ -29,25 +29,25 @@ final curriculumProvider =
       return CurriculumData.getSampleUnits();
     }
 
+    // top-level lessons 컬렉션에서 전체 레슨 로드
+    final lessonsSnapshot = await firestore
+        .collection('lessons')
+        .orderBy('order')
+        .get();
+
+    final lessonsByUnit = <String, List<Map<String, dynamic>>>{};
+    for (final lessonDoc in lessonsSnapshot.docs) {
+      final lessonData = lessonDoc.data();
+      lessonData['id'] = lessonDoc.id;
+      final unitId = lessonData['unitId'] as String? ?? '';
+      lessonsByUnit.putIfAbsent(unitId, () => []).add(lessonData);
+    }
+
     final units = <UnitModel>[];
     for (final doc in snapshot.docs) {
       final data = doc.data();
       data['id'] = doc.id;
-
-      // 서브컬렉션에서 레슨 로드
-      final lessonsSnapshot = await firestore
-          .collection('units')
-          .doc(doc.id)
-          .collection('lessons')
-          .orderBy('order')
-          .get();
-
-      data['lessons'] = lessonsSnapshot.docs.map((lessonDoc) {
-        final lessonData = lessonDoc.data();
-        lessonData['id'] = lessonDoc.id;
-        return lessonData;
-      }).toList();
-
+      data['lessons'] = lessonsByUnit[doc.id] ?? [];
       units.add(UnitModel.fromJson(data));
     }
 

@@ -20,20 +20,7 @@ class LessonsScreenFigma extends ConsumerStatefulWidget {
 class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     with SingleTickerProviderStateMixin {
   // Subject selection state
-  int _selectedSubjectIndex = 0;
-  final List<String> _subjects = [
-    '공통수학 1',
-    '공통수학 2',
-    '수학 I',
-    '수학 II',
-    '확률과 통계',
-    '미적분',
-    '기하',
-  ];
-
-  // Grade/level selection state
-  int _selectedGradeIndex = 0;
-  final List<String> _grades = ['중1-1', '중1-2'];
+  String? _selectedSubject; // null = 전체
 
   late AnimationController _bannerController;
   late Animation<Offset> _bannerSlideAnimation;
@@ -75,7 +62,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     final units = curriculumAsync.valueOrNull;
     if (units == null) return;
 
-    final progressState = ref.read(lessonProgressProvider(user.id));
+    final progressState = ref.read(lessonProgressProvider(user.uid));
 
     if (progressState.progressMap.isEmpty) {
       final firstLessonIds = <String>[];
@@ -87,7 +74,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
       if (firstLessonIds.isNotEmpty) {
         ref
-            .read(lessonProgressProvider(user.id).notifier)
+            .read(lessonProgressProvider(user.uid).notifier)
             .initializeFirstLessons(firstLessonIds);
       }
     }
@@ -99,24 +86,19 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     super.dispose();
   }
 
-  String get _currentSubject {
-    const subjectKeys = [
-      '공통수학1',
-      '공통수학2',
-      '수학I',
-      '수학II',
-      '확률과통계',
-      '미적분',
-      '기하',
-    ];
-    return subjectKeys[_selectedSubjectIndex];
-  }
+  // Firestore subject 값 → 표시 이름
+  static const _subjectLabels = {
+    'arithmetic': '기초 산술',
+    'algebra': '기초 대수',
+    'geometry': '기하학',
+    'fractions': '분수와 소수',
+  };
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     final progressState = user != null
-        ? ref.watch(lessonProgressProvider(user.id))
+        ? ref.watch(lessonProgressProvider(user.uid))
         : const LessonProgressState();
     final curriculumAsync = ref.watch(curriculumProvider);
 
@@ -128,11 +110,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       backgroundColor: const Color(0xFFFAFAFA),
       body: Column(
         children: [
-          // Blue rounded header
-          _buildBlueHeader(),
-
-          // Grade/level selector row
-          _buildGradeSelector(),
+          // Blue rounded header with dropdown
+          _buildBlueHeader(curriculumAsync),
 
           // Stats bar
           _buildStatsBar(streak, xp, level, curriculumAsync),
@@ -177,9 +156,11 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 ),
               ),
               data: (allUnits) {
-                final units = allUnits
-                    .where((u) => u.subject == _currentSubject)
-                    .toList();
+                final units = _selectedSubject == null
+                    ? allUnits
+                    : allUnits
+                        .where((u) => u.subject == _selectedSubject)
+                        .toList();
 
                 // Flatten all lessons from all units for the path
                 final allLessons = <LessonModel>[];
@@ -226,7 +207,14 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     );
   }
 
-  Widget _buildBlueHeader() {
+  Widget _buildBlueHeader(AsyncValue<List<UnitModel>> curriculumAsync) {
+    // Firestore에서 가져온 유닛들의 subject 목록
+    final subjects = <String>[];
+    final allUnits = curriculumAsync.valueOrNull ?? [];
+    for (final u in allUnits) {
+      if (!subjects.contains(u.subject)) subjects.add(u.subject);
+    }
+
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF61A1D8),
@@ -237,272 +225,63 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       ),
       child: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            // Top row: hamburger menu + "Home" title + GoMath logo
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  const Icon(Icons.menu, color: Colors.white, size: 24),
-                  const Spacer(),
-                  const Text(
-                    'Home',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              // 과목 드롭다운
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String?>(
+                    value: _selectedSubject,
+                    isDense: true,
+                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF61A1D8), size: 20),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF61A1D8),
                     ),
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('전체 과목'),
+                      ),
+                      ...subjects.map((s) => DropdownMenuItem<String?>(
+                        value: s,
+                        child: Text(_subjectLabels[s] ?? s),
+                      )),
+                    ],
+                    onChanged: (v) {
+                      HapticFeedback.selectionClick();
+                      setState(() => _selectedSubject = v);
+                    },
                   ),
-                  const Spacer(),
-                  Image.asset(
-                    'assets/icons/gomath_logo_small.png',
-                    width: 60,
-                    height: 28,
-                    errorBuilder: (_, __, ___) => Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'GoMath',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Subject selector row (scrollable)
-            SizedBox(
-              height: 44,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: List.generate(_subjects.length, (index) {
-                    final isSelected = _selectedSubjectIndex == index;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_selectedSubjectIndex != index) {
-                            HapticFeedback.selectionClick();
-                            setState(() => _selectedSubjectIndex = index);
-                          }
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            _subjects[index],
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? const Color(0xFF61A1D8)
-                                  : Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ============================================================
-  // === Grade / Level Selector ===
-  // ============================================================
-
-  Widget _buildGradeSelector() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            // Grade cards
-            ...List.generate(_grades.length, (index) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: _buildGradeCard(
-                  label: _grades[index],
-                  index: index,
-                  isSelected: _selectedGradeIndex == index,
+              const Spacer(),
+              // GoMath 로고
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              );
-            }),
-            // Add button
-            _buildAddGradeCard(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGradeCard({
-    required String label,
-    required int index,
-    required bool isSelected,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        if (_selectedGradeIndex != index) {
-          HapticFeedback.selectionClick();
-          setState(() => _selectedGradeIndex = index);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        width: 119,
-        height: 104,
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : AppColors.nodeLockedBg,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                child: const Text(
+                  'GoMath',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
                   ),
-                ]
-              : null,
-          border: isSelected
-              ? Border.all(
-                  color: AppColors.skyBlue.withValues(alpha: 0.3),
-                  width: 1.5,
-                )
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon placeholder area
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.skyBlue.withValues(alpha: 0.12)
-                    : const Color(0xFFD1D6D5),
-                borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: Icon(
-                Icons.menu_book_rounded,
-                size: 24,
-                color: isSelected
-                    ? AppColors.skyBlue
-                    : const Color(0xFF7E8381),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Grade label
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? AppColors.textPrimary
-                    : const Color(0xFF7E8381),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAddGradeCard() {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('새 학년을 추가하려면 설정에서 추가하세요'),
-            backgroundColor: AppColors.skyBlue,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            ],
           ),
-        );
-      },
-      child: Container(
-        width: 119,
-        height: 104,
-        decoration: BoxDecoration(
-          color: const Color(0xFFEFF3F2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD9DFDE),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.add_rounded,
-                size: 28,
-                color: Color(0xFF7E8381),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Add',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF7E8381),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -515,14 +294,16 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     AsyncValue<List<UnitModel>> curriculumAsync,
   ) {
     // Get current unit name
-    String unitName = '소인수분해';
+    String unitName = '전체 과목';
     final units = curriculumAsync.valueOrNull;
-    if (units != null) {
+    if (units != null && _selectedSubject != null) {
       final filteredUnits =
-          units.where((u) => u.subject == _currentSubject).toList();
+          units.where((u) => u.subject == _selectedSubject).toList();
       if (filteredUnits.isNotEmpty) {
         unitName = filteredUnits.first.title;
       }
+    } else if (units != null && units.isNotEmpty) {
+      unitName = units.first.title;
     }
 
     return Container(
@@ -945,9 +726,25 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       return;
     }
 
+    // Find parent unit info
+    String? unitTitle;
+    int? stepNumber;
+    int? totalSteps;
+    for (final unit in units) {
+      for (int i = 0; i < unit.lessons.length; i++) {
+        if (unit.lessons[i].id == lessonId) {
+          unitTitle = unit.title;
+          stepNumber = i + 1;
+          totalSteps = unit.lessons.length;
+          break;
+        }
+      }
+      if (unitTitle != null) break;
+    }
+
     // Record lesson start
     ref
-        .read(lessonProgressProvider(user.id).notifier)
+        .read(lessonProgressProvider(user.uid).notifier)
         .startLesson(lessonId);
 
     Navigator.of(context).push(
@@ -955,6 +752,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
         builder: (context) => ProblemSolvingScreen(
           lessonId: lessonId,
           lessonTitle: lesson!.title,
+          unitTitle: unitTitle,
+          stepNumber: stepNumber,
+          totalSteps: totalSteps,
         ),
       ),
     );

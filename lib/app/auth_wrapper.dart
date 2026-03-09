@@ -75,21 +75,26 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       //   }
       // }
 
-      // 4. FCM 서비스 초기화 확인 및 토픽 구독
-      final fcmServiceInitialized = await ref.read(fcmServiceInitializedProvider.future);
-      if (fcmServiceInitialized) {
-        final fcmService = ref.read(fcmServiceProvider);
-        try {
-          await fcmService.subscribeToTopic('user_$currentUserId');
-          AppLogger.info('사용자 토픽 구독 완료: user_$currentUserId', tag: 'AuthWrapper');
-          await fcmService.subscribeToTopic('all_users');
-          AppLogger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
-        } catch (e) {
-          AppLogger.error('FCM 토픽 구독 실패', error: e, tag: 'AuthWrapper');
+      // 4. FCM 서비스 초기화 확인 및 토픽 구독 (타임아웃 적용)
+      try {
+        final fcmServiceInitialized = await ref
+            .read(fcmServiceInitializedProvider.future)
+            .timeout(const Duration(seconds: 10));
+        if (fcmServiceInitialized) {
+          final fcmService = ref.read(fcmServiceProvider);
+          try {
+            await fcmService.subscribeToTopic('user_$currentUserId');
+            AppLogger.info('사용자 토픽 구독 완료: user_$currentUserId', tag: 'AuthWrapper');
+            await fcmService.subscribeToTopic('all_users');
+            AppLogger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
+          } catch (e) {
+            AppLogger.error('FCM 토픽 구독 실패', error: e, tag: 'AuthWrapper');
+          }
         }
+        AppLogger.info('FCM 푸시 알림 서비스 활성화됨', tag: 'AuthWrapper');
+      } catch (e) {
+        AppLogger.warning('FCM 초기화 타임아웃 또는 실패 (앱은 정상 작동)', tag: 'AuthWrapper');
       }
-
-      AppLogger.info('FCM 푸시 알림 서비스 활성화됨', tag: 'AuthWrapper');
     } catch (e) {
       AppLogger.error('초기화 실패', error: e, tag: 'AuthWrapper');
       _hasInitError = true;

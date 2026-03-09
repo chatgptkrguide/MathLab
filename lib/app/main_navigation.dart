@@ -37,31 +37,33 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     _setupDeepLinkListeners();
   }
 
-  /// 딥링크 리스너 설정
+  /// 딥링크 리스너 설정 (지연 초기화로 메인 로딩 블로킹 방지)
   void _setupDeepLinkListeners() {
-    // 1. 포그라운드 메시지 오픈 리스너
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      AppLogger.info('백그라운드 메시지 오픈: ${message.data}', tag: 'DeepLink');
-      if (message.data.isNotEmpty && mounted) {
-        _deepLinkService.handleNotification(context, message.data);
-      }
-    });
+    // 지연 실행으로 UI 로딩 완료 후 처리
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
 
-    // 2. 앱 종료 상태에서 알림 탭하여 실행된 경우
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if (message != null && message.data.isNotEmpty && mounted) {
-        AppLogger.info('앱 종료 상태에서 알림으로 실행: ${message.data}', tag: 'DeepLink');
-        // 약간의 딜레이 후 처리 (UI가 완전히 로드될 때까지 대기)
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            _deepLinkService.handleNotification(context, message.data);
-          }
-        });
-      }
-    });
+      // 1. 포그라운드 메시지 오픈 리스너
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        AppLogger.info('백그라운드 메시지 오픈: ${message.data}', tag: 'DeepLink');
+        if (message.data.isNotEmpty && mounted) {
+          _deepLinkService.handleNotification(context, message.data);
+        }
+      });
 
-    // 3. FCM Service의 대기 중인 딥링크 처리
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 2. 앱 종료 상태에서 알림 탭하여 실행된 경우
+      FirebaseMessaging.instance.getInitialMessage().then((message) {
+        if (message != null && message.data.isNotEmpty && mounted) {
+          AppLogger.info('앱 종료 상태에서 알림으로 실행: ${message.data}', tag: 'DeepLink');
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              _deepLinkService.handleNotification(context, message.data);
+            }
+          });
+        }
+      });
+
+      // 3. FCM Service의 대기 중인 딥링크 처리
       final fcmService = ref.read(fcmServiceProvider);
       fcmService.processPendingDeepLink(context);
     });
@@ -72,13 +74,22 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     final currentIndex = ref.watch(navigationProvider);
 
     // 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
-    final List<Widget> screens = [
-      const LessonsScreenFigma(),         // 0: 학습
-      const WrongAnswerScreen(),          // 1: 오답
-      const HomeScreenFigma(),            // 2: Home (가운데)
-      const ProfileDetailScreen(),        // 3: 프로필
-      const ChallengeHistoryScreen(),     // 4: 학습이력
-    ];
+    // 현재 탭만 빌드하여 초기 로딩 시 5개 화면 동시 빌드로 인한 과부하 방지
+    Widget currentScreen;
+    switch (currentIndex) {
+      case 0:
+        currentScreen = const LessonsScreenFigma();
+      case 1:
+        currentScreen = const WrongAnswerScreen();
+      case 2:
+        currentScreen = const HomeScreenFigma();
+      case 3:
+        currentScreen = const ProfileDetailScreen();
+      case 4:
+        currentScreen = const ChallengeHistoryScreen();
+      default:
+        currentScreen = const HomeScreenFigma();
+    }
 
     return PopScope(
       canPop: false,
@@ -99,10 +110,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         }
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: currentIndex,
-          children: screens,
-        ),
+        body: currentScreen,
         bottomNavigationBar: CustomBottomNavigation(
           currentIndex: currentIndex,
           onTap: (index) {

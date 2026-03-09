@@ -32,13 +32,29 @@ class FCMService {
   /// Initialize FCM service
   Future<void> initialize() async {
     try {
-      // Request notification permissions
+      // Request notification permissions (with timeout for web/headless)
       final settings = await _messaging.requestPermission(
         alert: true,
         badge: true,
         sound: true,
         provisional: false,
-      );
+      ).timeout(const Duration(seconds: 8), onTimeout: () {
+        AppLogger.warning('FCM 권한 요청 타임아웃', tag: 'FCM');
+        return const NotificationSettings(
+          authorizationStatus: AuthorizationStatus.denied,
+          alert: AppleNotificationSetting.disabled,
+          announcement: AppleNotificationSetting.disabled,
+          badge: AppleNotificationSetting.disabled,
+          carPlay: AppleNotificationSetting.disabled,
+          criticalAlert: AppleNotificationSetting.disabled,
+          lockScreen: AppleNotificationSetting.disabled,
+          notificationCenter: AppleNotificationSetting.disabled,
+          showPreviews: AppleShowPreviewSetting.never,
+          sound: AppleNotificationSetting.disabled,
+          timeSensitive: AppleNotificationSetting.disabled,
+          providesAppNotificationSettings: AppleNotificationSetting.disabled,
+        );
+      });
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         AppLogger.info('FCM 권한 승인됨', tag: 'FCM');

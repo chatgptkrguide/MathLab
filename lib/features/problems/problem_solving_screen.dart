@@ -32,11 +32,17 @@ import '../shop/shop_screen.dart';
 class ProblemSolvingScreen extends ConsumerStatefulWidget {
   final String lessonId;
   final String lessonTitle;
+  final String? unitTitle;
+  final int? stepNumber;
+  final int? totalSteps;
 
   const ProblemSolvingScreen({
     super.key,
     required this.lessonId,
     required this.lessonTitle,
+    this.unitTitle,
+    this.stepNumber,
+    this.totalSteps,
   });
 
   @override
@@ -73,6 +79,10 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
   @override
   void initState() {
     super.initState();
+    // 캐시된 문제 데이터 무효화 (항상 최신 데이터 로드)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(problemsForLessonProvider(widget.lessonId));
+    });
     _heartAnimController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -150,6 +160,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
         );
         break;
 
+      case ProblemType.shortAnswer:
       case ProblemType.fillInBlank:
         userAnswer = _textController.text.trim();
         if (userAnswer.isEmpty) return;
@@ -511,7 +522,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
       ),
       child: Column(
         children: [
-          // Top row: back arrow, centered title
+          // Top row: back arrow, unit/step info
           Row(
             children: [
               GestureDetector(
@@ -520,13 +531,33 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
               ),
               Expanded(
                 child: Center(
-                  child: Text(
-                    '문제 $problemNumber',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.unitTitle != null)
+                        Text(
+                          widget.unitTitle!,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      Text(
+                        widget.stepNumber != null
+                            ? '${widget.lessonTitle} (${widget.stepNumber}/${widget.totalSteps ?? '?'})'
+                            : '문제 $problemNumber',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -795,6 +826,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
       case ProblemType.trueFalse:
         return _buildAnswerOptions(problem);
 
+      case ProblemType.shortAnswer:
       case ProblemType.fillInBlank:
         return _buildFillInBlankInput(problem);
 
@@ -1086,6 +1118,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
         hasAnswer = selectedAnswer != null;
         break;
 
+      case ProblemType.shortAnswer:
       case ProblemType.fillInBlank:
         hasAnswer = _textController.text.trim().isNotEmpty;
         break;

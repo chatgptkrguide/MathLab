@@ -365,6 +365,8 @@ class _AdminProblemCard extends StatelessWidget {
         return '빈칸';
       case ProblemType.matching:
         return '매칭';
+      case ProblemType.shortAnswer:
+        return '단답형';
       case ProblemType.dragAndDrop:
         return '드래그';
     }
@@ -378,6 +380,8 @@ class _AdminProblemCard extends StatelessWidget {
         return '보통';
       case ProblemDifficulty.hard:
         return '어려움';
+      case ProblemDifficulty.expert:
+        return '전문가';
     }
   }
 
@@ -388,6 +392,8 @@ class _AdminProblemCard extends StatelessWidget {
       case ProblemDifficulty.medium:
         return AppColors.mathOrange;
       case ProblemDifficulty.hard:
+        return AppColors.mathRed;
+      case ProblemDifficulty.expert:
         return AppColors.mathRed;
     }
   }
