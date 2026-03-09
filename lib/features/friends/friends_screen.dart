@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/providers/friend/friend_provider.dart';
-import '../../../data/providers/auth/auth_handler.dart';
-import '../../../shared/widgets/loading_overlay.dart';
+import '../../data/providers/friend/friend_provider.dart';
+import '../../data/providers/auth/auth_handler.dart';
+import '../../shared/widgets/loading_overlay.dart';
 import 'friend_list_tab.dart';
 import 'friend_requests_tab.dart';
 import 'friend_activity_tab.dart';

@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/friend_model.dart';
-import '../../../data/providers/friend/friend_provider.dart';
+import '../../data/models/friend_model.dart';
+import '../../data/providers/friend/friend_provider.dart';
 
 class FriendActivityTab extends ConsumerWidget {
   final String userId;

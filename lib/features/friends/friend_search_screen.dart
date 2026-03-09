@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/providers/friend/friend_provider.dart';
-import '../../../data/providers/auth/auth_handler.dart';
+import '../../data/providers/friend/friend_provider.dart';
+import '../../data/providers/auth/auth_handler.dart';
 
 class FriendSearchScreen extends ConsumerStatefulWidget {
   const FriendSearchScreen({super.key});
