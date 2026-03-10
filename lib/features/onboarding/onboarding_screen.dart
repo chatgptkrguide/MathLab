@@ -11,7 +11,9 @@ import 'widgets/onboarding_page.dart';
 /// 온보딩 화면
 /// 새로운 사용자를 위한 앱 기능 소개
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  final VoidCallback? onComplete;
+
+  const OnboardingScreen({super.key, this.onComplete});
 
   static const String _onboardingCompleteKey = 'onboarding_completed';
 
@@ -305,8 +307,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       AppLogger.info('Onboarding completed');
 
       if (mounted) {
-        // 메인 화면으로 이동
-        Navigator.of(context).pushReplacementNamed('/home');
+        // AuthWrapper의 콜백이 있으면 사용, 없으면 직접 네비게이션
+        if (widget.onComplete != null) {
+          widget.onComplete!();
+        } else {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
       }
     } catch (e) {
       AppLogger.error('Failed to complete onboarding', error: e);

@@ -13,6 +13,13 @@ import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
 
 class HomeScreenFigma extends ConsumerStatefulWidget {
+  /// 코치마크에서 참조할 GlobalKey들
+  static final startButtonKey = GlobalKey(debugLabel: 'startButton');
+  static final todayGoalKey = GlobalKey(debugLabel: 'todayGoal');
+  static final statsRowKey = GlobalKey(debugLabel: 'statsRow');
+  static final dailyChallengeKey = GlobalKey(debugLabel: 'dailyChallenge');
+  static final streakBadgeKey = GlobalKey(debugLabel: 'streakBadge');
+
   const HomeScreenFigma({super.key});
 
   @override
@@ -152,6 +159,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
         ),
         // Right: streak badge
         GestureDetector(
+          key: HomeScreenFigma.streakBadgeKey,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const SettingsScreen()),
           ),
@@ -232,6 +240,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 3. Today's Goal Card ===
   Widget _buildTodayGoal(int dailyXP, int dailyGoal, double progress) {
     return Container(
+      key: HomeScreenFigma.todayGoalKey,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -296,6 +305,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 4. Start Button ===
   Widget _buildStartButton() {
     return GestureDetector(
+      key: HomeScreenFigma.startButtonKey,
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const LessonsScreenFigma()),
@@ -337,6 +347,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 5. Stats Row (3 squares: XP, Level, Streak) ===
   Widget _buildStatsRow(int xp, int level, int streak) {
     return Row(
+      key: HomeScreenFigma.statsRowKey,
       children: [
         _buildStatSquare(
           icon: 'assets/icons/xp_icon.png',
@@ -522,6 +533,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 7. Daily Challenge Card ===
   Widget _buildDailyChallenge() {
     return GestureDetector(
+      key: HomeScreenFigma.dailyChallengeKey,
       onTap: () => ref.read(navigationProvider.notifier).goToHistory(),
       child: Container(
         width: double.infinity,

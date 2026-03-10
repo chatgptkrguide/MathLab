@@ -12,6 +12,8 @@ import '../data/providers/infrastructure/navigation_provider.dart';
 import '../data/providers/communication/fcm_provider.dart';
 import '../data/services/deep_link_service.dart';
 import '../core/utils/app_logger.dart';
+import '../shared/widgets/coach_mark/coach_mark_controller.dart';
+import '../shared/widgets/coach_mark/coach_mark_overlay.dart';
 
 /// 메인 네비게이션 위젯
 /// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
@@ -25,6 +27,7 @@ class MainNavigation extends ConsumerStatefulWidget {
 class _MainNavigationState extends ConsumerState<MainNavigation> {
 
   DeepLinkService? _deepLinkServiceInstance;
+  bool _coachMarkChecked = false;
 
   DeepLinkService get _deepLinkService {
     _deepLinkServiceInstance ??= DeepLinkService(ref);
@@ -35,6 +38,61 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
   void initState() {
     super.initState();
     _setupDeepLinkListeners();
+    _checkAndShowCoachMark();
+  }
+
+  /// 첫 진입 시 코치마크 온보딩 표시
+  Future<void> _checkAndShowCoachMark() async {
+    if (_coachMarkChecked) return;
+    _coachMarkChecked = true;
+
+    final isCompleted = await CoachMarkController.isCompleted();
+    if (isCompleted || !mounted) return;
+
+    // 홈 화면이 완전히 빌드된 후 코치마크 표시 (약간의 지연)
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (!mounted) return;
+
+    final steps = [
+      CoachMarkStep(
+        targetKey: HomeScreenFigma.todayGoalKey,
+        title: '오늘의 학습 목표',
+        description: '매일 목표 XP를 달성하면 연속 학습 기록이 쌓여요.\n꾸준히 학습하면 레벨이 올라갑니다!',
+        arrowDirection: ArrowDirection.up,
+      ),
+      CoachMarkStep(
+        targetKey: HomeScreenFigma.startButtonKey,
+        title: '학습 시작하기',
+        description: '이 버튼을 눌러 오늘의 수학 학습을 시작하세요.\n단계별 커리큘럼으로 쉽게 배울 수 있어요.',
+        arrowDirection: ArrowDirection.up,
+      ),
+      CoachMarkStep(
+        targetKey: HomeScreenFigma.statsRowKey,
+        title: '나의 학습 현황',
+        description: 'XP(경험치), 레벨, 연속 학습일을\n한눈에 확인할 수 있어요.',
+        arrowDirection: ArrowDirection.up,
+      ),
+      CoachMarkStep(
+        targetKey: HomeScreenFigma.dailyChallengeKey,
+        title: '데일리 챌린지',
+        description: '매일 새로운 챌린지에 도전하세요.\n보너스 XP를 획득할 수 있어요!',
+        arrowDirection: ArrowDirection.up,
+      ),
+      CoachMarkStep(
+        targetKey: CustomBottomNavigation.bottomNavKey,
+        title: '하단 메뉴',
+        description: '학습, 오답노트, 홈, 프로필, 학습이력을\n자유롭게 이동할 수 있어요.',
+        arrowDirection: ArrowDirection.down,
+        tooltipOffset: const EdgeInsets.only(top: -60),
+      ),
+    ];
+
+    if (mounted) {
+      CoachMarkController.show(
+        context: context,
+        steps: steps,
+      );
+    }
   }
 
   /// 딥링크 리스너 설정 (지연 초기화로 메인 로딩 블로킹 방지)

@@ -12,6 +12,8 @@ import 'widgets/league_header.dart';
 import 'widgets/leaderboard_list.dart';
 import 'widgets/league_info_card.dart';
 import 'widgets/league_timer.dart';
+import 'league_history_screen.dart';
+import '../lessons/figma/lessons_screen_figma.dart';
 
 class LeagueScreen extends ConsumerStatefulWidget {
   const LeagueScreen({super.key});
@@ -75,8 +77,11 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () {
-              // Navigate to league history
-              Navigator.pushNamed(context, '/league-history');
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const LeagueHistoryScreen(),
+                ),
+              );
             },
             tooltip: '리그 히스토리',
           ),
@@ -158,7 +163,11 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/lessons');
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const LessonsScreenFigma(),
+                ),
+              );
             },
             child: const Text('학습 시작하기'),
           ),
