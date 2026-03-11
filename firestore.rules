@@ -229,6 +229,61 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Teams Collection
+    match /teams/{teamId} {
+      // Read: All authenticated users
+      allow read: if isSignedIn();
+
+      // Create: Authenticated users can create teams (must be leader)
+      allow create: if isSignedIn() &&
+                      request.resource.data.leaderId == request.auth.uid &&
+                      request.resource.data.memberIds.hasAll([request.auth.uid]) &&
+                      request.resource.data.memberIds.size() <= 10 &&
+                      isValidString(request.resource.data.name, 2, 20);
+
+      // Update: Leader can manage team, non-members can join via arrayUnion
+      allow update: if isSignedIn() &&
+                      request.resource.data.memberIds.size() <= 10 &&
+                      (
+                        // Leader: full management (remove members, transfer leader, edit info)
+                        resource.data.leaderId == request.auth.uid ||
+                        // Non-leader member: can only leave (remove self from memberIds)
+                        (resource.data.memberIds.hasAll([request.auth.uid]) &&
+                         !request.resource.data.memberIds.hasAll([request.auth.uid]) &&
+                         request.resource.data.leaderId == resource.data.leaderId &&
+                         request.resource.data.name == resource.data.name) ||
+                        // New member joining: can only add self
+                        (!resource.data.memberIds.hasAll([request.auth.uid]) &&
+                         request.resource.data.memberIds.hasAll([request.auth.uid]) &&
+                         request.resource.data.leaderId == resource.data.leaderId &&
+                         request.resource.data.name == resource.data.name)
+                      );
+
+      // Delete: Only leader when last member
+      allow delete: if isSignedIn() &&
+                      resource.data.leaderId == request.auth.uid &&
+                      resource.data.memberIds.size() <= 1;
+    }
+
+    // Team Invitations Collection
+    match /team_invitations/{invitationId} {
+      allow read: if isSignedIn() &&
+                    (resource.data.fromUserId == request.auth.uid ||
+                     resource.data.toUserId == request.auth.uid);
+
+      allow create: if isSignedIn() &&
+                      request.resource.data.fromUserId == request.auth.uid &&
+                      request.resource.data.status == 'pending';
+
+      allow update: if isSignedIn() &&
+                      resource.data.toUserId == request.auth.uid &&
+                      resource.data.status == 'pending';
+
+      allow delete: if isSignedIn() &&
+                      (resource.data.fromUserId == request.auth.uid ||
+                       resource.data.toUserId == request.auth.uid);
+    }
+
     // Default deny all other collections
     match /{document=**} {
       allow read, write: if false;

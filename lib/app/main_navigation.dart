@@ -7,7 +7,7 @@ import '../features/home/home_screen_figma.dart';
 import '../features/lessons/figma/lessons_screen_figma.dart';
 import '../features/wrong_answer/wrong_answer_screen.dart';
 import '../features/profile/figma/profile_detail_screen.dart';
-import '../features/challenges/challenge_history_screen.dart';
+import '../features/team/team_screen.dart';
 import '../data/providers/infrastructure/navigation_provider.dart';
 import '../data/providers/communication/fcm_provider.dart';
 import '../data/services/deep_link_service.dart';
@@ -16,7 +16,7 @@ import '../shared/widgets/coach_mark/coach_mark_controller.dart';
 import '../shared/widgets/coach_mark/coach_mark_overlay.dart';
 
 /// 메인 네비게이션 위젯
-/// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
+/// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 팀(4)
 class MainNavigation extends ConsumerStatefulWidget {
   const MainNavigation({super.key});
 
@@ -81,7 +81,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
       CoachMarkStep(
         targetKey: CustomBottomNavigation.bottomNavKey,
         title: '하단 메뉴',
-        description: '학습, 오답노트, 홈, 프로필, 학습이력을\n자유롭게 이동할 수 있어요.',
+        description: '학습, 오답노트, 홈, 프로필, 팀을\n자유롭게 이동할 수 있어요.',
         arrowDirection: ArrowDirection.down,
         tooltipOffset: const EdgeInsets.only(top: -60),
       ),
@@ -144,7 +144,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
       case 3:
         currentScreen = const ProfileDetailScreen();
       case 4:
-        currentScreen = const ChallengeHistoryScreen();
+        currentScreen = const TeamScreen();
       default:
         currentScreen = const HomeScreenFigma();
     }

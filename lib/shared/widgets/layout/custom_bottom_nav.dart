@@ -74,8 +74,8 @@ class CustomBottomNavigation extends StatelessWidget {
             ),
             _buildNavItem(
               index: 4,
-              icon: Icons.history_rounded,
-              label: '학습이력',
+              icon: Icons.groups_rounded,
+              label: '팀',
             ),
           ],
         ),
