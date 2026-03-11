@@ -15,7 +15,8 @@ service cloud.firestore {
     function isValidString(value, minLen, maxLen) {
       return value is string &&
              value.size() >= minLen &&
-             value.size() <= maxLen;
+             value.size() <= maxLen &&
+             value.trim().size() > 0;
     }
 
     function isValidEmail(email) {

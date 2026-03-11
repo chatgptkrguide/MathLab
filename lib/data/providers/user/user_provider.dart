@@ -176,6 +176,7 @@ class User extends _$User {
   /// Add XP to user
   Future<void> addXp(int amount) async {
     if (state == null) return;
+    if (amount <= 0 || amount > 200) return; // Firestore rules: max +200
 
     try {
       AppLogger.info('Adding XP', tag: 'User', data: {'amount': amount});

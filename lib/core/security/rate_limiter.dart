@@ -218,7 +218,8 @@ class RateLimiter {
       return null;
     }
 
-    final lockoutExpiry = _lockouts[key]!;
+    final lockoutExpiry = _lockouts[key];
+    if (lockoutExpiry == null) return null;
     return lockoutExpiry.difference(DateTime.now());
   }
 

@@ -100,10 +100,13 @@ class TeamModel {
   }
 
   static DateTime _parseDateTime(dynamic value) {
+    if (value is DateTime) return value;
     if (value is String) return DateTime.parse(value);
-    // Firestore Timestamp
-    if (value != null && value.runtimeType.toString().contains('Timestamp')) {
-      return (value as dynamic).toDate() as DateTime;
+    // Firestore Timestamp - duck typing for toDate()
+    if (value != null) {
+      try {
+        return (value as dynamic).toDate() as DateTime;
+      } catch (_) {}
     }
     return DateTime.now();
   }

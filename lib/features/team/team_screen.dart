@@ -57,7 +57,7 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
 
     // Listen for snackbar messages
     ref.listen<TeamState>(teamProvider(user.uid), (prev, next) {
-      if (next.error != null && next.error != prev?.error) {
+      if (prev?.error != next.error && next.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.error!),
@@ -66,8 +66,8 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
         );
         ref.read(teamProvider(user.uid).notifier).clearError();
       }
-      if (next.successMessage != null &&
-          next.successMessage != prev?.successMessage) {
+      if (prev?.successMessage != next.successMessage &&
+          next.successMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.successMessage!),
