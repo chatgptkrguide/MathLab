@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/lesson/lesson_model.dart';
-import '../../../data/models/lesson/lesson_progress_model.dart';
-import '../../../data/models/lesson/unit_model.dart';
-import '../../../data/providers/curriculum/curriculum_provider.dart';
-import '../../../data/providers/lesson/lesson_progress_provider.dart';
-import '../../../data/providers/user/user_provider.dart';
-import '../../../shared/constants/app_colors.dart';
-import '../../problems/problem_solving_screen.dart';
+import '../../data/models/lesson/lesson_model.dart';
+import '../../data/models/lesson/lesson_progress_model.dart';
+import '../../data/models/lesson/unit_model.dart';
+import '../../data/providers/curriculum/curriculum_provider.dart';
+import '../../data/providers/lesson/lesson_progress_provider.dart';
+import '../../data/providers/user/user_provider.dart';
+import '../../shared/constants/app_colors.dart';
+import '../problems/problem_solving_screen.dart';
 
 class LessonsScreenFigma extends ConsumerStatefulWidget {
   const LessonsScreenFigma({super.key});

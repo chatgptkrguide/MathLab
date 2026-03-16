@@ -24,7 +24,7 @@ import '../../shared/widgets/input/drag_and_drop_widget.dart';
 import '../../shared/widgets/zoomable_image_viewer.dart';
 import '../../shared/utils/answer_validator.dart';
 import '../../data/models/learning/problem.dart' show Problem;
-import '../../data/providers/learning/hint_provider_optimized.dart';
+import '../../data/providers/learning/hint_provider.dart';
 import 'widgets/hint_button.dart';
 import 'widgets/hint_popup.dart';
 import '../shop/shop_screen.dart';

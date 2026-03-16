@@ -3,7 +3,7 @@
 // Displays individual achievement with progress
 
 import 'package:flutter/material.dart';
-import '../../../data/models/achievement_model.dart';
+import '../../data/models/achievement_model.dart';
 
 class AchievementCard extends StatelessWidget {
   final AchievementModel achievement;

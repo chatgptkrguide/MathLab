@@ -18,7 +18,7 @@ import 'data/services/remote_config_service.dart';
 import 'app/auth_wrapper.dart';
 import 'app/main_navigation.dart';
 import 'features/auth/auth_screen.dart';
-import 'features/home/home_screen_figma.dart';
+import 'features/home/home_screen.dart';
 import 'data/providers/communication/fcm_provider.dart';
 
 import 'firebase_options.dart';

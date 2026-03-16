@@ -4,11 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/providers/user/user_provider.dart';
-import '../../../data/models/user/user_model.dart';
-import '../../../shared/constants/app_colors.dart';
-import '../edit_profile_screen.dart';
-import '../../settings/settings_screen.dart';
+import '../../data/providers/user/user_provider.dart';
+import '../../data/models/user/user_model.dart';
+import '../../shared/constants/app_colors.dart';
+import 'edit_profile_screen.dart';
+import '../settings/settings_screen.dart';
 
 class ProfileDetailScreen extends ConsumerStatefulWidget {
   const ProfileDetailScreen({super.key});

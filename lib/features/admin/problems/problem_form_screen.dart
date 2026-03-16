@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../shared/constants/constants.dart';
-import '../../shared/widgets/layout/adaptive_app_header.dart';
-import '../../data/models/problem/problem_model.dart';
-import '../../data/models/lesson/unit_model.dart';
-import '../../data/models/lesson/lesson_model.dart';
-import '../../data/providers/admin/admin_problem_provider.dart';
-import '../../data/providers/curriculum/curriculum_provider.dart';
-import 'widgets/admin_image_picker_section.dart';
+import '../../../shared/constants/constants.dart';
+import '../../../shared/widgets/layout/adaptive_app_header.dart';
+import '../../../data/models/problem/problem_model.dart';
+import '../../../data/models/lesson/unit_model.dart';
+import '../../../data/models/lesson/lesson_model.dart';
+import '../../../data/providers/admin/admin_problem_provider.dart';
+import '../../../data/providers/curriculum/curriculum_provider.dart';
+import '../widgets/admin_image_picker_section.dart';
 
 class AdminProblemFormScreen extends ConsumerStatefulWidget {
   final ProblemModel? problem;

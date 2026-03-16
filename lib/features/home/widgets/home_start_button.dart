@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../lessons/figma/lessons_screen_figma.dart';
+import '../../lessons/lessons_screen.dart';
 
 class HomeStartButton extends StatelessWidget {
   const HomeStartButton({super.key});

@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/achievement_model.dart';
-import '../../../data/providers/achievement/achievement_provider.dart';
-import '../../../data/providers/auth/auth_handler.dart';
-import '../../../shared/widgets/loading_overlay.dart';
+import '../../data/models/achievement_model.dart';
+import '../../data/providers/achievement/achievement_provider.dart';
+import '../../data/providers/auth/auth_provider.dart';
+import '../../shared/widgets/loading_overlay.dart';
 import 'achievement_card.dart';
 
 class AchievementScreen extends ConsumerStatefulWidget {
@@ -36,16 +36,16 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authHandlerProvider);
-    final user = authState.user;
+    final authState = ref.watch(authProvider);
+    final firebaseUser = authState.firebaseUser;
 
-    if (user == null) {
+    if (firebaseUser == null) {
       return const Scaffold(
         body: Center(child: Text('로그인이 필요합니다')),
       );
     }
 
-    final achievementState = ref.watch(achievementProvider(user.id));
+    final achievementState = ref.watch(achievementProvider(firebaseUser.uid));
 
     return Scaffold(
       appBar: AppBar(
@@ -133,9 +133,9 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
               setState(() {
                 _selectedCategory = null;
               });
-              final user = ref.read(authHandlerProvider).user;
-              if (user != null) {
-                ref.read(achievementProvider(user.id).notifier).filterByCategory(null);
+              final fu = ref.read(authProvider).firebaseUser;
+              if (fu != null) {
+                ref.read(achievementProvider(fu.uid).notifier).filterByCategory(null);
               }
             },
           ),
@@ -152,9 +152,9 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
                   setState(() {
                     _selectedCategory = selected ? category : null;
                   });
-                  final user = ref.read(authHandlerProvider).user;
-                  if (user != null) {
-                    ref.read(achievementProvider(user.id).notifier)
+                  final fu = ref.read(authProvider).firebaseUser;
+                  if (fu != null) {
+                    ref.read(achievementProvider(fu.uid).notifier)
                         .filterByCategory(selected ? category : null);
                   }
                 },
@@ -195,9 +195,9 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
 
     return RefreshIndicator(
       onRefresh: () async {
-        final user = ref.read(authHandlerProvider).user;
-        if (user != null) {
-          await ref.read(achievementProvider(user.id).notifier).loadAchievements();
+        final fu = ref.read(authProvider).firebaseUser;
+        if (fu != null) {
+          await ref.read(achievementProvider(fu.uid).notifier).loadAchievements();
         }
       },
       child: ListView.builder(

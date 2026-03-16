@@ -8,7 +8,7 @@ import '../../shared/widgets/daily_reward_dialog.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';
 import '../settings/settings_screen.dart';
-import '../lessons/figma/lessons_screen_figma.dart';
+import '../lessons/lessons_screen.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
 

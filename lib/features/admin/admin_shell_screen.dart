@@ -10,7 +10,7 @@ import '../../data/providers/admin/admin_stats_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import 'widgets/admin_stat_card.dart';
 import 'widgets/admin_menu_card.dart';
-import 'admin_problem_list_screen.dart';
+import 'problems/problem_list_screen.dart';
 import 'units/admin_unit_list_screen.dart';
 import 'achievements/admin_achievement_list_screen.dart';
 import 'users/admin_user_list_screen.dart';

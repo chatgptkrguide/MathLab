@@ -13,7 +13,7 @@ import 'widgets/leaderboard_list.dart';
 import 'widgets/league_info_card.dart';
 import 'widgets/league_timer.dart';
 import 'league_history_screen.dart';
-import '../lessons/figma/lessons_screen_figma.dart';
+import '../lessons/lessons_screen.dart';
 
 class LeagueScreen extends ConsumerStatefulWidget {
   const LeagueScreen({super.key});
