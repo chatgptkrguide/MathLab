@@ -6,7 +6,6 @@ import '../features/auth/auth_screen.dart';
 import '../features/profile/onboarding_profile_setup_screen.dart';
 import '../data/providers/auth/auth_provider.dart';
 import '../data/providers/user/user_provider.dart';
-// import '../data/providers/infrastructure/sync_manager_provider.dart'; // TODO: Create provider file
 import '../data/providers/communication/fcm_provider.dart';
 import '../core/utils/app_logger.dart';
 import '../shared/widgets/welcome_dialog.dart';
@@ -57,25 +56,16 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
         _shouldShowWelcome = true;
       }
 
-      // 2. TODO: ProblemProvider 초기화 (문제 데이터 로드) - Provider 파일 생성 필요
-      // ref.read(problemProvider);
-      // AppLogger.info('문제 데이터 로드 시작', tag: 'AuthWrapper');
+      // 2. SyncManager 초기화 (오프라인 큐 동기화)
+      try {
+        final syncManager = ref.read(syncManagerProvider);
+        await syncManager.initialize(currentUserId);
+        AppLogger.info('SyncManager 초기화 완료: $currentUserId', tag: 'AuthWrapper');
+      } catch (e) {
+        AppLogger.error('SyncManager 초기화 실패 (앱은 정상 작동)', error: e, tag: 'AuthWrapper');
+      }
 
-      // 3. TODO: SyncManager 초기화 - Provider 파일 생성 필요
-      // final syncManagerInitialized = await ref.read(syncManagerInitializedProvider.future);
-      // if (syncManagerInitialized) {
-      //   final syncActions = ref.read(syncActionsProvider);
-      //   try {
-      //     await syncActions.startRealtimeSync();
-      //     AppLogger.info('실시간 동기화 시작 완료: $currentAccountId', tag: 'AuthWrapper');
-      //     await syncActions.initialSync();
-      //     AppLogger.info('초기 동기화 완료: $currentAccountId', tag: 'AuthWrapper');
-      //   } catch (e) {
-      //     AppLogger.error('동기화 실패', error: e, tag: 'AuthWrapper');
-      //   }
-      // }
-
-      // 4. FCM 서비스 초기화 확인 및 토픽 구독 (타임아웃 적용)
+      // 3. FCM 서비스 초기화 확인 및 토픽 구독 (타임아웃 적용)
       try {
         final fcmServiceInitialized = await ref
             .read(fcmServiceInitializedProvider.future)
@@ -122,6 +112,8 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
         authState.firebaseUser == null) {
       // Reset tracking on logout so next login triggers initialization
       if (!authState.isLoading && _lastAccountId != null) {
+        // SyncManager reset on logout
+        ref.read(syncManagerProvider).reset();
         _lastAccountId = null;
         _shouldShowWelcome = false;
       }
