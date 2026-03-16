@@ -3,6 +3,8 @@
 // Manages push notifications and FCM token
 
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -75,12 +77,17 @@ class FCMService {
         AppLogger.info('FCM 토큰 획득: ${_token!.substring(0, 20)}...', tag: 'FCM');
       }
 
+      // Save initial token to Firestore
+      if (_token != null) {
+        await _saveFcmTokenToFirestore(_token!);
+      }
+
       // Listen for token refresh
       _tokenRefreshSub?.cancel();
       _tokenRefreshSub = _messaging.onTokenRefresh.listen((newToken) {
         _token = newToken;
         AppLogger.info('FCM 토큰 갱신됨: ${newToken.substring(0, 20)}...', tag: 'FCM');
-        // TODO: Send new token to server
+        _saveFcmTokenToFirestore(newToken);
       });
 
       // Configure foreground notification presentation
@@ -107,6 +114,29 @@ class FCMService {
       AppLogger.info('FCM 서비스 초기화 완료', tag: 'FCM');
     } catch (e) {
       AppLogger.error('FCM 초기화 실패', error: e, tag: 'FCM');
+    }
+  }
+
+  /// Save FCM token to Firestore for the current user
+  Future<void> _saveFcmTokenToFirestore(String token) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        AppLogger.debug('FCM 토큰 저장 스킵: 로그인된 사용자 없음', tag: 'FCM');
+        return;
+      }
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'fcmToken': token,
+        'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+      });
+
+      AppLogger.info('FCM 토큰 Firestore 저장 완료', tag: 'FCM');
+    } catch (e) {
+      AppLogger.error('FCM 토큰 Firestore 저장 실패', error: e, tag: 'FCM');
     }
   }
 
@@ -187,22 +217,7 @@ class FCMService {
 
     if (data.isEmpty) return;
 
-    // TODO: Implement navigation based on notification type
-    // Example:
-    // final type = data['type'];
-    // final id = data['id'];
-    //
-    // switch (type) {
-    //   case 'friend_request':
-    //     navigatorKey.currentState?.pushNamed('/friends');
-    //     break;
-    //   case 'achievement':
-    //     navigatorKey.currentState?.pushNamed('/achievements');
-    //     break;
-    //   case 'league':
-    //     navigatorKey.currentState?.pushNamed('/league');
-    //     break;
-    // }
+    // TODO: Phase 2 - 알림 타입별 네비게이션 구현
 
     AppLogger.info(
       'FCM 알림 네비게이션 요청: ${data["type"] ?? "타입 없음"}',
@@ -212,18 +227,9 @@ class FCMService {
   }
 
   /// Process pending deep link
-  /// This method is called when the app is opened and needs to process
-  /// any pending deep links from notifications
   void processPendingDeepLink(dynamic context) {
-    // TODO: Implement pending deep link processing
-    // For now, just log that the method was called
+    // TODO: Phase 2 - 대기 중인 딥링크 처리 구현
     AppLogger.info('대기 중인 딥링크 처리 요청됨', tag: 'FCM');
-
-    // This would typically:
-    // 1. Check if there's a pending deep link stored
-    // 2. Process the deep link data
-    // 3. Navigate to the appropriate screen
-    // 4. Clear the pending deep link
   }
 
   /// Cleanup resources

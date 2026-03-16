@@ -11,6 +11,7 @@
 // ```
 
 import 'package:flutter/foundation.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
 import '../config/env_config.dart';
@@ -98,8 +99,8 @@ class AppLogger {
     final formattedMessage = _formatMessage(message, tag, data);
     _logger.e(formattedMessage, error: error, stackTrace: stackTrace);
 
-    // TODO: Send to crash reporting service (Firebase Crashlytics, Sentry, etc.)
-    _reportToCrashlytics(message, error, stackTrace, data);
+    // Send to Firebase Crashlytics (non-fatal)
+    _reportToCrashlytics(message, error, stackTrace, data, fatal: false);
   }
 
   /// Fatal log (very severe error events that will presumably lead the app to abort)
@@ -113,8 +114,8 @@ class AppLogger {
     final formattedMessage = _formatMessage(message, tag, data);
     _logger.f(formattedMessage, error: error, stackTrace: stackTrace);
 
-    // TODO: Send to crash reporting service immediately
-    _reportToCrashlytics(message, error, stackTrace, data);
+    // Send to Firebase Crashlytics (fatal)
+    _reportToCrashlytics(message, error, stackTrace, data, fatal: true);
   }
 
   /// Format message with tag and data
@@ -143,8 +144,9 @@ class AppLogger {
     String message,
     dynamic error,
     StackTrace? stackTrace,
-    Map<String, dynamic>? data,
-  ) async {
+    Map<String, dynamic>? data, {
+    bool fatal = false,
+  }) async {
     // Skip in debug mode to avoid polluting crashlytics with dev errors
     if (kDebugMode) {
       return;
@@ -169,7 +171,7 @@ class AppLogger {
           error,
           stackTrace,
           reason: message,
-          fatal: false,
+          fatal: fatal,
         );
       }
     } catch (e) {
@@ -233,11 +235,26 @@ class AppLogger {
       data: parameters,
     );
 
-    // TODO: Send to analytics service (Firebase Analytics, Mixpanel, etc.)
-    // FirebaseAnalytics.instance.logEvent(
-    //   name: action,
-    //   parameters: parameters,
-    // );
+    // Send to Firebase Analytics
+    logEvent(action, parameters: parameters?.map(
+      (key, value) => MapEntry(key, value is Object ? value : value.toString()),
+    ));
+  }
+
+  /// Send analytics event to Firebase Analytics
+  static Future<void> logEvent(
+    String name, {
+    Map<String, Object>? parameters,
+  }) async {
+    try {
+      await FirebaseAnalytics.instance.logEvent(
+        name: name,
+        parameters: parameters,
+      );
+    } catch (e) {
+      // Analytics failure should not affect app behavior
+      debugPrint('Failed to log analytics event: $e');
+    }
   }
 
   /// Log performance metrics
