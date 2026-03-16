@@ -58,35 +58,25 @@ dependencies:
   # 로컬 저장소
   # ========================================
   hive: ^2.2.3
-  hive_flutter: ^1.1.0
   shared_preferences: ^2.3.5
-  path_provider: ^2.1.5
 
   # ========================================
   # UI/UX
   # ========================================
   cached_network_image: ^3.4.1
-  flutter_svg: ^2.0.14
-  google_fonts: ^6.2.1
-  lottie: ^3.2.0
   shimmer: ^3.0.0
-  confetti: ^0.7.0
 
   # ========================================
   # 수학 수식 렌더링
   # ========================================
   flutter_math_fork: ^0.7.2
-  fl_chart: ^0.69.0
 
   # ========================================
   # 유틸리티
   # ========================================
   intl: ^0.20.1
   url_launcher: ^6.3.2
-  permission_handler: ^11.3.1
-  package_info_plus: ^8.1.2
   uuid: ^4.5.1
-  equatable: ^2.0.7
   logger: ^2.5.0
   image_picker: ^1.2.1
   sign_in_with_apple: ^7.0.1
