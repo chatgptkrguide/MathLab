@@ -587,33 +587,6 @@ class _AdminProblemFormScreenState
       final notifier = ref.read(adminProblemNotifierProvider.notifier);
       final imageService = ref.read(problemImageServiceProvider);
 
-      // Determine the problem ID for image upload
-      String problemId;
-      if (_isEditing) {
-        problemId = widget.problem!.id;
-      } else {
-        // Create a temporary ID for a new problem - we'll create first then upload
-        problemId = DateTime.now().millisecondsSinceEpoch.toString();
-      }
-
-      // Upload new images
-      final newImageUrls = <String>[];
-      for (final xFile in _newImageFiles) {
-        final url = await imageService.uploadXFile(problemId, xFile);
-        newImageUrls.add(url);
-      }
-
-      // Delete removed images
-      for (final url in _deletedImageUrls) {
-        await imageService.deleteImage(url);
-      }
-
-      // Build final imageUrls list
-      final finalImageUrls = [
-        ..._existingImageUrls.where((u) => !_deletedImageUrls.contains(u)),
-        ...newImageUrls,
-      ];
-
       // Build options list
       final options = _optionControllers
           .map((c) => c.text.trim())
@@ -626,8 +599,49 @@ class _AdminProblemFormScreenState
           .where((t) => t.isNotEmpty)
           .toList();
 
+      // Delete removed images
+      for (final url in _deletedImageUrls) {
+        await imageService.deleteImage(url);
+      }
+
+      // Determine the problem ID for image upload
+      final String problemId;
+      if (_isEditing) {
+        problemId = widget.problem!.id;
+      } else {
+        // Create Firestore document first (without images) to get the real docId
+        final tempProblem = ProblemModel(
+          id: '',
+          lessonId: _selectedLessonId!,
+          question: _questionController.text.trim(),
+          type: _selectedType,
+          difficulty: _selectedDifficulty,
+          options: options,
+          correctAnswer: _correctAnswerController.text.trim(),
+          explanation: _explanationController.text.trim().isEmpty
+              ? null
+              : _explanationController.text.trim(),
+          hints: hints,
+          points: int.tryParse(_pointsController.text) ?? 10,
+        );
+        problemId = await notifier.createProblem(tempProblem);
+      }
+
+      // Upload new images with the correct problemId
+      final newImageUrls = <String>[];
+      for (final xFile in _newImageFiles) {
+        final url = await imageService.uploadXFile(problemId, xFile);
+        newImageUrls.add(url);
+      }
+
+      // Build final imageUrls list
+      final finalImageUrls = [
+        ..._existingImageUrls.where((u) => !_deletedImageUrls.contains(u)),
+        ...newImageUrls,
+      ];
+
       final problem = ProblemModel(
-        id: _isEditing ? widget.problem!.id : '',
+        id: problemId,
         lessonId: _selectedLessonId!,
         question: _questionController.text.trim(),
         type: _selectedType,
@@ -643,44 +657,10 @@ class _AdminProblemFormScreenState
       );
 
       if (_isEditing) {
-        await notifier.updateProblem(widget.problem!.id, problem);
-      } else {
-        final docId = await notifier.createProblem(problem);
-
-        // If we uploaded images with a temp ID, we need to handle it
-        // For simplicity, we use the docId after creation
-        // Images were already uploaded with the temp ID, let's update with correct URLs if needed
-        if (newImageUrls.isNotEmpty) {
-          // Re-upload images with correct problemId
-          final correctedUrls = <String>[];
-          for (final xFile in _newImageFiles) {
-            final url = await imageService.uploadXFile(docId, xFile);
-            correctedUrls.add(url);
-          }
-          // Delete temp images
-          for (final url in newImageUrls) {
-            await imageService.deleteImage(url);
-          }
-          // Update the problem with correct URLs
-          if (correctedUrls.isNotEmpty) {
-            await notifier.updateProblem(
-              docId,
-              ProblemModel(
-                id: docId,
-                lessonId: problem.lessonId,
-                question: problem.question,
-                type: problem.type,
-                difficulty: problem.difficulty,
-                options: problem.options,
-                correctAnswer: problem.correctAnswer,
-                explanation: problem.explanation,
-                hints: problem.hints,
-                points: problem.points,
-                imageUrls: correctedUrls,
-              ),
-            );
-          }
-        }
+        await notifier.updateProblem(problemId, problem);
+      } else if (newImageUrls.isNotEmpty) {
+        // New problem with images: update with image URLs
+        await notifier.updateProblem(problemId, problem);
       }
 
       if (mounted) {
