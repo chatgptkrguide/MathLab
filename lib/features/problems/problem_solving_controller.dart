@@ -11,7 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/problem/problem_model.dart';
 import '../../data/models/problem/problem_session_model.dart';
 import '../../data/models/wrong_answer_model.dart';
-import '../../data/models/learning/problem.dart' show Problem;
 import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/wrong_answer/wrong_answer_provider.dart';
 import '../../data/providers/learning/hint_provider.dart';
@@ -107,7 +106,7 @@ class ProblemSolvingController {
 
     // Update session
     final updatedAnswers = Map<String, String>.from(session.userAnswers);
-    updatedAnswers[currentProblem.id] = userAnswer!;
+    updatedAnswers[currentProblem.id] = userAnswer;
 
     final updatedCorrectness = Map<String, bool>.from(session.correctness);
     updatedCorrectness[currentProblem.id] = result.isCorrect;
@@ -243,14 +242,7 @@ class ProblemSolvingController {
       return false;
     }
 
-    final tempProblem = Problem(
-      id: problem.id,
-      lessonId: lessonId,
-      question: problem.question,
-      correctAnswer: problem.correctAnswer,
-      hints: problem.allHints,
-    );
-    await ref.read(hintProvider.notifier).unlockHint(tempProblem, hintIndex);
+    await ref.read(hintProvider.notifier).unlockHint(problem, hintIndex);
     return true;
   }
 }
