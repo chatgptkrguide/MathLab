@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/friend/friend_provider.dart';
-import '../../data/providers/auth/auth_handler.dart';
+import '../../data/providers/auth/auth_provider.dart';
 
 class FriendSearchScreen extends ConsumerStatefulWidget {
   const FriendSearchScreen({super.key});
@@ -30,10 +30,10 @@ class _FriendSearchScreenState extends ConsumerState<FriendSearchScreen> {
 
     setState(() => _isLoading = true);
 
-    final user = ref.read(authHandlerProvider).user;
-    if (user != null) {
+    final firebaseUser = ref.read(authProvider).firebaseUser;
+    if (firebaseUser != null) {
       final results = await ref
-          .read(friendProvider(user.id).notifier)
+          .read(friendProvider(firebaseUser.uid).notifier)
           .searchUsers(query);
       setState(() {
         _searchResults = results;
@@ -44,12 +44,12 @@ class _FriendSearchScreenState extends ConsumerState<FriendSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authHandlerProvider).user;
-    if (user == null) {
+    final firebaseUser = ref.watch(authProvider).firebaseUser;
+    if (firebaseUser == null) {
       return const Scaffold(body: Center(child: Text('로그인이 필요합니다')));
     }
 
-    final friendState = ref.watch(friendProvider(user.id));
+    final friendState = ref.watch(friendProvider(firebaseUser.uid));
 
     return Scaffold(
       appBar: AppBar(title: const Text('친구 찾기')),
@@ -109,7 +109,7 @@ class _FriendSearchScreenState extends ConsumerState<FriendSearchScreen> {
                                     label: const Text('친구 추가'),
                                     onPressed: () async {
                                       await ref
-                                          .read(friendProvider(user.id).notifier)
+                                          .read(friendProvider(firebaseUser.uid).notifier)
                                           .sendFriendRequest(resultId);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context)
@@ -126,7 +126,7 @@ class _FriendSearchScreenState extends ConsumerState<FriendSearchScreen> {
                   ),
           ),
           // Friend suggestions
-          ref.watch(friendSuggestionsProvider(user.id)).when(
+          ref.watch(friendSuggestionsProvider(firebaseUser.uid)).when(
                 data: (suggestions) {
                   if (suggestions.isEmpty) return const SizedBox.shrink();
                   return Container(

@@ -4,7 +4,6 @@
 
 // User Models
 export 'user/user_model.dart';
-export 'user/friend.dart';
 
 // Lesson Models
 export 'lesson/lesson_model.dart';
@@ -20,7 +19,6 @@ export 'problem/problem_session_model.dart';
 export 'achievement_model.dart';
 export 'league_model.dart';
 export 'friend_model.dart';
-export '../providers/gamification/leaderboard_provider.dart' show LeaderboardPeriod;
 
 // Other Models
 export 'concept_card_model.dart';

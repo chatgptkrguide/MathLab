@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/friend/friend_provider.dart';
-import '../../data/providers/auth/auth_handler.dart';
+import '../../data/providers/auth/auth_provider.dart';
 import '../../shared/widgets/loading_overlay.dart';
 import 'friend_list_tab.dart';
 import 'friend_requests_tab.dart';
@@ -37,16 +37,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authHandlerProvider);
-    final user = authState.user;
+    final authState = ref.watch(authProvider);
+    final firebaseUser = authState.firebaseUser;
 
-    if (user == null) {
+    if (firebaseUser == null) {
       return const Scaffold(
         body: Center(child: Text('로그인이 필요합니다')),
       );
     }
 
-    final friendState = ref.watch(friendProvider(user.id));
+    final friendState = ref.watch(friendProvider(firebaseUser.uid));
 
     return Scaffold(
       appBar: AppBar(
@@ -125,9 +125,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
           : TabBarView(
               controller: _tabController,
               children: [
-                FriendListTab(userId: user.id),
-                FriendRequestsTab(userId: user.id),
-                FriendActivityTab(userId: user.id),
+                FriendListTab(userId: firebaseUser.uid),
+                FriendRequestsTab(userId: firebaseUser.uid),
+                FriendActivityTab(userId: firebaseUser.uid),
               ],
             ),
     );

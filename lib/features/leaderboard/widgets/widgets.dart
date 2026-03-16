@@ -6,5 +6,4 @@ library;
 export 'leaderboard_header.dart';
 export 'leaderboard_period_tabs.dart';
 export 'leaderboard_current_user_rank.dart';
-export 'leaderboard_list.dart';
 export 'leaderboard_card.dart';

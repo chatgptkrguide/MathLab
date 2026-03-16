@@ -2,6 +2,25 @@
 //
 // Represents a league/tier in the gamification system
 
+/// 리더보드 기간 enum
+enum LeaderboardPeriod {
+  weekly,
+  monthly,
+  allTime;
+
+  /// 기간별 표시 이름
+  String get displayName {
+    switch (this) {
+      case LeaderboardPeriod.weekly:
+        return '주간';
+      case LeaderboardPeriod.monthly:
+        return '월간';
+      case LeaderboardPeriod.allTime:
+        return '전체';
+    }
+  }
+}
+
 class LeagueTier {
   static const String bronze = 'Bronze';
   static const String silver = 'Silver';

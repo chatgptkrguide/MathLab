@@ -3,7 +3,7 @@
 // Hint management with XP-based unlock system
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/learning/problem.dart';
+import '../../models/problem/problem_model.dart';
 import '../user/user_provider.dart';
 
 /// Hint state
@@ -41,7 +41,7 @@ class HintNotifier extends StateNotifier<HintState> {
   HintNotifier(this._ref) : super(const HintState());
 
   /// Unlock a hint for a problem
-  Future<bool> unlockHint(Problem problem, int hintIndex) async {
+  Future<bool> unlockHint(ProblemModel problem, int hintIndex) async {
     final hintKey = '${problem.id}_$hintIndex';
 
     // Already unlocked

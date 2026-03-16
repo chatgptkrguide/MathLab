@@ -4,7 +4,7 @@ import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/utils/level_badge_mapper.dart';
 import '../../../data/models/models.dart';
-import '../../../data/providers/user/friend_provider.dart';
+import '../../../data/providers/friend/friend_provider.dart';
 import '../../../data/providers/user/all_users_provider.dart';
 
 /// 리더보드 카드 위젯 (Duolingo flat style)
