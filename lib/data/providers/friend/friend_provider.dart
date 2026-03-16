@@ -361,6 +361,36 @@ class FriendNotifier extends StateNotifier<FriendState> {
     }
   }
 
+  /// Block a friend (remove + add to blocked list)
+  Future<bool> blockFriend(String friendId) async {
+    try {
+      final batch = _firestore.batch();
+
+      // Remove from both users' friends
+      batch.delete(_userFriendsRef(userId).doc(friendId));
+      batch.delete(_userFriendsRef(friendId).doc(userId));
+
+      // Add to blocked list
+      batch.set(
+        _firestore.collection('users').doc(userId).collection('blocked').doc(friendId),
+        {
+          'blockedUserId': friendId,
+          'blockedAt': FieldValue.serverTimestamp(),
+        },
+      );
+
+      await batch.commit();
+      await loadFriends();
+
+      AppLogger.info('Friend blocked: $friendId', tag: 'Friend');
+      return true;
+    } catch (e, stackTrace) {
+      final appError = AppErrorHandler.handle(e, stackTrace);
+      state = state.copyWith(error: appError.userMessage);
+      return false;
+    }
+  }
+
   /// Load friend activities (recent lesson completions from friends)
   Future<void> loadFriendActivities({int limit = 20}) async {
     try {

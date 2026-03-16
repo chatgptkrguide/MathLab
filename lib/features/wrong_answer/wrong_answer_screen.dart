@@ -230,7 +230,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
             await ref
                 .read(wrongAnswerProvider(userId).notifier)
                 .retryWrongAnswer(answer.id);
-            if (mounted) {
+            if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('문제를 다시 풀어보세요'),
@@ -246,7 +246,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
             await ref
                 .read(wrongAnswerProvider(userId).notifier)
                 .markAsResolved(answer.id);
-            if (mounted) {
+            if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('해결 완료!'),
