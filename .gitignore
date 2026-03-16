@@ -39,7 +39,7 @@ migrate_working_dir/
 /build/macos/
 /build/windows/
 /build/flutter_assets/
-# Keep build/web/ for Vercel static deployment
+/build/web/
 
 # Symbolication related
 app.*.symbols
