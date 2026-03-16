@@ -146,7 +146,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     if (currentProblem == null) return;
 
     String? userAnswer;
-    ValidationResult result;
+    late ValidationResult result;
 
     // Validate answer based on problem type
     switch (currentProblem.type) {

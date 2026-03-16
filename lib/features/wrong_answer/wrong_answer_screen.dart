@@ -78,7 +78,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
                               ),
                             ),
                           ),
-                          // 총 오답 수
+                          // 총 오답 수 (카테고리 필터 반영)
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
@@ -87,7 +87,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Text(
-                              '${state.filteredAnswers.length}개',
+                              '${_selectedCategory == null ? state.filteredAnswers.length : state.filteredAnswers.where((a) => a.unitName == _selectedCategory).length}개',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
@@ -118,7 +118,12 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
                           borderRadius:
                               BorderRadius.vertical(top: Radius.circular(24)),
                         ),
-                        child: state.filteredAnswers.isEmpty
+                        child: (_selectedCategory == null
+                                ? state.filteredAnswers
+                                : state.filteredAnswers
+                                    .where((a) => a.unitName == _selectedCategory)
+                                    .toList())
+                            .isEmpty
                             ? _buildEmptyState()
                             : _buildAnswerList(user.uid, state),
                       ),
@@ -215,7 +220,12 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
   }
 
   Widget _buildAnswerList(String userId, WrongAnswerState state) {
-    final answers = state.filteredAnswers;
+    // 카테고리 필터 적용
+    final answers = _selectedCategory == null
+        ? state.filteredAnswers
+        : state.filteredAnswers
+            .where((a) => a.unitName == _selectedCategory)
+            .toList();
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
