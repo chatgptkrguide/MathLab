@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +28,7 @@ class MainNavigation extends ConsumerStatefulWidget {
 class _MainNavigationState extends ConsumerState<MainNavigation> {
 
   DeepLinkService? _deepLinkServiceInstance;
+  StreamSubscription<RemoteMessage>? _deepLinkSub;
   bool _coachMarkChecked = false;
 
   DeepLinkService get _deepLinkService {
@@ -102,7 +104,8 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
       if (!mounted) return;
 
       // 1. 포그라운드 메시지 오픈 리스너
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _deepLinkSub?.cancel();
+      _deepLinkSub = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         AppLogger.info('백그라운드 메시지 오픈: ${message.data}', tag: 'DeepLink');
         if (message.data.isNotEmpty && mounted) {
           _deepLinkService.handleNotification(context, message.data);
@@ -128,10 +131,16 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
   }
 
   @override
+  void dispose() {
+    _deepLinkSub?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(navigationProvider);
 
-    // 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
+    // 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 팀(4)
     // 현재 탭만 빌드하여 초기 로딩 시 5개 화면 동시 빌드로 인한 과부하 방지
     Widget currentScreen;
     switch (currentIndex) {

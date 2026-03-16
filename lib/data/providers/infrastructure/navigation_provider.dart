@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 네비게이션 탭 인덱스 관리
-/// 피그마 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 학습이력(4)
+/// 탭 순서: 학습(0), 오답(1), Home(2), 프로필(3), 팀(4)
 class NavigationNotifier extends StateNotifier<int> {
   NavigationNotifier() : super(2); // 초기값: Home(2) - 가운데 탭
 
@@ -25,8 +25,8 @@ class NavigationNotifier extends StateNotifier<int> {
     state = 3; // 프로필 탭
   }
 
-  void goToHistory() {
-    state = 4; // 학습이력 탭
+  void goToTeam() {
+    state = 4; // 팀 탭
   }
 
   // Legacy compatibility

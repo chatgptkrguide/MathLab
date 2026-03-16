@@ -220,13 +220,13 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                               // Edit Profile + Share buttons
                               Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const EditProfileScreen()),
-                                    ),
-                                    child: Expanded(
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                const EditProfileScreen()),
+                                      ),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 14, vertical: 8),
@@ -247,7 +247,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                                         ),
                                         child: const Center(
                                           child: Text(
-                                            'Edit Profile',
+                                            '프로필 편집',
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w700,
@@ -384,7 +384,6 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
   // ============================================================
   Widget _buildStatsRow(UserModel user) {
     return Container(
-      height: 71,
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
         color: const Color(0xFFF1F2F1),
@@ -392,11 +391,11 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
       ),
       child: Row(
         children: [
-          _buildStatItem('팔로워', _formatNumber(user.longestStreak)),
+          _buildStatItem('최장 스트릭', '${user.longestStreak}일'),
           Container(width: 1, height: 31, color: const Color(0xFFD9D9D9)),
-          _buildStatItem(' XP', _formatNumber(user.totalXp)),
+          _buildStatItem('총 XP', _formatNumber(user.totalXp)),
           Container(width: 1, height: 31, color: const Color(0xFFD9D9D9)),
-          _buildStatItem('팔로잉', user.gems.toString()),
+          _buildStatItem('보유 젬', _formatNumber(user.gems)),
         ],
       ),
     );
@@ -632,7 +631,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Badges',
+          '보유 뱃지',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
@@ -697,37 +696,37 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
   Widget _buildStatisticsSection(UserModel user) {
     final stats = [
       {
-        'label': 'Challenges',
+        'label': '챌린지 완료',
         'value': (user.achievements.isNotEmpty ? 235 : 0).toString(),
         'icon': Icons.flag_rounded,
         'color': const Color(0xFFFF6B35),
       },
       {
-        'label': 'Lessons Passed',
+        'label': '완료한 레슨',
         'value': (user.level > 1 ? 138 : 0).toString(),
         'icon': Icons.check_circle_rounded,
         'color': const Color(0xFF58CC02),
       },
       {
-        'label': 'Total Diamonds',
+        'label': '보유 다이아',
         'value': _formatNumber(user.gems),
         'icon': Icons.diamond_rounded,
         'color': const Color(0xFF42A5F5),
       },
       {
-        'label': 'Total Lifetime',
+        'label': '누적 XP',
         'value': _formatNumber(user.totalXp),
         'icon': Icons.bolt_rounded,
         'color': const Color(0xFFFFC800),
       },
       {
-        'label': 'Correct Practices',
+        'label': '정답 수',
         'value': '${user.totalXp > 0 ? _formatNumber(user.totalXp ~/ 10) : 0}',
         'icon': Icons.task_alt_rounded,
         'color': const Color(0xFF26A69A),
       },
       {
-        'label': 'Top 3 Position',
+        'label': 'Top 3 횟수',
         'value': '${user.league != 'Bronze' ? 43 : 0}',
         'icon': Icons.leaderboard_rounded,
         'color': const Color(0xFFCE82FF),
@@ -738,12 +737,11 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Your Statistics',
+          '나의 기록',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
             color: Color(0xFF2B2F2D),
-            letterSpacing: 1,
           ),
         ),
         const SizedBox(height: 14),
@@ -824,7 +822,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Upgrade to Premium',
+                  '프리미엄으로 업그레이드',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -833,7 +831,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Get benefit from our premium',
+                  '광고 없이 무제한 학습하세요',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -849,7 +847,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Text(
-              'Upgrade',
+              '업그레이드',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,

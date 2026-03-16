@@ -534,7 +534,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   Widget _buildDailyChallenge() {
     return GestureDetector(
       key: HomeScreenFigma.dailyChallengeKey,
-      onTap: () => ref.read(navigationProvider.notifier).goToHistory(),
+      onTap: () => ref.read(navigationProvider.notifier).goToTeam(),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -762,14 +762,39 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     );
   }
 
-  // === Coming Soon Snackbar ===
+  // === Coming Soon Dialog ===
   void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature 기능은 곧 출시됩니다!'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 2),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.construction_rounded, color: Color(0xFFFF9600), size: 28),
+            const SizedBox(width: 8),
+            Text(
+              feature,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Text(
+          '$feature 기능은 현재 준비 중입니다.\n곧 업데이트 될 예정이니 기대해주세요!',
+          style: const TextStyle(fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              '확인',
+              style: TextStyle(
+                color: Color(0xFF2B59FF),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

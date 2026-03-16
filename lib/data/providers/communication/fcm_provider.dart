@@ -2,6 +2,7 @@
 //
 // Manages push notifications and FCM token
 
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,9 @@ final fcmTokenProvider = FutureProvider<String?>((ref) async {
 class FCMService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? _token;
+  StreamSubscription<String>? _tokenRefreshSub;
+  StreamSubscription<RemoteMessage>? _foregroundMsgSub;
+  StreamSubscription<RemoteMessage>? _backgroundMsgSub;
 
   /// Initialize FCM service
   Future<void> initialize() async {
@@ -72,7 +76,8 @@ class FCMService {
       }
 
       // Listen for token refresh
-      _messaging.onTokenRefresh.listen((newToken) {
+      _tokenRefreshSub?.cancel();
+      _tokenRefreshSub = _messaging.onTokenRefresh.listen((newToken) {
         _token = newToken;
         AppLogger.info('FCM 토큰 갱신됨: ${newToken.substring(0, 20)}...', tag: 'FCM');
         // TODO: Send new token to server
@@ -86,10 +91,12 @@ class FCMService {
       );
 
       // Handle foreground messages
-      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      _foregroundMsgSub?.cancel();
+      _foregroundMsgSub = FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
 
       // Handle background messages
-      FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
+      _backgroundMsgSub?.cancel();
+      _backgroundMsgSub = FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
 
       // Check if app was opened from a terminated state via notification
       final initialMessage = await _messaging.getInitialMessage();
@@ -221,6 +228,12 @@ class FCMService {
 
   /// Cleanup resources
   void dispose() {
+    _tokenRefreshSub?.cancel();
+    _foregroundMsgSub?.cancel();
+    _backgroundMsgSub?.cancel();
+    _tokenRefreshSub = null;
+    _foregroundMsgSub = null;
+    _backgroundMsgSub = null;
     AppLogger.info('FCM 서비스 정리됨', tag: 'FCM');
   }
 }

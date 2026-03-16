@@ -272,6 +272,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
   }
 
   void _nextProblem() {
+    if (session == null) return;
+
     // Check if hearts are depleted
     if (session!.hearts <= 0) {
       _showFailureScreen();
@@ -1146,7 +1148,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                   : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: (canCheck || canContinue)
-                ? const Color(0xFF61A1D8)
+                ? AppColors.skyBlue
                 : const Color(0xFFE0E0E0),
             foregroundColor: (canCheck || canContinue)
                 ? Colors.white

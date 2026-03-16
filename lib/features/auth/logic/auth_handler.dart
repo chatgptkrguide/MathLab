@@ -5,11 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../data/providers/auth/auth_provider.dart';
-import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_durations.dart';
 import '../../../shared/widgets/loading_overlay.dart';
-import '../../../shared/widgets/welcome_dialog.dart';
 
 /// 인증 관련 로직 핸들러
 class AuthHandler {
@@ -246,15 +244,7 @@ class AuthHandler {
       if (!mounted) return false;
 
       if (success) {
-        // Show welcome dialog
-        final user = ref.read(userProvider);
-        if (mounted && user != null) {
-          await WelcomeDialog.show(
-            context,
-            user: user,
-            authMethod: 'email',
-          );
-        }
+        // WelcomeDialog is handled by AuthWrapper to avoid duplicate display
         return true;
       } else {
         if (mounted) {

@@ -43,8 +43,8 @@ class DeepLinkService {
           break;
 
         case 'achievement':
-          // Navigate to achievements
-          ref.read(navigationProvider.notifier).setTab(4); // Profile tab
+          // Navigate to profile (achievements)
+          ref.read(navigationProvider.notifier).setTab(3); // 프로필 탭
           break;
 
         case 'friend_request':
