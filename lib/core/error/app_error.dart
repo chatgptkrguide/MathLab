@@ -1,16 +1,5 @@
-// 🚨 Application Error Handling System
-//
-// Centralized error handling for MathLab app with proper logging,
-// user-friendly messages, and error recovery strategies.
-//
-// Usage:
-// ```dart
-// try {
-//   // Your code
-// } on NetworkException catch (e) {
-//   AppErrorHandler.handle(e);
-// }
-// ```
+// Application Error Handling System
+// Centralized error handling with logging, user-friendly messages, and recovery strategies.
 
 import '../utils/app_logger.dart';
 

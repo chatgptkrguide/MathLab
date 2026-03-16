@@ -93,19 +93,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
   }
 
+  // Kakao 로그인: SDK 호환성 문제로 비활성화 (Phase 2 예정)
   Future<void> _handleKakaoLogin() async {
-    if (_isLoading) return;
-    setState(() => _isLoading = true);
-
-    await AuthHandler.handleKakaoLogin(
-      context: context,
-      ref: ref,
-      mounted: mounted,
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Kakao 로그인은 준비 중입니다')),
     );
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
   }
 
   Future<void> _handleAppleLogin() async {

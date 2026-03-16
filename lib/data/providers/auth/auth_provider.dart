@@ -10,7 +10,6 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/app_error.dart';
@@ -381,89 +380,7 @@ class Auth extends _$Auth {
     }
   }
 
-  // ========================================
-  // Kakao Authentication
-  // ========================================
-
-  /// Sign in with Kakao
-  Future<bool> signInWithKakao() async {
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      AppLogger.info('Kakao signin temporarily disabled', tag: 'Auth');
-
-      // Temporarily disabled due to SDK compatibility issues
-      // TODO: Re-enable when SDK is updated
-      // bool isKakaoTalkAvailable = await kakao.isKakaoTalkInstalled();
-      // kakao.OAuthToken token;
-      // if (isKakaoTalkAvailable) {
-      //   token = await kakao.UserApi.instance.loginWithKakaoTalk();
-      // } else {
-      //   token = await kakao.UserApi.instance.loginWithKakaoAccount();
-      // }
-      // final kakaoUser = await kakao.UserApi.instance.me();
-
-      // TODO: Backend Integration Required
-      // You need to implement a backend endpoint that:
-      // 1. Receives the Kakao access token
-      // 2. Validates it with Kakao servers
-      // 3. Creates or retrieves the user in your system
-      // 4. Generates a custom Firebase token
-      // 5. Returns the Firebase token
-      //
-      // Example backend call:
-      // final response = await http.post(
-      //   Uri.parse('${EnvConfig.apiBaseUrl}/auth/kakao'),
-      //   body: {'accessToken': token.accessToken},
-      // );
-      // final firebaseToken = response.data['firebaseToken'];
-
-      // For now, throw an error to indicate backend integration is needed
-      throw const AuthException(
-        message: 'Kakao 로그인은 백엔드 연동이 필요합니다',
-        type: AuthErrorType.unknown,
-      );
-
-      // Once backend is ready, uncomment and use this code:
-      /*
-      // Sign in to Firebase with custom token from backend
-      final userCredential = await _firebaseAuth.signInWithCustomToken(firebaseToken);
-
-      if (userCredential.user == null) {
-        throw const AuthException(
-          message: 'Kakao 로그인에 실패했습니다',
-          code: AuthErrorCode.loginFailed,
-        );
-      }
-
-      // Save auth token
-      final idToken = await userCredential.user!.getIdToken();
-      if (idToken != null) {
-        await _storage.saveAuthToken(idToken);
-      }
-
-      // Load or create user data
-      await ref.read(userProvider.notifier).loadUser(userCredential.user!.uid);
-
-      // Update state
-      state = state.copyWith(
-        firebaseUser: userCredential.user,
-        isAuthenticated: true,
-        isLoading: false,
-      );
-
-      AppLogger.info('Kakao signin successful', tag: 'Auth');
-      return true;
-      */
-    } catch (e, st) {
-      AppLogger.error('Kakao signin failed', tag: 'Auth', error: e, stackTrace: st);
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Kakao 로그인 중 오류가 발생했습니다',
-      );
-      return false;
-    }
-  }
+  // Kakao 로그인: SDK 호환성 문제로 비활성화 (Phase 2 예정)
 
   // ========================================
   // Guest Authentication
