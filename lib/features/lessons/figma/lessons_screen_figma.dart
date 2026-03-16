@@ -388,7 +388,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
           ),
           const SizedBox(width: 4),
           Text(
-            'HLv$level',
+            'Lv.$level',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,

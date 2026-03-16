@@ -362,7 +362,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           fallbackIcon: Icons.shield_rounded,
           fallbackColor: AppColors.royalBlue,
           label: '레벨',
-          value: 'H Lv$level',
+          value: 'Lv.$level',
         ),
         const SizedBox(width: 10),
         _buildStatSquare(

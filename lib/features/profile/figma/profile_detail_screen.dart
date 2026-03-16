@@ -726,8 +726,8 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         'color': const Color(0xFF26A69A),
       },
       {
-        'label': 'Top 3 횟수',
-        'value': '${user.league != 'Bronze' ? 43 : 0}',
+        'label': '3위 이내',
+        'value': '${user.achievements.where((a) => a == 'top3').length}',
         'icon': Icons.leaderboard_rounded,
         'color': const Color(0xFFCE82FF),
       },
