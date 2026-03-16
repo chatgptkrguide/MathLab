@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// 피그마 디자인 하단 네비게이션 바
-/// 5탭: 학습(0), 오답(1), Home(2, 가운데 강조), 프로필(3), 학습이력(4)
+/// 하단 네비게이션 바
+/// 5탭: 학습(0), 오답(1), 홈(2, 가운데 강조), 프로필(3), 팀(4)
 class CustomBottomNavigation extends StatelessWidget {
   /// 코치마크에서 참조할 GlobalKey
   static final bottomNavKey = GlobalKey(debugLabel: 'bottomNav');
@@ -64,7 +64,7 @@ class CustomBottomNavigation extends StatelessWidget {
             _buildNavItem(
               index: 2,
               icon: Icons.home_rounded,
-              label: 'Home',
+              label: '홈',
               isSpecial: true,
             ),
             _buildNavItem(

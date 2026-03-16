@@ -563,7 +563,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 ],
               ),
               child: const Text(
-                'START!',
+                '시작!',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,

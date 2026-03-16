@@ -571,7 +571,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                 ),
                 if (!hasIcon)
                   Text(
-                    '${subject['tasks']} Task',
+                    '${subject['tasks']}개 과제',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFFFF9121),
@@ -697,13 +697,13 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     final stats = [
       {
         'label': '챌린지 완료',
-        'value': (user.achievements.isNotEmpty ? 235 : 0).toString(),
+        'value': user.achievements.length.toString(),
         'icon': Icons.flag_rounded,
         'color': const Color(0xFFFF6B35),
       },
       {
         'label': '완료한 레슨',
-        'value': (user.level > 1 ? 138 : 0).toString(),
+        'value': (user.totalXp ~/ 50).toString(),
         'icon': Icons.check_circle_rounded,
         'color': const Color(0xFF58CC02),
       },
