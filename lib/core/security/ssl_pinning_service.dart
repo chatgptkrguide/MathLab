@@ -80,7 +80,9 @@ class SSLPinningService {
   }) async {
     // SSL pinning is not supported on web platform
     if (kIsWeb) {
-      debugPrint('⚠️ SSL Pinning: Skipped on web platform for $serverURL');
+      if (kDebugMode) {
+        debugPrint('⚠️ SSL Pinning: Skipped on web platform for $serverURL');
+      }
       return true;
     }
 
@@ -111,7 +113,9 @@ class SSLPinningService {
         timeout: timeout,
       );
 
-      debugPrint('✅ SSL Pinning: Certificate validated for $serverURL');
+      if (kDebugMode) {
+        debugPrint('✅ SSL Pinning: Certificate validated for $serverURL');
+      }
       return true;
     } on Exception catch (e) {
       throw SSLPinningException(
@@ -135,7 +139,9 @@ class SSLPinningService {
         );
       } catch (e) {
         results[url] = false;
-        debugPrint('❌ SSL Pinning failed for $url: $e');
+        if (kDebugMode) {
+          debugPrint('❌ SSL Pinning failed for $url: $e');
+        }
       }
     }
 
@@ -151,7 +157,9 @@ class SSLPinningService {
   static HttpClient? getSecureHttpClient() {
     // HttpClient is not available on web
     if (kIsWeb) {
-      debugPrint('⚠️ SSL Pinning: HttpClient not available on web');
+      if (kDebugMode) {
+        debugPrint('⚠️ SSL Pinning: HttpClient not available on web');
+      }
       return null;
     }
 
@@ -167,7 +175,9 @@ class SSLPinningService {
       final fingerprints = _getFingerprints('https://$host');
 
       if (fingerprints.isEmpty) {
-        debugPrint('⚠️ No fingerprints for $host - rejecting certificate');
+        if (kDebugMode) {
+          debugPrint('⚠️ No fingerprints for $host - rejecting certificate');
+        }
         return false;
       }
 
@@ -179,9 +189,11 @@ class SSLPinningService {
       final isValid = fingerprints.contains(certSHA256);
 
       if (!isValid) {
-        debugPrint('❌ Certificate mismatch for $host');
-        debugPrint('   Expected one of: $fingerprints');
-        debugPrint('   Received: $certSHA256');
+        if (kDebugMode) {
+          debugPrint('❌ Certificate mismatch for $host');
+          debugPrint('   Expected one of: $fingerprints');
+          debugPrint('   Received: $certSHA256');
+        }
       }
 
       return isValid;

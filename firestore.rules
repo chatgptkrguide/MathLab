@@ -24,9 +24,9 @@ service cloud.firestore {
     }
 
     function isAdmin() {
+      let userData = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
       return isSignedIn() &&
-             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+             (userData.role == 'admin' || userData.isAdmin == true);
     }
 
     // Users Collection

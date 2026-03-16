@@ -130,10 +130,12 @@ class RateLimiter {
       final lockoutExpiry = _lockouts[key]!;
       final remainingTime = lockoutExpiry.difference(DateTime.now());
 
-      debugPrint(
-        '🚫 Rate Limit: $identifier is locked out for ${context.name}. '
-        'Remaining: ${remainingTime.inMinutes} minutes',
-      );
+      if (kDebugMode) {
+        debugPrint(
+          '🚫 Rate Limit: $identifier is locked out for ${context.name}. '
+          'Remaining: ${remainingTime.inMinutes} minutes',
+        );
+      }
 
       return false;
     }
@@ -152,10 +154,12 @@ class RateLimiter {
       // Apply lock-out
       _applyLockout(key, config.lockoutDuration);
 
-      debugPrint(
-        '⚠️ Rate Limit: Maximum ${config.maxAttempts} ${config.description} '
-        'exceeded for $identifier. Locked out for ${config.lockoutDuration.inMinutes} minutes.',
-      );
+      if (kDebugMode) {
+        debugPrint(
+          '⚠️ Rate Limit: Maximum ${config.maxAttempts} ${config.description} '
+          'exceeded for $identifier. Locked out for ${config.lockoutDuration.inMinutes} minutes.',
+        );
+      }
 
       return false;
     }
@@ -164,10 +168,12 @@ class RateLimiter {
     _attempts[key]!.add(now);
 
     final remaining = config.maxAttempts - _attempts[key]!.length;
-    debugPrint(
-      '✅ Rate Limit: Allowed for $identifier. '
-      'Remaining attempts: $remaining/${config.maxAttempts}',
-    );
+    if (kDebugMode) {
+      debugPrint(
+        '✅ Rate Limit: Allowed for $identifier. '
+        'Remaining attempts: $remaining/${config.maxAttempts}',
+      );
+    }
 
     return true;
   }
@@ -181,7 +187,9 @@ class RateLimiter {
     _attempts.remove(key);
     _lockouts.remove(key);
 
-    debugPrint('✨ Rate Limit: Success recorded for $identifier (${context.name}). Counter reset.');
+    if (kDebugMode) {
+      debugPrint('✨ Rate Limit: Success recorded for $identifier (${context.name}). Counter reset.');
+    }
   }
 
   /// Get remaining attempts for an identifier
@@ -251,14 +259,18 @@ class RateLimiter {
       _lockouts.remove(key);
     }
 
-    debugPrint('🗑️ Rate Limit: Cleared all limits for $identifier');
+    if (kDebugMode) {
+      debugPrint('🗑️ Rate Limit: Cleared all limits for $identifier');
+    }
   }
 
   /// Clear all rate limit data (use with caution)
   static void clearAll() {
     _attempts.clear();
     _lockouts.clear();
-    debugPrint('🗑️ Rate Limit: Cleared all rate limit data');
+    if (kDebugMode) {
+      debugPrint('🗑️ Rate Limit: Cleared all rate limit data');
+    }
   }
 
   /// Get statistics for debugging
@@ -317,10 +329,12 @@ class RateLimiter {
     final lockoutExpiry = DateTime.now().add(duration);
     _lockouts[key] = lockoutExpiry;
 
-    debugPrint(
-      '🔒 Rate Limit: Lock-out applied for $key until '
-      '${lockoutExpiry.toIso8601String()}',
-    );
+    if (kDebugMode) {
+      debugPrint(
+        '🔒 Rate Limit: Lock-out applied for $key until '
+        '${lockoutExpiry.toIso8601String()}',
+      );
+    }
   }
 
   /// Periodic cleanup of old data (call this periodically in production)
@@ -351,7 +365,9 @@ class RateLimiter {
     }
 
     if (expiredKeys.isNotEmpty) {
-      debugPrint('🧹 Rate Limit: Cleaned up ${expiredKeys.length} expired entries');
+      if (kDebugMode) {
+        debugPrint('🧹 Rate Limit: Cleaned up ${expiredKeys.length} expired entries');
+      }
     }
   }
 }

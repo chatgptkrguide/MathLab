@@ -17,7 +17,7 @@ import '../../../core/error/app_error.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../models/user/user_model.dart';
-import '../../services/temp_profile_storage.dart';
+import '../../services/onboarding_profile_storage.dart';
 import '../user/user_provider.dart';
 
 part 'auth_provider.g.dart';
@@ -99,7 +99,7 @@ class Auth extends _$Auth {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      AppLogger.info('Starting email signup', tag: 'Auth', data: {'email': email});
+      AppLogger.info('Starting email signup', tag: 'Auth');
 
       // Create user in Firebase Auth
       final credential = await _firebaseAuth.createUserWithEmailAndPassword(
@@ -155,7 +155,7 @@ class Auth extends _$Auth {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      AppLogger.info('Starting email signin', tag: 'Auth', data: {'email': email});
+      AppLogger.info('Starting email signin', tag: 'Auth');
 
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -683,7 +683,7 @@ class Auth extends _$Auth {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      AppLogger.info('Sending password reset email', tag: 'Auth', data: {'email': email});
+      AppLogger.info('Sending password reset email', tag: 'Auth');
 
       await _firebaseAuth.sendPasswordResetEmail(email: email);
 
@@ -767,7 +767,7 @@ class Auth extends _$Auth {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      AppLogger.info('Starting email change', tag: 'Auth', data: {'newEmail': newEmail});
+      AppLogger.info('Starting email change', tag: 'Auth');
 
       final user = _firebaseAuth.currentUser;
       if (user == null || user.email == null) {

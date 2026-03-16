@@ -33,6 +33,7 @@
 // ```
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_logger.dart';
 import 'secure_storage_service.dart';
@@ -161,7 +162,9 @@ class SessionManager {
     // Update last activity in secure storage
     _updateLastActivityInStorage(now);
 
-    debugPrint('📱 Session: Activity recorded at ${now.toIso8601String()}');
+    if (kDebugMode) {
+      debugPrint('📱 Session: Activity recorded at ${now.toIso8601String()}');
+    }
   }
 
   // ========================================

@@ -19,6 +19,7 @@
 // await storage.deleteAuthToken();
 // ```
 
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
@@ -35,7 +36,7 @@ class SecureStorageService {
       resetOnError: true,
     ),
     iOptions: IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock,
+      accessibility: KeychainAccessibility.unlocked_this_device,
       accountName: 'com.gomath.mathlab',
     ),
   );
@@ -246,6 +247,7 @@ class SecureStorageService {
 
   /// Get all stored keys (for debugging only)
   Future<Map<String, String>> getAllSecure() async {
+    assert(!kReleaseMode, 'getAllSecure() must not be called in production');
     try {
       return await _storage.readAll();
     } catch (e) {
