@@ -2,12 +2,14 @@
 //
 // Firestore-based premium subscription state management,
 // trial management, and subscription status checking.
+// In-App Purchase (Google Play / App Store) integration via IapService.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/app_logger.dart';
 import '../../models/subscription/premium_tier.dart';
+import '../../services/iap_service.dart';
 import '../infrastructure/firebase_providers.dart';
 // user_provider not directly imported; user UID comes via currentUserProvider
 
@@ -238,24 +240,68 @@ class SubscriptionService {
 }
 
 // ========================================
-// In-App Purchase Service
+// In-App Purchase Service (Store Integration)
 // ========================================
 
-/// In-app purchase service (placeholder for store integration)
+/// In-app purchase service with real store integration
+///
+/// IapService를 래핑하여 구매 결과를 Firestore에 반영합니다.
+/// - 스토어 상품이 로드된 경우: 실제 IAP 결제 흐름
+/// - 스토어 상품이 없는 경우 (개발/테스트): Firestore 직접 활성화 폴백
 class InAppPurchaseService {
   final SubscriptionService _subscriptionService;
+  final IapService _iapService;
 
-  InAppPurchaseService(this._subscriptionService);
+  InAppPurchaseService(this._subscriptionService, this._iapService);
 
-  /// Purchase subscription
+  /// IAP 서비스 접근 (UI에서 상품 정보 표시용)
+  IapService get iapService => _iapService;
+
+  /// Purchase subscription via store or fallback
   Future<void> purchaseSubscription({
     required String userId,
     required PremiumTier tier,
     required void Function(bool success, String? error) onComplete,
   }) async {
     try {
-      // TODO: Integrate with Google Play / App Store billing
-      // For now, directly activate in Firestore
+      // IAP 서비스가 사용 가능하고 상품이 로드된 경우 실제 결제
+      if (_iapService.isAvailable && _iapService.products.isNotEmpty) {
+        final product = _iapService.getProductForTier(tier);
+
+        if (product != null) {
+          // 구매 결과 콜백 설정
+          _iapService.onPurchaseResult = (success, productId, error) {
+            if (success && productId != null) {
+              // 구매 성공 -> Firestore에 구독 활성화
+              _subscriptionService
+                  .activateSubscription(userId, tier)
+                  .then((_) => onComplete(true, null))
+                  .catchError((e) => onComplete(false, e.toString()));
+            } else {
+              onComplete(false, error ?? 'Purchase failed');
+            }
+          };
+
+          // 스토어 결제 흐름 시작
+          final initiated = await _iapService.purchaseProduct(product);
+          if (!initiated) {
+            onComplete(false, 'Failed to initiate purchase');
+          }
+          // 결과는 onPurchaseResult 콜백으로 전달됨
+          return;
+        }
+
+        AppLogger.warning(
+          'Product not found for tier ${tier.name}, falling back to direct activation',
+          tag: 'IAP',
+        );
+      }
+
+      // 폴백: Firestore 직접 활성화 (개발/테스트 환경)
+      AppLogger.info(
+        'Using fallback direct activation for tier ${tier.name}',
+        tag: 'IAP',
+      );
       await _subscriptionService.activateSubscription(userId, tier);
       onComplete(true, null);
     } catch (e) {
@@ -263,13 +309,33 @@ class InAppPurchaseService {
     }
   }
 
-  /// Restore purchases
+  /// Restore purchases from store
   Future<void> restorePurchases({
     required String userId,
     required void Function(bool success, String? error) onComplete,
   }) async {
     try {
-      // TODO: Integrate with store restore purchase APIs
+      if (_iapService.isAvailable) {
+        // 구매 복원 결과 콜백 설정
+        _iapService.onPurchaseResult = (success, productId, error) {
+          if (success && productId != null) {
+            // 복원 성공 -> productId로 tier 판별하여 Firestore 업데이트
+            final tier = _tierFromProductId(productId);
+            _subscriptionService
+                .activateSubscription(userId, tier)
+                .then((_) => onComplete(true, null))
+                .catchError((e) => onComplete(false, e.toString()));
+          } else {
+            onComplete(false, error ?? 'Restore failed');
+          }
+        };
+
+        await _iapService.restorePurchases();
+        // 결과는 onPurchaseResult 콜백으로 전달됨
+        return;
+      }
+
+      // 폴백: Firestore에서 기존 구독 상태 확인
       final status =
           await _subscriptionService.checkSubscriptionStatus(userId);
       onComplete(status.isActive, null);
@@ -277,11 +343,37 @@ class InAppPurchaseService {
       onComplete(false, e.toString());
     }
   }
+
+  /// Product ID에서 PremiumTier 판별
+  PremiumTier _tierFromProductId(String productId) {
+    switch (productId) {
+      case IapService.monthlyProductId:
+        return PremiumTier.monthly;
+      case IapService.yearlyProductId:
+        return PremiumTier.yearly;
+      default:
+        return PremiumTier.monthly;
+    }
+  }
 }
 
 // ========================================
 // Providers
 // ========================================
+
+/// IapService provider (싱글톤, 앱 시작 시 초기화)
+final iapServiceProvider = Provider<IapService>((ref) {
+  final service = IapService();
+  // 비동기 초기화는 앱 시작 시 별도 호출 필요
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
+/// IapService 초기화 상태 provider
+final iapInitializationProvider = FutureProvider<void>((ref) async {
+  final iapService = ref.watch(iapServiceProvider);
+  await iapService.initialize();
+});
 
 /// Subscription service provider
 final subscriptionServiceProvider = Provider<SubscriptionService>((ref) {
@@ -356,8 +448,15 @@ final canStartTrialProvider = Provider<bool>((ref) {
   return ref.watch(premiumStateProvider).canStartTrial;
 });
 
-/// In-app purchase service provider
+/// In-app purchase service provider (with real IAP integration)
 final inAppPurchaseServiceProvider = Provider<InAppPurchaseService>((ref) {
   final subscriptionService = ref.watch(subscriptionServiceProvider);
-  return InAppPurchaseService(subscriptionService);
+  final iapService = ref.watch(iapServiceProvider);
+  return InAppPurchaseService(subscriptionService, iapService);
+});
+
+/// IAP 상품 목록 provider (UI에서 스토어 가격 표시용)
+final iapProductsProvider = Provider<List<dynamic>>((ref) {
+  final iapService = ref.watch(iapServiceProvider);
+  return iapService.products;
 });
