@@ -5,7 +5,7 @@ import AdminLayout from "@/components/layout/admin-layout";
 import { bulkCreateProblems, getUnits, getLessons } from "@/lib/firestore";
 import { Problem, Unit, Lesson, ProblemType, ProblemDifficulty, PROBLEM_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/types";
 import LatexRenderer from "@/components/ui/latex-renderer";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 import { Download, Upload, FileSpreadsheet, Check, AlertCircle } from "lucide-react";
 
 interface ParsedProblem {
@@ -113,6 +113,19 @@ export default function BulkUploadPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Defensive: limit file size to 10MB and validate extension
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      alert("파일 크기가 10MB를 초과합니다.");
+      return;
+    }
+    const allowedExtensions = [".xlsx", ".csv", ".xls"];
+    const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+    if (!allowedExtensions.includes(ext)) {
+      alert("지원하지 않는 파일 형식입니다. (.xlsx, .csv, .xls만 가능)");
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
