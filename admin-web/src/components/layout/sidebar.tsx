@@ -9,12 +9,16 @@ import {
   BookOpen,
   LogOut,
   GraduationCap,
+  Shapes,
+  FileUp,
 } from "lucide-react";
 
 const navItems = [
-  { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
-  { href: "/problems", label: "문제 관리", icon: FileText },
-  { href: "/curriculum", label: "커리큘럼 관리", icon: BookOpen },
+  { href: "/dashboard", label: "대시보드", icon: LayoutDashboard, exact: true },
+  { href: "/problems", label: "문제 관리", icon: FileText, exact: true },
+  { href: "/problems/geometry", label: "기하 문제 생성기", icon: Shapes, exact: false },
+  { href: "/problems/pdf", label: "PDF 변환", icon: FileUp, exact: false },
+  { href: "/curriculum", label: "커리큘럼 관리", icon: BookOpen, exact: false },
 ];
 
 export default function Sidebar() {
@@ -33,9 +37,9 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-4">
           {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive = item.exact
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
 
             return (
