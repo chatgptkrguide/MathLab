@@ -1,57 +1,21 @@
 #!/usr/bin/env node
 
 // Seed 공통수학1 (2022 개정) curriculum to Firestore
-// Usage: node admin-web/scripts/seed-curriculum.mjs
+// Usage: cd admin-web && node scripts/seed-curriculum.mjs --force
 //
-// Reads Firebase config from admin-web/.env.local
+// Uses Firebase Admin SDK with Application Default Credentials
 
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDocs,
-  collection,
-  query,
-  where,
-  writeBatch,
-  serverTimestamp,
-} from "firebase/firestore";
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+import "dotenv/config";
+import { initializeApp, getApps } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "mathlab-gomath";
 
-// Load .env.local
-function loadEnv() {
-  const envPath = resolve(__dirname, "../.env.local");
-  const envContent = readFileSync(envPath, "utf-8");
-  const env = {};
-  for (const line of envContent.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const [key, ...valueParts] = trimmed.split("=");
-    env[key.trim()] = valueParts.join("=").trim();
-  }
-  return env;
+if (getApps().length === 0) {
+  initializeApp({ projectId });
 }
 
-const env = loadEnv();
-
-const firebaseConfig = {
-  apiKey: env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-console.log(`Firebase project: ${firebaseConfig.projectId}`);
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getFirestore();
 
 // ==================== Curriculum Data ====================
 
@@ -80,52 +44,41 @@ const lessons = [
   { id: "cm1_1_1_2", unitId: "cm1_1_1", title: "다항식의 나눗셈", description: "다항식을 다항식으로 나누는 방법을 학습합니다", order: 2, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "beginner", concepts: ["다항식 나눗셈", "몫", "나머지", "조립제법"] },
   { id: "cm1_1_1_3", unitId: "cm1_1_1", title: "곱셈공식", description: "자주 쓰이는 곱셈공식을 익힙니다", order: 3, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "beginner", concepts: ["완전제곱식", "합차공식", "곱셈공식"] },
   { id: "cm1_1_1_4", unitId: "cm1_1_1", title: "곱셈공식의 변형", description: "곱셈공식을 변형하여 다양한 문제에 적용합니다", order: 4, xpReward: 25, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["곱셈공식 변형", "대칭식", "교대식"] },
-
   // 1.2 항등식과 나머지정리
   { id: "cm1_1_2_1", unitId: "cm1_1_2", title: "항등식과 미정계수", description: "항등식의 성질과 미정계수법을 학습합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["항등식", "미정계수법", "수치대입법", "계수비교법"] },
   { id: "cm1_1_2_2", unitId: "cm1_1_2", title: "나머지정리와 인수정리", description: "나머지정리와 인수정리를 이해하고 활용합니다", order: 2, xpReward: 25, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["나머지정리", "인수정리", "다항식의 나눗셈"] },
-
   // 1.3 인수분해
   { id: "cm1_1_3_1", unitId: "cm1_1_3", title: "인수분해 공식", description: "기본적인 인수분해 공식을 학습합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["인수분해", "공통인수", "완전제곱식", "합차공식"] },
   { id: "cm1_1_3_2", unitId: "cm1_1_3", title: "여러 가지 인수분해", description: "복잡한 다항식의 인수분해 방법을 학습합니다", order: 2, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["치환 인수분해", "복이차식", "인수정리 활용"] },
-
   // 2.1 복소수
   { id: "cm1_2_1_1", unitId: "cm1_2_1", title: "허수단위와 복소수", description: "허수단위 i와 복소수의 개념을 학습합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["허수단위", "복소수", "실수부", "허수부"] },
   { id: "cm1_2_1_2", unitId: "cm1_2_1", title: "복소수의 사칙연산", description: "복소수의 덧셈, 뺄셈, 곱셈, 나눗셈을 학습합니다", order: 2, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["복소수 덧셈", "복소수 곱셈", "켤레복소수", "복소수 나눗셈"] },
   { id: "cm1_2_1_3", unitId: "cm1_2_1", title: "음수의 제곱근", description: "음수의 제곱근과 그 성질을 학습합니다", order: 3, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["음수의 제곱근", "i의 거듭제곱", "복소수의 성질"] },
-
   // 2.2 이차방정식
   { id: "cm1_2_2_1", unitId: "cm1_2_2", title: "이차방정식의 근의 판별", description: "판별식을 이용하여 근의 종류를 판별합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["판별식", "실근", "허근", "중근"] },
   { id: "cm1_2_2_2", unitId: "cm1_2_2", title: "근과 계수의 관계", description: "이차방정식의 근과 계수 사이의 관계를 학습합니다", order: 2, xpReward: 25, estimatedMinutes: 15, type: "standard", difficulty: "advanced", concepts: ["근과 계수의 관계", "두 근의 합", "두 근의 곱"] },
-
   // 2.3 이차함수와 이차방정식
   { id: "cm1_2_3_1", unitId: "cm1_2_3", title: "이차함수와 이차방정식의 관계", description: "이차함수의 그래프와 이차방정식의 관계를 학습합니다", order: 1, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["이차함수 그래프", "x축과의 교점", "판별식과 그래프"] },
   { id: "cm1_2_3_2", unitId: "cm1_2_3", title: "이차함수의 최대, 최소", description: "이차함수의 최댓값과 최솟값을 구합니다", order: 2, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["꼭짓점", "최댓값", "최솟값", "완전제곱식"] },
-
   // 2.4 고차방정식
   { id: "cm1_2_4_1", unitId: "cm1_2_4", title: "고차방정식의 풀이", description: "삼차 이상의 방정식을 인수분해하여 풀이합니다", order: 1, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["삼차방정식", "사차방정식", "인수정리 활용", "조립제법"] },
   { id: "cm1_2_4_2", unitId: "cm1_2_4", title: "삼차방정식의 근과 계수와의 관계", description: "삼차방정식에서 근과 계수의 관계를 학습합니다", order: 2, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["세 근의 합", "세 근의 곱", "근과 계수의 관계"] },
   { id: "cm1_2_4_3", unitId: "cm1_2_4", title: "오메가의 성질", description: "1의 세제곱근 오메가의 성질을 학습합니다", order: 3, xpReward: 25, estimatedMinutes: 15, type: "standard", difficulty: "expert", concepts: ["오메가", "1의 세제곱근", "허근의 성질"] },
-
   // 2.5 연립방정식
   { id: "cm1_2_5_1", unitId: "cm1_2_5", title: "연립이차방정식", description: "이차식을 포함한 연립방정식을 풀이합니다", order: 1, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["연립이차방정식", "대입법", "가감법"] },
   { id: "cm1_2_5_2", unitId: "cm1_2_5", title: "부정방정식", description: "해가 무수히 많은 부정방정식을 학습합니다", order: 2, xpReward: 25, estimatedMinutes: 15, type: "standard", difficulty: "advanced", concepts: ["부정방정식", "정수해", "자연수해"] },
-
   // 2.6 부등식
   { id: "cm1_2_6_1", unitId: "cm1_2_6", title: "부등식의 성질과 일차부등식", description: "부등식의 기본 성질과 일차부등식을 학습합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "beginner", concepts: ["부등식의 성질", "일차부등식", "해집합"] },
   { id: "cm1_2_6_2", unitId: "cm1_2_6", title: "연립일차부등식", description: "연립일차부등식의 풀이를 학습합니다", order: 2, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["연립일차부등식", "공통범위", "수직선"] },
   { id: "cm1_2_6_3", unitId: "cm1_2_6", title: "절댓값이 있는 일차부등식", description: "절댓값을 포함한 일차부등식을 풀이합니다", order: 3, xpReward: 25, estimatedMinutes: 15, type: "standard", difficulty: "advanced", concepts: ["절댓값", "절댓값 부등식", "경우 나누기"] },
-
   // 2.7 이차부등식
   { id: "cm1_2_7_1", unitId: "cm1_2_7", title: "이차부등식", description: "이차부등식의 풀이를 학습합니다", order: 1, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "intermediate", concepts: ["이차부등식", "이차함수 그래프", "부등식의 해"] },
   { id: "cm1_2_7_2", unitId: "cm1_2_7", title: "연립이차부등식", description: "연립이차부등식의 풀이를 학습합니다", order: 2, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "advanced", concepts: ["연립이차부등식", "공통범위", "수직선"] },
   { id: "cm1_2_7_3", unitId: "cm1_2_7", title: "이차방정식의 실근의 조건", description: "이차방정식이 실근을 가질 조건을 학습합니다", order: 3, xpReward: 25, estimatedMinutes: 20, type: "standard", difficulty: "expert", concepts: ["판별식", "실근의 조건", "이차부등식 활용"] },
-
   // 3.1 경우의 수
   { id: "cm1_3_1_1", unitId: "cm1_3_1", title: "합의 법칙과 곱의 법칙", description: "경우의 수의 기본 원리를 학습합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "beginner", concepts: ["합의 법칙", "곱의 법칙", "경우의 수"] },
   { id: "cm1_3_1_2", unitId: "cm1_3_1", title: "순열", description: "순열의 뜻과 계산 방법을 학습합니다", order: 2, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["순열", "팩토리얼", "nPr", "원순열"] },
   { id: "cm1_3_1_3", unitId: "cm1_3_1", title: "조합", description: "조합의 뜻과 계산 방법을 학습합니다", order: 3, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "intermediate", concepts: ["조합", "nCr", "이항계수", "조합의 성질"] },
-
   // 4.1 행렬
   { id: "cm1_4_1_1", unitId: "cm1_4_1", title: "행렬의 뜻", description: "행렬의 개념과 용어를 학습합니다", order: 1, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "beginner", concepts: ["행렬", "성분", "행", "열", "영행렬", "단위행렬"] },
   { id: "cm1_4_1_2", unitId: "cm1_4_1", title: "행렬의 덧셈, 뺄셈, 실수배", description: "행렬의 기본 연산을 학습합니다", order: 2, xpReward: 20, estimatedMinutes: 15, type: "standard", difficulty: "beginner", concepts: ["행렬의 덧셈", "행렬의 뺄셈", "실수배", "행렬의 상등"] },
@@ -134,24 +87,14 @@ const lessons = [
 
 // ==================== Seed Functions ====================
 
-async function checkExisting() {
-  const unitsSnap = await getDocs(
-    query(collection(db, "units"), where("subject", "==", "공통수학1"))
-  );
-  return unitsSnap.size;
-}
-
 async function seedUnits() {
   console.log("\n--- Seeding Units (중단원) ---");
   let count = 0;
-
   for (const unit of units) {
     const { id, ...data } = unit;
-    await setDoc(doc(db, "units", id), data);
-    console.log(`  [${count + 1}/${units.length}] ${id}: ${data.title}`);
-    count++;
+    await db.collection("units").doc(id).set(data, { merge: true });
+    console.log(`  [${++count}/${units.length}] ${id}: ${data.title}`);
   }
-
   console.log(`=> ${count} units seeded`);
   return count;
 }
@@ -159,32 +102,15 @@ async function seedUnits() {
 async function seedLessons() {
   console.log("\n--- Seeding Lessons (소단원) ---");
   let count = 0;
-
-  // Use batches for efficiency
-  const batchSize = 450;
-  let batch = writeBatch(db);
-  let batchCount = 0;
+  const batch = db.batch();
 
   for (const lesson of lessons) {
     const { id, ...data } = lesson;
-    const docRef = doc(db, "lessons", id);
-    batch.set(docRef, data);
-    count++;
-    batchCount++;
-
-    console.log(`  [${count}/${lessons.length}] ${id}: ${data.title}`);
-
-    if (batchCount >= batchSize) {
-      await batch.commit();
-      batch = writeBatch(db);
-      batchCount = 0;
-    }
+    batch.set(db.collection("lessons").doc(id), data, { merge: true });
+    console.log(`  [${++count}/${lessons.length}] ${id}: ${data.title}`);
   }
 
-  if (batchCount > 0) {
-    await batch.commit();
-  }
-
+  await batch.commit();
   console.log(`=> ${count} lessons seeded`);
   return count;
 }
@@ -194,20 +120,14 @@ async function main() {
   console.log("  공통수학1 (2022 개정) Curriculum Seeder");
   console.log("===========================================");
 
-  // Check for --force flag
   const force = process.argv.includes("--force");
 
-  // Check existing data
-  const existingCount = await checkExisting();
-  if (existingCount > 0 && !force) {
-    console.log(`\n기존 공통수학1 unit이 ${existingCount}개 있습니다.`);
+  const unitsSnap = await db.collection("units").where("subject", "==", "공통수학1").get();
+  if (unitsSnap.size > 0 && !force) {
+    console.log(`\n기존 공통수학1 unit이 ${unitsSnap.size}개 있습니다.`);
     console.log("덮어쓰려면 --force 플래그를 사용하세요:");
-    console.log("  node admin-web/scripts/seed-curriculum.mjs --force");
+    console.log("  node scripts/seed-curriculum.mjs --force");
     process.exit(1);
-  }
-
-  if (existingCount > 0) {
-    console.log(`\n기존 ${existingCount}개 unit을 덮어씁니다...`);
   }
 
   const unitCount = await seedUnits();
@@ -216,7 +136,6 @@ async function main() {
   console.log("\n===========================================");
   console.log(`  완료! Units: ${unitCount}, Lessons: ${lessonCount}`);
   console.log("===========================================");
-
   process.exit(0);
 }
 

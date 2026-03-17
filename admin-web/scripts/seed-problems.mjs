@@ -158,10 +158,10 @@ const lesson_cm1_1_1_1 = [
   },
 ];
 
-// ==================== 2.1.1 허수단위와 복소수 (cm2_1_1_1) ====================
-const lesson_cm2_1_1_1 = [
+// ==================== 2.1.1 허수단위와 복소수 (cm1_2_1_1) ====================
+const lesson_cm1_2_1_1 = [
   {
-    lessonId: "cm2_1_1_1",
+    lessonId: "cm1_2_1_1",
     question: "5의 켤레복소수는? (단, $i=\\sqrt{-1}$)",
     type: "multipleChoice",
     difficulty: "easy",
@@ -174,7 +174,7 @@ const lesson_cm2_1_1_1 = [
     imageUrls: [],
   },
   {
-    lessonId: "cm2_1_1_1",
+    lessonId: "cm1_2_1_1",
     question: "$-3+6i$의 실수부분을 a, 허수부분을 b라고 할 때, $a-b$의 값을 구하시오. (단, $i=\\sqrt{-1}$)",
     type: "shortAnswer",
     difficulty: "easy",
@@ -187,7 +187,7 @@ const lesson_cm2_1_1_1 = [
     imageUrls: [],
   },
   {
-    lessonId: "cm2_1_1_1",
+    lessonId: "cm1_2_1_1",
     question: "7의 실수부분을 a, 허수부분을 b라고 할 때, $a-b$의 값을 구하시오.",
     type: "shortAnswer",
     difficulty: "easy",
@@ -200,7 +200,7 @@ const lesson_cm2_1_1_1 = [
     imageUrls: [],
   },
   {
-    lessonId: "cm2_1_1_1",
+    lessonId: "cm1_2_1_1",
     question: "다음 중 허수인 것의 개수를 구하시오. (단, $i=\\sqrt{-1}$)\n$\\sqrt{3}i$, $-\\sqrt{5}$, $\\frac{2}{3}i$, $(2i)^2$, $3+4i$",
     type: "shortAnswer",
     difficulty: "medium",
@@ -213,7 +213,7 @@ const lesson_cm2_1_1_1 = [
     imageUrls: [],
   },
   {
-    lessonId: "cm2_1_1_1",
+    lessonId: "cm1_2_1_1",
     question: "$4i$의 실수부분을 a, 허수부분을 b라고 할 때, $a+b$의 값을 구하시오. (단, $i=\\sqrt{-1}$)",
     type: "shortAnswer",
     difficulty: "easy",
@@ -226,7 +226,7 @@ const lesson_cm2_1_1_1 = [
     imageUrls: [],
   },
   {
-    lessonId: "cm2_1_1_1",
+    lessonId: "cm1_2_1_1",
     question: "$5-4i$의 켤레복소수는? (단, $i=\\sqrt{-1}$)",
     type: "multipleChoice",
     difficulty: "easy",
@@ -243,7 +243,7 @@ const lesson_cm2_1_1_1 = [
 // ==================== SEED ====================
 
 async function seed() {
-  const allProblems = [...lesson_cm1_1_1_1, ...lesson_cm2_1_1_1];
+  const allProblems = [...lesson_cm1_1_1_1, ...lesson_cm1_2_1_1];
 
   console.log(`\n총 ${allProblems.length}개 문제를 Firestore에 등록합니다...\n`);
 
