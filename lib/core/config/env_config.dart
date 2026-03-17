@@ -119,6 +119,20 @@ class EnvConfig {
   }
 
   // ========================================
+  // SSL Pinning Configuration
+  // ========================================
+
+  /// SSL certificate SHA256 fingerprints (comma-separated)
+  /// Set SSL_PINS env var with your server's SHA256 fingerprints
+  /// Example: SSL_PINS=AA:BB:CC:...,DD:EE:FF:...
+  /// Empty or unset = SSL pinning disabled (development mode)
+  static List<String> get sslPins {
+    final pins = _getEnvVar('SSL_PINS', defaultValue: '');
+    if (pins.isEmpty) return [];
+    return pins.split(',').map((p) => p.trim()).toList();
+  }
+
+  // ========================================
   // Helper Methods
   // ========================================
 

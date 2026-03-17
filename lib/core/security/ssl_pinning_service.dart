@@ -1,36 +1,33 @@
-// 🔐 SSL Certificate Pinning Service
+// SSL Certificate Pinning Service
 //
 // Provides SSL certificate pinning to prevent Man-in-the-Middle (MITM) attacks
 // by validating server certificates against known SHA256 fingerprints.
 //
-// Security Features:
-// - Certificate pinning for API servers
-// - SHA256 fingerprint validation
-// - Multiple certificate support (for certificate rotation)
-// - Timeout configuration
+// Configuration:
+// SSL pins are loaded from the SSL_PINS environment variable (comma-separated).
+// When SSL_PINS is empty or unset, pinning is disabled (development mode).
+//
+// Production setup:
+// 1. Get your server's SHA256 fingerprint:
+//    openssl s_client -connect api.mathlab.app:443 < /dev/null 2>/dev/null | \
+//      openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
+// 2. Set SSL_PINS in your .env file:
+//    SSL_PINS=AA:BB:CC:...:ZZ,11:22:33:...:99
+//    (multiple pins separated by commas for certificate rotation)
 //
 // Usage:
 // ```dart
-// // Initialize SSL pinning before making API calls
-// await SSLPinningService.checkCertificate(
-//   serverURL: 'https://api.mathlab.app',
-// );
-//
-// // Or use in Dio interceptor
-// final dio = Dio();
-// dio.interceptors.add(SSLPinningInterceptor());
-// ```
-//
-// How to get SHA256 fingerprint:
-// ```bash
-// # For your API server
-// openssl s_client -connect api.mathlab.app:443 < /dev/null 2>/dev/null | \
-//   openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
+// if (SSLPinningService.isEnabled) {
+//   await SSLPinningService.checkCertificate(
+//     serverURL: 'https://api.mathlab.app',
+//   );
+// }
 // ```
 
 import 'dart:io';
 import 'package:http_certificate_pinning/http_certificate_pinning.dart';
 import 'package:flutter/foundation.dart';
+import '../../core/config/env_config.dart';
 
 class SSLPinningService {
   // Singleton pattern
@@ -44,26 +41,18 @@ class SSLPinningService {
   // Certificate Fingerprints Configuration
   // ========================================
 
-  /// Production API server fingerprints
-  /// TODO: Replace with your actual server's SHA256 fingerprints
-  static const List<String> _productionFingerprints = [
-    // Primary certificate
-    // 'AB:CD:EF:12:34:56:78:90:AB:CD:EF:12:34:56:78:90:AB:CD:EF:12:34:56:78:90:AB:CD:EF:12:34:56:78:90',
-    // Backup certificate (for rotation)
-    // 'FE:DC:BA:98:76:54:32:10:FE:DC:BA:98:76:54:32:10:FE:DC:BA:98:76:54:32:10:FE:DC:BA:98:76:54:32:10',
-  ];
+  /// SSL pin list - loaded from environment variables
+  /// Returns empty list when SSL_PINS is not configured (disables pinning)
+  static List<String> get pinnedCertificates {
+    final pins = EnvConfig.sslPins;
+    if (pins.isEmpty && kDebugMode) {
+      debugPrint('SSL Pinning: No pins configured - pinning disabled');
+    }
+    return pins;
+  }
 
-  /// Staging/Development server fingerprints
-  static const List<String> _developmentFingerprints = [
-    // Development certificate
-    // 'DE:V1:23:45:67:89:AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89:AB:CD',
-  ];
-
-  /// Firebase/Google services fingerprints
-  static const List<String> _firebaseFingerprints = [
-    // Firebase uses Google's certificates
-    // These are examples - verify actual fingerprints from Firebase console
-  ];
+  /// Whether SSL pinning is active
+  static bool get isEnabled => pinnedCertificates.isNotEmpty;
 
   // ========================================
   // SSL Pinning Check Methods
@@ -81,26 +70,29 @@ class SSLPinningService {
     // SSL pinning is not supported on web platform
     if (kIsWeb) {
       if (kDebugMode) {
-        debugPrint('⚠️ SSL Pinning: Skipped on web platform for $serverURL');
+        debugPrint('SSL Pinning: Skipped on web platform for $serverURL');
       }
       return true;
     }
 
     // Skip SSL pinning in debug mode for easier development
     if (kDebugMode) {
-      debugPrint('⚠️ SSL Pinning: Skipped in debug mode for $serverURL');
+      debugPrint('SSL Pinning: Skipped in debug mode for $serverURL');
+      return true;
+    }
+
+    // Skip if no pins are configured
+    if (!isEnabled && customFingerprints == null) {
       return true;
     }
 
     try {
-      // Determine which fingerprints to use
-      final fingerprints = customFingerprints ?? _getFingerprints(serverURL);
+      final fingerprints = customFingerprints ?? pinnedCertificates;
 
-      // If no fingerprints configured, throw error
       if (fingerprints.isEmpty) {
         throw SSLPinningException(
           'No SSL fingerprints configured for $serverURL. '
-          'Please add certificate fingerprints in SSLPinningService.',
+          'Set SSL_PINS environment variable with your server fingerprints.',
         );
       }
 
@@ -114,7 +106,7 @@ class SSLPinningService {
       );
 
       if (kDebugMode) {
-        debugPrint('✅ SSL Pinning: Certificate validated for $serverURL');
+        debugPrint('SSL Pinning: Certificate validated for $serverURL');
       }
       return true;
     } on Exception catch (e) {
@@ -140,7 +132,7 @@ class SSLPinningService {
       } catch (e) {
         results[url] = false;
         if (kDebugMode) {
-          debugPrint('❌ SSL Pinning failed for $url: $e');
+          debugPrint('SSL Pinning failed for $url: $e');
         }
       }
     }
@@ -158,7 +150,7 @@ class SSLPinningService {
     // HttpClient is not available on web
     if (kIsWeb) {
       if (kDebugMode) {
-        debugPrint('⚠️ SSL Pinning: HttpClient not available on web');
+        debugPrint('SSL Pinning: HttpClient not available on web');
       }
       return null;
     }
@@ -170,13 +162,17 @@ class SSLPinningService {
       return httpClient;
     }
 
+    // Skip if no pins configured
+    if (!isEnabled) {
+      return httpClient;
+    }
+
     httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
-      // Get fingerprints for this host
-      final fingerprints = _getFingerprints('https://$host');
+      final fingerprints = pinnedCertificates;
 
       if (fingerprints.isEmpty) {
         if (kDebugMode) {
-          debugPrint('⚠️ No fingerprints for $host - rejecting certificate');
+          debugPrint('No fingerprints configured for $host - rejecting certificate');
         }
         return false;
       }
@@ -190,7 +186,7 @@ class SSLPinningService {
 
       if (!isValid) {
         if (kDebugMode) {
-          debugPrint('❌ Certificate mismatch for $host');
+          debugPrint('Certificate mismatch for $host');
           debugPrint('   Expected one of: $fingerprints');
           debugPrint('   Received: $certSHA256');
         }
@@ -200,30 +196,6 @@ class SSLPinningService {
     };
 
     return httpClient;
-  }
-
-  // ========================================
-  // Helper Methods
-  // ========================================
-
-  /// Get appropriate fingerprints based on environment and URL
-  static List<String> _getFingerprints(String url) {
-    // Firebase/Google services
-    if (url.contains('googleapis.com') ||
-        url.contains('firebase') ||
-        url.contains('google.com')) {
-      return _firebaseFingerprints;
-    }
-
-    // Production vs Development
-    if (url.contains('api.mathlab.app') || url.contains('production')) {
-      return _productionFingerprints;
-    } else if (url.contains('dev') || url.contains('staging')) {
-      return _developmentFingerprints;
-    }
-
-    // Default: return empty (will throw error if not in debug mode)
-    return [];
   }
 
   /// Test SSL connection without throwing exceptions
