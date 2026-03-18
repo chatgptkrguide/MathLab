@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Shapes,
   FileUp,
+  Sparkles,
 } from "lucide-react";
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/problems", label: "문제 관리", icon: FileText, exact: true },
   { href: "/problems/geometry", label: "기하 문제 생성기", icon: Shapes, exact: false },
   { href: "/problems/pdf", label: "PDF 변환", icon: FileUp, exact: false },
+  { href: "/problems/ai", label: "AI 도구", icon: Sparkles, exact: false },
   { href: "/curriculum", label: "커리큘럼 관리", icon: BookOpen, exact: false },
 ];
 
