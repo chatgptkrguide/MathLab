@@ -274,11 +274,12 @@ class AnswerFeedbackOverlay extends StatelessWidget {
           const SizedBox(height: AppDimensions.spacing4),
           ...hints.map((hint) => Padding(
                 padding: const EdgeInsets.only(top: AppDimensions.spacing4),
-                child: Text(
-                  hint,
-                  style: AppTextStyles.bodyMedium.copyWith(
+                child: MathRichText(
+                  text: hint,
+                  textStyle: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
+                  mathFontSize: 16.0,
                 ),
               )),
         ],

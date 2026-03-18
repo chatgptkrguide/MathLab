@@ -10,6 +10,7 @@ import '../../../data/models/problem/problem_model.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
+import '../../../shared/widgets/math/math_renderer.dart';
 import '../../../shared/widgets/input/math_input_field.dart';
 import '../../../shared/widgets/input/drag_and_drop_widget.dart';
 
@@ -108,9 +109,9 @@ class AnswerInput extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-                  child: Text(
-                    option,
-                    style: AppTextStyles.bodyMedium.copyWith(
+                  child: MathRichText(
+                    text: option,
+                    textStyle: AppTextStyles.bodyMedium.copyWith(
                       fontWeight:
                           isSelected || (isAnswerChecked && isThisCorrect)
                               ? FontWeight.w600
@@ -118,6 +119,8 @@ class AnswerInput extends StatelessWidget {
                       color: textColor,
                       fontSize: 15,
                     ),
+                    mathFontSize: 16.0,
+                    mathColor: textColor,
                   ),
                 ),
                 if (trailingIcon != null) ...[

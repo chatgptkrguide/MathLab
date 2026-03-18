@@ -130,12 +130,14 @@ class MathRichText extends StatelessWidget {
   final String text;
   final TextStyle? textStyle;
   final double? mathFontSize;
+  final Color? mathColor;
 
   const MathRichText({
     super.key,
     required this.text,
     this.textStyle,
     this.mathFontSize,
+    this.mathColor,
   });
 
   @override
@@ -151,6 +153,7 @@ class MathRichText extends StatelessWidget {
             latex: part.content,
             textStyle: baseStyle,
             fontSize: mathFontSize,
+            color: mathColor,
           );
         } else {
           return Text(part.content, style: baseStyle);
