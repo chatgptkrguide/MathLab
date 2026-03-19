@@ -377,7 +377,7 @@ export default function AIToolsPage() {
               </div>
 
               {/* Problem List */}
-              <div className="max-h-[600px] overflow-y-auto divide-y divide-gray-50">
+              <div className="max-h-[calc(100vh-340px)] overflow-y-auto divide-y divide-gray-50">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -646,7 +646,7 @@ export default function AIToolsPage() {
                                 rows={3}
                                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none resize-none"
                               />
-                              <div className="mt-2 rounded-lg bg-white border border-gray-100 p-3 text-sm text-gray-700">
+                              <div className="mt-2 rounded-lg bg-white border border-gray-100 p-3 text-sm text-gray-700 overflow-x-auto">
                                 <LatexRenderer text={hint.content} />
                               </div>
                             </div>

@@ -45,7 +45,7 @@ class AnswerInput extends StatelessWidget {
     switch (problem.type) {
       case ProblemType.multipleChoice:
       case ProblemType.trueFalse:
-        return _buildAnswerOptions();
+        return _buildAnswerOptions(context);
 
       case ProblemType.shortAnswer:
       case ProblemType.fillInBlank:
@@ -57,7 +57,7 @@ class AnswerInput extends StatelessWidget {
     }
   }
 
-  Widget _buildAnswerOptions() {
+  Widget _buildAnswerOptions(BuildContext context) {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
@@ -95,16 +95,20 @@ class AnswerInput extends StatelessWidget {
           textColor = const Color(0xFF3D4543);
         }
 
-        return GestureDetector(
-          onTap: () => onSelectAnswer(option),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: borderColor, width: borderWidth),
-            ),
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width - 48,
+          ),
+          child: GestureDetector(
+            onTap: () => onSelectAnswer(option),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: borderColor, width: borderWidth),
+              ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -128,6 +132,7 @@ class AnswerInput extends StatelessWidget {
                   Icon(trailingIcon, color: trailingIconColor, size: 20),
                 ],
               ],
+            ),
             ),
           ),
         );

@@ -97,12 +97,18 @@ class AnswerFeedbackOverlay extends StatelessWidget {
                     ),
                     child: SafeArea(
                       top: false,
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppDimensions.spacing24),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight:
+                              MediaQuery.of(context).size.height * 0.6,
+                        ),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.all(AppDimensions.spacing24),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                             // Drag handle
                             Container(
                               width: AppDimensions.spacing40,
@@ -158,7 +164,9 @@ class AnswerFeedbackOverlay extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ],
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),

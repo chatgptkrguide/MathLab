@@ -38,9 +38,21 @@ export default function LatexRenderer({ text, className = "" }: LatexRendererPro
     return result;
   }, [text]);
 
+  const hasDisplayMode = /\$\$[\s\S]*?\$\$/.test(text);
+
+  if (hasDisplayMode) {
+    return (
+      <div
+        className={`overflow-x-auto max-w-full ${className}`}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rendered) }}
+      />
+    );
+  }
+
   return (
     <span
-      className={className}
+      className={`overflow-x-auto ${className}`}
+      style={{ wordBreak: "break-word" }}
       dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rendered) }}
     />
   );
