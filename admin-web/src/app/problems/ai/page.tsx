@@ -38,6 +38,12 @@ import {
 type TabType = "hints" | "variants";
 type VariantType = "number_change" | "level_up" | "concept_similar";
 
+interface StructuredHint {
+  step: number;
+  label: string;
+  content: string;
+}
+
 interface GeneratedVariant {
   question: string;
   type: string;
@@ -63,8 +69,8 @@ export default function AIToolsPage() {
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("hints");
 
-  // Hint generation
-  const [generatedHints, setGeneratedHints] = useState<string[]>([]);
+  // Hint generation (GoPS 3-Step)
+  const [structuredHints, setStructuredHints] = useState<StructuredHint[]>([]);
   const [hintLoading, setHintLoading] = useState(false);
   const [hintSaved, setHintSaved] = useState(false);
   const [hintError, setHintError] = useState("");
@@ -122,7 +128,7 @@ export default function AIToolsPage() {
 
   const selectProblem = (p: Problem) => {
     setSelectedProblem(p);
-    setGeneratedHints([]);
+    setStructuredHints([]);
     setVariants([]);
     setHintSaved(false);
     setVariantSaved(false);
@@ -131,6 +137,23 @@ export default function AIToolsPage() {
   };
 
   // ==================== HINT GENERATION ====================
+
+  // Detect math topic from lesson title
+  const detectTopic = (): string => {
+    if (!selectedProblem) return "";
+    const lesson = lessons.find((l) => l.id === selectedProblem.lessonId);
+    if (!lesson) return "";
+    const title = lesson.title.toLowerCase();
+    const unit = units.find((u) => u.id === lesson.unitId);
+    const unitTitle = unit?.title?.toLowerCase() || "";
+    const combined = title + " " + unitTitle;
+
+    if (/미분|적분|극한|미적/.test(combined)) return "미적분";
+    if (/기하|도형|좌표|벡터|직선|원|삼각/.test(combined)) return "기하";
+    if (/확률|통계|평균|분산|표준편차/.test(combined)) return "확률/통계";
+    if (/수열|급수|점화/.test(combined)) return "수열";
+    return "대수";
+  };
 
   const generateHints = async () => {
     if (!selectedProblem) return;
@@ -149,12 +172,19 @@ export default function AIToolsPage() {
           correctAnswer: selectedProblem.correctAnswer,
           explanation: selectedProblem.explanation,
           difficulty: selectedProblem.difficulty,
+          topic: detectTopic(),
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "힌트 생성 실패");
-      setGeneratedHints(data.hints);
+      setStructuredHints(
+        data.structuredHints || data.hints.map((h: string, i: number) => ({
+          step: i + 1,
+          label: ["인지 활성화", "전략 제시", "해결 구조"][i] || `Step ${i + 1}`,
+          content: h,
+        }))
+      );
     } catch (err) {
       setHintError(err instanceof Error ? err.message : "힌트 생성 실패");
     }
@@ -162,15 +192,15 @@ export default function AIToolsPage() {
   };
 
   const saveHints = async () => {
-    if (!selectedProblem || generatedHints.length === 0) return;
+    if (!selectedProblem || structuredHints.length === 0) return;
+    const flatHints = structuredHints.map((h) => h.content);
     try {
-      await updateProblem(selectedProblem.id, { hints: generatedHints });
+      await updateProblem(selectedProblem.id, { hints: flatHints });
       setHintSaved(true);
-      // Update local state
-      setSelectedProblem({ ...selectedProblem, hints: generatedHints });
+      setSelectedProblem({ ...selectedProblem, hints: flatHints });
       setProblems((prev) =>
         prev.map((p) =>
-          p.id === selectedProblem.id ? { ...p, hints: generatedHints } : p
+          p.id === selectedProblem.id ? { ...p, hints: flatHints } : p
         )
       );
     } catch (err) {
@@ -496,11 +526,10 @@ export default function AIToolsPage() {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-base font-semibold text-gray-900">
-                          단계별 힌트 생성
+                          GoPS 3-Step 힌트 생성
                         </h3>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          개념 → 적용 → 풀이 순서의 3단계 힌트를 자동
-                          생성합니다
+                          인지 활성화 → 전략 제시 → 해결 구조 (보이게 → 생각하게 → 풀게)
                         </p>
                       </div>
                       <button
@@ -546,57 +575,83 @@ export default function AIToolsPage() {
                       </div>
                     )}
 
-                    {/* Generated Hints */}
-                    {generatedHints.length > 0 && (
+                    {/* Generated Hints - GoPS 3-Step */}
+                    {structuredHints.length > 0 && (
                       <div className="space-y-3">
                         <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          생성된 힌트
+                          GoPS 3-Step 힌트
                         </div>
-                        {generatedHints.map((hint, i) => (
-                          <div
-                            key={i}
-                            className="rounded-lg border border-gray-100 bg-gray-50 p-4"
-                          >
-                            <div className="flex items-center gap-2 mb-2">
-                              <span
-                                className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white ${
-                                  i === 0
-                                    ? "bg-blue-500"
-                                    : i === 1
-                                    ? "bg-amber-500"
-                                    : "bg-red-400"
-                                }`}
-                              >
-                                {i + 1}
-                              </span>
-                              <span className="text-xs font-medium text-gray-500">
-                                {i === 0
-                                  ? "개념 힌트"
-                                  : i === 1
-                                  ? "적용 힌트"
-                                  : "풀이 힌트"}
-                              </span>
-                            </div>
-                            {/* Editable hint */}
-                            <textarea
-                              value={hint}
-                              onChange={(e) => {
-                                const updated = [...generatedHints];
-                                updated[i] = e.target.value;
-                                setGeneratedHints(updated);
-                              }}
-                              rows={2}
-                              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none resize-none"
-                            />
-                            <div className="mt-1 text-xs text-gray-400">
-                              미리보기:{" "}
-                              <LatexRenderer
-                                text={hint}
-                                className="text-gray-700"
+                        {structuredHints.map((hint, i) => {
+                          const stepConfig = [
+                            {
+                              color: "bg-blue-500",
+                              borderColor: "border-blue-200",
+                              bgColor: "bg-blue-50/50",
+                              tagColor: "bg-blue-100 text-blue-700",
+                              desc: "보이게 한다 - 질문으로 끝나야 함",
+                            },
+                            {
+                              color: "bg-amber-500",
+                              borderColor: "border-amber-200",
+                              bgColor: "bg-amber-50/50",
+                              tagColor: "bg-amber-100 text-amber-700",
+                              desc: "생각하게 한다 - ~해보자로 끝나야 함",
+                            },
+                            {
+                              color: "bg-rose-500",
+                              borderColor: "border-rose-200",
+                              bgColor: "bg-rose-50/50",
+                              tagColor: "bg-rose-100 text-rose-700",
+                              desc: "풀게 한다 - 마지막 답만 빼고 scaffold",
+                            },
+                          ][i] || {
+                            color: "bg-gray-500",
+                            borderColor: "border-gray-200",
+                            bgColor: "bg-gray-50",
+                            tagColor: "bg-gray-100 text-gray-700",
+                            desc: "",
+                          };
+
+                          return (
+                            <div
+                              key={i}
+                              className={`rounded-lg border ${stepConfig.borderColor} ${stepConfig.bgColor} p-4`}
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <span
+                                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white ${stepConfig.color}`}
+                                >
+                                  {hint.step}
+                                </span>
+                                <span
+                                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${stepConfig.tagColor}`}
+                                >
+                                  {hint.label}
+                                </span>
+                                <span className="text-[10px] text-gray-400 ml-auto">
+                                  {stepConfig.desc}
+                                </span>
+                              </div>
+                              {/* Editable hint content */}
+                              <textarea
+                                value={hint.content}
+                                onChange={(e) => {
+                                  const updated = [...structuredHints];
+                                  updated[i] = {
+                                    ...updated[i],
+                                    content: e.target.value,
+                                  };
+                                  setStructuredHints(updated);
+                                }}
+                                rows={3}
+                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none resize-none"
                               />
+                              <div className="mt-2 rounded-lg bg-white border border-gray-100 p-3 text-sm text-gray-700">
+                                <LatexRenderer text={hint.content} />
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
 
                         {/* Save Button */}
                         <div className="flex items-center gap-3 pt-2">
