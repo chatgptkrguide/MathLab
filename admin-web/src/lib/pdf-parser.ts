@@ -1,8 +1,9 @@
-import * as pdfjsLib from "pdfjs-dist";
-
-// Worker setup for Next.js
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+async function getPdfjsLib() {
+  const pdfjsLib = await import("pdfjs-dist");
+  if (typeof window !== "undefined") {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+  }
+  return pdfjsLib;
 }
 
 export interface ParsedProblem {
@@ -18,6 +19,7 @@ export interface ParsedProblem {
  * PDF 파일에서 페이지별 텍스트를 추출합니다.
  */
 export async function extractTextFromPdf(file: File): Promise<string[]> {
+  const pdfjsLib = await getPdfjsLib();
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const pages: string[] = [];
