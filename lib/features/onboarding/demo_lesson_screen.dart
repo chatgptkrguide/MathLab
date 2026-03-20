@@ -84,7 +84,7 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
   }
 
   void _selectOption(int index) {
-    if (_answered) return;
+    if (_answered || _selectedOption != null) return;
     setState(() {
       _selectedOption = index;
       _answered = true;

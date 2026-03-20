@@ -21,7 +21,7 @@ class TeamHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+          colors: [Color(0xFF5B8EC9), Color(0xFF61A1D8)],
         ),
       ),
       child: Column(

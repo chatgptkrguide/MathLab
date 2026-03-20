@@ -79,7 +79,10 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
     });
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           '팀',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -186,11 +189,13 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: AppColors.beigPurple,
+              color: AppColors.skyBlue.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Center(
-              child: Text('👥', style: TextStyle(fontSize: 56)),
+            child: Icon(
+              Icons.people_rounded,
+              size: 56,
+              color: AppColors.skyBlue.withValues(alpha: 0.6),
             ),
           ),
         ),
@@ -225,7 +230,7 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
+              backgroundColor: AppColors.skyBlue,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -246,8 +251,8 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
           child: OutlinedButton(
             onPressed: () => _showSearchTeamSheet(context, userId),
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF6366F1),
-              side: const BorderSide(color: Color(0xFF6366F1)),
+              foregroundColor: AppColors.skyBlue,
+              side: BorderSide(color: AppColors.skyBlue),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -577,7 +582,7 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
                     Navigator.pop(context);
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
+              backgroundColor: AppColors.skyBlue,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

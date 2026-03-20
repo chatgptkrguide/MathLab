@@ -58,81 +58,114 @@ class AnswerInput extends StatelessWidget {
   }
 
   Widget _buildAnswerOptions(BuildContext context) {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: problem.options.map((option) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: problem.options.asMap().entries.map((entry) {
+        final index = entry.key;
+        final option = entry.value;
         final isSelected = selectedAnswer == option;
         final isThisCorrect = option == problem.correctAnswer;
 
         Color backgroundColor = Colors.white;
-        Color borderColor = const Color(0xFFE7EEEC);
+        Color borderColor = const Color(0xFFE0E4E3);
         double borderWidth = 1.5;
-        Color textColor = const Color(0xFF7E8381);
+        Color textColor = const Color(0xFF3D4543);
         IconData? trailingIcon;
         Color? trailingIconColor;
+
+        // Option label (A, B, C, D)
+        final optionLabel = String.fromCharCode(65 + index);
 
         if (isAnswerChecked) {
           if (isThisCorrect) {
             backgroundColor = AppColors.mathGreen.withValues(alpha: 0.1);
             borderColor = AppColors.mathGreen;
-            borderWidth = 2.0;
+            borderWidth = 2.5;
             textColor = AppColors.mathGreen;
             trailingIcon = Icons.check_circle_rounded;
             trailingIconColor = AppColors.mathGreen;
           } else if (isSelected && !isCorrect) {
             backgroundColor = AppColors.mathRed.withValues(alpha: 0.1);
             borderColor = AppColors.mathRed;
-            borderWidth = 2.0;
+            borderWidth = 2.5;
             textColor = AppColors.mathRed;
             trailingIcon = Icons.cancel_rounded;
             trailingIconColor = AppColors.mathRed;
+          } else {
+            backgroundColor = Colors.white.withValues(alpha: 0.6);
+            textColor = const Color(0xFFAAAAAA);
+            borderColor = const Color(0xFFEEEEEE);
           }
         } else if (isSelected) {
-          backgroundColor = const Color(0xFFF1F2F1);
+          backgroundColor = const Color(0xFFEDF4FC);
           borderColor = const Color(0xFF61A1D8);
-          borderWidth = 2.0;
-          textColor = const Color(0xFF3D4543);
+          borderWidth = 2.5;
+          textColor = const Color(0xFF2C5F8A);
         }
 
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width - 48,
-          ),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
           child: GestureDetector(
             onTap: () => onSelectAnswer(option),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: borderColor, width: borderWidth),
               ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: MathRichText(
-                    text: option,
-                    textStyle: AppTextStyles.bodyMedium.copyWith(
-                      fontWeight:
-                          isSelected || (isAnswerChecked && isThisCorrect)
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                      color: textColor,
-                      fontSize: 15,
+              child: Row(
+                children: [
+                  // Option label circle
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected && !isAnswerChecked
+                          ? const Color(0xFF61A1D8)
+                          : isAnswerChecked && isThisCorrect
+                              ? AppColors.mathGreen
+                              : isAnswerChecked && isSelected && !isCorrect
+                                  ? AppColors.mathRed
+                                  : const Color(0xFFF0F0F0),
                     ),
-                    mathFontSize: 16.0,
-                    mathColor: textColor,
+                    child: Center(
+                      child: Text(
+                        optionLabel,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: (isSelected && !isAnswerChecked) ||
+                                  (isAnswerChecked && (isThisCorrect || (isSelected && !isCorrect)))
+                              ? Colors.white
+                              : const Color(0xFF999999),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                if (trailingIcon != null) ...[
-                  const SizedBox(width: 6),
-                  Icon(trailingIcon, color: trailingIconColor, size: 20),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: MathRichText(
+                      text: option,
+                      textStyle: AppTextStyles.bodyMedium.copyWith(
+                        fontWeight:
+                            isSelected || (isAnswerChecked && isThisCorrect)
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                        color: textColor,
+                        fontSize: 16,
+                      ),
+                      mathFontSize: 18.0,
+                      mathColor: textColor,
+                    ),
+                  ),
+                  if (trailingIcon != null)
+                    Icon(trailingIcon, color: trailingIconColor, size: 22),
                 ],
-              ],
-            ),
+              ),
             ),
           ),
         );
