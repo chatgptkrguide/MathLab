@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/layout/admin-layout";
 import { bulkCreateProblems, getUnits, getLessons } from "@/lib/firestore";
