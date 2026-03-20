@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 interface HintRequest {
   question: string;
@@ -119,7 +121,7 @@ ${body.topic ? `- 수학 분야: ${body.topic}` : ""}
 
 위 문제에 대해 GoPS 3-Step 힌트를 생성해주세요.`;
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
