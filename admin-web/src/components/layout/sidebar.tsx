@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
 import {
   LayoutDashboard,
   FileText,
   BookOpen,
-  LogOut,
   GraduationCap,
   Shapes,
   FileUp,
@@ -25,7 +23,6 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-200 bg-white">
@@ -60,20 +57,6 @@ export default function Sidebar() {
             );
           })}
         </nav>
-
-        {/* User / Logout */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="mb-2 truncate text-xs text-gray-500">
-            {user?.email}
-          </div>
-          <button
-            onClick={signOut}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            로그아웃
-          </button>
-        </div>
       </div>
     </aside>
   );
