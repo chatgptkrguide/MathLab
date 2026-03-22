@@ -7,6 +7,7 @@ import '../../../data/models/wrong_answer_model.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
 import '../../../shared/constants/app_text_styles.dart';
+import '../../../shared/widgets/math/math_renderer.dart';
 
 class WrongAnswerCard extends StatelessWidget {
   final WrongAnswerModel wrongAnswer;
@@ -96,15 +97,19 @@ class WrongAnswerCard extends StatelessWidget {
                       // Top row: type badge + status + difficulty
                       _buildTopRow(),
                       const SizedBox(height: AppDimensions.spacing12),
-                      // Problem text preview
-                      Text(
-                        wrongAnswer.problemText,
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w500,
-                          height: 1.4,
+                      // Problem text preview (with math rendering)
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 48),
+                        child: ClipRect(
+                          child: MathRichText(
+                            text: wrongAnswer.problemText,
+                            textStyle: AppTextStyles.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w500,
+                              height: 1.4,
+                            ),
+                            mathFontSize: 18.0,
+                          ),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: AppDimensions.spacing12),
                       // Answer comparison (compact)
@@ -246,14 +251,14 @@ class WrongAnswerCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    wrongAnswer.userAnswer,
-                    style: AppTextStyles.bodySmall.copyWith(
+                  child: MathRichText(
+                    text: wrongAnswer.userAnswer,
+                    textStyle: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.mathRed,
                       fontWeight: FontWeight.w500,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    mathFontSize: 14.0,
+                    mathColor: AppColors.mathRed,
                   ),
                 ),
               ],
@@ -287,14 +292,14 @@ class WrongAnswerCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    wrongAnswer.correctAnswer,
-                    style: AppTextStyles.bodySmall.copyWith(
+                  child: MathRichText(
+                    text: wrongAnswer.correctAnswer,
+                    textStyle: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.mathGreen,
                       fontWeight: FontWeight.w500,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    mathFontSize: 14.0,
+                    mathColor: AppColors.mathGreen,
                   ),
                 ),
               ],
@@ -322,14 +327,18 @@ class WrongAnswerCard extends StatelessWidget {
           ),
           const SizedBox(width: AppDimensions.spacing8),
           Expanded(
-            child: Text(
-              wrongAnswer.explanation!,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.4,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 60),
+              child: ClipRect(
+                child: MathRichText(
+                  text: wrongAnswer.explanation!,
+                  textStyle: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                  mathFontSize: 14.0,
+                ),
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
