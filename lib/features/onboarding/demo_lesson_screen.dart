@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
+import '../../shared/widgets/math/math_renderer.dart';
 
 /// Data class for demo problems (no Firebase dependency)
 class DemoProblem {
@@ -169,16 +170,17 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
 
                   const Spacer(flex: 2),
 
-                  // Question
-                  Text(
-                    problem.question,
-                    style: const TextStyle(
+                  // Question (with math rendering)
+                  MathRichText(
+                    text: problem.question,
+                    textStyle: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       letterSpacing: 2,
                     ),
-                    textAlign: TextAlign.center,
+                    mathFontSize: 36.0,
+                    mathColor: Colors.white,
                   ),
 
                   const Spacer(flex: 2),
@@ -233,13 +235,15 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
                           child: Row(
                             children: [
                               Expanded(
-                                child: Text(
-                                  problem.options[i],
-                                  style: TextStyle(
+                                child: MathRichText(
+                                  text: problem.options[i],
+                                  textStyle: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                     color: textColor,
                                   ),
+                                  mathFontSize: 20.0,
+                                  mathColor: textColor,
                                 ),
                               ),
                               if (_answered && isCorrect)
@@ -269,13 +273,15 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
                               color: Colors.white.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Text(
-                              problem.explanation,
-                              style: const TextStyle(
+                            child: MathRichText(
+                              text: problem.explanation,
+                              textStyle: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
                                 height: 1.4,
                               ),
+                              mathFontSize: 16.0,
+                              mathColor: Colors.white,
                             ),
                           ),
                           const SizedBox(height: 16),

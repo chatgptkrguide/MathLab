@@ -8,6 +8,7 @@ import '../../../data/models/lesson/unit_model.dart';
 import '../../../data/models/lesson/lesson_model.dart';
 import '../../../data/providers/admin/admin_problem_provider.dart';
 import '../../../data/providers/curriculum/curriculum_provider.dart';
+import '../../../shared/widgets/math/math_renderer.dart';
 import 'problem_form_screen.dart';
 
 class AdminProblemListScreen extends ConsumerStatefulWidget {
@@ -285,14 +286,18 @@ class _AdminProblemCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Question text
-              Text(
-                problem.question,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.titleSmall.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
+              // Question text (with math rendering)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 44),
+                child: ClipRect(
+                  child: MathRichText(
+                    text: problem.question,
+                    textStyle: AppTextStyles.titleSmall.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    mathFontSize: 16.0,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimensions.spacing8),
