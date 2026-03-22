@@ -213,7 +213,7 @@ class _HintPopupState extends State<HintPopup> {
 
   Widget _buildHintItem(int index) {
     final isUnlocked = widget.unlockedHints.contains(index);
-    final canUnlock = widget.userXp >= widget.xpCost;
+    final canUnlock = true; // Hints are free
     final isFirstLocked = !isUnlocked &&
         (index == 0 || widget.unlockedHints.contains(index - 1));
 
@@ -346,18 +346,12 @@ class _HintPopupState extends State<HintPopup> {
                 ),
               ),
               const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.diamond, size: 14, color: Colors.grey[500]),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${widget.xpCost} XP로 잠금 해제',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
+              Text(
+                '탭하여 힌트 보기',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
               ),
             ],
           ),

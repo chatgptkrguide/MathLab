@@ -233,17 +233,9 @@ class ProblemSolvingController {
     return result;
   }
 
-  /// Unlock a hint (deducts XP via hintProvider)
+  /// Unlock a hint (currently free)
   Future<bool> unlockHint(ProblemModel problem, int hintIndex) async {
-    final user = ref.read(userProvider);
-    if (user == null) return false;
-
-    if (user.xp < hintXpCost) {
-      return false;
-    }
-
-    await ref.read(hintProvider.notifier).unlockHint(problem, hintIndex);
-    return true;
+    return await ref.read(hintProvider.notifier).unlockHint(problem, hintIndex);
   }
 }
 

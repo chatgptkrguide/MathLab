@@ -168,24 +168,13 @@ class _HintButtonState extends State<HintButton>
                               color: AppColors.mathOrange.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.diamond,
-                                  size: 10,
-                                  color: AppColors.mathOrange,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '${widget.xpCost}',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.mathOrange,
-                                  ),
-                                ),
-                              ],
+                            child: const Text(
+                              '무료',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.mathOrange,
+                              ),
                             ),
                           ),
                         ],

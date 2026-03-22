@@ -4,7 +4,6 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/problem/problem_model.dart';
-import '../user/user_provider.dart';
 
 /// Hint state
 class HintState {
@@ -31,35 +30,23 @@ class HintState {
   }
 }
 
-/// Hint notifier with XP cost system
+/// Hint notifier (free unlock)
 class HintNotifier extends StateNotifier<HintState> {
-  final Ref _ref;
+  /// Cost in XP to unlock a hint (0 = free)
+  static const int hintCost = 0;
 
-  /// Cost in XP to unlock a hint
-  static const int hintCost = 20;
+  HintNotifier(Ref ref) : super(const HintState());
 
-  HintNotifier(this._ref) : super(const HintState());
-
-  /// Unlock a hint for a problem
+  /// Unlock a hint for a problem (currently free)
   Future<bool> unlockHint(ProblemModel problem, int hintIndex) async {
     final hintKey = '${problem.id}_$hintIndex';
 
     // Already unlocked
     if (state.unlockedHints.contains(hintKey)) return true;
 
-    // Check user XP
-    final user = _ref.read(userProvider);
-    if (user == null || user.xp < hintCost) {
-      state = state.copyWith(error: 'XP가 부족합니다');
-      return false;
-    }
-
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // Deduct XP
-      await _ref.read(userProvider.notifier).addXp(-hintCost);
-
       // Update unlocked hints
       final updatedHints = {...state.unlockedHints, hintKey};
       state = state.copyWith(
