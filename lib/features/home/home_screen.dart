@@ -6,6 +6,7 @@ import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/gamification/daily_reward_provider.dart';
 import '../../shared/widgets/daily_reward_dialog.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
+import '../../shared/widgets/coach_mark/coach_mark_controller.dart';
 import '../../shared/widgets/indicators/circular_progress_ring.dart';
 import '../settings/settings_screen.dart';
 import '../lessons/lessons_screen.dart';
@@ -37,12 +38,17 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     });
   }
 
-  void _checkAndShowRewardDialog() {
+  Future<void> _checkAndShowRewardDialog() async {
     if (_dialogShown) return;
+
+    // 코치마크 온보딩이 완료되지 않았으면 보상 다이얼로그를 표시하지 않음
+    final coachMarkDone = await CoachMarkController.isCompleted();
+    if (!coachMarkDone || !mounted) return;
+
     final rewardState = ref.read(dailyRewardProvider);
     if (!rewardState.isLoading && rewardState.shouldShowDialog) {
       _dialogShown = true;
-      DailyRewardDialog.show(context);
+      if (mounted) DailyRewardDialog.show(context);
     }
   }
 
