@@ -59,12 +59,6 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     final steps = [
       // ──── 홈 화면 (탭 2) ────
       CoachMarkStep(
-        targetKey: HomeScreenFigma.streakBadgeKey,
-        title: '연속 학습 스트릭',
-        description: '매일 접속하면 스트릭이 쌓여요.\n스트릭을 유지하면 보너스 보상을 받을 수 있어요!',
-        arrowDirection: ArrowDirection.up,
-      ),
-      CoachMarkStep(
         targetKey: HomeScreenFigma.todayGoalKey,
         title: '오늘의 학습 목표',
         description: '하루 목표 XP를 달성하면 스트릭이 유지됩니다.\n진행률 바에서 달성도를 확인하세요.',
@@ -82,12 +76,6 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         description: '문제를 풀면 XP를 획득하고, XP가 쌓이면\n레벨이 올라갑니다. 스트릭으로 꾸준함을 확인하세요.',
         arrowDirection: ArrowDirection.down,
       ),
-      CoachMarkStep(
-        targetKey: HomeScreenFigma.subjectRowKey,
-        title: '과목 선택',
-        description: '대수, 기하, 통계 등 다양한 수학 과목을\n선택해서 학습할 수 있어요.',
-        arrowDirection: ArrowDirection.down,
-      ),
 
       // ──── 학습 화면 (탭 0) ────
       CoachMarkStep(
@@ -96,24 +84,6 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         description: '단계별로 구성된 학습 노드입니다.\n잠금 해제된 노드를 탭하면 문제 풀이가 시작돼요.',
         arrowDirection: ArrowDirection.up,
         tabIndex: 0,
-      ),
-
-      // ──── 오답노트 화면 (탭 1) ────
-      CoachMarkStep(
-        targetKey: WrongAnswerScreen.wrongAnswerHeaderKey,
-        title: '오답 노트',
-        description: '틀린 문제가 자동으로 저장됩니다.\n오답을 복습하면 실력이 빠르게 향상돼요!',
-        arrowDirection: ArrowDirection.up,
-        tabIndex: 1,
-      ),
-
-      // ──── 프로필 화면 (탭 3) ────
-      CoachMarkStep(
-        targetKey: ProfileDetailScreen.profileCardKey,
-        title: '나의 프로필',
-        description: '프로필 사진, 레벨, 리그 진행 상황을\n한눈에 확인하고 편집할 수 있어요.',
-        arrowDirection: ArrowDirection.up,
-        tabIndex: 3,
       ),
 
       // ──── 하단 메뉴 (홈 복귀) ────

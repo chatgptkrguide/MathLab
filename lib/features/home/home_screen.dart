@@ -453,9 +453,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     // 전체 접근이면 대표 과목 2개만 표시
     final displaySubjects = subjects.isEmpty
         ? ['공통수학1', '공통수학2']
-        : subjects.length > 2
-            ? subjects.sublist(0, 2)
-            : subjects;
+        : subjects.take(2).toList();
 
     final subjectStyles = {
       '기초수학': (Icons.calculate_rounded, AppColors.mathGreen, const Color(0xFFE8FFE0)),
@@ -534,7 +532,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF3C283),
+          color: AppColors.gold,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

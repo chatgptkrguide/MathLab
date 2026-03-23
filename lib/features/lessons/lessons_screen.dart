@@ -90,6 +90,23 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     super.dispose();
   }
 
+  List<UnitModel> _filterUnitsByGrade(List<UnitModel> units) {
+    final user = ref.read(userProvider);
+    final grade = user?.currentGrade ?? '중1';
+    final allowedSubjects = GradeCurriculumMap.getSubjectsForGrade(grade);
+    if (GradeCurriculumMap.hasFullAccess(grade)) return units;
+    return units.where((u) => allowedSubjects.contains(u.subject)).toList();
+  }
+
+  List<String> _getFilteredSubjects(List<UnitModel> units) {
+    final filtered = _filterUnitsByGrade(units);
+    final subjects = <String>{};
+    for (final u in filtered) {
+      subjects.add(u.subject);
+    }
+    return subjects.toList();
+  }
+
   // Firestore subject 값 → 표시 이름
   static const _subjectLabels = {
     '공통수학1': '공통수학1',
@@ -164,16 +181,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               ),
               data: (allUnits) {
                 // Filter units by user's grade
-                final grade = user?.currentGrade ?? '중1';
-                final allowedSubjects =
-                    GradeCurriculumMap.getSubjectsForGrade(grade);
-                final gradeFilteredUnits =
-                    GradeCurriculumMap.hasFullAccess(grade)
-                        ? allUnits
-                        : allUnits
-                            .where(
-                                (u) => allowedSubjects.contains(u.subject))
-                            .toList();
+                final gradeFilteredUnits = _filterUnitsByGrade(allUnits);
 
                 final units = _selectedSubject == null
                     ? gradeFilteredUnits
@@ -227,22 +235,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
   }
 
   Widget _buildBlueHeader(AsyncValue<List<UnitModel>> curriculumAsync) {
-    // Filter subjects by user's grade
-    final user = ref.read(userProvider);
-    final grade = user?.currentGrade ?? '중1';
-    final allowedSubjects = GradeCurriculumMap.getSubjectsForGrade(grade);
-    final fullAccess = GradeCurriculumMap.hasFullAccess(grade);
-
     // Firestore에서 가져온 유닛들의 subject 목록 (학년 필터 적용)
-    final subjects = <String>[];
     final allUnits = curriculumAsync.valueOrNull ?? [];
-    for (final u in allUnits) {
-      if (!subjects.contains(u.subject)) {
-        if (fullAccess || allowedSubjects.contains(u.subject)) {
-          subjects.add(u.subject);
-        }
-      }
-    }
+    final subjects = _getFilteredSubjects(allUnits);
 
     return Container(
       decoration: const BoxDecoration(

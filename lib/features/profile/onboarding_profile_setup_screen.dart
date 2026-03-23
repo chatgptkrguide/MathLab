@@ -41,6 +41,7 @@ class _OnboardingProfileSetupScreenState
   }
 
   void _nextPage() {
+    if (!mounted) return;
     AppLogger.info('_nextPage called: current=$_currentPage, total=$_totalPages',
         tag: 'OnboardingProfileSetup');
     if (_currentPage < _totalPages - 1) {

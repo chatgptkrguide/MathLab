@@ -115,10 +115,21 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
           _waitAndShow(targetStep, retries + 1);
           return;
         }
-        // 5회 재시도 후에도 못 찾으면 다음 스텝으로 건너뜀
-        if (targetStep > _currentStep && targetStep < widget.steps.length - 1) {
-          _currentStep = targetStep;
-          _nextStep();
+        // 재시도 실패: 해당 스텝 건너뛰기
+        final nextTarget = targetStep + 1;
+        if (nextTarget < widget.steps.length) {
+          setState(() => _currentStep = nextTarget);
+          // 다음 스텝도 탭 전환이 필요하면 처리
+          final nextStep = widget.steps[nextTarget];
+          if (nextStep.tabIndex != null) {
+            widget.onTabChange?.call(nextStep.tabIndex!);
+            _waitAndShow(nextTarget);
+          } else {
+            _animController.forward();
+          }
+        } else {
+          // 마지막이면 온보딩 완료
+          widget.onComplete();
         }
         return;
       }

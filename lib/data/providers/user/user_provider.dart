@@ -1,3 +1,4 @@
+// TODO: null 체크 전략 통일 - 필수 작업은 Exception, 선택적 작업은 return
 // 👤 User Provider
 //
 // Manages user data operations with Firestore integration.

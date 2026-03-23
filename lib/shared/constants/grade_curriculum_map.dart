@@ -26,6 +26,12 @@ class GradeCurriculumMap {
       case '성인':
         return []; // empty list = full access
       default:
+        // Unknown grade - log and return default
+        assert(() {
+          // ignore: avoid_print
+          print('[GradeCurriculumMap] Unknown grade: "$grade", defaulting to 공통수학1');
+          return true;
+        }());
         return ['공통수학1'];
     }
   }

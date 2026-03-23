@@ -1,3 +1,4 @@
+// TODO: 위젯 분리 필요 - ProfileCard, StreakCard, SubjectSection, BadgesSection, StatisticsSection
 // Profile Detail Screen — Figma "05" 디자인
 // 프로필 카드 + 통계 + 스트릭 + 과목 + 뱃지 + 통계 그리드 + 프리미엄 배너
 
