@@ -243,6 +243,7 @@ class _OnboardingProfileSetupScreenState
                             setState(() {
                               _selectedGrade = grade;
                             });
+                            Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
                         const SizedBox(height: 10),
@@ -257,6 +258,7 @@ class _OnboardingProfileSetupScreenState
                             setState(() {
                               _selectedGrade = grade;
                             });
+                            Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
                         const SizedBox(height: 10),
@@ -271,6 +273,7 @@ class _OnboardingProfileSetupScreenState
                             setState(() {
                               _selectedGrade = grade;
                             });
+                            Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
                         const SizedBox(height: 10),
@@ -285,6 +288,7 @@ class _OnboardingProfileSetupScreenState
                             setState(() {
                               _selectedGrade = grade;
                             });
+                            Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
                       ],
