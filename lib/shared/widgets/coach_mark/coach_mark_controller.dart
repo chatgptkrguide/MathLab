@@ -70,11 +70,6 @@ class CoachMarkController {
           await markCompleted();
           onComplete?.call();
         },
-        onSkip: () async {
-          entry.remove();
-          await markCompleted();
-          onComplete?.call();
-        },
         onTabChange: onTabChange,
       ),
     );

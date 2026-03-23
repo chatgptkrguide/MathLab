@@ -27,14 +27,12 @@ enum ArrowDirection { up, down, left, right }
 class CoachMarkOverlay extends StatefulWidget {
   final List<CoachMarkStep> steps;
   final VoidCallback onComplete;
-  final VoidCallback? onSkip;
   final ValueChanged<int>? onTabChange;
 
   const CoachMarkOverlay({
     super.key,
     required this.steps,
     required this.onComplete,
-    this.onSkip,
     this.onTabChange,
   });
 
@@ -153,38 +151,28 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
             if (targetRect != null)
               _buildTooltip(targetRect, step, screenSize),
 
-            // Skip button (top right)
+            // Step counter (top right)
             Positioned(
-              top: MediaQuery.of(context).padding.top + 12,
-              right: 16,
-              child: GestureDetector(
-                onTap: widget.onSkip ?? widget.onComplete,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    '건너뛰기',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+              top: MediaQuery.of(context).padding.top + 16,
+              right: 20,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${_currentStep + 1} / ${widget.steps.length}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
 
-            // Step indicator (bottom)
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 24,
-              left: 0,
-              right: 0,
-              child: _buildStepIndicator(),
-            ),
           ],
         ),
       ),
@@ -325,40 +313,6 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
     );
   }
 
-  Widget _buildStepIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          '${_currentStep + 1} / ${widget.steps.length}',
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Progress dots
-        ...List.generate(widget.steps.length, (index) {
-          final isActive = index == _currentStep;
-          final isPast = index < _currentStep;
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            width: isActive ? 24 : 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: isActive
-                  ? AppColors.mathBlue
-                  : isPast
-                      ? Colors.white.withValues(alpha: 0.6)
-                      : Colors.white.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          );
-        }),
-      ],
-    );
-  }
 }
 
 /// Spotlight painter - draws dark overlay with a cutout around the target
