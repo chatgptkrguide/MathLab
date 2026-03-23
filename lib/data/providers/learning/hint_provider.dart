@@ -81,7 +81,3 @@ final hintProvider =
   (ref) => HintNotifier(ref),
 );
 
-// Backward compatibility aliases
-typedef HintStateOptimized = HintState;
-typedef HintProviderOptimized = HintNotifier;
-final hintProviderOptimized = hintProvider;

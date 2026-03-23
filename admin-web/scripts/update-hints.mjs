@@ -238,8 +238,15 @@ async function updateHints() {
 
   for (const docSnap of snapshot.docs) {
     const data = docSnap.data();
-    const question = data.question || "";
+    const question = data.question;
     const existingHints = data.hints || [];
+
+    // question이 없는 문제는 건너뜀
+    if (!question || typeof question !== "string" || question.trim() === "") {
+      console.log(`  ⚠️  question 필드 누락: ${docSnap.id}`);
+      noMatch++;
+      continue;
+    }
 
     // 이미 hints가 있고 force 모드가 아니면 건너뜀
     if (existingHints.length > 0 && !forceUpdate) {

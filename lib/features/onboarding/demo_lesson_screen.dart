@@ -31,22 +31,22 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
     with SingleTickerProviderStateMixin {
   static const _problems = [
     DemoProblem(
-      question: '3 + 5 = ?',
+      question: r'$3 + 5 = ?$',
       options: ['6', '7', '8', '9'],
       correctIndex: 2,
-      explanation: '3과 5를 더하면 8입니다.',
+      explanation: r'$3 + 5 = 8$입니다.',
     ),
     DemoProblem(
-      question: '12 - 7 = ?',
+      question: r'$12 - 7 = ?$',
       options: ['4', '5', '6', '3'],
       correctIndex: 1,
-      explanation: '12에서 7을 빼면 5입니다.',
+      explanation: r'$12 - 7 = 5$입니다.',
     ),
     DemoProblem(
-      question: '4 × 3 = ?',
+      question: r'$4 \times 3 = ?$',
       options: ['10', '11', '12', '14'],
       correctIndex: 2,
-      explanation: '4에 3을 곱하면 12입니다.',
+      explanation: r'$4 \times 3 = 12$입니다.',
     ),
     DemoProblem(
       question: '다음 중 소수는?',

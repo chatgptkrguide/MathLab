@@ -27,8 +27,6 @@ class ProblemSolvingController {
     required this.lessonTitle,
   });
 
-  int get hintXpCost => HintNotifier.hintCost;
-
   ProblemSessionModel initializeSession(List<ProblemModel> problems) {
     final user = ref.read(userProvider);
     return ProblemSessionModel(
@@ -164,7 +162,7 @@ class ProblemSolvingController {
       question: problem.question,
       correctAnswer: problem.correctAnswer,
       userAnswer: userAnswer,
-      hint: problem.hint,
+      hint: problem.allHints.isNotEmpty ? problem.allHints.first : problem.hint,
       explanation: problem.explanation,
       attemptDate: DateTime.now(),
       isResolved: false,

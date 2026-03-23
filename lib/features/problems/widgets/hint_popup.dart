@@ -9,8 +9,6 @@ import '../../../shared/widgets/math/math_renderer.dart';
 class HintPopup extends StatefulWidget {
   final List<String> hints;
   final Set<int> unlockedHints;
-  final int userXp;
-  final int xpCost;
   final Function(int) onUnlockHint;
   final VoidCallback onClose;
 
@@ -18,8 +16,6 @@ class HintPopup extends StatefulWidget {
     super.key,
     required this.hints,
     required this.unlockedHints,
-    required this.userXp,
-    this.xpCost = 10,
     required this.onUnlockHint,
     required this.onClose,
   });
@@ -31,8 +27,6 @@ class HintPopup extends StatefulWidget {
     required BuildContext context,
     required List<String> hints,
     required Set<int> unlockedHints,
-    required int userXp,
-    int xpCost = 10,
     required Function(int) onUnlockHint,
   }) {
     return showGeneralDialog(
@@ -41,17 +35,15 @@ class HintPopup extends StatefulWidget {
       barrierLabel: 'Hint Popup',
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
         return HintPopup(
           hints: hints,
           unlockedHints: unlockedHints,
-          userXp: userXp,
-          xpCost: xpCost,
           onUnlockHint: onUnlockHint,
-          onClose: () => Navigator.of(context).pop(),
+          onClose: () => Navigator.of(dialogContext).pop(),
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
+      transitionBuilder: (_, animation, secondaryAnimation, child) {
         return ScaleTransition(
           scale: CurvedAnimation(
             parent: animation,
@@ -165,30 +157,6 @@ class _HintPopupState extends State<HintPopup> {
               ],
             ),
           ),
-          // XP indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.diamond, color: Colors.white, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  '${widget.userXp}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
           // Close button
           GestureDetector(
             onTap: widget.onClose,
@@ -213,7 +181,6 @@ class _HintPopupState extends State<HintPopup> {
 
   Widget _buildHintItem(int index) {
     final isUnlocked = widget.unlockedHints.contains(index);
-    final canUnlock = true; // Hints are free
     final isFirstLocked = !isUnlocked &&
         (index == 0 || widget.unlockedHints.contains(index - 1));
 
@@ -236,7 +203,7 @@ class _HintPopupState extends State<HintPopup> {
         ),
         child: isUnlocked
             ? _buildUnlockedHint(index)
-            : _buildLockedHint(index, canUnlock && isFirstLocked),
+            : _buildLockedHint(index, isFirstLocked),
       ),
     );
   }

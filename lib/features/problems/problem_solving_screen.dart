@@ -296,7 +296,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     );
   }
 
-  void _showHintPopup(ProblemModel problem, int userXp) {
+  void _showHintPopup(ProblemModel problem) {
     _initController();
     final hints = problem.allHints;
     if (hints.isEmpty) return;
@@ -309,8 +309,6 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
       context: context,
       hints: hints,
       unlockedHints: unlockedSet,
-      userXp: userXp,
-      xpCost: _controller.hintXpCost,
       onUnlockHint: (index) => _unlockHint(problem, index),
     );
   }
@@ -323,8 +321,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text('XP가 부족합니다. (필요: ${_controller.hintXpCost} XP)'),
+            content: const Text('힌트를 해제할 수 없습니다.'),
             backgroundColor: Colors.red[400],
             behavior: SnackBarBehavior.floating,
           ),
@@ -335,8 +332,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
 
     if (mounted) {
       Navigator.of(context).pop();
-      final updatedUser = ref.read(userProvider);
-      _showHintPopup(problem, updatedUser?.xp ?? 0);
+      _showHintPopup(problem);
     }
   }
 
@@ -378,8 +374,6 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     final problemNumber =
         '${session!.currentProblemIndex + 1}'.padLeft(2, '0');
 
-    final user = ref.watch(userProvider);
-    final userXp = user?.xp ?? 0;
     final hintState = ref.watch(hintProvider);
     final hints = currentProblem.allHints;
     final unlockedCount = _controller.getUnlockedCount(
@@ -425,9 +419,8 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                       currentProblem: currentProblem,
                       unlockedHintCount: unlockedCount,
                       totalHints: hints.length,
-                      hintXpCost: _controller.hintXpCost,
                       onHintTap: () =>
-                          _showHintPopup(currentProblem, userXp),
+                          _showHintPopup(currentProblem),
                     ),
 
                     // Question + answer area

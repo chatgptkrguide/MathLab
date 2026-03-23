@@ -157,27 +157,29 @@ class _HintButtonState extends State<HintButton>
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        if (!hasUnlockedAll) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.mathOrange.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              '무료',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.mathOrange,
-                              ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: hasUnlockedAll
+                                ? AppColors.mathGreen.withValues(alpha: 0.15)
+                                : AppColors.mathOrange.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            hasUnlockedAll ? '완료' : '무료',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: hasUnlockedAll
+                                  ? AppColors.mathGreen
+                                  : AppColors.mathOrange,
                             ),
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ],

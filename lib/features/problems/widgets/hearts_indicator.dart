@@ -19,7 +19,6 @@ class HeartsIndicator extends StatelessWidget {
   final ProblemModel? currentProblem;
   final int unlockedHintCount;
   final int totalHints;
-  final int hintXpCost;
   final VoidCallback onHintTap;
 
   const HeartsIndicator({
@@ -32,7 +31,6 @@ class HeartsIndicator extends StatelessWidget {
     required this.currentProblem,
     required this.unlockedHintCount,
     required this.totalHints,
-    required this.hintXpCost,
     required this.onHintTap,
   });
 
@@ -52,7 +50,7 @@ class HeartsIndicator extends StatelessWidget {
             HintButton(
               unlockedCount: unlockedHintCount,
               totalHints: totalHints,
-              xpCost: hintXpCost,
+              xpCost: 0,
               isEnabled: !isAnswerChecked,
               onTap: onHintTap,
             )

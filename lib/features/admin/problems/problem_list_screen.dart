@@ -287,18 +287,13 @@ class _AdminProblemCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Question text (with math rendering)
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 44),
-                child: ClipRect(
-                  child: MathRichText(
-                    text: problem.question,
-                    textStyle: AppTextStyles.titleSmall.copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    mathFontSize: 16.0,
-                  ),
+              MathRichText(
+                text: problem.question,
+                textStyle: AppTextStyles.titleSmall.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
                 ),
+                mathFontSize: 16.0,
               ),
               const SizedBox(height: AppDimensions.spacing8),
               // Chips row
