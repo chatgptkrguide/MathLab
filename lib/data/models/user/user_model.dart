@@ -41,6 +41,9 @@ class UserModel {
   final int streakFreezes;
   final DateTime? lastFreezeUsedAt;
 
+  // Grade
+  final String currentGrade;
+
   // Settings
   final String preferredLanguage;
   final bool notificationsEnabled;
@@ -83,6 +86,7 @@ class UserModel {
     this.achievements = const [],
     this.streakFreezes = 0,
     this.lastFreezeUsedAt,
+    this.currentGrade = '중1',
     this.preferredLanguage = 'ko',
     this.notificationsEnabled = true,
     this.soundEnabled = true,
@@ -179,6 +183,7 @@ class UserModel {
       lastFreezeUsedAt: data['lastFreezeUsedAt'] != null
           ? (data['lastFreezeUsedAt'] as Timestamp).toDate()
           : null,
+      currentGrade: data['currentGrade'] as String? ?? '중1',
       preferredLanguage: data['preferredLanguage'] ?? 'ko',
       notificationsEnabled: data['notificationsEnabled'] ?? true,
       soundEnabled: data['soundEnabled'] ?? true,
@@ -225,6 +230,7 @@ class UserModel {
       'achievements': achievements,
       'streakFreezes': streakFreezes,
       'lastFreezeUsedAt': lastFreezeUsedAt != null ? Timestamp.fromDate(lastFreezeUsedAt!) : null,
+      'currentGrade': currentGrade,
       'preferredLanguage': preferredLanguage,
       'notificationsEnabled': notificationsEnabled,
       'soundEnabled': soundEnabled,
@@ -268,6 +274,7 @@ class UserModel {
       'achievements': achievements,
       'streakFreezes': streakFreezes,
       'lastFreezeUsedAt': lastFreezeUsedAt?.toIso8601String(),
+      'currentGrade': currentGrade,
       'preferredLanguage': preferredLanguage,
       'notificationsEnabled': notificationsEnabled,
       'soundEnabled': soundEnabled,
@@ -313,6 +320,7 @@ class UserModel {
     List<String>? achievements,
     int? streakFreezes,
     DateTime? lastFreezeUsedAt,
+    String? currentGrade,
     String? preferredLanguage,
     bool? notificationsEnabled,
     bool? soundEnabled,
@@ -352,6 +360,7 @@ class UserModel {
       achievements: achievements ?? this.achievements,
       streakFreezes: streakFreezes ?? this.streakFreezes,
       lastFreezeUsedAt: lastFreezeUsedAt ?? this.lastFreezeUsedAt,
+      currentGrade: currentGrade ?? this.currentGrade,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       soundEnabled: soundEnabled ?? this.soundEnabled,

@@ -106,7 +106,7 @@ class _OnboardingProfileSetupScreenState
           tag: 'OnboardingProfileSetupScreen');
 
       // Provider를 통해 직접 프로필 저장 (AuthWrapper 자동 리빌드)
-      await ref.read(userProvider.notifier).updateProfile(displayName: name);
+      await ref.read(userProvider.notifier).updateProfile(displayName: name, currentGrade: _selectedGrade);
 
       if (!mounted) return;
       HapticFeedback.heavyImpact();

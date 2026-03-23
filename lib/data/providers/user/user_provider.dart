@@ -112,6 +112,7 @@ class User extends _$User {
     String? displayName,
     String? photoUrl,
     String? phoneNumber,
+    String? currentGrade,
   }) async {
     if (state == null) {
       throw const DataException(message: '사용자 정보가 없습니다');
@@ -124,6 +125,7 @@ class User extends _$User {
         displayName: displayName,
         photoUrl: photoUrl,
         phoneNumber: phoneNumber,
+        currentGrade: currentGrade,
         updatedAt: DateTime.now(),
       );
 
@@ -434,6 +436,7 @@ class User extends _$User {
           achievements: state!.achievements,
           streakFreezes: state!.streakFreezes,
           lastFreezeUsedAt: state!.lastFreezeUsedAt,
+          currentGrade: state!.currentGrade,
           preferredLanguage: state!.preferredLanguage,
           notificationsEnabled: state!.notificationsEnabled,
           soundEnabled: state!.soundEnabled,
