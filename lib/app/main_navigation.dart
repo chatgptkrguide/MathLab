@@ -72,13 +72,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         targetKey: HomeScreenFigma.statsRowKey,
         title: '나의 학습 현황',
         description: 'XP(경험치), 레벨, 연속 학습일을\n한눈에 확인할 수 있어요.',
-        arrowDirection: ArrowDirection.up,
-      ),
-      CoachMarkStep(
-        targetKey: HomeScreenFigma.dailyChallengeKey,
-        title: '데일리 챌린지',
-        description: '매일 새로운 챌린지에 도전하세요.\n보너스 XP를 획득할 수 있어요!',
-        arrowDirection: ArrowDirection.up,
+        arrowDirection: ArrowDirection.down,
       ),
       CoachMarkStep(
         targetKey: CustomBottomNavigation.bottomNavKey,
