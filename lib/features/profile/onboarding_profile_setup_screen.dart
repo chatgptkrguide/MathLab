@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/services/onboarding_profile_storage.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
 import '../../core/utils/app_logger.dart';
 import 'widgets/widgets.dart';
@@ -230,9 +229,14 @@ class _OnboardingProfileSetupScreenState
                     },
                     isLastPage: false,
                     isLoading: _isLoading,
-                    content: Column(
+                    content: GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.3,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        // 초등학생
                         GradeSelectionCard(
                           title: '초등학생',
                           icon: '🎒',
@@ -240,14 +244,10 @@ class _OnboardingProfileSetupScreenState
                           color: AppColors.mathGreen,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
-                            setState(() {
-                              _selectedGrade = grade;
-                            });
+                            setState(() => _selectedGrade = grade);
                             Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
-                        const SizedBox(height: 10),
-                        // 중학생
                         GradeSelectionCard(
                           title: '중학생',
                           icon: '📚',
@@ -255,14 +255,10 @@ class _OnboardingProfileSetupScreenState
                           color: AppColors.mathBlue,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
-                            setState(() {
-                              _selectedGrade = grade;
-                            });
+                            setState(() => _selectedGrade = grade);
                             Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
-                        const SizedBox(height: 10),
-                        // 고등학생
                         GradeSelectionCard(
                           title: '고등학생',
                           icon: '🎓',
@@ -270,14 +266,10 @@ class _OnboardingProfileSetupScreenState
                           color: AppColors.mathOrange,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
-                            setState(() {
-                              _selectedGrade = grade;
-                            });
+                            setState(() => _selectedGrade = grade);
                             Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
-                        const SizedBox(height: 10),
-                        // 성인
                         GradeSelectionCard(
                           title: '성인',
                           icon: '📖',
@@ -285,9 +277,7 @@ class _OnboardingProfileSetupScreenState
                           color: AppColors.mathPurple,
                           selectedGrade: _selectedGrade,
                           onGradeSelected: (grade) {
-                            setState(() {
-                              _selectedGrade = grade;
-                            });
+                            setState(() => _selectedGrade = grade);
                             Future.delayed(const Duration(milliseconds: 200), _nextPage);
                           },
                         ),
@@ -311,107 +301,70 @@ class _OnboardingProfileSetupScreenState
                     isLoading: _isLoading,
                     content: Column(
                       children: [
+                        // 프로필 요약 카드
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(AppDimensions.spacing24),
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(AppDimensions.radius20),
-                            border: Border.all(
-                              color: AppColors.mathGreen,
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.mathGreen.withValues(alpha: 0.2),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.mathGreen, width: 2),
                           ),
-                          child: Column(
+                          child: Row(
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    '👤',
-                                    style: const TextStyle(fontSize: 32),
-                                  ),
-                                  const SizedBox(width: AppDimensions.spacing12),
-                                  Expanded(
-                                    child: Column(
+                              // 이름
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    const Text('👤', style: TextStyle(fontSize: 24)),
+                                    const SizedBox(width: 10),
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '이름',
-                                          style: AppTextStyles.bodySmall.copyWith(
-                                            color: AppColors.textSecondary,
-                                          ),
-                                        ),
-                                        const SizedBox(height: AppDimensions.spacing4),
-                                        Text(
-                                          _nameController.text.trim(),
-                                          style: AppTextStyles.headlineSmall.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        Text('이름', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                                        Text(_nameController.text.trim(), style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: AppDimensions.spacing16),
-                              Divider(color: AppColors.borderLight),
-                              const SizedBox(height: AppDimensions.spacing16),
-                              Row(
-                                children: [
-                                  Text(
-                                    '🎓',
-                                    style: const TextStyle(fontSize: 32),
-                                  ),
-                                  const SizedBox(width: AppDimensions.spacing12),
-                                  Expanded(
-                                    child: Column(
+                              Container(width: 1, height: 36, color: AppColors.borderLight),
+                              // 학년
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text('🎓', style: TextStyle(fontSize: 24)),
+                                    const SizedBox(width: 10),
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '학년',
-                                          style: AppTextStyles.bodySmall.copyWith(
-                                            color: AppColors.textSecondary,
-                                          ),
-                                        ),
-                                        const SizedBox(height: AppDimensions.spacing4),
-                                        Text(
-                                          _selectedGrade,
-                                          style: AppTextStyles.headlineSmall.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        Text('학년', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                                        Text(_selectedGrade, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: AppDimensions.spacing24),
+                        const SizedBox(height: 16),
+                        // 안내 텍스트
                         Container(
-                          padding: const EdgeInsets.all(AppDimensions.spacing16),
+                          padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             color: AppColors.beigOrange,
-                            borderRadius: BorderRadius.circular(AppDimensions.radius12),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             children: [
-                              const Text('💡', style: TextStyle(fontSize: 24)),
-                              const SizedBox(width: AppDimensions.spacing12),
+                              const Text('💡', style: TextStyle(fontSize: 20)),
+                              const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
                                   '나머지 정보는 프로필에서 언제든지 추가할 수 있어요',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
+                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                                 ),
                               ),
                             ],
