@@ -167,18 +167,20 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
   Widget _buildTooltip(
       Rect targetRect, CoachMarkStep step, Size screenSize) {
     final isAbove = step.arrowDirection == ArrowDirection.down ||
-        targetRect.center.dy > screenSize.height * 0.5;
+        targetRect.center.dy > screenSize.height * 0.45;
     final tooltipMaxWidth = screenSize.width - 48;
+    final safeTop = MediaQuery.of(context).padding.top + 16;
 
-    // Calculate tooltip position
+    // Calculate tooltip position - ensure no overlap with target
     double top;
     if (isAbove) {
-      top = targetRect.top - 160 + step.tooltipOffset.top;
+      // Place tooltip above target with enough gap
+      top = targetRect.top - 180 + step.tooltipOffset.top;
     } else {
-      top = targetRect.bottom + 20 + step.tooltipOffset.top;
+      // Place tooltip below target with gap
+      top = targetRect.bottom + 16 + step.tooltipOffset.top;
     }
-    top = top.clamp(
-        MediaQuery.of(context).padding.top + 60, screenSize.height - 200);
+    top = top.clamp(safeTop, screenSize.height - 220);
 
     return Positioned(
       top: top,

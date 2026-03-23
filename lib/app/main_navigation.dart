@@ -66,7 +66,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         targetKey: HomeScreenFigma.startButtonKey,
         title: '학습 시작하기',
         description: '이 버튼을 눌러 오늘의 수학 학습을 시작하세요.\n단계별 커리큘럼으로 쉽게 배울 수 있어요.',
-        arrowDirection: ArrowDirection.up,
+        arrowDirection: ArrowDirection.down,
       ),
       CoachMarkStep(
         targetKey: HomeScreenFigma.statsRowKey,
