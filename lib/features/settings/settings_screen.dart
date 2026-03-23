@@ -74,7 +74,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   children: [
                     // 사용자 정보 섹션
                     if (authState.currentAccount != null && !authState.isGuest)
-                      UserInfoSection(user: user),
+                      UserInfoSection(
+                        user: user,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                        ),
+                      ),
 
                     const SizedBox(height: AppDimensions.spacing12),
 

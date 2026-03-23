@@ -7,15 +7,19 @@ import '../../../data/models/user/user_model.dart';
 /// - 프로필 사진, 이름, 이메일 표시
 class UserInfoSection extends StatelessWidget {
   final UserModel? user;
+  final VoidCallback? onTap;
 
   const UserInfoSection({
     super.key,
     required this.user,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingLarge,
         vertical: AppDimensions.paddingMedium,
@@ -87,6 +91,7 @@ class UserInfoSection extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 
