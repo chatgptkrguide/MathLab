@@ -174,8 +174,8 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
     // Calculate tooltip position - ensure no overlap with target
     double top;
     if (isAbove) {
-      // Place tooltip above target with enough gap
-      top = targetRect.top - 180 + step.tooltipOffset.top;
+      // Place tooltip fully above target (tooltip height ~200 + arrow 12 + gap 8)
+      top = targetRect.top - 220 + step.tooltipOffset.top;
     } else {
       // Place tooltip below target with gap
       top = targetRect.bottom + 16 + step.tooltipOffset.top;
