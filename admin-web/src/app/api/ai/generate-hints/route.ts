@@ -97,6 +97,18 @@ const TYPE_LABELS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    // 인증 확인
+    const { verifyAdminRequest } = await import("@/lib/firebase-admin");
+    const authResult = await verifyAdminRequest(
+      req.headers.get("Authorization")
+    );
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
+    }
+
     const body: HintRequest = await req.json();
 
     if (!body.question || !body.correctAnswer) {
