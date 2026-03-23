@@ -313,6 +313,8 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -320,6 +322,8 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.textSecondary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -562,6 +566,8 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${team.memberCount}/${team.maxMembers}명',

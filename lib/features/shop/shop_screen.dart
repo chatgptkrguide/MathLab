@@ -301,6 +301,8 @@ class ShopScreen extends ConsumerWidget {
                       fontSize: isFeatured ? 16 : 14,
                       fontWeight: FontWeight.w700,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -311,6 +313,8 @@ class ShopScreen extends ConsumerWidget {
                       color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

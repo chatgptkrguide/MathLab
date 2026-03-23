@@ -642,6 +642,8 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const Spacer(),
               Icon(
@@ -738,6 +740,8 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

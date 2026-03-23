@@ -347,6 +347,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               color: AppColors.textPrimary,
               letterSpacing: 1,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
 
           const SizedBox(width: 12),
@@ -371,6 +373,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               color: AppColors.textPrimary,
               letterSpacing: 1,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
 
           const Spacer(),
@@ -395,6 +399,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               color: AppColors.textPrimary,
               letterSpacing: 1,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

@@ -96,6 +96,9 @@ class _ProblemCompletionScreenState
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: Colors.white.withValues(alpha: 0.9),
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppDimensions.spacing48),
 
