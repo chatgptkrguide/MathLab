@@ -20,6 +20,7 @@ class HomeScreenFigma extends ConsumerStatefulWidget {
   static final statsRowKey = GlobalKey(debugLabel: 'statsRow');
   static final dailyChallengeKey = GlobalKey(debugLabel: 'dailyChallenge');
   static final streakBadgeKey = GlobalKey(debugLabel: 'streakBadge');
+  static final subjectRowKey = GlobalKey(debugLabel: 'subjectRow');
 
   const HomeScreenFigma({super.key});
 
@@ -446,6 +447,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
   // === 6. Subject Cards (horizontal row) ===
   Widget _buildSubjectRow() {
     return Container(
+      key: HomeScreenFigma.subjectRowKey,
       height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),

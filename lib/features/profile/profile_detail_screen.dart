@@ -14,6 +14,8 @@ import '../shop/shop_screen.dart';
 class ProfileDetailScreen extends ConsumerStatefulWidget {
   /// 코치마크용 GlobalKey
   static final profileCardKey = GlobalKey(debugLabel: 'profileCard');
+  static final badgesSectionKey = GlobalKey(debugLabel: 'badgesSection');
+  static final statsSectionKey = GlobalKey(debugLabel: 'statsSection');
 
   const ProfileDetailScreen({super.key});
 
@@ -653,6 +655,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     ];
 
     return Column(
+      key: ProfileDetailScreen.badgesSectionKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
@@ -769,6 +772,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     ];
 
     return Column(
+      key: ProfileDetailScreen.statsSectionKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(

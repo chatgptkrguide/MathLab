@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../shared/widgets/layout/custom_bottom_nav.dart';
+import '../shared/widgets/daily_reward_dialog.dart';
 import '../features/home/home_screen.dart';
 import '../features/lessons/lessons_screen.dart';
 import '../features/wrong_answer/wrong_answer_screen.dart';
@@ -56,11 +57,17 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     if (!mounted) return;
 
     final steps = [
-      // --- 홈 화면 (탭 2) ---
+      // ──── 홈 화면 (탭 2) ────
+      CoachMarkStep(
+        targetKey: HomeScreenFigma.streakBadgeKey,
+        title: '연속 학습 스트릭',
+        description: '매일 접속하면 스트릭이 쌓여요.\n스트릭을 유지하면 보너스 보상을 받을 수 있어요!',
+        arrowDirection: ArrowDirection.up,
+      ),
       CoachMarkStep(
         targetKey: HomeScreenFigma.todayGoalKey,
         title: '오늘의 학습 목표',
-        description: '매일 목표 XP를 달성하면 연속 학습 기록이 쌓여요.\n꾸준히 학습하면 레벨이 올라갑니다!',
+        description: '하루 목표 XP를 달성하면 스트릭이 유지됩니다.\n진행률 바에서 달성도를 확인하세요.',
         arrowDirection: ArrowDirection.up,
       ),
       CoachMarkStep(
@@ -71,39 +78,49 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
       ),
       CoachMarkStep(
         targetKey: HomeScreenFigma.statsRowKey,
-        title: '나의 학습 현황',
-        description: 'XP(경험치), 레벨, 연속 학습일을\n한눈에 확인할 수 있어요.',
+        title: 'XP · 레벨 · 스트릭',
+        description: '문제를 풀면 XP를 획득하고, XP가 쌓이면\n레벨이 올라갑니다. 스트릭으로 꾸준함을 확인하세요.',
         arrowDirection: ArrowDirection.down,
       ),
-      // --- 학습 화면 (탭 0) ---
+      CoachMarkStep(
+        targetKey: HomeScreenFigma.subjectRowKey,
+        title: '과목 선택',
+        description: '대수, 기하, 통계 등 다양한 수학 과목을\n선택해서 학습할 수 있어요.',
+        arrowDirection: ArrowDirection.down,
+      ),
+
+      // ──── 학습 화면 (탭 0) ────
       CoachMarkStep(
         targetKey: LessonsScreenFigma.lessonPathKey,
         title: '학습 경로',
-        description: '단계별로 구성된 학습 경로입니다.\n각 노드를 탭하면 문제를 풀 수 있어요.',
+        description: '단계별로 구성된 학습 노드입니다.\n잠금 해제된 노드를 탭하면 문제 풀이가 시작돼요.',
         arrowDirection: ArrowDirection.up,
         tabIndex: 0,
       ),
-      // --- 오답노트 화면 (탭 1) ---
+
+      // ──── 오답노트 화면 (탭 1) ────
       CoachMarkStep(
         targetKey: WrongAnswerScreen.wrongAnswerHeaderKey,
         title: '오답 노트',
-        description: '틀린 문제가 자동으로 저장됩니다.\n복습하면서 취약점을 보완하세요!',
+        description: '틀린 문제가 자동으로 저장됩니다.\n오답을 복습하면 실력이 빠르게 향상돼요!',
         arrowDirection: ArrowDirection.up,
         tabIndex: 1,
       ),
-      // --- 프로필 화면 (탭 3) ---
+
+      // ──── 프로필 화면 (탭 3) ────
       CoachMarkStep(
         targetKey: ProfileDetailScreen.profileCardKey,
         title: '나의 프로필',
-        description: '학습 기록과 뱃지, 레벨을 확인하고\n프로필을 꾸밀 수 있어요.',
+        description: '프로필 사진, 레벨, 리그 진행 상황을\n한눈에 확인하고 편집할 수 있어요.',
         arrowDirection: ArrowDirection.up,
         tabIndex: 3,
       ),
-      // --- 하단 메뉴 (홈으로 복귀) ---
+
+      // ──── 하단 메뉴 (홈 복귀) ────
       CoachMarkStep(
         targetKey: CustomBottomNavigation.bottomNavKey,
-        title: '하단 메뉴',
-        description: '학습, 오답노트, 홈, 프로필, 팀을\n자유롭게 이동할 수 있어요.',
+        title: '탭으로 자유롭게 이동',
+        description: '학습, 오답노트, 홈, 프로필, 팀\n5개 탭을 자유롭게 오갈 수 있어요.',
         arrowDirection: ArrowDirection.down,
         tooltipOffset: const EdgeInsets.only(top: -60),
         tabIndex: 2,
@@ -116,6 +133,14 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         steps: steps,
         onTabChange: (tabIndex) {
           ref.read(navigationProvider.notifier).setTab(tabIndex);
+        },
+        onComplete: () {
+          // 온보딩 완료 후 일일 보상 다이얼로그 표시
+          if (mounted) {
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) DailyRewardDialog.show(context);
+            });
+          }
         },
       );
     }
