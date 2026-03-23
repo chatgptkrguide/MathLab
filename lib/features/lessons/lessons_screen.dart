@@ -217,7 +217,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF61A1D8),
+        color: AppColors.skyBlue,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
@@ -240,11 +240,11 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   child: DropdownButton<String?>(
                     value: _selectedSubject,
                     isDense: true,
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF61A1D8), size: 20),
+                    icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.skyBlue, size: 20),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF61A1D8),
+                      color: AppColors.skyBlue,
                     ),
                     items: [
                       const DropdownMenuItem<String?>(
@@ -335,7 +335,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
           // Streak (fire icon + number)
           const Icon(
             Icons.local_fire_department_rounded,
-            color: Color(0xFFFF9600),
+            color: AppColors.mathOrange,
             size: 20,
           ),
           const SizedBox(width: 2),
@@ -358,7 +358,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
             height: 23,
             errorBuilder: (_, __, ___) => const Icon(
               Icons.bolt_rounded,
-              color: Color(0xFFFFC800),
+              color: AppColors.mathYellow,
               size: 20,
             ),
           ),
@@ -382,7 +382,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
             height: 20,
             errorBuilder: (_, __, ___) => const Icon(
               Icons.shield_rounded,
-              color: Color(0xFF61A1D8),
+              color: AppColors.skyBlue,
               size: 20,
             ),
           ),
@@ -522,9 +522,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     final nodeIcon = _getLessonIcon(lesson.type, index);
 
     // Colors
-    const activeColor = Color(0xFF2B59FF);
-    const completedColor = Color(0xFF58CC02);
-    const lockedBgColor = Color(0xFFE4F5FF);
+    const activeColor = AppColors.nodeActive;
+    const completedColor = AppColors.mathGreen;
+    const lockedBgColor = AppColors.profileBg;
 
     final bgColor = isCompleted
         ? completedColor
@@ -549,7 +549,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               ),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF2B59FF), Color(0xFF1A3CF7)],
+                  colors: [AppColors.nodeActive, Color(0xFF1A3CF7)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -593,7 +593,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   : null,
               border: isLocked
                   ? Border.all(
-                      color: const Color(0xFFE4F5FF),
+                      color: AppColors.profileBg,
                       width: 0,
                     )
                   : null,
@@ -604,7 +604,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 child: Icon(
                   isCompleted ? Icons.check_rounded : nodeIcon,
                   color: isLocked
-                      ? const Color(0xFF61A1D8)
+                      ? AppColors.skyBlue
                       : Colors.white,
                   size: isCompleted ? 36 : 32,
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_colors.dart';
 
 /// 하단 네비게이션 바
 /// 5탭: 학습(0), 오답(1), 홈(2, 가운데 강조), 프로필(3), 팀(4)
@@ -106,7 +107,7 @@ class CustomBottomNavigation extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2B59FF),
+                  color: AppColors.nodeActive,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -130,8 +131,8 @@ class CustomBottomNavigation extends StatelessWidget {
                 label,
                 style: TextStyle(
                   color: isSelected
-                      ? const Color(0xFF2B59FF)
-                      : const Color(0xFFAAAAAA),
+                      ? AppColors.nodeActive
+                      : AppColors.textLight,
                   fontWeight:
                       isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 10,
@@ -159,7 +160,7 @@ class CustomBottomNavigation extends StatelessWidget {
                 icon,
                 color: isSelected
                     ? const Color(0xFF030204)
-                    : const Color(0xFFAAAAAA),
+                    : AppColors.textLight,
                 size: 22,
               ),
               const SizedBox(height: 2),
@@ -171,7 +172,7 @@ class CustomBottomNavigation extends StatelessWidget {
                 style: TextStyle(
                   color: isSelected
                       ? const Color(0xFF030204)
-                      : const Color(0xFFAAAAAA),
+                      : AppColors.textLight,
                   fontWeight:
                       isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 10,

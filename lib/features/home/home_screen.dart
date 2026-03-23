@@ -174,7 +174,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
               children: [
                 const Icon(
                   Icons.local_fire_department_rounded,
-                  color: Color(0xFFFF9600),
+                  color: AppColors.mathOrange,
                   size: 20,
                 ),
                 const SizedBox(width: 4),
@@ -770,7 +770,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(Icons.construction_rounded, color: Color(0xFFFF9600), size: 28),
+            const Icon(Icons.construction_rounded, color: AppColors.mathOrange, size: 28),
             const SizedBox(width: 8),
             Text(
               feature,
@@ -788,7 +788,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
             child: const Text(
               '확인',
               style: TextStyle(
-                color: Color(0xFF2B59FF),
+                color: AppColors.nodeActive,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
