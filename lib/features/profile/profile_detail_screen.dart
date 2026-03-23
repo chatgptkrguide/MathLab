@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/grade_curriculum_map.dart';
+import '../../data/providers/infrastructure/navigation_provider.dart';
 import 'edit_profile_screen.dart';
 import '../settings/settings_screen.dart';
 import '../shop/shop_screen.dart';
@@ -549,11 +551,13 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
   // SUBJECT CARDS
   // ============================================================
   Widget _buildSubjectSection() {
-    final subjects = [
-      {'name': '대수', 'tasks': 12, 'hasIcon': false},
-      {'name': '공통수학 1', 'tasks': 8, 'hasIcon': true},
-      {'name': '공통수학 2', 'tasks': 6, 'hasIcon': true},
-    ];
+    final user = ref.watch(userProvider);
+    final grade = user?.currentGrade ?? '중1';
+    final gradeSubjects = GradeCurriculumMap.getSubjectsForGrade(grade);
+    final displaySubjects = gradeSubjects.isEmpty
+        ? ['공통수학1', '공통수학2', '수학I']
+        : gradeSubjects;
+    final subjects = displaySubjects.map((name) => {'name': name}).toList();
 
     return SizedBox(
       height: 130,
@@ -563,16 +567,9 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final subject = subjects[index];
-          final hasIcon = subject['hasIcon'] as bool;
+          final name = subject['name'] as String;
           return GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${subject['name']} 과목 보기 준비 중'),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            },
+            onTap: () => ref.read(navigationProvider.notifier).goToLessons(),
             child: Container(
             width: 120,
             padding: const EdgeInsets.all(12),
@@ -585,44 +582,28 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  subject['name'] as String,
+                  name,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF18181B),
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  textAlign: index == 0 ? TextAlign.center : TextAlign.left,
                 ),
-                if (!hasIcon)
-                  Text(
-                    '${subject['tasks']}개 과제',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.badgeOrange,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  )
-                else
-                  Image.asset(
-                    'assets/icons/subject_icon.png',
-                    width: 38,
-                    height: 38,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: AppColors.skyBlue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.menu_book_rounded,
-                        size: 20,
-                        color: AppColors.skyBlue,
-                      ),
-                    ),
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: AppColors.skyBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  child: const Icon(
+                    Icons.menu_book_rounded,
+                    size: 20,
+                    color: AppColors.skyBlue,
+                  ),
+                ),
               ],
             ),
             ),
