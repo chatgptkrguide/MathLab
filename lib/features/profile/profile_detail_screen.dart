@@ -9,6 +9,7 @@ import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';
 import 'edit_profile_screen.dart';
 import '../settings/settings_screen.dart';
+import '../shop/shop_screen.dart';
 
 class ProfileDetailScreen extends ConsumerStatefulWidget {
   const ProfileDetailScreen({super.key});
@@ -100,7 +101,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF61A1D8),
+        color: AppColors.skyBlue,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
       child: SafeArea(
@@ -146,10 +147,10 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE4F5FF),
+                  color: AppColors.profileBg,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: const Color(0xFF2B59FF),
+                      color: AppColors.nodeActive,
                       width: 1),
                 ),
                 child: Column(
@@ -240,7 +241,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                                           ),
                                           boxShadow: const [
                                             BoxShadow(
-                                              color: Color(0xFFCFCFCF),
+                                              color: AppColors.borderDark,
                                               offset: Offset(0, 3),
                                             ),
                                           ],
@@ -259,27 +260,37 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius:
-                                          BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: const Color(0xFF18181B)
-                                            .withValues(alpha: 0.12),
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color(0xFFCFCFCF),
-                                          offset: Offset(0, 3),
+                                  GestureDetector(
+                                    onTap: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('공유 기능 준비 중'),
+                                          duration: Duration(seconds: 2),
                                         ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.send_outlined,
-                                      size: 16,
-                                      color: Color(0xFF555555),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: const Color(0xFF18181B)
+                                              .withValues(alpha: 0.12),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: AppColors.borderDark,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Icon(
+                                        Icons.send_outlined,
+                                        size: 16,
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -301,7 +312,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                           height: 45,
                           errorBuilder: (_, __, ___) => const Icon(
                             Icons.shield_rounded,
-                            color: Color(0xFF61A1D8),
+                            color: AppColors.skyBlue,
                             size: 36,
                           ),
                         ),
@@ -336,7 +347,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                                 height: 14,
                                 padding: const EdgeInsets.all(2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF6F6F6),
+                                  color: AppColors.cardBg,
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
@@ -386,15 +397,15 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F2F1),
+        color: AppColors.chipBg,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           _buildStatItem('최장 스트릭', '${user.longestStreak}일'),
-          Container(width: 1, height: 31, color: const Color(0xFFD9D9D9)),
+          Container(width: 1, height: 31, color: AppColors.borderDark),
           _buildStatItem('총 XP', _formatNumber(user.totalXp)),
-          Container(width: 1, height: 31, color: const Color(0xFFD9D9D9)),
+          Container(width: 1, height: 31, color: AppColors.borderDark),
           _buildStatItem('보유 젬', _formatNumber(user.gems)),
         ],
       ),
@@ -410,7 +421,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
             label,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF7E8381),
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
               letterSpacing: 1,
             ),
@@ -421,7 +432,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF2B2F2D),
+              color: AppColors.textDark,
               letterSpacing: 1,
             ),
           ),
@@ -437,7 +448,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFE4F5FF),
+        color: AppColors.profileBg,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -449,7 +460,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
             height: 28,
             errorBuilder: (_, __, ___) => const Icon(
               Icons.local_fire_department_rounded,
-              color: Color(0xFFFF9600),
+              color: AppColors.mathOrange,
               size: 28,
             ),
           ),
@@ -507,7 +518,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                     strokeWidth: 3,
                     backgroundColor: Colors.transparent,
                     valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFF2E90FA),
+                      AppColors.premiumBlue,
                     ),
                   ),
                 ),
@@ -547,11 +558,20 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         itemBuilder: (context, index) {
           final subject = subjects[index];
           final hasIcon = subject['hasIcon'] as bool;
-          return Container(
+          return GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${subject['name']} 과목 보기 준비 중'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            child: Container(
             width: 120,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF6F6F6),
+              color: AppColors.cardBg,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
@@ -574,7 +594,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                     '${subject['tasks']}개 과제',
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Color(0xFFFF9121),
+                      color: AppColors.badgeOrange,
                       fontWeight: FontWeight.w700,
                     ),
                   )
@@ -599,6 +619,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                   ),
               ],
             ),
+            ),
           );
         },
       ),
@@ -613,7 +634,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
       {
         'name': '첫번째 챌린지 완성',
         'icon': Icons.emoji_events_rounded,
-        'color': const Color(0xFFFFB53E),
+        'color': AppColors.streakGold,
       },
       {
         'name': '연속학습 달성',
@@ -646,41 +667,51 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               child: Padding(
                 padding: EdgeInsets.only(
                     right: badge != badges.last ? 10.0 : 0.0),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: achieved
-                            ? (badge['color'] as Color)
-                                .withValues(alpha: 0.15)
-                            : const Color(0xFFF0F0F0),
-                        borderRadius: BorderRadius.circular(16),
+                child: GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${badge['name']}'),
+                        duration: const Duration(seconds: 2),
                       ),
-                      child: Icon(
-                        badge['icon'] as IconData,
-                        size: 28,
-                        color: achieved
-                            ? badge['color'] as Color
-                            : const Color(0xFFCCCCCC),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: achieved
+                              ? (badge['color'] as Color)
+                                  .withValues(alpha: 0.15)
+                              : AppColors.cardBg,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          badge['icon'] as IconData,
+                          size: 28,
+                          color: achieved
+                              ? badge['color'] as Color
+                              : AppColors.borderDark,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      badge['name'] as String,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: achieved
-                            ? const Color(0xFF18181B)
-                            : const Color(0xFFAAAAAA),
+                      const SizedBox(height: 8),
+                      Text(
+                        badge['name'] as String,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: achieved
+                              ? const Color(0xFF18181B)
+                              : AppColors.textLight,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -705,7 +736,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         'label': '완료한 레슨',
         'value': (user.totalXp ~/ 50).toString(),
         'icon': Icons.check_circle_rounded,
-        'color': const Color(0xFF58CC02),
+        'color': AppColors.mathGreen,
       },
       {
         'label': '보유 다이아',
@@ -717,7 +748,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         'label': '누적 XP',
         'value': _formatNumber(user.totalXp),
         'icon': Icons.bolt_rounded,
-        'color': const Color(0xFFFFC800),
+        'color': AppColors.mathYellow,
       },
       {
         'label': '정답 수',
@@ -729,7 +760,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         'label': '3위 이내',
         'value': '${user.achievements.where((a) => a == 'top3').length}',
         'icon': Icons.leaderboard_rounded,
-        'color': const Color(0xFFCE82FF),
+        'color': AppColors.mathPurple,
       },
     ];
 
@@ -741,7 +772,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF2B2F2D),
+            color: AppColors.textDark,
           ),
         ),
         const SizedBox(height: 14),
@@ -777,7 +808,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                     stat['label'] as String,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF7E8381),
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 1,
                     ),
@@ -791,7 +822,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF2B2F2D),
+                      color: AppColors.textDark,
                       letterSpacing: 1,
                     ),
                     textAlign: TextAlign.center,
@@ -812,7 +843,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFD3E9FF),
+        color: AppColors.premiumBg,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -840,18 +871,23 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E90FA),
-              borderRadius: BorderRadius.circular(10),
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ShopScreen()),
             ),
-            child: const Text(
-              '업그레이드',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.premiumBlue,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                '업그레이드',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
