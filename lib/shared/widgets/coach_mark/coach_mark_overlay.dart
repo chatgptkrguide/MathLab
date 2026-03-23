@@ -77,15 +77,9 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
     if (_currentStep < widget.steps.length - 1) {
       _animController.reset();
       final nextStep = widget.steps[_currentStep + 1];
-      // 탭 전환이 필요하면 먼저 전환 후 딜레이
       if (nextStep.tabIndex != null) {
         widget.onTabChange?.call(nextStep.tabIndex!);
-        Future.delayed(const Duration(milliseconds: 400), () {
-          if (mounted) {
-            setState(() => _currentStep++);
-            _animController.forward();
-          }
-        });
+        _waitAndShow(_currentStep + 1);
       } else {
         setState(() => _currentStep++);
         _animController.forward();
@@ -101,17 +95,36 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
       final prevStep = widget.steps[_currentStep - 1];
       if (prevStep.tabIndex != null) {
         widget.onTabChange?.call(prevStep.tabIndex!);
-        Future.delayed(const Duration(milliseconds: 400), () {
-          if (mounted) {
-            setState(() => _currentStep--);
-            _animController.forward();
-          }
-        });
+        _waitAndShow(_currentStep - 1);
       } else {
         setState(() => _currentStep--);
         _animController.forward();
       }
     }
+  }
+
+  /// 탭 전환 후 타겟 위젯이 빌드될 때까지 대기
+  void _waitAndShow(int targetStep, [int retries = 0]) {
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (!mounted) return;
+      final step = widget.steps[targetStep];
+      final renderBox =
+          step.targetKey.currentContext?.findRenderObject() as RenderBox?;
+      if (renderBox == null || !renderBox.attached) {
+        if (retries < 5) {
+          _waitAndShow(targetStep, retries + 1);
+          return;
+        }
+        // 5회 재시도 후에도 못 찾으면 다음 스텝으로 건너뜀
+        if (targetStep > _currentStep && targetStep < widget.steps.length - 1) {
+          _currentStep = targetStep;
+          _nextStep();
+        }
+        return;
+      }
+      setState(() => _currentStep = targetStep);
+      _animController.forward();
+    });
   }
 
   Rect? _getTargetRect() {
@@ -151,27 +164,6 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
             if (targetRect != null)
               _buildTooltip(targetRect, step, screenSize),
 
-            // Step counter (top right)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 16,
-              right: 20,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  '${_currentStep + 1} / ${widget.steps.length}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
 
           ],
         ),
