@@ -45,6 +45,8 @@ class _OnboardingProfileSetupScreenState
     AppLogger.info('_nextPage called: current=$_currentPage, total=$_totalPages',
         tag: 'OnboardingProfileSetup');
     if (_currentPage < _totalPages - 1) {
+      // Dismiss keyboard before transitioning
+      FocusScope.of(context).unfocus();
       // Haptic feedback for smooth transition
       HapticFeedback.lightImpact();
       setState(() => _currentPage++);
