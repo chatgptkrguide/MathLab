@@ -8,6 +8,7 @@ class CoachMarkStep {
   final String description;
   final ArrowDirection arrowDirection;
   final EdgeInsets tooltipOffset;
+  final int? tabIndex; // null = 현재 탭 유지
 
   const CoachMarkStep({
     required this.targetKey,
@@ -15,6 +16,7 @@ class CoachMarkStep {
     required this.description,
     this.arrowDirection = ArrowDirection.up,
     this.tooltipOffset = EdgeInsets.zero,
+    this.tabIndex,
   });
 }
 
@@ -26,12 +28,14 @@ class CoachMarkOverlay extends StatefulWidget {
   final List<CoachMarkStep> steps;
   final VoidCallback onComplete;
   final VoidCallback? onSkip;
+  final ValueChanged<int>? onTabChange;
 
   const CoachMarkOverlay({
     super.key,
     required this.steps,
     required this.onComplete,
     this.onSkip,
+    this.onTabChange,
   });
 
   @override
@@ -74,8 +78,20 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
   void _nextStep() {
     if (_currentStep < widget.steps.length - 1) {
       _animController.reset();
-      setState(() => _currentStep++);
-      _animController.forward();
+      final nextStep = widget.steps[_currentStep + 1];
+      // 탭 전환이 필요하면 먼저 전환 후 딜레이
+      if (nextStep.tabIndex != null) {
+        widget.onTabChange?.call(nextStep.tabIndex!);
+        Future.delayed(const Duration(milliseconds: 400), () {
+          if (mounted) {
+            setState(() => _currentStep++);
+            _animController.forward();
+          }
+        });
+      } else {
+        setState(() => _currentStep++);
+        _animController.forward();
+      }
     } else {
       widget.onComplete();
     }
@@ -84,8 +100,19 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
   void _prevStep() {
     if (_currentStep > 0) {
       _animController.reset();
-      setState(() => _currentStep--);
-      _animController.forward();
+      final prevStep = widget.steps[_currentStep - 1];
+      if (prevStep.tabIndex != null) {
+        widget.onTabChange?.call(prevStep.tabIndex!);
+        Future.delayed(const Duration(milliseconds: 400), () {
+          if (mounted) {
+            setState(() => _currentStep--);
+            _animController.forward();
+          }
+        });
+      } else {
+        setState(() => _currentStep--);
+        _animController.forward();
+      }
     }
   }
 

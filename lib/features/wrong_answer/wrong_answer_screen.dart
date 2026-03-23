@@ -11,6 +11,9 @@ import '../../shared/widgets/effects/noise_texture.dart';
 import 'widgets/wrong_answer_card.dart';
 
 class WrongAnswerScreen extends ConsumerStatefulWidget {
+  /// 코치마크용 GlobalKey
+  static final wrongAnswerHeaderKey = GlobalKey(debugLabel: 'wrongAnswerHeader');
+
   const WrongAnswerScreen({super.key});
 
   @override
@@ -51,6 +54,7 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
 
                     // ── 헤더 ──
                     Padding(
+                      key: WrongAnswerScreen.wrongAnswerHeaderKey,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         children: [

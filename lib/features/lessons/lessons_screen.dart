@@ -11,6 +11,9 @@ import '../../shared/constants/app_colors.dart';
 import '../problems/problem_solving_screen.dart';
 
 class LessonsScreenFigma extends ConsumerStatefulWidget {
+  /// 코치마크용 GlobalKey
+  static final lessonPathKey = GlobalKey(debugLabel: 'lessonPath');
+
   const LessonsScreenFigma({super.key});
 
   @override
@@ -489,6 +492,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
         }
 
         return Padding(
+          key: index == 0 ? LessonsScreenFigma.lessonPathKey : null,
           padding: const EdgeInsets.only(bottom: 28),
           child: Align(
             alignment: nodeAlignment,

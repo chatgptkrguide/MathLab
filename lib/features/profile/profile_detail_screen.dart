@@ -12,6 +12,9 @@ import '../settings/settings_screen.dart';
 import '../shop/shop_screen.dart';
 
 class ProfileDetailScreen extends ConsumerStatefulWidget {
+  /// 코치마크용 GlobalKey
+  static final profileCardKey = GlobalKey(debugLabel: 'profileCard');
+
   const ProfileDetailScreen({super.key});
 
   @override
@@ -145,6 +148,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
 
               // Profile Card
               Container(
+                key: ProfileDetailScreen.profileCardKey,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.profileBg,

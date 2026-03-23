@@ -56,6 +56,7 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
     if (!mounted) return;
 
     final steps = [
+      // --- 홈 화면 (탭 2) ---
       CoachMarkStep(
         targetKey: HomeScreenFigma.todayGoalKey,
         title: '오늘의 학습 목표',
@@ -74,12 +75,38 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
         description: 'XP(경험치), 레벨, 연속 학습일을\n한눈에 확인할 수 있어요.',
         arrowDirection: ArrowDirection.down,
       ),
+      // --- 학습 화면 (탭 0) ---
+      CoachMarkStep(
+        targetKey: LessonsScreenFigma.lessonPathKey,
+        title: '학습 경로',
+        description: '단계별로 구성된 학습 경로입니다.\n각 노드를 탭하면 문제를 풀 수 있어요.',
+        arrowDirection: ArrowDirection.up,
+        tabIndex: 0,
+      ),
+      // --- 오답노트 화면 (탭 1) ---
+      CoachMarkStep(
+        targetKey: WrongAnswerScreen.wrongAnswerHeaderKey,
+        title: '오답 노트',
+        description: '틀린 문제가 자동으로 저장됩니다.\n복습하면서 취약점을 보완하세요!',
+        arrowDirection: ArrowDirection.up,
+        tabIndex: 1,
+      ),
+      // --- 프로필 화면 (탭 3) ---
+      CoachMarkStep(
+        targetKey: ProfileDetailScreen.profileCardKey,
+        title: '나의 프로필',
+        description: '학습 기록과 뱃지, 레벨을 확인하고\n프로필을 꾸밀 수 있어요.',
+        arrowDirection: ArrowDirection.up,
+        tabIndex: 3,
+      ),
+      // --- 하단 메뉴 (홈으로 복귀) ---
       CoachMarkStep(
         targetKey: CustomBottomNavigation.bottomNavKey,
         title: '하단 메뉴',
         description: '학습, 오답노트, 홈, 프로필, 팀을\n자유롭게 이동할 수 있어요.',
         arrowDirection: ArrowDirection.down,
         tooltipOffset: const EdgeInsets.only(top: -60),
+        tabIndex: 2,
       ),
     ];
 
@@ -87,6 +114,9 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
       CoachMarkController.show(
         context: context,
         steps: steps,
+        onTabChange: (tabIndex) {
+          ref.read(navigationProvider.notifier).setTab(tabIndex);
+        },
       );
     }
   }

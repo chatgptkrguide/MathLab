@@ -57,6 +57,7 @@ class CoachMarkController {
     required BuildContext context,
     required List<CoachMarkStep> steps,
     VoidCallback? onComplete,
+    ValueChanged<int>? onTabChange,
   }) {
     final overlay = Overlay.of(context);
     late OverlayEntry entry;
@@ -74,6 +75,7 @@ class CoachMarkController {
           await markCompleted();
           onComplete?.call();
         },
+        onTabChange: onTabChange,
       ),
     );
 

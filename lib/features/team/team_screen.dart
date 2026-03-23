@@ -14,6 +14,9 @@ import 'widgets/team_member_card.dart';
 import 'create_team_screen.dart';
 
 class TeamScreen extends ConsumerStatefulWidget {
+  /// 코치마크용 GlobalKey
+  static final teamHeaderKey = GlobalKey(debugLabel: 'teamHeader');
+
   const TeamScreen({super.key});
 
   @override
@@ -120,9 +123,12 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
       slivers: [
         // Team Header
         SliverToBoxAdapter(
-          child: TeamHeader(
-            team: team,
-            memberCount: teamState.memberCount,
+          child: Container(
+            key: TeamScreen.teamHeaderKey,
+            child: TeamHeader(
+              team: team,
+              memberCount: teamState.memberCount,
+            ),
           ),
         ),
 
