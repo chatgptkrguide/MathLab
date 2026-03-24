@@ -56,6 +56,7 @@ class UserModel {
   final int reminderMinute;
   final bool streakReminderEnabled;
   final bool achievementAlertEnabled;
+  final bool leagueUpdateEnabled;
   final bool weeklyReportEnabled;
 
   const UserModel({
@@ -96,6 +97,7 @@ class UserModel {
     this.reminderMinute = 0,
     this.streakReminderEnabled = true,
     this.achievementAlertEnabled = true,
+    this.leagueUpdateEnabled = false,
     this.weeklyReportEnabled = true,
   });
 
@@ -193,6 +195,7 @@ class UserModel {
       reminderMinute: data['reminderMinute'] ?? 0,
       streakReminderEnabled: data['streakReminderEnabled'] ?? true,
       achievementAlertEnabled: data['achievementAlertEnabled'] ?? true,
+      leagueUpdateEnabled: data['leagueUpdateEnabled'] ?? false,
       weeklyReportEnabled: data['weeklyReportEnabled'] ?? true,
     );
   }
@@ -240,6 +243,7 @@ class UserModel {
       'reminderMinute': reminderMinute,
       'streakReminderEnabled': streakReminderEnabled,
       'achievementAlertEnabled': achievementAlertEnabled,
+      'leagueUpdateEnabled': leagueUpdateEnabled,
       'weeklyReportEnabled': weeklyReportEnabled,
     };
   }
@@ -284,6 +288,7 @@ class UserModel {
       'reminderMinute': reminderMinute,
       'streakReminderEnabled': streakReminderEnabled,
       'achievementAlertEnabled': achievementAlertEnabled,
+      'leagueUpdateEnabled': leagueUpdateEnabled,
       'weeklyReportEnabled': weeklyReportEnabled,
     };
   }
@@ -330,6 +335,7 @@ class UserModel {
     int? reminderMinute,
     bool? streakReminderEnabled,
     bool? achievementAlertEnabled,
+    bool? leagueUpdateEnabled,
     bool? weeklyReportEnabled,
   }) {
     return UserModel(
@@ -370,6 +376,7 @@ class UserModel {
       reminderMinute: reminderMinute ?? this.reminderMinute,
       streakReminderEnabled: streakReminderEnabled ?? this.streakReminderEnabled,
       achievementAlertEnabled: achievementAlertEnabled ?? this.achievementAlertEnabled,
+      leagueUpdateEnabled: leagueUpdateEnabled ?? this.leagueUpdateEnabled,
       weeklyReportEnabled: weeklyReportEnabled ?? this.weeklyReportEnabled,
     );
   }

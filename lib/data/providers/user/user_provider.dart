@@ -447,6 +447,7 @@ class User extends _$User {
           reminderMinute: state!.reminderMinute,
           streakReminderEnabled: state!.streakReminderEnabled,
           achievementAlertEnabled: state!.achievementAlertEnabled,
+          leagueUpdateEnabled: state!.leagueUpdateEnabled,
           weeklyReportEnabled: state!.weeklyReportEnabled,
         );
       }
@@ -654,6 +655,7 @@ class User extends _$User {
     int? reminderMinute,
     bool? streakReminderEnabled,
     bool? achievementAlertEnabled,
+    bool? leagueUpdateEnabled,
     bool? weeklyReportEnabled,
   }) async {
     if (state == null) return;
@@ -668,6 +670,7 @@ class User extends _$User {
         reminderMinute: reminderMinute,
         streakReminderEnabled: streakReminderEnabled,
         achievementAlertEnabled: achievementAlertEnabled,
+        leagueUpdateEnabled: leagueUpdateEnabled,
         weeklyReportEnabled: weeklyReportEnabled,
         updatedAt: now,
       );
@@ -681,6 +684,7 @@ class User extends _$User {
       if (reminderMinute != null) updates['reminderMinute'] = reminderMinute;
       if (streakReminderEnabled != null) updates['streakReminderEnabled'] = streakReminderEnabled;
       if (achievementAlertEnabled != null) updates['achievementAlertEnabled'] = achievementAlertEnabled;
+      if (leagueUpdateEnabled != null) updates['leagueUpdateEnabled'] = leagueUpdateEnabled;
       if (weeklyReportEnabled != null) updates['weeklyReportEnabled'] = weeklyReportEnabled;
 
       await _firestore

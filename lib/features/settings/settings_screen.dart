@@ -30,8 +30,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _soundEnabled = true;
-  bool _darkModeEnabled = false;
+  final bool _darkModeEnabled = false;
   String _selectedLanguage = '한국어';
 
   @override
@@ -176,11 +175,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           icon: Icons.volume_up_outlined,
                           title: '사운드',
                           subtitle: '효과음 및 배경음악',
-                          value: _soundEnabled,
+                          value: user?.soundEnabled ?? true,
                           onChanged: (value) {
-                            setState(() {
-                              _soundEnabled = value;
-                            });
+                            ref.read(userProvider.notifier).updateSettings(
+                              soundEnabled: value,
+                            );
                           },
                         ),
                       ],
@@ -247,9 +246,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           subtitle: '어두운 테마 사용',
                           value: _darkModeEnabled,
                           onChanged: (value) {
-                            setState(() {
-                              _darkModeEnabled = value;
-                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('다크 모드는 준비 중입니다'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
                           },
                         ),
                       ],

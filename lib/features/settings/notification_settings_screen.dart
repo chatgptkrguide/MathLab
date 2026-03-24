@@ -37,6 +37,7 @@ class _NotificationSettingsScreenState
         _dailyReminder = user.dailyReminderEnabled;
         _streakReminder = user.streakReminderEnabled;
         _achievementAlert = user.achievementAlertEnabled;
+        _leagueUpdate = user.leagueUpdateEnabled;
         _weeklyReport = user.weeklyReportEnabled;
         _reminderTime = TimeOfDay(hour: user.reminderHour, minute: user.reminderMinute);
       });
@@ -49,6 +50,7 @@ class _NotificationSettingsScreenState
     int? reminderMinute,
     bool? streakReminderEnabled,
     bool? achievementAlertEnabled,
+    bool? leagueUpdateEnabled,
     bool? weeklyReportEnabled,
   }) {
     ref.read(userProvider.notifier).updateNotificationSettings(
@@ -57,6 +59,7 @@ class _NotificationSettingsScreenState
       reminderMinute: reminderMinute,
       streakReminderEnabled: streakReminderEnabled,
       achievementAlertEnabled: achievementAlertEnabled,
+      leagueUpdateEnabled: leagueUpdateEnabled,
       weeklyReportEnabled: weeklyReportEnabled,
     );
   }
@@ -122,6 +125,7 @@ class _NotificationSettingsScreenState
               value: _leagueUpdate,
               onChanged: (value) {
                 setState(() => _leagueUpdate = value);
+                _saveSettings(leagueUpdateEnabled: value);
               },
             ),
 
