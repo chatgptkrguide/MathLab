@@ -7,7 +7,7 @@ import { Problem, Unit, Lesson, ProblemType, ProblemDifficulty, PROBLEM_TYPE_LAB
 import LatexRenderer from "@/components/ui/latex-renderer";
 import CreateProblemModal from "@/components/problems/create-problem-modal";
 import { DocumentSnapshot } from "firebase/firestore";
-import { Search, Trash2, Edit2, Plus, Filter } from "lucide-react";
+import { Search, Trash2, Edit2, Plus, Filter, AlertCircle } from "lucide-react";
 
 export default function ProblemsPage() {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -19,6 +19,7 @@ export default function ProblemsPage() {
   const [hasMore, setHasMore] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
+  const [error, setError] = useState("");
 
   // Filters
   const [selectedUnitId, setSelectedUnitId] = useState("");
@@ -39,7 +40,8 @@ export default function ProblemsPage() {
       setUnits(u);
       setLessons(l);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to load curriculum:", error);
+      setError("커리큘럼 데이터를 불러오지 못했습니다. 새로고침해주세요.");
     }
   };
 
@@ -54,6 +56,7 @@ export default function ProblemsPage() {
 
   const loadProblems = async (append = false) => {
     setLoading(true);
+    setError("");
     try {
       const filters = buildFilters();
       const result = await getProblems(filters, 20, append ? lastDoc || undefined : undefined);
@@ -62,7 +65,8 @@ export default function ProblemsPage() {
       setTotal(result.total);
       setHasMore(result.problems.length === 20);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to load problems:", error);
+      setError("문제 목록을 불러오지 못했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -80,8 +84,8 @@ export default function ProblemsPage() {
       setProblems(problems.filter((p) => p.id !== id));
       setTotal((prev) => prev - 1);
     } catch (error) {
-      console.error(error);
-      alert("삭제에 실패했습니다.");
+      console.error("Failed to delete problem:", error);
+      setError("문제 삭제에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -109,6 +113,15 @@ export default function ProblemsPage() {
           문제 등록
         </button>
       </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-6 flex items-start gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+          <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+          <span className="text-sm text-red-700">{error}</span>
+          <button onClick={() => setError("")} className="ml-auto text-red-400 hover:text-red-600 text-sm">&times;</button>
+        </div>
+      )}
 
       {/* Search & Filters */}
       <div className="rounded-xl border border-gray-200 bg-white mb-6">

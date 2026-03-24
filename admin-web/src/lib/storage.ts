@@ -2,6 +2,15 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage
 import { storage } from "./firebase";
 
 export async function uploadProblemImage(file: File): Promise<string> {
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error(`허용되지 않는 파일 형식: ${file.type}`);
+  }
+  const MAX_SIZE = 5 * 1024 * 1024;
+  if (file.size > MAX_SIZE) {
+    throw new Error("파일 크기는 5MB 이하여야 합니다.");
+  }
+
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const path = `problem_images/${timestamp}_${safeName}`;

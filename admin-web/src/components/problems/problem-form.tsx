@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Problem, ProblemType, ProblemDifficulty, Unit, Lesson, DIFFICULTY_LABELS } from "@/lib/types";
 import { getUnits, getLessons, getProblemCountsByLesson } from "@/lib/firestore";
 import { uploadProblemImage } from "@/lib/storage";
-import { Upload, X, Check, Plus, Lightbulb, BookOpen } from "lucide-react";
+import { Upload, X, Check, Plus, Lightbulb, BookOpen, AlertCircle } from "lucide-react";
 
 interface ProblemFormProps {
   initialData?: Problem;
@@ -24,6 +24,7 @@ export default function ProblemForm({ initialData, onSubmit, submitLabel = "저�
   const [successToast, setSuccessToast] = useState(false);
   const [questionMode, setQuestionMode] = useState<"text" | "image">("text");
   const [imageUploading, setImageUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const [lessonId, setLessonId] = useState(initialData?.lessonId || "");
   const [question, setQuestion] = useState(initialData?.question || "");
@@ -68,12 +69,30 @@ export default function ProblemForm({ initialData, onSubmit, submitLabel = "저�
 
   const handleImageUpload = async (files: FileList) => {
     setImageUploading(true);
+    setUploadError("");
     try {
-      const uploadPromises = Array.from(files).map((file) => uploadProblemImage(file));
-      const urls = await Promise.all(uploadPromises);
-      setImageUrls((prev) => [...prev, ...urls]);
-    } catch {
-      alert("이미지 업로드 실패");
+      const results = await Promise.allSettled(
+        Array.from(files).map((file) => uploadProblemImage(file))
+      );
+      const successUrls = results
+        .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled")
+        .map((r) => r.value);
+      const failCount = results.filter((r) => r.status === "rejected").length;
+
+      if (successUrls.length > 0) {
+        setImageUrls((prev) => [...prev, ...successUrls]);
+      }
+      if (failCount > 0) {
+        console.error("Image upload failures:", results.filter((r) => r.status === "rejected"));
+        setUploadError(
+          failCount === files.length
+            ? "이미지 업로드에 실패했습니다. 다시 시도해주세요."
+            : `${files.length}개 중 ${failCount}개 이미지 업로드에 실패했습니다.`
+        );
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+      setUploadError("이미지 업로드 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setImageUploading(false);
     }
@@ -225,6 +244,13 @@ export default function ProblemForm({ initialData, onSubmit, submitLabel = "저�
               <input type="file" accept="image/*" multiple className="hidden"
                 onChange={(e) => { if (e.target.files) handleImageUpload(e.target.files); }} />
             </label>
+            {uploadError && (
+              <div className="mt-2 flex items-start gap-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
+                <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <span className="text-xs text-red-700">{uploadError}</span>
+                <button onClick={() => setUploadError("")} className="ml-auto text-red-400 hover:text-red-600 text-xs">&times;</button>
+              </div>
+            )}
           </>
         )}
       </div>

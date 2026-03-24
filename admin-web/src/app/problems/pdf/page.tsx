@@ -148,8 +148,8 @@ export default function PdfUploadPage() {
 
       setProblems(editable);
     } catch (error) {
-      console.error(error);
-      setParseError("PDF 파싱 중 오류가 발생했습니다: " + String(error));
+      console.error("PDF parsing error:", error);
+      setParseError("PDF 파싱 중 오류가 발생했습니다. 파일이 손상되었거나 지원하지 않는 형식일 수 있습니다.");
     } finally {
       setParsing(false);
     }
@@ -264,8 +264,8 @@ export default function PdfUploadPage() {
       setUploaded(true);
       setProblems([]);
     } catch (error) {
-      console.error(error);
-      alert("업로드에 실패했습니다: " + String(error));
+      console.error("Upload error:", error);
+      setParseError("문제 등록에 실패했습니다. 네트워크 상태를 확인하고 다시 시도해주세요.");
     } finally {
       setUploading(false);
     }

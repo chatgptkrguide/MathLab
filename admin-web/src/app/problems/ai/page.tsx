@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { auth } from "@/lib/firebase";
 import AdminLayout from "@/components/layout/admin-layout";
 import {
   getProblems,
@@ -162,9 +163,15 @@ export default function AIToolsPage() {
     setHintSaved(false);
 
     try {
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : null;
+
       const res = await fetch("/api/ai/generate-hints", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
         body: JSON.stringify({
           question: selectedProblem.question,
           type: selectedProblem.type,
@@ -218,9 +225,15 @@ export default function AIToolsPage() {
     setVariantSaved(false);
 
     try {
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : null;
+
       const res = await fetch("/api/ai/generate-variants", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
         body: JSON.stringify({
           question: selectedProblem.question,
           type: selectedProblem.type,
