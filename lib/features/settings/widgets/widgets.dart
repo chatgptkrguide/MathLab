@@ -3,5 +3,4 @@ library;
 
 export 'section_header.dart';
 export 'setting_tile.dart';
-export 'setting_switch_tile.dart';
 export 'user_info_section.dart';
