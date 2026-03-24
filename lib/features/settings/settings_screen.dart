@@ -14,10 +14,9 @@ import '../../core/config/env_config.dart';
 import '../../data/providers/infrastructure/feature_flag_provider.dart';
 
 /// 설정 화면 (간소화)
-/// - 닉네임 변경
-/// - 알림 설정
-/// - 앱 정보
-/// - 로그아웃 / 계정 탈퇴
+/// - 사용자 정보
+/// - 설정 (닉네임 변경, 알림 설정)
+/// - 앱 정보 + 로그아웃/탈퇴
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -57,7 +56,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 사용자 정보
+                    // 섹션 1: 사용자 정보
                     UserInfoSection(
                       user: user,
                       onTap: () => Navigator.of(context).push(
@@ -68,9 +67,9 @@ class SettingsScreen extends ConsumerWidget {
 
                     const SizedBox(height: AppDimensions.spacing20),
 
-                    // 계정
+                    // 섹션 2: 설정
                     const SectionHeader(
-                      title: '계정',
+                      title: '설정',
                       accentColor: AppColors.mathBlue,
                     ),
                     const SizedBox(height: AppDimensions.spacing8),
@@ -80,29 +79,16 @@ class SettingsScreen extends ConsumerWidget {
                           icon: Icons.person_outline,
                           title: '닉네임 변경',
                           subtitle: user?.displayName ?? '설정되지 않음',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const EditProfileScreen()),
-                          ),
+                          onTap: () => _showNicknameDialog(
+                              context, ref, user?.displayName),
                         ),
-                      ],
-                    ),
-
-                    const SizedBox(height: AppDimensions.spacing20),
-
-                    // 알림
-                    const SectionHeader(
-                      title: '알림',
-                      accentColor: AppColors.mathOrange,
-                    ),
-                    const SizedBox(height: AppDimensions.spacing8),
-                    _buildSettingsCard(
-                      children: [
+                        const _SettingDivider(),
                         SettingTile(
                           icon: Icons.notifications_outlined,
                           title: '알림 설정',
-                          subtitle: '알림 타입 및 시간 설정',
+                          subtitle: user?.dailyReminderEnabled == true
+                              ? '알림 켜짐'
+                              : '알림 꺼짐',
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -150,9 +136,9 @@ class SettingsScreen extends ConsumerWidget {
 
                     const SizedBox(height: AppDimensions.spacing20),
 
-                    // 정보
+                    // 섹션 3: 앱 정보 + 로그아웃/탈퇴
                     const SectionHeader(
-                      title: '정보',
+                      title: '앱 정보',
                       accentColor: AppColors.tealGreen,
                     ),
                     const SizedBox(height: AppDimensions.spacing8),
@@ -162,41 +148,13 @@ class SettingsScreen extends ConsumerWidget {
                           icon: Icons.info_outline,
                           title: '앱 정보',
                           subtitle: 'v1.0.0',
-                          onTap: () => _showAboutDialog(context),
-                        ),
-                        const _SettingDivider(),
-                        SettingTile(
-                          icon: Icons.description_outlined,
-                          title: '이용약관',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) =>
-                                    const TermsOfServiceScreen()),
-                          ),
-                        ),
-                        const _SettingDivider(),
-                        SettingTile(
-                          icon: Icons.privacy_tip_outlined,
-                          title: '개인정보 처리방침',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) =>
-                                    const PrivacyPolicyScreen()),
-                          ),
+                          onTap: () => _showAppInfoDialog(context),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: AppDimensions.spacing20),
-
-                    // 계정 관리
-                    const SectionHeader(
-                      title: '계정 관리',
-                      accentColor: AppColors.mathRed,
-                    ),
                     const SizedBox(height: AppDimensions.spacing8),
+
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.mathRed.withValues(alpha: 0.05),
@@ -263,28 +221,106 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
+  void _showNicknameDialog(
+      BuildContext context, WidgetRef ref, String? currentName) {
+    final controller = TextEditingController(text: currentName);
+    showDialog(
       context: context,
-      applicationName: 'MathLab',
-      applicationVersion: '1.0.0',
-      applicationIcon: Image.asset(
-        'assets/icons/gomath_logo_small.png',
-        width: 48,
-        height: 48,
-        errorBuilder: (_, __, ___) => const Text('M',
-            style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                color: AppColors.mathBlue)),
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('닉네임 변경'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: '새 닉네임 입력',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.length >= 2) {
+                await ref
+                    .read(userProvider.notifier)
+                    .updateProfile(displayName: name);
+                if (ctx.mounted) Navigator.pop(ctx);
+              }
+            },
+            child: const Text('확인'),
+          ),
+        ],
       ),
-      children: [
-        Text('매일 5분, 수학이 쉬워진다',
-            style: AppTextStyles.titleMedium),
-        const SizedBox(height: AppDimensions.spacing16),
-        Text('게이미피케이션을 통한 재미있는 수학 학습 앱',
-            style: AppTextStyles.bodyMedium),
-      ],
+    );
+  }
+
+  void _showAppInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/icons/gomath_logo_small.png',
+              width: 32,
+              height: 32,
+              errorBuilder: (_, __, ___) => const Text('M',
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.mathBlue)),
+            ),
+            const SizedBox(width: 12),
+            const Text('MathLab'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('v1.0.0',
+                style: AppTextStyles.bodyMedium
+                    .copyWith(color: AppColors.textSecondary)),
+            const SizedBox(height: 4),
+            Text('매일 5분, 수학이 쉬워진다',
+                style: AppTextStyles.titleMedium),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const TermsOfServiceScreen()),
+                    );
+                  },
+                  child: const Text('이용약관'),
+                ),
+                const Text(' · '),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const PrivacyPolicyScreen()),
+                    );
+                  },
+                  child: const Text('개인정보 처리방침'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
