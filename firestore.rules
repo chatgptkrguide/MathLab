@@ -25,8 +25,7 @@ service cloud.firestore {
 
     function isAdmin() {
       let userData = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-      return isSignedIn() &&
-             (userData.role == 'admin' || userData.isAdmin == true);
+      return isSignedIn() && userData.role == 'admin';
     }
 
     // Users Collection
@@ -40,7 +39,10 @@ service cloud.firestore {
                       request.resource.data.hearts >= 0 &&
                       request.resource.data.hearts <= 5 &&
                       request.resource.data.streak >= 0 &&
-                      request.resource.data.xp >= 0;
+                      request.resource.data.xp >= 0 &&
+                      // Prevent privilege escalation: force role='user' and isAdmin=false on signup
+                      request.resource.data.role == 'user' &&
+                      (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
 
       // Update: Owner can update their own data with validation, admin can update role
       allow update: if (isAdmin() &&

@@ -6,7 +6,17 @@ const projectId =
   process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "mathlab-gomath";
 
 if (getApps().length === 0) {
-  initializeApp({ projectId });
+  // Use service account credentials if available, otherwise fallback to projectId only (dev)
+  const serviceAccountKey = process.env.FIREBASE_ADMIN_SDK_KEY;
+  if (serviceAccountKey) {
+    const serviceAccount = JSON.parse(serviceAccountKey);
+    initializeApp({
+      credential: cert(serviceAccount),
+      projectId,
+    });
+  } else {
+    initializeApp({ projectId });
+  }
 }
 
 export const adminAuth = getAuth();

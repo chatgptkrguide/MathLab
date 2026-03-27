@@ -24,10 +24,8 @@ export interface Problem {
   options: string[];
   correctAnswer: string;
   explanation?: string;
-  hint?: string;
   hints: string[];
   points: number;
-  imageUrl?: string;
   imageUrls: string[];
   createdAt?: Timestamp;
   updatedAt?: Timestamp;

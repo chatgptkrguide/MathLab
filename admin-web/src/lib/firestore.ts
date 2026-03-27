@@ -34,57 +34,64 @@ export async function getProblems(
   pageSize = 20,
   lastDoc?: DocumentSnapshot
 ): Promise<{ problems: Problem[]; lastDoc: DocumentSnapshot | null; total: number }> {
-  const constraints: QueryConstraint[] = [];
+  try {
+    const constraints: QueryConstraint[] = [];
 
-  if (filters.lessonId) {
-    constraints.push(where("lessonId", "==", filters.lessonId));
-  }
-  if (filters.difficulty) {
-    constraints.push(where("difficulty", "==", filters.difficulty));
-  }
-  if (filters.type) {
-    constraints.push(where("type", "==", filters.type));
-  }
+    if (filters.lessonId) {
+      constraints.push(where("lessonId", "==", filters.lessonId));
+    }
+    if (filters.difficulty) {
+      constraints.push(where("difficulty", "==", filters.difficulty));
+    }
+    if (filters.type) {
+      constraints.push(where("type", "==", filters.type));
+    }
 
-  constraints.push(orderBy("createdAt", "desc"));
+    constraints.push(orderBy("createdAt", "desc"));
 
-  if (lastDoc) {
-    constraints.push(startAfter(lastDoc));
-  }
-  constraints.push(limit(pageSize));
+    if (lastDoc) {
+      constraints.push(startAfter(lastDoc));
+    }
+    constraints.push(limit(pageSize));
 
-  const q = query(collection(db, "problems"), ...constraints);
-  const snapshot = await getDocs(q);
+    const q = query(collection(db, "problems"), ...constraints);
+    const snapshot = await getDocs(q);
 
-  const problems: Problem[] = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Problem[];
+    const problems: Problem[] = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Problem[];
 
-  // Client-side text search if needed
-  let filtered = problems;
-  if (filters.searchText) {
-    const search = filters.searchText.toLowerCase();
-    filtered = problems.filter(
-      (p) =>
-        p.question.toLowerCase().includes(search) ||
-        p.correctAnswer.toLowerCase().includes(search)
+    // Client-side text search if needed
+    let filtered = problems;
+    if (filters.searchText) {
+      const search = filters.searchText.toLowerCase();
+      filtered = problems.filter(
+        (p) =>
+          p.question.toLowerCase().includes(search) ||
+          p.correctAnswer.toLowerCase().includes(search)
+      );
+    }
+
+    // Get total count (separate query without pagination)
+    const countConstraints: QueryConstraint[] = [];
+    if (filters.lessonId) countConstraints.push(where("lessonId", "==", filters.lessonId));
+    if (filters.difficulty) countConstraints.push(where("difficulty", "==", filters.difficulty));
+    if (filters.type) countConstraints.push(where("type", "==", filters.type));
+    const countQuery = query(collection(db, "problems"), ...countConstraints);
+    const countSnapshot = await getDocs(countQuery);
+
+    return {
+      problems: filtered,
+      lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+      total: countSnapshot.size,
+    };
+  } catch (error) {
+    console.error("Failed to fetch problems:", error);
+    throw new Error(
+      `문제 목록 조회에 실패했습니다: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
-
-  // Get total count (separate query without pagination)
-  const countConstraints: QueryConstraint[] = [];
-  if (filters.lessonId) countConstraints.push(where("lessonId", "==", filters.lessonId));
-  if (filters.difficulty) countConstraints.push(where("difficulty", "==", filters.difficulty));
-  if (filters.type) countConstraints.push(where("type", "==", filters.type));
-  const countQuery = query(collection(db, "problems"), ...countConstraints);
-  const countSnapshot = await getDocs(countQuery);
-
-  return {
-    problems: filtered,
-    lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
-    total: countSnapshot.size,
-  };
 }
 
 export async function getProblem(id: string): Promise<Problem | null> {

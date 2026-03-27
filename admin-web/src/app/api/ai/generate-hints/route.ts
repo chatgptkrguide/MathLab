@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { requireAdmin } from "@/lib/auth-middleware";
 
 function getOpenAI() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured");
+  }
+  return new OpenAI({ apiKey });
 }
 
 interface HintRequest {
@@ -98,16 +103,8 @@ const TYPE_LABELS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     // 인증 확인
-    const { verifyAdminRequest } = await import("@/lib/firebase-admin");
-    const authResult = await verifyAdminRequest(
-      req.headers.get("Authorization")
-    );
-    if ("error" in authResult) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.status }
-      );
-    }
+    const auth = await requireAdmin(req);
+    if (auth instanceof NextResponse) return auth;
 
     const body: HintRequest = await req.json();
 
@@ -156,15 +153,16 @@ ${body.topic ? `- 수학 분야: ${body.topic}` : ""}
         .trim();
       parsed = JSON.parse(jsonStr);
     } catch {
+      console.error("Failed to parse hint response:", { contentLength: content.length });
       return NextResponse.json(
-        { error: "AI 응답을 파싱할 수 없습니다.", raw: content },
+        { error: "AI 응답을 파싱할 수 없습니다. 다시 시도해주세요." },
         { status: 500 }
       );
     }
 
     if (!parsed.hints || !Array.isArray(parsed.hints)) {
       return NextResponse.json(
-        { error: "유효한 힌트를 생성하지 못했습니다.", raw: content },
+        { error: "유효한 힌트를 생성하지 못했습니다." },
         { status: 500 }
       );
     }
