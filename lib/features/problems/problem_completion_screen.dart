@@ -75,64 +75,72 @@ class _ProblemCompletionScreenState
         child: Padding(
           padding: const EdgeInsets.all(AppDimensions.spacing32),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.celebration,
-                size: 100,
-                color: Colors.white,
-              ),
-              const SizedBox(height: AppDimensions.spacing24),
-              Text(
-                '레슨 완료!',
-                style: AppTextStyles.heading1.copyWith(
-                  color: Colors.white,
-                  fontSize: 32,
-                ),
-              ),
-              const SizedBox(height: AppDimensions.spacing16),
-              Text(
-                widget.lessonTitle,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppDimensions.spacing48),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: AppDimensions.spacing32),
+                      const Icon(
+                        Icons.celebration,
+                        size: 100,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: AppDimensions.spacing24),
+                      Text(
+                        '레슨 완료!',
+                        style: AppTextStyles.heading1.copyWith(
+                          color: Colors.white,
+                          fontSize: 32,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.spacing16),
+                      Text(
+                        widget.lessonTitle,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppDimensions.spacing48),
 
-              // Stars
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  3,
-                  (index) => Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimensions.spacing8),
-                    child: Icon(
-                      index < widget.session.starsEarned
-                          ? Icons.star
-                          : Icons.star_border,
-                      size: AppDimensions.iconXLarge,
-                      color: Colors.white,
-                    ),
+                      // Stars
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          3,
+                          (index) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AppDimensions.spacing8),
+                            child: Icon(
+                              index < widget.session.starsEarned
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              size: AppDimensions.iconXLarge,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: AppDimensions.spacing48),
+
+                      // Stats
+                      _buildStatCard(
+                          '정답률',
+                          '${(widget.session.accuracy * 100).toStringAsFixed(0)}%'),
+                      const SizedBox(height: AppDimensions.spacing16),
+                      _buildStatCard('점수', '${widget.session.score}점'),
+                      const SizedBox(height: AppDimensions.spacing16),
+                      _buildStatCard('남은 하트', '${widget.session.hearts}/5'),
+                      const SizedBox(height: AppDimensions.spacing32),
+                    ],
                   ),
                 ),
               ),
-
-              const SizedBox(height: AppDimensions.spacing48),
-
-              // Stats
-              _buildStatCard(
-                  '정답률',
-                  '${(widget.session.accuracy * 100).toStringAsFixed(0)}%'),
-              const SizedBox(height: AppDimensions.spacing16),
-              _buildStatCard('점수', '${widget.session.score}점'),
-              const SizedBox(height: AppDimensions.spacing16),
-              _buildStatCard('남은 하트', '${widget.session.hearts}/5'),
-
-              const Spacer(),
 
               // Continue button
               SizedBox(

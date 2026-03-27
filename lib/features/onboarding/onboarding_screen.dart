@@ -244,10 +244,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             const Icon(Icons.warning, color: AppColors.warningOrange, size: 24),
             const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              '튜토리얼 건너뛰기',
-              style: AppTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
+            Flexible(
+              child: Text(
+                '튜토리얼 건너뛰기',
+                style: AppTextStyles.headlineSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

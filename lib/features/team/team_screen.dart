@@ -382,44 +382,46 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
       builder: (context) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              if (isLeader)
+                const SizedBox(height: 20),
+                if (isLeader)
+                  ListTile(
+                    leading: const Icon(Icons.person_add),
+                    title: const Text('팀원 초대'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showInviteDialog(context, userId);
+                    },
+                  ),
                 ListTile(
-                  leading: const Icon(Icons.person_add),
-                  title: const Text('팀원 초대'),
+                  leading: Icon(
+                    Icons.exit_to_app,
+                    color: AppColors.error,
+                  ),
+                  title: Text(
+                    isLeader && team.memberCount > 1
+                        ? '팀 탈퇴 (먼저 팀장 위임 필요)'
+                        : '팀 탈퇴',
+                    style: TextStyle(color: AppColors.error),
+                  ),
                   onTap: () {
                     Navigator.pop(context);
-                    _showInviteDialog(context, userId);
+                    _confirmLeaveTeam(context, userId);
                   },
                 ),
-              ListTile(
-                leading: Icon(
-                  Icons.exit_to_app,
-                  color: AppColors.error,
-                ),
-                title: Text(
-                  isLeader && team.memberCount > 1
-                      ? '팀 탈퇴 (먼저 팀장 위임 필요)'
-                      : '팀 탈퇴',
-                  style: TextStyle(color: AppColors.error),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _confirmLeaveTeam(context, userId);
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

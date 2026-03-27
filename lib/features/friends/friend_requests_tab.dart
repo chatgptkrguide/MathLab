@@ -74,6 +74,7 @@ class _RequestCard extends ConsumerWidget {
               ),
             ),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.green),

@@ -769,9 +769,13 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           children: [
             const Icon(Icons.construction_rounded, color: AppColors.mathOrange, size: 28),
             const SizedBox(width: 8),
-            Text(
-              feature,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                feature,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

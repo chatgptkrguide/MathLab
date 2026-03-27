@@ -168,153 +168,162 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
                     ],
                   ),
 
-                  const Spacer(flex: 2),
-
-                  // Question (with math rendering)
-                  MathRichText(
-                    text: problem.question,
-                    textStyle: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 2,
-                    ),
-                    mathFontSize: 36.0,
-                    mathColor: Colors.white,
-                  ),
-
-                  const Spacer(flex: 2),
-
-                  // Options
-                  ...List.generate(problem.options.length, (i) {
-                    final isSelected = _selectedOption == i;
-                    final isCorrect = i == problem.correctIndex;
-                    Color bgColor;
-                    Color borderColor;
-                    Color textColor;
-
-                    if (!_answered) {
-                      bgColor = Colors.white;
-                      borderColor = Colors.white.withValues(alpha: 0.3);
-                      textColor = AppColors.textDark;
-                    } else if (isCorrect) {
-                      bgColor = AppColors.mathGreen.withValues(alpha: 0.15);
-                      borderColor = AppColors.mathGreen;
-                      textColor = AppColors.mathGreen;
-                    } else if (isSelected) {
-                      bgColor = AppColors.mathRed.withValues(alpha: 0.15);
-                      borderColor = AppColors.mathRed;
-                      textColor = AppColors.mathRed;
-                    } else {
-                      bgColor = Colors.white.withValues(alpha: 0.5);
-                      borderColor = Colors.transparent;
-                      textColor = AppColors.textSecondary;
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: GestureDetector(
-                        onTap: () => _selectOption(i),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 14,
-                            horizontal: 20,
-                          ),
-                          decoration: BoxDecoration(
-                            color: bgColor,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: borderColor,
-                              width: isSelected || (_answered && isCorrect)
-                                  ? 2.5
-                                  : 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: MathRichText(
-                                  text: problem.options[i],
-                                  textStyle: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: textColor,
-                                  ),
-                                  mathFontSize: 20.0,
-                                  mathColor: textColor,
-                                ),
-                              ),
-                              if (_answered && isCorrect)
-                                const Icon(Icons.check_circle,
-                                    color: AppColors.mathGreen, size: 22),
-                              if (_answered && isSelected && !isCorrect)
-                                const Icon(Icons.cancel,
-                                    color: AppColors.mathRed, size: 22),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-
-                  // Feedback + next button
-                  if (_answered)
-                    FadeTransition(
-                      opacity: _feedbackAnimation,
+                  // Scrollable content area
+                  Expanded(
+                    child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          const SizedBox(height: 8),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 32),
+
+                          // Question (with math rendering)
+                          MathRichText(
+                            text: problem.question,
+                            textStyle: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 2,
                             ),
-                            child: MathRichText(
-                              text: problem.explanation,
-                              textStyle: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
-                                height: 1.4,
-                              ),
-                              mathFontSize: 16.0,
-                              mathColor: Colors.white,
-                            ),
+                            mathFontSize: 36.0,
+                            mathColor: Colors.white,
                           ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: _nextProblem,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.mathGreen,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+
+                          const SizedBox(height: 32),
+
+                          // Options
+                          ...List.generate(problem.options.length, (i) {
+                            final isSelected = _selectedOption == i;
+                            final isCorrect = i == problem.correctIndex;
+                            Color bgColor;
+                            Color borderColor;
+                            Color textColor;
+
+                            if (!_answered) {
+                              bgColor = Colors.white;
+                              borderColor = Colors.white.withValues(alpha: 0.3);
+                              textColor = AppColors.textDark;
+                            } else if (isCorrect) {
+                              bgColor = AppColors.mathGreen.withValues(alpha: 0.15);
+                              borderColor = AppColors.mathGreen;
+                              textColor = AppColors.mathGreen;
+                            } else if (isSelected) {
+                              bgColor = AppColors.mathRed.withValues(alpha: 0.15);
+                              borderColor = AppColors.mathRed;
+                              textColor = AppColors.mathRed;
+                            } else {
+                              bgColor = Colors.white.withValues(alpha: 0.5);
+                              borderColor = Colors.transparent;
+                              textColor = AppColors.textSecondary;
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: GestureDetector(
+                                onTap: () => _selectOption(i),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: bgColor,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: borderColor,
+                                      width: isSelected || (_answered && isCorrect)
+                                          ? 2.5
+                                          : 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: MathRichText(
+                                          text: problem.options[i],
+                                          textStyle: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: textColor,
+                                          ),
+                                          mathFontSize: 20.0,
+                                          mathColor: textColor,
+                                        ),
+                                      ),
+                                      if (_answered && isCorrect)
+                                        const Icon(Icons.check_circle,
+                                            color: AppColors.mathGreen, size: 22),
+                                      if (_answered && isSelected && !isCorrect)
+                                        const Icon(Icons.cancel,
+                                            color: AppColors.mathRed, size: 22),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              child: Text(
-                                _currentIndex < _problems.length - 1
-                                    ? '다음 문제'
-                                    : '결과 보기',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            );
+                          }),
+
+                          // Feedback + next button
+                          if (_answered)
+                            FadeTransition(
+                              opacity: _feedbackAnimation,
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: MathRichText(
+                                      text: problem.explanation,
+                                      textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        height: 1.4,
+                                      ),
+                                      mathFontSize: 16.0,
+                                      mathColor: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 48,
+                                    child: ElevatedButton(
+                                      onPressed: _nextProblem,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.mathGreen,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(14),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        _currentIndex < _problems.length - 1
+                                            ? '다음 문제'
+                                            : '결과 보기',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
+
+                          if (!_answered) const SizedBox(height: 80),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
-
-                  if (!_answered) const SizedBox(height: 80),
-                  const SizedBox(height: 24),
+                  ),
                 ],
               ),
             ),
@@ -337,59 +346,66 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  const Spacer(flex: 2),
+                  Expanded(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Result icon
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withValues(alpha: 0.2),
+                              ),
+                              child: Icon(
+                                allCorrect ? Icons.star_rounded : Icons.emoji_events,
+                                size: 56,
+                                color: AppColors.mathYellow,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
 
-                  // Result icon
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.2),
-                    ),
-                    child: Icon(
-                      allCorrect ? Icons.star_rounded : Icons.emoji_events,
-                      size: 56,
-                      color: AppColors.mathYellow,
+                            // Title
+                            const Text(
+                              '체험 완료!',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Score
+                            Text(
+                              '$_correctCount/${_problems.length} 정답'
+                              '${allCorrect ? " - 훌륭해요!" : ""}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+
+                            // Description
+                            Text(
+                              'MathLab에서 더 많은 문제를 풀어보세요.\n매일 학습하면 수학 실력이 쑥쑥 올라요!',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white.withValues(alpha: 0.8),
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // Title
-                  const Text(
-                    '체험 완료!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Score
-                  Text(
-                    '$_correctCount/${_problems.length} 정답'
-                    '${allCorrect ? " - 훌륭해요!" : ""}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Description
-                  Text(
-                    'MathLab에서 더 많은 문제를 풀어보세요.\n매일 학습하면 수학 실력이 쑥쑥 올라요!',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white.withValues(alpha: 0.8),
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  const Spacer(flex: 2),
 
                   // CTA: Sign up
                   SizedBox(

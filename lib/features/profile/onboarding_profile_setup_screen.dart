@@ -319,12 +319,19 @@ class _OnboardingProfileSetupScreenState
                                   children: [
                                     const Text('👤', style: TextStyle(fontSize: 24)),
                                     const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('이름', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                                        Text(_nameController.text.trim(), style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
-                                      ],
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('이름', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                                          Text(
+                                            _nameController.text.trim(),
+                                            style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
