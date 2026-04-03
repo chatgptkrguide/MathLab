@@ -36,8 +36,12 @@ class LogoutDialog extends ConsumerWidget {
         ),
         ElevatedButton(
           onPressed: () async {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(); // 다이얼로그 닫기
             await ref.read(authProvider.notifier).signOut();
+            // 로그아웃 후 네비게이션 스택 정리 → AuthWrapper가 AuthScreen 표시
+            if (context.mounted) {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.mathRed,

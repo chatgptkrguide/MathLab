@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/providers/user/user_provider.dart';
+import '../../data/providers/infrastructure/navigation_provider.dart';
 import '../../data/services/onboarding_profile_storage.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
@@ -111,6 +112,9 @@ class _OnboardingProfileSetupScreenState
 
       if (!mounted) return;
       HapticFeedback.heavyImpact();
+
+      // 온보딩 완료 후 홈 탭으로 이동하도록 설정
+      ref.read(navigationProvider.notifier).goToHome();
 
       // Navigator.push로 열린 경우 pop, 아니면 AuthWrapper가 자동 처리
       if (Navigator.of(context).canPop()) {
