@@ -1,0 +1,84 @@
+default_platform(:ios)
+
+# 프로젝트 루트 (ios/fastlane → ../../)
+PROJECT_ROOT = File.expand_path("../..", __dir__)
+
+def shorebird_cmd(args)
+  "cd #{PROJECT_ROOT} && export PATH=\"$HOME/.shorebird/bin:$PATH\" && yes | shorebird #{args}"
+end
+
+def release_notes(prefix)
+  commit_msg = `git -C #{PROJECT_ROOT} log -1 --pretty=%s 2>/dev/null`.strip
+  commit_msg = "New build" if commit_msg.empty?
+  "#{prefix} #{Time.now.strftime('%Y%m%d%H%M')} - #{commit_msg}"
+end
+
+def latest_ipa
+  path = Dir["#{PROJECT_ROOT}/build/ios/ipa/*.ipa"].first
+  UI.user_error!("IPA file not found under build/ios/ipa/. Run shorebird/flutter build first.") if path.nil?
+  path
+end
+
+platform :ios do
+  # ========================================
+  # App Store Connect 앱 생성 (최초 1회)
+  # ========================================
+
+  desc "Create app on App Store Connect (one-time)"
+  lane :create_app do
+    produce(
+      app_identifier: "com.gomath.mathlab",
+      app_name: "MathLab",
+      language: "Korean",
+      app_version: "1.0.0",
+      sku: "mathlab-gomath"
+    )
+    UI.success("✅ App Store Connect에 앱 생성 완료!")
+  end
+
+  # ========================================
+  # Firebase App Distribution (테스터 배포)
+  # ========================================
+
+  desc "Build and distribute to Firebase App Distribution"
+  lane :distribute do
+    sh(shorebird_cmd("release ios --export-method=ad-hoc"))
+
+    firebase_app_distribution(
+      app: "1:421762663548:ios:ec47fb21b270e08dff35f9",
+      groups: "testers",
+      ipa_path: latest_ipa,
+      release_notes: release_notes("Build")
+    )
+  end
+
+  # ========================================
+  # Shorebird OTA Patch (재설치 불필요)
+  # ========================================
+
+  desc "OTA patch via Shorebird (no reinstall needed)"
+  lane :patch do
+    sh(shorebird_cmd("patch ios"))
+    UI.success("✅ iOS OTA patch deployed! 테스터 앱 자동 업데이트.")
+  end
+
+  # ========================================
+  # App Store 배포
+  # ========================================
+
+  desc "Deploy to App Store (submit for review)"
+  lane :deploy_app_store do
+    sh(shorebird_cmd("release ios"))
+
+    deliver(
+      ipa: latest_ipa,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+      automatic_release: false,
+      force: true
+    )
+
+    UI.success("✅ App Store에 빌드 업로드 완료! App Store Connect에서 심사 제출하세요.")
+  end
+end

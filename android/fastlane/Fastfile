@@ -1,0 +1,65 @@
+default_platform(:android)
+
+# 프로젝트 루트 (android/fastlane → ../../)
+PROJECT_ROOT = File.expand_path("../..", __dir__)
+
+def shorebird_cmd(args)
+  "cd #{PROJECT_ROOT} && export PATH=\"$HOME/.shorebird/bin:$PATH\" && yes | shorebird #{args}"
+end
+
+def release_notes(prefix)
+  commit_msg = `git -C #{PROJECT_ROOT} log -1 --pretty=%s 2>/dev/null`.strip
+  commit_msg = "New build" if commit_msg.empty?
+  "#{prefix} #{Time.now.strftime('%Y%m%d%H%M')} - #{commit_msg}"
+end
+
+platform :android do
+  # ========================================
+  # Firebase App Distribution (테스터 배포)
+  # ========================================
+
+  desc "Build and distribute to Firebase App Distribution"
+  lane :distribute do
+    sh(shorebird_cmd("release android --artifact apk"))
+
+    firebase_app_distribution(
+      app: "1:421762663548:android:8819363bb6b0f241ff35f9",
+      groups: "testers",
+      android_artifact_type: "APK",
+      android_artifact_path: "#{PROJECT_ROOT}/build/app/outputs/flutter-apk/app-release.apk",
+      release_notes: release_notes("Build")
+    )
+  end
+
+  # ========================================
+  # Shorebird OTA Patch (재설치 불필요)
+  # ========================================
+
+  desc "OTA patch via Shorebird (no reinstall needed)"
+  lane :patch do
+    sh(shorebird_cmd("patch android"))
+    UI.success("✅ Android OTA patch deployed! 테스터 앱 자동 업데이트.")
+  end
+
+  # ========================================
+  # Google Play Store 배포
+  # ========================================
+
+  desc "Deploy to Google Play Store (internal/alpha/beta/production)"
+  lane :deploy_play_store do |options|
+    track = options[:track] || "internal"
+
+    sh(shorebird_cmd("release android"))
+
+    supply(
+      track: track,
+      aab: "#{PROJECT_ROOT}/build/app/outputs/bundle/release/app-release.aab",
+      json_key: "#{PROJECT_ROOT}/.secrets/play-store-deploy.json",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+
+    UI.success("✅ Google Play #{track} 트랙에 배포 완료!")
+  end
+end

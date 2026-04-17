@@ -1,0 +1,2 @@
+json_key_file("../../.secrets/play-store-deploy.json")
+package_name("com.gomath.mathlab")
