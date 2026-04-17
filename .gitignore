@@ -65,6 +65,10 @@ app.*.map.json
 **/ios/**/DerivedData/
 **/ios/**/Icon?
 **/ios/**/Pods/
+**/macos/**/Pods/
+**/macos/Podfile.lock
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
 **/ios/**/.symlinks/
 **/ios/**/profile
 **/ios/**/xcuserdata
@@ -212,3 +216,18 @@ error_logs/
 test_data/
 sample_data/
 fixtures/*.prod.*
+
+# ========================================
+# Shorebird
+# ========================================
+.shorebird/
+
+# ========================================
+# Fastlane
+# ========================================
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+*/fastlane/test_output
+vendor/bundle/
+Gemfile.lock
