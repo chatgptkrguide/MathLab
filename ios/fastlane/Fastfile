@@ -19,6 +19,17 @@ def latest_ipa
   path
 end
 
+# App Store Connect API Key (전역 저장, Apple 웹 로그인 불필요)
+def ensure_api_key
+  app_store_connect_api_key(
+    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"] || "3RYV62XWSP",
+    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"] || "d3533159-bf11-4529-a45d-ce8022d0322f",
+    key_filepath: File.expand_path("~/.appstoreconnect/private_keys/AuthKey_3RYV62XWSP.p8"),
+    duration: 1200,
+    in_house: false
+  )
+end
+
 platform :ios do
   # ========================================
   # App Store Connect 앱 생성 (최초 1회)
@@ -26,6 +37,7 @@ platform :ios do
 
   desc "Create app on App Store Connect (one-time)"
   lane :create_app do
+    ensure_api_key
     produce(
       app_identifier: "com.gomath.mathlab",
       app_name: "MathLab",
@@ -68,6 +80,7 @@ platform :ios do
 
   desc "Deploy to App Store (submit for review)"
   lane :deploy_app_store do
+    ensure_api_key
     sh(shorebird_cmd("release ios"))
 
     deliver(
