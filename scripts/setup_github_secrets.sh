@@ -58,7 +58,7 @@ printf "1:421762663548:android:8819363bb6b0f241ff35f9" | \
     gh secret set FIREBASE_ANDROID_APP_ID --repo "$REPO" && \
     print_ok "FIREBASE_ANDROID_APP_ID"
 
-printf "1:421762663548:ios:ec47fb21b270e08dff35f9" | \
+printf "1:421762663548:ios:20d3e33da071d49bff35f9" | \
     gh secret set FIREBASE_IOS_APP_ID --repo "$REPO" && \
     print_ok "FIREBASE_IOS_APP_ID"
 

@@ -1,2 +1,9 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
+#include? "KakaoSecrets.xcconfig"
+
+// Manual code signing for Ad Hoc / TestFlight / App Store distribution
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = Apple Distribution: Junsu Yeo (UHL26F5Y87)
+PROVISIONING_PROFILE_SPECIFIER = MathLab AdHoc
+DEVELOPMENT_TEAM = UHL26F5Y87

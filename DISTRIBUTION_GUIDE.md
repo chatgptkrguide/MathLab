@@ -114,7 +114,7 @@ GitHub 웹에서 수동으로 배포 트리거:
 | Secret | 설명 |
 |--------|------|
 | `FIREBASE_ANDROID_APP_ID` | `1:421762663548:android:8819363bb6b0f241ff35f9` |
-| `FIREBASE_IOS_APP_ID` | `1:421762663548:ios:ec47fb21b270e08dff35f9` |
+| `FIREBASE_IOS_APP_ID` | `1:421762663548:ios:20d3e33da071d49bff35f9` |
 | `FIREBASE_SERVICE_ACCOUNT` | Firebase 서비스 계정 JSON |
 | `GOOGLE_SERVICES_JSON` | google-services.json을 base64 인코딩한 값 |
 | `GOOGLE_SERVICE_INFO_PLIST` | GoogleService-Info.plist을 base64 인코딩한 값 |

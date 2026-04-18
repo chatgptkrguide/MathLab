@@ -57,7 +57,7 @@ platform :ios do
     sh(shorebird_cmd("release ios --export-method=ad-hoc"))
 
     firebase_app_distribution(
-      app: "1:421762663548:ios:ec47fb21b270e08dff35f9",
+      app: "1:421762663548:ios:20d3e33da071d49bff35f9",
       groups: "testers",
       ipa_path: latest_ipa,
       release_notes: release_notes("Build")

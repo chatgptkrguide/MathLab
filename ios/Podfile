@@ -29,6 +29,7 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
+  use_frameworks! :linkage => :static
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
     inherit! :search_paths
@@ -48,4 +49,13 @@ post_install do |installer|
       ]
     end
   end
+
+  # Fix gRPC modulemap path (Flutter + Firebase + gRPC compatibility)
+  ['grpc', 'grpcpp'].each do |dir_name|
+    private_dir = File.expand_path("Pods/Headers/Private/#{dir_name}", __dir__)
+    FileUtils.mkdir_p(private_dir) unless Dir.exist?(private_dir)
+  end
+  grpc_core_src = File.expand_path('Pods/Target Support Files/gRPC-Core/gRPC-Core.modulemap', __dir__)
+  grpc_core_dst = File.expand_path('Pods/Headers/Private/grpc/gRPC-Core.modulemap', __dir__)
+  FileUtils.ln_sf(grpc_core_src, grpc_core_dst) if File.exist?(grpc_core_src)
 end

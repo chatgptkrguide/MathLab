@@ -19,5 +19,15 @@
   ],
   "storage": {
     "rules": "storage.rules"
+  },
+  "appdistribution": {
+    "android": {
+      "appId": "1:421762663548:android:8819363bb6b0f241ff35f9",
+      "groups": "testers"
+    },
+    "ios": {
+      "appId": "1:421762663548:ios:20d3e33da071d49bff35f9",
+      "groups": "testers"
+    }
   }
 }
