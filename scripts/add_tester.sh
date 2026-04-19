@@ -30,14 +30,23 @@ EMAIL="$1"
 FIRST_NAME="${2:-Tester}"
 LAST_NAME="${3:-}"
 
-APP_ID="6762421843"
-GROUP_ID="ba7e7cd4-428a-4829-86c4-199081236059"
-KEY_ID="3RYV62XWSP"
-ISSUER_ID="d3533159-bf11-4529-a45d-ce8022d0322f"
+APP_ID="${MATHLAB_APP_ID:-6762421843}"
+GROUP_ID="${MATHLAB_TESTFLIGHT_GROUP_ID:-ba7e7cd4-428a-4829-86c4-199081236059}"
+API_JSON="$HOME/.appstoreconnect/api_key.json"
+
+if [ ! -f "$API_JSON" ]; then
+    echo -e "${RED}App Store Connect API key JSON 없음: $API_JSON${NC}"
+    echo -e "${YELLOW}~/.claude/CLAUDE.md의 'App Store Connect API Key' 섹션 참조${NC}"
+    exit 1
+fi
+
+# JSON에서 credentials 읽기 (로그에 출력 금지)
+KEY_ID=$(python3 -c "import json; print(json.load(open('$API_JSON'))['key_id'])")
+ISSUER_ID=$(python3 -c "import json; print(json.load(open('$API_JSON'))['issuer_id'])")
 KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8"
 
 if [ ! -f "$KEY_PATH" ]; then
-    echo -e "${RED}App Store Connect API Key 파일 없음: $KEY_PATH${NC}"
+    echo -e "${RED}App Store Connect API Key p8 파일 없음: $KEY_PATH${NC}"
     exit 1
 fi
 
@@ -46,19 +55,31 @@ echo "  Email: $EMAIL"
 echo "  Name: $FIRST_NAME $LAST_NAME"
 echo ""
 
-python3 <<PY
-import jwt, time, json, urllib.request, urllib.error
+EMAIL_ARG="$EMAIL" FIRST_NAME_ARG="$FIRST_NAME" LAST_NAME_ARG="$LAST_NAME" \
+KEY_PATH_ARG="$KEY_PATH" KEY_ID_ARG="$KEY_ID" ISSUER_ID_ARG="$ISSUER_ID" \
+APP_ID_ARG="$APP_ID" GROUP_ID_ARG="$GROUP_ID" \
+python3 <<'PY'
+import os, jwt, time, json, urllib.request, urllib.error, urllib.parse
 
-with open('$KEY_PATH') as f:
+EMAIL = os.environ['EMAIL_ARG']
+FIRST_NAME = os.environ['FIRST_NAME_ARG']
+LAST_NAME = os.environ['LAST_NAME_ARG']
+KEY_PATH = os.environ['KEY_PATH_ARG']
+KEY_ID = os.environ['KEY_ID_ARG']
+ISSUER_ID = os.environ['ISSUER_ID_ARG']
+APP_ID = os.environ['APP_ID_ARG']
+GROUP_ID = os.environ['GROUP_ID_ARG']
+
+with open(KEY_PATH) as f:
     pk = f.read()
 
 def tok():
-    p = {'iss':'$ISSUER_ID','iat':int(time.time()),'exp':int(time.time())+1200,'aud':'appstoreconnect-v1'}
-    return jwt.encode(p, pk, algorithm='ES256', headers={'kid':'$KEY_ID'})
+    p = {'iss': ISSUER_ID, 'iat': int(time.time()), 'exp': int(time.time())+1200, 'aud': 'appstoreconnect-v1'}
+    return jwt.encode(p, pk, algorithm='ES256', headers={'kid': KEY_ID})
 
 def api(method, path, body=None):
     req = urllib.request.Request(f'https://api.appstoreconnect.apple.com{path}',
-        headers={'Authorization':f'Bearer {tok()}','Content-Type':'application/json'},
+        headers={'Authorization': f'Bearer {tok()}', 'Content-Type': 'application/json'},
         method=method, data=json.dumps(body).encode() if body else None)
     try:
         with urllib.request.urlopen(req) as r:
@@ -67,8 +88,9 @@ def api(method, path, body=None):
     except urllib.error.HTTPError as e:
         return {'_err': e.code, '_body': e.read().decode()[:300]}
 
-# 기존 테스터 조회
-r = api('GET', f'/v1/betaTesters?filter[email]=$EMAIL')
+# 기존 테스터 조회 (URL 인코딩)
+email_enc = urllib.parse.quote(EMAIL, safe='')
+r = api('GET', f'/v1/betaTesters?filter[email]={email_enc}')
 if r.get('data'):
     tester_id = r['data'][0]['id']
     print(f'  ✅ 기존 테스터 발견: {tester_id}')
@@ -77,8 +99,8 @@ else:
     res = api('POST', '/v1/betaTesters', {
         'data': {
             'type': 'betaTesters',
-            'attributes': {'email': '$EMAIL', 'firstName': '$FIRST_NAME', 'lastName': '$LAST_NAME'},
-            'relationships': {'betaGroups': {'data': [{'type': 'betaGroups', 'id': '$GROUP_ID'}]}}
+            'attributes': {'email': EMAIL, 'firstName': FIRST_NAME, 'lastName': LAST_NAME},
+            'relationships': {'betaGroups': {'data': [{'type': 'betaGroups', 'id': GROUP_ID}]}}
         }
     })
     if '_err' in res:
@@ -92,7 +114,7 @@ res = api('POST', '/v1/betaTesterInvitations', {
     'data': {
         'type': 'betaTesterInvitations',
         'relationships': {
-            'app': {'data': {'type': 'apps', 'id': '$APP_ID'}},
+            'app': {'data': {'type': 'apps', 'id': APP_ID}},
             'betaTester': {'data': {'type': 'betaTesters', 'id': tester_id}}
         }
     }

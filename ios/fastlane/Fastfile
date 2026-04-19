@@ -20,14 +20,24 @@ def latest_ipa
 end
 
 # App Store Connect API Key (전역 저장, Apple 웹 로그인 불필요)
+# 로컬: ~/.appstoreconnect/api_key.json (git 추적 제외, Fastlane 기본 경로)
+# CI: APP_STORE_CONNECT_API_KEY_ID, APP_STORE_CONNECT_API_ISSUER_ID, APP_STORE_CONNECT_API_KEY_BASE64 환경변수
 def ensure_api_key
-  app_store_connect_api_key(
-    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"] || "3RYV62XWSP",
-    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"] || "d3533159-bf11-4529-a45d-ce8022d0322f",
-    key_filepath: File.expand_path("~/.appstoreconnect/private_keys/AuthKey_3RYV62XWSP.p8"),
-    duration: 1200,
-    in_house: false
-  )
+  local_json = File.expand_path("~/.appstoreconnect/api_key.json")
+  if File.exist?(local_json) && ENV["APP_STORE_CONNECT_API_KEY_ID"].nil?
+    # 로컬 개발: JSON 파일 사용
+    app_store_connect_api_key(json_key_filepath: local_json)
+  else
+    # CI 환경: 환경변수 사용
+    app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_BASE64"],
+      is_key_content_base64: true,
+      duration: 1200,
+      in_house: false
+    )
+  end
 end
 
 platform :ios do
