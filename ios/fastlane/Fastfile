@@ -1,5 +1,7 @@
 default_platform(:ios)
 
+require "json"
+
 # 프로젝트 루트 (ios/fastlane → ../../)
 PROJECT_ROOT = File.expand_path("../..", __dir__)
 
@@ -25,10 +27,15 @@ end
 def ensure_api_key
   local_json = File.expand_path("~/.appstoreconnect/api_key.json")
   if File.exist?(local_json) && ENV["APP_STORE_CONNECT_API_KEY_ID"].nil?
-    # 로컬 개발: JSON 파일 사용
-    app_store_connect_api_key(json_key_filepath: local_json)
+    key = JSON.parse(File.read(local_json))
+    app_store_connect_api_key(
+      key_id: key["key_id"],
+      issuer_id: key["issuer_id"],
+      key_content: key["key"],
+      duration: 1200,
+      in_house: false
+    )
   else
-    # CI 환경: 환경변수 사용
     app_store_connect_api_key(
       key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
       issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
