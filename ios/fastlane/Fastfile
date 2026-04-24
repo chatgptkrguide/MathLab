@@ -6,7 +6,12 @@ require "json"
 PROJECT_ROOT = File.expand_path("../..", __dir__)
 
 def shorebird_cmd(args)
-  "cd #{PROJECT_ROOT} && export PATH=\"$HOME/.shorebird/bin:$PATH\" && yes | shorebird #{args}"
+  # Fastlane(Bundle) 환경변수가 자식 프로세스(flutter/pod)로 전파되면
+  # CocoaPods가 잘못된 Ruby로 실행되어 "CocoaPods is broken" 에러 발생.
+  # BUNDLE_*/GEM_* 변수를 제거하고 PATH에 Homebrew 경로 보장.
+  env_clean = "unset BUNDLE_GEMFILE BUNDLE_BIN_PATH BUNDLE_PATH BUNDLER_ORIG_BUNDLE_BIN_PATH BUNDLER_ORIG_BUNDLE_GEMFILE BUNDLER_ORIG_BUNDLE_PATH BUNDLER_ORIG_PATH BUNDLER_ORIG_RUBYLIB BUNDLER_ORIG_RUBYOPT BUNDLER_ORIG_GEM_HOME BUNDLER_ORIG_GEM_PATH RUBYOPT RUBYLIB GEM_HOME GEM_PATH"
+  path_setup = "export PATH=\"$HOME/.shorebird/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\""
+  "cd #{PROJECT_ROOT} && #{env_clean} && #{path_setup} && yes | shorebird #{args}"
 end
 
 def release_notes(prefix)
