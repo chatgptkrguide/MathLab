@@ -161,6 +161,10 @@ secrets.dart
 # 소셜 로그인 설정 (OAuth)
 oauth_config.json
 kakao_config.json
+ios/Flutter/KakaoSecrets.xcconfig
+
+# Flutter linux ephemeral plugin symlinks (자동 생성)
+linux/flutter/ephemeral/
 
 # Firebase Admin Key (보안)
 firebase-admin-key.json
