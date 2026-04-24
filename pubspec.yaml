@@ -1,7 +1,7 @@
 name: mathlab
 description: "게이미피케이션 기반 수학 학습 앱 - MathLab"
 publish_to: 'none'
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
