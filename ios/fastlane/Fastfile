@@ -111,7 +111,10 @@ platform :ios do
       skip_screenshots: true,
       submit_for_review: false,
       automatic_release: false,
-      force: true
+      force: true,
+      # App Store Connect API Key는 IAP precheck를 지원하지 않으므로 비활성화.
+      # 업로드 자체에는 영향 없음 (TestFlight/심사 제출 시 별도로 검증됨).
+      run_precheck_before_submit: false
     )
 
     UI.success("✅ App Store에 빌드 업로드 완료! App Store Connect에서 심사 제출하세요.")
