@@ -137,6 +137,23 @@ class FCMService {
       AppLogger.info('FCM 토큰 Firestore 저장 완료', tag: 'FCM');
     } catch (e) {
       AppLogger.error('FCM 토큰 Firestore 저장 실패', error: e, tag: 'FCM');
+      // 한 번 재시도
+      try {
+        await Future.delayed(const Duration(seconds: 3));
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .update({
+            'fcmToken': token,
+            'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+          });
+          AppLogger.info('FCM 토큰 Firestore 재시도 저장 성공', tag: 'FCM');
+        }
+      } catch (retryError) {
+        AppLogger.error('FCM 토큰 Firestore 재시도도 실패', error: retryError, tag: 'FCM');
+      }
     }
   }
 

@@ -105,8 +105,14 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
         authState.firebaseUser == null) {
       // Reset tracking on logout so next login triggers initialization
       if (!authState.isLoading && _lastAccountId != null) {
-        _lastAccountId = null;
-        _shouldShowWelcome = false;
+        Future.microtask(() {
+          if (mounted) {
+            setState(() {
+              _lastAccountId = null;
+              _shouldShowWelcome = false;
+            });
+          }
+        });
       }
       return const AuthScreen();
     }

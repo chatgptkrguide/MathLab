@@ -19,6 +19,7 @@ import {
   PROBLEM_TYPE_LABELS,
 } from "@/lib/types";
 import LatexRenderer from "@/components/ui/latex-renderer";
+import { GRADES, DEFAULT_GRADE } from "@/lib/grades";
 import {
   Sparkles,
   Lightbulb,
@@ -62,6 +63,7 @@ export default function AIToolsPage() {
   const [loading, setLoading] = useState(false);
 
   // Filters
+  const [aiGrade, setAiGrade] = useState(DEFAULT_GRADE);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -338,6 +340,19 @@ export default function AIToolsPage() {
                   문제 선택
                 </div>
 
+                {/* Grade Tabs */}
+                <div className="flex gap-1 flex-wrap">
+                  {GRADES.map((g) => (
+                    <button key={g.key}
+                      onClick={() => { setAiGrade(g.key); setSelectedUnitId(""); setSelectedLessonId(""); }}
+                      className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+                        aiGrade === g.key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}>
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Unit Select */}
                 <div className="relative">
                   <select
@@ -349,9 +364,12 @@ export default function AIToolsPage() {
                     className="w-full appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2 pr-8 text-sm focus:border-blue-500 focus:outline-none"
                   >
                     <option value="">전체 단원</option>
-                    {units.map((u) => (
+                    {units.filter((u) => {
+                      const grade = GRADES.find((g) => g.key === aiGrade);
+                      return grade?.subjects.includes(u.subject);
+                    }).map((u) => (
                       <option key={u.id} value={u.id}>
-                        {u.emoji} {u.title}
+                        {u.title}
                       </option>
                     ))}
                   </select>

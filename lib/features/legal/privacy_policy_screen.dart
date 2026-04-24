@@ -28,7 +28,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '최종 수정일: 2025년 2월 1일',
+              '최종 수정일: 2026년 4월 3일',
               style: AppTextStyles.bodySmall,
             ),
             const SizedBox(height: AppDimensions.paddingLarge),

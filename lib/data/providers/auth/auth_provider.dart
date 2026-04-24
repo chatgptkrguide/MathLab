@@ -9,6 +9,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' as kakao;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -66,6 +67,8 @@ class Auth extends _$Auth {
   GoogleSignIn? _googleSignIn;
 
   GoogleSignIn _getGoogleSignIn() {
+    // Android: google-services.json에서 web client ID를 자동 감지
+    // serverClientId를 지정하지 않으면 google-services.json의 type=3 client를 사용
     _googleSignIn ??= GoogleSignIn(
       scopes: ['email'],
     );
@@ -212,10 +215,15 @@ class Auth extends _$Auth {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      AppLogger.info('Starting Google signin', tag: 'Auth');
+      AppLogger.info('=== GOOGLE SIGNIN START ===', tag: 'Auth');
+
+      final gsi = _getGoogleSignIn();
+      AppLogger.info('GoogleSignIn instance created, calling signIn()...', tag: 'Auth');
 
       // Trigger the Google Sign-In flow
-      final googleUser = await _getGoogleSignIn().signIn();
+      final googleUser = await gsi.signIn();
+
+      AppLogger.info('GoogleSignIn.signIn() returned: ${googleUser?.email ?? "NULL"}', tag: 'Auth');
 
       if (googleUser == null) {
         // User canceled the sign-in
@@ -380,7 +388,122 @@ class Auth extends _$Auth {
     }
   }
 
-  // Kakao 로그인: SDK 호환성 문제로 비활성화 (Phase 2 예정)
+  // ========================================
+  // Kakao Authentication (개발 단계)
+  // ========================================
+  // ⚠️ 개발용 구현: Firebase Custom Token 서버 없이 Email/Password로 연동
+  //    프로덕션에서는 반드시 Cloud Functions에서 Custom Token 발급하도록 교체
+  //    참고: https://firebase.google.com/docs/auth/admin/create-custom-tokens
+
+  /// Sign in with Kakao (개발 단계)
+  Future<bool> signInWithKakao() async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      AppLogger.info('Starting Kakao signin', tag: 'Auth');
+
+      // 1. Kakao 로그인 (KakaoTalk 앱 우선, 실패 시 카카오 계정)
+      kakao.OAuthToken kakaoToken;
+      final talkInstalled = await kakao.isKakaoTalkInstalled();
+      if (talkInstalled) {
+        try {
+          kakaoToken = await kakao.UserApi.instance.loginWithKakaoTalk();
+        } catch (e) {
+          AppLogger.warning(
+            'KakaoTalk login failed, falling back to account',
+            tag: 'Auth',
+            error: e,
+          );
+          kakaoToken = await kakao.UserApi.instance.loginWithKakaoAccount();
+        }
+      } else {
+        kakaoToken = await kakao.UserApi.instance.loginWithKakaoAccount();
+      }
+      AppLogger.info('Kakao OAuth token acquired (expires: ${kakaoToken.expiresAt})', tag: 'Auth');
+
+      // 2. Kakao user 정보 조회
+      final kakaoUser = await kakao.UserApi.instance.me();
+      final kakaoId = kakaoUser.id.toString();
+      final email = kakaoUser.kakaoAccount?.email ?? '$kakaoId@mathlab.kakao.local';
+      final nickname = kakaoUser.kakaoAccount?.profile?.nickname ?? '카카오 사용자';
+
+      // 3. 개발 단계: deterministic password 로 Firebase Email/Password 인증
+      final password = _sha256ofString('kakao_dev_$kakaoId');
+
+      auth.UserCredential userCredential;
+      try {
+        userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+      } on auth.FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
+          // 최초 로그인 — 자동 가입
+          userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+          if (userCredential.user != null && nickname.isNotEmpty) {
+            await userCredential.user!.updateDisplayName(nickname);
+          }
+        } else {
+          rethrow;
+        }
+      }
+
+      if (userCredential.user == null) {
+        throw const AuthException(
+          message: 'Kakao 로그인에 실패했습니다',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      // 4. 토큰 저장
+      final idToken = await userCredential.user!.getIdToken();
+      if (idToken != null) {
+        await _storage.saveAuthToken(idToken);
+      }
+
+      // 5. 사용자 데이터 로드
+      await ref.read(userProvider.notifier).loadUser(userCredential.user!.uid);
+
+      // 6. 상태 업데이트
+      state = state.copyWith(
+        firebaseUser: userCredential.user,
+        isAuthenticated: true,
+        isLoading: false,
+      );
+
+      AppLogger.info('Kakao signin successful', tag: 'Auth');
+      return true;
+    } on kakao.KakaoAuthException catch (e) {
+      AppLogger.error('Kakao auth failed', tag: 'Auth', error: e);
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Kakao 로그인에 실패했습니다',
+      );
+      return false;
+    } on kakao.KakaoClientException catch (e) {
+      // 사용자가 Kakao 로그인 화면 취소한 경우
+      AppLogger.info('Kakao signin canceled or client error: ${e.reason}', tag: 'Auth');
+      state = state.copyWith(isLoading: false);
+      return false;
+    } on auth.FirebaseAuthException catch (e) {
+      AppLogger.error('Firebase auth failed after Kakao', tag: 'Auth', error: e);
+      state = state.copyWith(
+        isLoading: false,
+        error: _getFirebaseAuthErrorMessage(e.code),
+      );
+      return false;
+    } catch (e, st) {
+      AppLogger.error('Kakao signin failed', tag: 'Auth', error: e, stackTrace: st);
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Kakao 로그인 중 오류가 발생했습니다',
+      );
+      return false;
+    }
+  }
 
   // ========================================
   // Guest Authentication
@@ -463,7 +586,7 @@ class Auth extends _$Auth {
       await Future.wait([
         _firebaseAuth.signOut(),
         _getGoogleSignIn().signOut(),
-        // Kakao logout is handled automatically when Firebase signs out
+        _safeKakaoLogout(),
       ]);
 
       // Clear secure storage
@@ -555,6 +678,15 @@ class Auth extends _$Auth {
   // ========================================
   // Error Handling
   // ========================================
+
+  /// Safe Kakao logout (실패 무시)
+  Future<void> _safeKakaoLogout() async {
+    try {
+      await kakao.UserApi.instance.logout();
+    } catch (_) {
+      // 로그인 안 된 상태 등은 무시
+    }
+  }
 
   /// Convert Firebase Auth error codes to Korean messages
   String _getFirebaseAuthErrorMessage(String code) {

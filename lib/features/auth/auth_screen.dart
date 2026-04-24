@@ -5,11 +5,8 @@ import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_durations.dart';
 import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
-import '../../shared/widgets/effects/noise_texture.dart';
 import '../onboarding/demo_lesson_screen.dart';
 
-/// Auth screen based on Figma design
-/// Blue background + robot character + login buttons
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
@@ -22,38 +19,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   bool _isLoading = false;
   bool _showMoreLogin = false;
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeIn;
 
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
-  }
-
-  void _setupAnimations() {
     _animationController = AnimationController(
       duration: AppDurations.authAnimation,
       vsync: this,
     );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-      ),
+    _fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
-
     _animationController.forward();
   }
 
@@ -66,258 +43,226 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Future<void> _handleGuestStart() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
-
-    await AuthHandler.handleGuestStart(
-      context: context,
-      ref: ref,
-      mounted: mounted,
-    );
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
+    await AuthHandler.handleGuestStart(context: context, ref: ref, mounted: mounted);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   Future<void> _handleGoogleLogin() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
-
-    await AuthHandler.handleGoogleLogin(
-      context: context,
-      ref: ref,
-      mounted: mounted,
-    );
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  // Kakao 로그인: SDK 호환성 문제로 비활성화 (Phase 2 예정)
-  Future<void> _handleKakaoLogin() async {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Kakao 로그인은 준비 중입니다')),
-    );
+    await AuthHandler.handleGoogleLogin(context: context, ref: ref, mounted: mounted);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   Future<void> _handleAppleLogin() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
+    await AuthHandler.handleAppleLogin(context: context, ref: ref, mounted: mounted);
+    if (mounted) setState(() => _isLoading = false);
+  }
 
-    await AuthHandler.handleAppleLogin(
-      context: context,
-      ref: ref,
-      mounted: mounted,
-    );
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
+  Future<void> _handleKakaoLogin() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+    await AuthHandler.handleKakaoLogin(context: context, ref: ref, mounted: mounted);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   Future<void> _handleEmailLogin() async {
     await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => const EmailLoginScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const EmailLoginScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
-      backgroundColor: AppColors.skyBlue,
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            const NoiseTexture(opacity: 0.02, color: Colors.white),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  // Robot character - fills available space
-                  Expanded(
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Center(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final imageSize = (constraints.maxHeight * 0.8).clamp(100.0, 220.0);
-                            return Image.asset(
-                              'assets/images/login/chatbot.png',
-                              width: imageSize,
-                              height: imageSize,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                ),
-                                child: const Icon(Icons.smart_toy_rounded, size: 60, color: Colors.white),
-                              ),
-                            );
-                          },
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        // 피그마 배경색: #211E41 (darkNavy)
+        color: const Color(0xFF211E41),
+        child: SafeArea(
+          bottom: false,
+          child: Stack(
+            children: [
+              FadeTransition(
+                opacity: _fadeIn,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(28, 0, 28, bottom + 16),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: Column(
+                    children: [
+                      const Spacer(flex: 2),
+
+                      // "Math is Fun!!!" 텍스트 (피그마: 기울어진 흰색 볼드)
+                      Transform.rotate(
+                        angle: -0.06,
+                        child: const Text(
+                          'Math is\nFun!!!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.2,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
 
-                  // Buttons
-                  SlideTransition(
-                    position: _slideAnimation,
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Primary CTA
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: _handleGuestStart,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.mathGreen,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Text('시작하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          // Google (primary social)
-                          _buildSocialButton(
-                            text: 'Google로 계속하기',
-                            fallbackIcon: Icons.g_mobiledata,
-                            backgroundColor: Colors.white,
-                            textColor: AppColors.textDark,
-                            onPressed: _handleGoogleLogin,
-                          ),
-                          // Apple (iOS only, primary social)
-                          if (defaultTargetPlatform == TargetPlatform.iOS) ...[
-                            const SizedBox(height: 6),
-                            _buildSocialButton(
-                              text: 'Apple로 계속하기',
-                              fallbackIcon: Icons.apple,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              onPressed: _handleAppleLogin,
-                            ),
-                          ],
-                          // More login options (collapsed)
-                          if (!_showMoreLogin) ...[
-                            const SizedBox(height: 12),
-                            GestureDetector(
-                              onTap: () => setState(() => _showMoreLogin = true),
-                              child: Text(
-                                '다른 방법으로 로그인',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ] else ...[
-                            const SizedBox(height: 6),
-                            _buildSocialButton(
-                              text: 'Kakao로 계속하기',
-                              fallbackIcon: Icons.chat_bubble,
-                              backgroundColor: AppColors.kakaoYellow,
-                              textColor: AppColors.kakaoBrown,
-                              onPressed: _handleKakaoLogin,
-                            ),
-                            const SizedBox(height: 6),
-                            _buildSocialButton(
-                              text: '이메일로 계속하기',
-                              fallbackIcon: Icons.email_outlined,
-                              backgroundColor: Colors.white.withValues(alpha: 0.2),
-                              textColor: Colors.white,
-                              onPressed: _handleEmailLogin,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
+                      const SizedBox(height: 20),
 
-                  const SizedBox(height: 10),
-
-                  // Demo + Terms combined
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const DemoLessonScreen(),
+                      // 3D 로봇 캐릭터 (피그마에서 추출)
+                      Image.asset(
+                        'assets/images/login/chatbot.png',
+                        width: 180,
+                        height: 180,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.smart_toy_rounded, size: 100, color: Colors.white54,
                         ),
-                      );
-                    },
-                    child: Text(
-                      '먼저 체험해보기',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.white.withValues(alpha: 0.4),
                       ),
-                    ),
+
+                      const SizedBox(height: 24),
+
+                      // "GoMath Lab" 타이틀 (피그마: 흰색 36px 볼드, 가운데)
+                      const Text(
+                        'GoMath Lab',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+
+                      const Spacer(flex: 2),
+
+                      // 시작 버튼 (피그마 스타일)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: _handleGuestStart,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4B6EF5),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Text(
+                            '시작하기',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // Google 로그인
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: _handleGoogleLogin,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.g_mobiledata, size: 22, color: Colors.white.withValues(alpha: 0.85)),
+                              const SizedBox(width: 8),
+                              Text('Google로 계속하기',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.85))),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity, height: 48,
+                          child: OutlinedButton(
+                            onPressed: _handleAppleLogin,
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              Icon(Icons.apple, size: 20, color: Colors.white.withValues(alpha: 0.85)),
+                              const SizedBox(width: 8),
+                              Text('Apple로 계속하기',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.85))),
+                            ]),
+                          ),
+                        ),
+                      ],
+
+                      if (!_showMoreLogin) ...[
+                        const SizedBox(height: 12),
+                        GestureDetector(
+                          onTap: () => setState(() => _showMoreLogin = true),
+                          child: Text('다른 방법으로 로그인',
+                            style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.3))),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 8),
+                        SizedBox(width: double.infinity, height: 44,
+                          child: ElevatedButton(onPressed: _handleKakaoLogin,
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.kakaoYellow, foregroundColor: AppColors.kakaoBrown, elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              Icon(Icons.chat_bubble_rounded, size: 16, color: AppColors.kakaoBrown), const SizedBox(width: 8),
+                              Text('Kakao로 계속하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.kakaoBrown)),
+                            ]))),
+                        const SizedBox(height: 8),
+                        SizedBox(width: double.infinity, height: 44,
+                          child: OutlinedButton(onPressed: _handleEmailLogin,
+                            style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              Icon(Icons.mail_outline_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)), const SizedBox(width: 8),
+                              Text('이메일로 계속하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.6))),
+                            ]))),
+                      ],
+
+                      const SizedBox(height: 10),
+
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const DemoLessonScreen())),
+                        child: Text('먼저 체험해보기',
+                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.25),
+                            decoration: TextDecoration.underline, decorationColor: Colors.white.withValues(alpha: 0.15))),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
                   ),
-
-                  const SizedBox(height: 8),
-                ],
-              ),
-            ),
-
-            // Loading overlay
-            if (_isLoading)
-              Container(
-                color: Colors.black54,
-                child: const Center(
-                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildSocialButton({
-    required String text,
-    required IconData fallbackIcon,
-    required Color backgroundColor,
-    required Color textColor,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      height: 42,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+              if (_isLoading)
+                Container(color: Colors.black54,
+                  child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))),
+            ],
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(fallbackIcon, size: 22, color: textColor),
-            const SizedBox(width: 8),
-            Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
-          ],
         ),
       ),
     );

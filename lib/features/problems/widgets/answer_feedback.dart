@@ -100,7 +100,7 @@ class AnswerFeedbackOverlay extends StatelessWidget {
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           maxHeight:
-                              MediaQuery.of(context).size.height * 0.6,
+                              MediaQuery.of(context).size.height * 0.75,
                         ),
                         child: Padding(
                           padding:
@@ -206,6 +206,8 @@ class AnswerFeedbackOverlay extends StatelessWidget {
             children: [
               Text(
                 title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.headlineSmall.copyWith(
                   color: panelColor,
                   fontWeight: FontWeight.bold,
@@ -227,6 +229,9 @@ class AnswerFeedbackOverlay extends StatelessWidget {
   }
 
   Widget _buildExplanation(String explanation, Color accentColor) {
+    // Split explanation at '=' for step-by-step display
+    final steps = _splitAtEquals(explanation);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppDimensions.spacing16),
@@ -247,18 +252,80 @@ class AnswerFeedbackOverlay extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
-          MathRichText(
-            text: explanation,
-            textStyle: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textPrimary,
-              height: 1.5,
+          const SizedBox(height: 10),
+          if (steps.length > 1)
+            ...steps.asMap().entries.map((entry) {
+              final i = entry.key;
+              final step = entry.value.trim();
+              return Padding(
+                padding: EdgeInsets.only(top: i == 0 ? 0 : 6),
+                child: MathRichText(
+                  text: step,
+                  textStyle: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.textPrimary,
+                    height: 1.6,
+                    fontSize: 17,
+                  ),
+                  mathFontSize: 19.0,
+                ),
+              );
+            })
+          else
+            MathRichText(
+              text: explanation,
+              textStyle: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textPrimary,
+                height: 1.6,
+                fontSize: 17,
+              ),
+              mathFontSize: 19.0,
             ),
-            mathFontSize: 16.0,
-          ),
         ],
       ),
     );
+  }
+
+  /// Split explanation at '=' or '→' signs for step-by-step display.
+  /// Handles all formats: plain text, single $...$, multiple $...$, mixed.
+  List<String> _splitAtEquals(String text) {
+    final trimmed = text.trim();
+
+    // Strip $ signs for splitting, then re-wrap
+    var raw = trimmed.replaceAll('\$', '');
+
+    // Manual split at '=' or '→' to keep delimiters separate
+    final lines = <String>[];
+    final buffer = StringBuffer();
+    String? lastDelim;
+
+    for (int i = 0; i < raw.length; i++) {
+      final ch = raw[i];
+      if (ch == '=' || ch == '→') {
+        final part = buffer.toString().trim();
+        if (part.isNotEmpty) {
+          if (lastDelim != null) {
+            lines.add('$lastDelim \$$part\$');
+          } else {
+            lines.add('\$$part\$');
+          }
+        }
+        lastDelim = ch == '=' ? '=' : '→';
+        buffer.clear();
+      } else {
+        buffer.write(ch);
+      }
+    }
+    // Last part
+    final remaining = buffer.toString().trim();
+    if (remaining.isNotEmpty) {
+      if (lastDelim != null) {
+        lines.add('$lastDelim \$$remaining\$');
+      } else {
+        lines.add('\$$remaining\$');
+      }
+    }
+
+    return lines.length > 1 ? lines : [text];
   }
 
   Widget _buildValidationHints(List<String> hints) {

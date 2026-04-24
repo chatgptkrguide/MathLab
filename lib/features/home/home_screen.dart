@@ -438,6 +438,8 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                 letterSpacing: 1,
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -467,7 +469,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
       '기하': (Icons.hexagon_rounded, AppColors.skyBlue, const Color(0xFFE0F0FF)),
     };
 
-    return Container(
+    return SizedBox(
       key: HomeScreenFigma.subjectRowKey,
       height: 48,
       child: Row(

@@ -50,7 +50,7 @@ class _ProblemCompletionScreenState
       if (user == null) return;
 
       await ref
-          .read(lessonProgressProvider(user.id).notifier)
+          .read(lessonProgressProvider(user.uid).notifier)
           .completeLesson(
             lessonId: widget.lessonId,
             correctAnswers: widget.session.correctCount,
@@ -195,12 +195,16 @@ class _ProblemCompletionScreenState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: Colors.white,
+          Flexible(
+            child: Text(
+              label,
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: Colors.white,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: AppDimensions.spacing8),
           Text(
             value,
             style: AppTextStyles.heading2.copyWith(

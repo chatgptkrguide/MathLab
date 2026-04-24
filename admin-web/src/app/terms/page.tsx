@@ -7,7 +7,7 @@ export default function TermsOfServicePage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold mb-2">서비스 이용약관</h1>
-        <p className="text-gray-500 mb-8">시행일자: 2025년 1월 1일</p>
+        <p className="text-gray-500 mb-8">시행일자: 2026년 4월 3일</p>
 
         <div className="prose prose-gray max-w-none space-y-6 text-[15px] leading-relaxed">
           <h2 className="text-xl font-semibold mt-8">제1조 (목적)</h2>
@@ -164,13 +164,13 @@ export default function TermsOfServicePage() {
           </p>
 
           <h2 className="text-xl font-semibold mt-8">부칙</h2>
-          <p>본 약관은 2025년 1월 1일부터 시행됩니다.</p>
+          <p>본 약관은 2026년 4월 3일부터 시행됩니다.</p>
 
           <hr className="my-8" />
           <div className="text-sm text-gray-500 space-y-1">
             <p>회사명: MathLab | 대표자: 여준수</p>
             <p>이메일: support@mathlab.com</p>
-            <p>최종 수정일: 2025년 1월 1일 | 버전: 1.0</p>
+            <p>최종 수정일: 2026년 4월 3일 | 버전: 1.0</p>
           </div>
         </div>
       </div>

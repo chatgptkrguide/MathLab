@@ -76,118 +76,127 @@ class _FriendSearchScreenState extends ConsumerState<FriendSearchScreen> {
           ),
           if (_isLoading) const LinearProgressIndicator(),
           Expanded(
-            child: _searchResults.isEmpty
-                ? const Center(
-                    child: Text('검색 결과가 없습니다', style: TextStyle(color: Colors.grey)))
-                : ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final result = _searchResults[index];
-                      final resultId = result['id'] as String;
-                      final isFriend = friendState.isFriend(resultId);
-                      final hasRequestSent =
-                          friendState.hasRequestSent(resultId);
+            child: ListView(
+              children: [
+                // Search results
+                if (_searchResults.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 64),
+                    child: Center(
+                      child: Text('검색 결과가 없습니다', style: TextStyle(color: Colors.grey)),
+                    ),
+                  )
+                else
+                  ..._searchResults.map((result) {
+                    final resultId = (result['id'] as String?) ?? '';
+                    final resultName = (result['name'] as String?) ?? '사용자';
+                    final resultPhoto = result['photoUrl'] as String?;
+                    final resultEmail = result['email'] as String?;
+                    final isFriend = friendState.isFriend(resultId);
+                    final hasRequestSent =
+                        friendState.hasRequestSent(resultId);
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: result['photoUrl'] != null
-                              ? NetworkImage(result['photoUrl'] as String)
-                              : null,
-                          child: result['photoUrl'] == null
-                              ? Text((result['name'] as String)[0])
-                              : null,
-                        ),
-                        title: Text(result['name'] as String),
-                        subtitle: Text(result['email'] as String? ?? ''),
-                        trailing: isFriend
-                            ? const Chip(label: Text('친구'))
-                            : hasRequestSent
-                                ? const Chip(label: Text('요청 전송됨'))
-                                : ElevatedButton.icon(
-                                    icon: const Icon(Icons.person_add,
-                                        size: 18),
-                                    label: const Text('친구 추가'),
-                                    onPressed: () async {
-                                      await ref
-                                          .read(friendProvider(firebaseUser.uid).notifier)
-                                          .sendFriendRequest(resultId);
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content:
-                                                  Text('${result['name']}님에게 친구 요청을 보냈습니다')),
-                                        );
-                                      }
-                                    },
-                                  ),
-                      );
-                    },
-                  ),
-          ),
-          // Friend suggestions
-          ref.watch(friendSuggestionsProvider(firebaseUser.uid)).when(
-                data: (suggestions) {
-                  if (suggestions.isEmpty) return const SizedBox.shrink();
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(16)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('추천 친구',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 100,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: suggestions.length,
-                            itemBuilder: (context, index) {
-                              final suggestion = suggestions[index];
-                              return Container(
-                                width: 80,
-                                margin: const EdgeInsets.only(right: 12),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage:
-                                          suggestion['photoUrl'] != null
-                                              ? NetworkImage(
-                                                  suggestion['photoUrl']
-                                                      as String)
-                                              : null,
-                                      child: suggestion['photoUrl'] == null
-                                          ? Text(
-                                              (suggestion['name'] as String)[0])
-                                          : null,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      suggestion['name'] as String,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: resultPhoto != null
+                            ? NetworkImage(resultPhoto)
+                            : null,
+                        child: resultPhoto == null
+                            ? Text(resultName.isNotEmpty ? resultName[0] : '?')
+                            : null,
+                      ),
+                      title: Text(resultName),
+                      subtitle: Text(resultEmail ?? ''),
+                      trailing: isFriend
+                          ? const Chip(label: Text('친구'))
+                          : hasRequestSent
+                              ? const Chip(label: Text('요청 전송됨'))
+                              : ElevatedButton.icon(
+                                  icon: const Icon(Icons.person_add,
+                                      size: 18),
+                                  label: const Text('친구 추가'),
+                                  onPressed: () async {
+                                    await ref
+                                        .read(friendProvider(firebaseUser.uid).notifier)
+                                        .sendFriendRequest(resultId);
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content:
+                                                Text('${result['name']}님에게 친구 요청을 보냈습니다')),
+                                      );
+                                    }
+                                  },
                                 ),
-                              );
-                            },
+                    );
+                  }),
+                // Friend suggestions
+                ref.watch(friendSuggestionsProvider(firebaseUser.uid)).when(
+                      data: (suggestions) {
+                        if (suggestions.isEmpty) return const SizedBox.shrink();
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius:
+                                const BorderRadius.vertical(top: Radius.circular(16)),
                           ),
-                        ),
-                      ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('추천 친구',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 100,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: suggestions.length,
+                                  itemBuilder: (context, index) {
+                                    final suggestion = suggestions[index];
+                                    return Container(
+                                      width: 80,
+                                      margin: const EdgeInsets.only(right: 12),
+                                      child: Column(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage:
+                                                suggestion['photoUrl'] != null
+                                                    ? NetworkImage(
+                                                        suggestion['photoUrl']
+                                                            as String)
+                                                    : null,
+                                            child: suggestion['photoUrl'] == null
+                                                ? Text(
+                                                    (suggestion['name'] as String)[0])
+                                                : null,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            suggestion['name'] as String,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
-                  );
-                },
-                loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
-              ),
+              ],
+            ),
+          ),
         ],
       ),
     );

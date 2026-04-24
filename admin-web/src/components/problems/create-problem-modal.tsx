@@ -7,6 +7,7 @@ import {
   X, Check, ChevronRight, ChevronLeft,
   Plus, Lightbulb, BookOpen, Sparkles,
 } from "lucide-react";
+import { GRADES, DEFAULT_GRADE } from "@/lib/grades";
 
 interface CreateProblemModalProps {
   open: boolean;
@@ -30,6 +31,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
   const [saving, setSaving] = useState(false);
 
   // Form state
+  const [modalGrade, setModalGrade] = useState(DEFAULT_GRADE);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [lessonId, setLessonId] = useState(editData?.lessonId || "");
   const [type, setType] = useState<ProblemType>(editData?.type || "multipleChoice");
@@ -191,12 +193,30 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* STEP 0: 위치 선택 */}
-          {step === 0 && (
+          {step === 0 && (() => {
+            const grade = GRADES.find((g) => g.key === modalGrade);
+            const gradeUnits = units.filter((u) => grade?.subjects.includes(u.subject));
+            return (
             <div className="space-y-5">
+              {/* 학년 탭 */}
+              <div>
+                <label className="text-sm font-semibold text-gray-900 mb-2 block">학년 선택</label>
+                <div className="flex gap-1.5 flex-wrap">
+                  {GRADES.map((g) => (
+                    <button key={g.key} type="button"
+                      onClick={() => { setModalGrade(g.key); setSelectedUnitId(""); setLessonId(""); }}
+                      className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+                        modalGrade === g.key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}>
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div>
                 <label className="text-sm font-semibold text-gray-900 mb-3 block">단원 선택</label>
                 <div className="grid grid-cols-1 gap-2">
-                  {units.map((unit) => {
+                  {gradeUnits.map((unit) => {
                     const unitLessons = lessons.filter((l) => l.unitId === unit.id);
                     const unitProblems = unitLessons.reduce((acc, l) => acc + (problemCounts[l.id] || 0), 0);
                     const isSelected = selectedUnitId === unit.id;
@@ -209,7 +229,6 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                           isSelected ? "border-blue-500 bg-blue-50 ring-1 ring-blue-200" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                         }`}
                       >
-                        <span className="text-xl">{unit.emoji}</span>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-gray-900">{unit.title}</div>
                           <div className="text-xs text-gray-500">{unitLessons.length}개 레슨 · {unitProblems}개 문제</div>
@@ -225,7 +244,7 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 <div>
                   <label className="text-sm font-semibold text-gray-900 mb-3 block">
                     레슨 선택
-                    <span className="ml-2 text-xs font-normal text-gray-400">{selectedUnit?.emoji} {selectedUnit?.title}</span>
+                    <span className="ml-2 text-xs font-normal text-gray-400">{selectedUnit?.title}</span>
                   </label>
                   <div className="grid grid-cols-1 gap-2">
                     {filteredLessons.length === 0 ? (
@@ -262,7 +281,8 @@ export default function CreateProblemModal({ open, onClose, onCreated, editData 
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {/* STEP 1: 문제 작성 */}
           {step === 1 && (

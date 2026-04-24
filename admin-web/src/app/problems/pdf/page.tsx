@@ -12,6 +12,7 @@ import {
   DIFFICULTY_LABELS,
 } from "@/lib/types";
 import LatexRenderer from "@/components/ui/latex-renderer";
+import { GRADES, DEFAULT_GRADE } from "@/lib/grades";
 import {
   Upload,
   FileText,
@@ -40,6 +41,7 @@ interface EditableProblem extends ParsedProblem {
 export default function PdfUploadPage() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [pdfGrade, setPdfGrade] = useState(DEFAULT_GRADE);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [selectedLessonId, setSelectedLessonId] = useState("");
   const [difficulty, setDifficulty] = useState<ProblemDifficulty>("medium");
@@ -375,6 +377,19 @@ export default function PdfUploadPage() {
             2. 단원/레슨 및 난이도 선택
           </h3>
 
+          {/* 학년 선택 */}
+          <div className="flex gap-1.5 flex-wrap mb-4">
+            {GRADES.map((g) => (
+              <button key={g.key}
+                onClick={() => { setPdfGrade(g.key); setSelectedUnitId(""); setSelectedLessonId(""); }}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+                  pdfGrade === g.key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}>
+                {g.label}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Unit Select */}
             <div>
@@ -391,9 +406,12 @@ export default function PdfUploadPage() {
                   className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-8 text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="">전체 단원</option>
-                  {units.map((unit) => (
+                  {units.filter((u) => {
+                    const grade = GRADES.find((g) => g.key === pdfGrade);
+                    return grade?.subjects.includes(u.subject);
+                  }).map((unit) => (
                     <option key={unit.id} value={unit.id}>
-                      {unit.emoji} {unit.title}
+                      {unit.title}
                     </option>
                   ))}
                 </select>

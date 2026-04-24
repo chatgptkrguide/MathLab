@@ -7,16 +7,16 @@ import {
   FileText,
   BookOpen,
   GraduationCap,
-  Shapes,
   FileUp,
   Sparkles,
+  Upload,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard, exact: true },
   { href: "/problems", label: "문제 관리", icon: FileText, exact: true },
-  { href: "/problems/geometry", label: "기하 문제 생성기", icon: Shapes, exact: false },
   { href: "/problems/pdf", label: "PDF 변환", icon: FileUp, exact: false },
+  { href: "/problems/bulk", label: "대량 업로드", icon: Upload, exact: false },
   { href: "/problems/ai", label: "AI 도구", icon: Sparkles, exact: false },
   { href: "/curriculum", label: "커리큘럼 관리", icon: BookOpen, exact: false },
 ];

@@ -190,8 +190,31 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                         .toList();
 
                 // Flatten all lessons from all units for the path
+                // 유닛 간 순차 잠금: 같은 과목 내에서만 이전 유닛 완료 필요
                 final allLessons = <LessonModel>[];
                 final lessonUnitMap = <String, UnitModel>{};
+                final unitUnlockMap = <String, bool>{};
+
+                // 과목별로 그룹화하여 순차 잠금
+                final subjectGroups = <String, List<UnitModel>>{};
+                for (final unit in units) {
+                  subjectGroups.putIfAbsent(unit.subject, () => []).add(unit);
+                }
+                for (final subjectUnits in subjectGroups.values) {
+                  bool prevDone = true;
+                  for (final unit in subjectUnits) {
+                    unitUnlockMap[unit.id] = prevDone;
+                    bool allDone = unit.lessons.isNotEmpty;
+                    for (final lesson in unit.lessons) {
+                      final progress = progressState.progressMap[lesson.id];
+                      if (progress?.status != LessonStatus.completed) {
+                        allDone = false;
+                      }
+                    }
+                    prevDone = allDone;
+                  }
+                }
+
                 for (final unit in units) {
                   for (final lesson in unit.lessons) {
                     allLessons.add(lesson);
@@ -456,18 +479,49 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       );
     }
 
+    // 유닛 잠금 맵 생성 (같은 과목 내에서 이전 유닛 완료 여부)
+    final unitUnlockMap = <String, bool>{};
+    // 과목별로 그룹화하여 순차 잠금 적용
+    final subjectGroups = <String, List<UnitModel>>{};
+    for (final unit in allUnits) {
+      subjectGroups.putIfAbsent(unit.subject, () => []).add(unit);
+    }
+    for (final subjectUnits in subjectGroups.values) {
+      bool prevDone = true;
+      for (final unit in subjectUnits) {
+        unitUnlockMap[unit.id] = prevDone;
+        bool allDone = unit.lessons.isNotEmpty;
+        for (final l in unit.lessons) {
+          if (progressState.progressMap[l.id]?.status != LessonStatus.completed) {
+            allDone = false;
+          }
+        }
+        prevDone = allDone;
+      }
+    }
+
     // Determine current lesson index
     int currentIndex = 0;
     for (int i = 0; i < lessons.length; i++) {
-      final progress = progressState.progressMap[lessons[i].id];
-      final isFirstOrPrevCompleted = i == 0 ||
+      final lesson = lessons[i];
+      final unit = allUnits.where((u) => u.lessons.any((l) => l.id == lesson.id)).firstOrNull;
+      final unitUnlocked = unit != null ? (unitUnlockMap[unit.id] ?? true) : true;
+
+      final progress = progressState.progressMap[lesson.id];
+      final isFirstInUnit = unit != null && unit.lessons.isNotEmpty && unit.lessons.first.id == lesson.id;
+      final isFirstOrPrevCompleted = (i == 0 || isFirstInUnit) ||
           (i > 0 &&
               progressState.progressMap[lessons[i - 1].id]?.status ==
                   LessonStatus.completed);
-      final status = progress?.status ??
-          (isFirstOrPrevCompleted
-              ? LessonStatus.unlocked
-              : LessonStatus.locked);
+      LessonStatus status;
+      if (!unitUnlocked) {
+        status = progress?.status ?? LessonStatus.locked;
+      } else {
+        status = progress?.status ??
+            (isFirstOrPrevCompleted
+                ? LessonStatus.unlocked
+                : LessonStatus.locked);
+      }
 
       if (status == LessonStatus.unlocked ||
           status == LessonStatus.inProgress) {
@@ -482,22 +536,49 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       currentIndex = lessons.length - 1;
     }
 
+    // 유닛 구분선을 위한 레슨→유닛 매핑
+    final lessonToUnit = <String, String>{};
+    for (final unit in allUnits) {
+      for (final l in unit.lessons) {
+        lessonToUnit[l.id] = unit.id;
+      }
+    }
+
     return Column(
       children: List.generate(lessons.length, (index) {
         final lesson = lessons[index];
         final progress = progressState.progressMap[lesson.id];
-        final isFirstOrPrevCompleted = index == 0 ||
+
+        // 유닛 잠금 확인
+        final unitId = lessonToUnit[lesson.id];
+        final unit = allUnits.where((u) => u.id == unitId).firstOrNull;
+        final unitUnlocked = unitId != null ? (unitUnlockMap[unitId] ?? true) : true;
+        final isFirstInUnit = unit != null && unit.lessons.isNotEmpty && unit.lessons.first.id == lesson.id;
+
+        final isFirstOrPrevCompleted = (index == 0 || isFirstInUnit) ||
             (index > 0 &&
                 progressState.progressMap[lessons[index - 1].id]?.status ==
                     LessonStatus.completed);
-        final status = progress?.status ??
-            (isFirstOrPrevCompleted
-                ? LessonStatus.unlocked
-                : LessonStatus.locked);
+
+        LessonStatus status;
+        if (!unitUnlocked) {
+          status = progress?.status ?? LessonStatus.locked;
+        } else {
+          status = progress?.status ??
+              (isFirstOrPrevCompleted
+                  ? LessonStatus.unlocked
+                  : LessonStatus.locked);
+        }
+
         final isCompleted = status == LessonStatus.completed;
         final isLocked = status == LessonStatus.locked;
         final isActive = !isLocked;
         final isCurrent = index == currentIndex && !isCompleted;
+
+        // 유닛 구분선: 이전 레슨과 다른 유닛에 속할 때
+        final showUnitDivider = index > 0 &&
+            unitId != null &&
+            lessonToUnit[lessons[index - 1].id] != unitId;
 
         // Zigzag alignment: center, left, right, left, right...
         final zigzagAlign = _getZigzagAlignment(index);
@@ -512,22 +593,79 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
             nodeAlignment = Alignment.center;
         }
 
-        return Padding(
-          key: index == 0 ? LessonsScreenFigma.lessonPathKey : null,
-          padding: const EdgeInsets.only(bottom: 28),
-          child: Align(
-            alignment: nodeAlignment,
-            child: _buildLessonNode(
-              index: index,
-              lesson: lesson,
-              status: status,
-              isActive: isActive,
-              isCompleted: isCompleted,
-              isCurrent: isCurrent,
-              allUnits: allUnits,
-              progressState: progressState,
+        return Column(
+          children: [
+            // 유닛 구분선
+            if (showUnitDivider && unit != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20, top: 4),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: unitUnlocked
+                        ? AppColors.skyBlue.withValues(alpha: 0.08)
+                        : Colors.grey.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: unitUnlocked
+                          ? AppColors.skyBlue.withValues(alpha: 0.2)
+                          : Colors.grey.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        unitUnlocked ? Icons.menu_book_rounded : Icons.lock_outline_rounded,
+                        size: 16,
+                        color: unitUnlocked ? AppColors.skyBlue : Colors.grey[400],
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          unit.title,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: unitUnlocked ? AppColors.skyBlue : Colors.grey[400],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (!unitUnlocked) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          '이전 단원 완료 필요',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            Padding(
+              key: index == 0 ? LessonsScreenFigma.lessonPathKey : null,
+              padding: const EdgeInsets.only(bottom: 28),
+              child: Align(
+                alignment: nodeAlignment,
+                child: _buildLessonNode(
+                  index: index,
+                  lesson: lesson,
+                  status: status,
+                  isActive: isActive,
+                  isCompleted: isCompleted,
+                  isCurrent: isCurrent,
+                  allUnits: allUnits,
+                  progressState: progressState,
+                ),
+              ),
             ),
-          ),
+          ],
         );
       }),
     );
@@ -727,10 +865,35 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
 
     if (lesson == null) return;
 
+    // 유닛 잠금 확인: 같은 과목 내에서 이전 유닛 완료 여부
+    UnitModel? parentUnit;
+    for (final unit in units) {
+      if (unit.lessons.any((l) => l.id == lessonId)) {
+        parentUnit = unit;
+        break;
+      }
+    }
+
+    bool unitUnlocked = true;
+    if (parentUnit != null) {
+      // 같은 과목의 유닛들만 필터링하여 순서 확인
+      final sameSubjectUnits = units
+          .where((u) => u.subject == parentUnit!.subject)
+          .toList();
+      final unitIndex = sameSubjectUnits.indexOf(parentUnit);
+      if (unitIndex > 0) {
+        final prevUnit = sameSubjectUnits[unitIndex - 1];
+        unitUnlocked = prevUnit.lessons.every((l) =>
+            progressState.progressMap[l.id]?.status == LessonStatus.completed);
+      }
+    }
+
     // Check if accessible
     bool isAccessible = false;
 
-    if (lessonIndex == 0) {
+    if (!unitUnlocked) {
+      isAccessible = false;
+    } else if (lessonIndex == 0) {
       isAccessible = true;
     } else if (progress != null && progress.status != LessonStatus.locked) {
       isAccessible = true;
@@ -746,7 +909,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     if (!isAccessible) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('이전 레슨을 먼저 완료해주세요!'),
+          content: Text(
+            unitUnlocked ? '이전 레슨을 먼저 완료해주세요!' : '이전 단원을 먼저 완료해주세요!',
+          ),
           backgroundColor: Colors.red[400],
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(

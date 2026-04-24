@@ -5,12 +5,14 @@ import AdminLayout from "@/components/layout/admin-layout";
 import ProblemForm from "@/components/problems/problem-form";
 import { createProblem, getUnits, getLessons, getProblemCountsByLesson } from "@/lib/firestore";
 import { Problem, Unit, Lesson } from "@/lib/types";
+import { GRADES, DEFAULT_GRADE } from "@/lib/grades";
 
 export default function NewProblemPage() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [problemCounts, setProblemCounts] = useState<Record<string, number>>({});
   const [selectedOverviewUnitId, setSelectedOverviewUnitId] = useState<string | null>(null);
+  const [sidebarGrade, setSidebarGrade] = useState(DEFAULT_GRADE);
 
   const loadOverviewData = useCallback(async () => {
     try {
@@ -79,8 +81,23 @@ export default function NewProblemPage() {
         {/* Sidebar - Unit/Lesson Overview */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-gray-900">단원별 문제 현황</h3>
-          <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
-            {units.map((unit) => {
+          {/* 학년 탭 */}
+          <div className="flex gap-1 flex-wrap">
+            {GRADES.map((g) => (
+              <button key={g.key}
+                onClick={() => { setSidebarGrade(g.key); setSelectedOverviewUnitId(null); }}
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  sidebarGrade === g.key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}>
+                {g.label}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-2 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
+            {units.filter((u) => {
+              const grade = GRADES.find((g) => g.key === sidebarGrade);
+              return grade?.subjects.includes(u.subject);
+            }).map((unit) => {
               const unitLessons = getLessonsForUnit(unit.id);
               const totalProblems = getUnitTotalProblems(unit.id);
               const isExpanded = selectedOverviewUnitId === unit.id;
@@ -95,7 +112,6 @@ export default function NewProblemPage() {
                     className="flex w-full items-center justify-between px-3 py-2.5 text-left hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-sm">{unit.emoji}</span>
                       <span className="text-sm font-medium text-gray-800 truncate">
                         {unit.title}
                       </span>

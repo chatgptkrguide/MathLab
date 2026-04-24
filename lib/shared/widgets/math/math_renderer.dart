@@ -145,35 +145,23 @@ class MathRichText extends StatelessWidget {
     final parts = _parseTextWithMath(text);
     final baseStyle = textStyle ?? AppTextStyles.bodyLarge;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const ClampingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: constraints.maxWidth > 0
-                  ? constraints.maxWidth
-                  : MediaQuery.of(context).size.width - 48,
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: parts.map((part) {
+        if (part.isMath) {
+          return FittedBox(
+            fit: BoxFit.scaleDown,
+            child: InlineMath(
+              latex: part.content,
+              textStyle: baseStyle,
+              fontSize: mathFontSize,
+              color: mathColor,
             ),
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: parts.map((part) {
-                if (part.isMath) {
-                  return InlineMath(
-                    latex: part.content,
-                    textStyle: baseStyle,
-                    fontSize: mathFontSize,
-                    color: mathColor,
-                  );
-                } else {
-                  return Text(part.content, style: baseStyle);
-                }
-              }).toList(),
-            ),
-          ),
-        );
-      },
+          );
+        } else {
+          return Text(part.content, style: baseStyle);
+        }
+      }).toList(),
     );
   }
 

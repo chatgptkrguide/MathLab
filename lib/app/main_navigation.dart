@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../shared/widgets/layout/custom_bottom_nav.dart';
-import '../shared/widgets/daily_reward_dialog.dart';
 import '../features/home/home_screen.dart';
 import '../features/lessons/lessons_screen.dart';
 import '../features/wrong_answer/wrong_answer_screen.dart';
@@ -105,12 +104,8 @@ class _MainNavigationState extends ConsumerState<MainNavigation> {
           ref.read(navigationProvider.notifier).setTab(tabIndex);
         },
         onComplete: () {
-          // 온보딩 완료 후 일일 보상 다이얼로그 표시
-          if (mounted) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) DailyRewardDialog.show(context);
-            });
-          }
+          // 온보딩 완료 후 일일 보상은 HomeScreen에서 자동 표시됨
+          // 여기서 중복 호출하지 않음
         },
       );
     }

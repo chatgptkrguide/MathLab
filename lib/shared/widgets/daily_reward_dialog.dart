@@ -36,47 +36,53 @@ class DailyRewardDialog extends ConsumerWidget {
       backgroundColor: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.spacing24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 타이틀
-            Text(
-              '🔥 일일 보상',
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.textDark,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing8),
-            Text(
-              'Day ${rewardState.currentDay} / 7',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing24),
-
-            // 7일 보상 그리드
-            _buildRewardGrid(rewardState),
-
-            const SizedBox(height: AppDimensions.spacing24),
-
-            // 보상 받기 버튼
-            _buildClaimButton(context, ref, rewardState),
-
-            const SizedBox(height: AppDimensions.spacing12),
-
-            // 닫기 버튼 (이미 수령한 경우)
-            if (rewardState.hasClaimedToday)
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  '닫기',
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 타이틀
+                Text(
+                  '🔥 일일 보상',
+                  style: AppTextStyles.headlineMedium.copyWith(
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacing8),
+                Text(
+                  'Day ${rewardState.currentDay} / 7',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
-              ),
-          ],
+                const SizedBox(height: AppDimensions.spacing24),
+
+                // 7일 보상 그리드
+                _buildRewardGrid(rewardState),
+
+                const SizedBox(height: AppDimensions.spacing24),
+
+                // 보상 받기 버튼
+                _buildClaimButton(context, ref, rewardState),
+
+                const SizedBox(height: AppDimensions.spacing12),
+
+                // 닫기 버튼 (항상 표시)
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    rewardState.hasClaimedToday ? '닫기' : '나중에 받기',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

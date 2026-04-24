@@ -13,6 +13,7 @@ import {
   deleteLesson,
 } from "@/lib/firestore";
 import { Unit, Lesson, UnitTheme, UNIT_THEME_COLORS } from "@/lib/types";
+import { GRADES, DEFAULT_GRADE } from "@/lib/grades";
 import {
   Plus,
   Trash2,
@@ -41,6 +42,7 @@ export default function CurriculumPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set());
+  const [currGrade, setCurrGrade] = useState(DEFAULT_GRADE);
 
   // Unit form
   const [showUnitForm, setShowUnitForm] = useState(false);
@@ -51,7 +53,7 @@ export default function CurriculumPage() {
     description: "",
     subject: "공통수학1",
     order: 0,
-    emoji: "📐",
+    emoji: "",
     theme: "blue" as UnitTheme,
   });
 
@@ -114,7 +116,7 @@ export default function CurriculumPage() {
         description: "",
         subject: "공통수학1",
         order: units.length + 1,
-        emoji: "📐",
+        emoji: "",
         theme: "blue",
       });
     }
@@ -236,7 +238,7 @@ export default function CurriculumPage() {
 
   const subjects = ["공통수학1", "공통수학2", "수학I", "수학II", "미적분", "확률과 통계", "기하"];
   const themeOptions: UnitTheme[] = ["blue", "green", "orange", "purple", "red", "yellow"];
-  const emojiOptions = ["📐", "📊", "📈", "🔢", "🧮", "📏", "📝", "🎯", "🔺", "🔵", "⭐", "🧩"];
+  const emojiOptions = [""];
 
   // Stepper component
   const Stepper = ({ steps, currentStep }: { steps: { label: string; desc: string }[]; currentStep: number }) => (
@@ -297,9 +299,25 @@ export default function CurriculumPage() {
             첫 단원 추가하기
           </button>
         </div>
-      ) : (
+      ) : (() => {
+        const grade = GRADES.find((g) => g.key === currGrade);
+        const gradeUnits = units.filter((u) => grade?.subjects.includes(u.subject));
+        return (
+        <>
+        {/* 학년 탭 */}
+        <div className="flex gap-1.5 flex-wrap mb-4">
+          {GRADES.map((g) => (
+            <button key={g.key}
+              onClick={() => setCurrGrade(g.key)}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+                currGrade === g.key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}>
+              {g.label}
+            </button>
+          ))}
+        </div>
         <div className="space-y-3">
-          {units.map((unit) => {
+          {gradeUnits.map((unit) => {
             const unitLessons = lessons
               .filter((l) => l.unitId === unit.id)
               .sort((a, b) => a.order - b.order);
@@ -325,7 +343,6 @@ export default function CurriculumPage() {
                     className="h-3 w-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: UNIT_THEME_COLORS[unit.theme] }}
                   />
-                  <span className="text-lg">{unit.emoji}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-gray-900">
@@ -416,7 +433,9 @@ export default function CurriculumPage() {
             );
           })}
         </div>
-      )}
+        </>
+        );
+      })()}
 
       {/* Unit Form Modal */}
       {showUnitForm && (
@@ -498,26 +517,6 @@ export default function CurriculumPage() {
               {unitStep === 1 && (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">아이콘 선택</label>
-                    <div className="flex flex-wrap gap-2">
-                      {emojiOptions.map((e) => (
-                        <button
-                          key={e}
-                          type="button"
-                          onClick={() => setUnitForm({ ...unitForm, emoji: e })}
-                          className={`h-11 w-11 rounded-xl text-xl flex items-center justify-center transition-all ${
-                            unitForm.emoji === e
-                              ? "bg-blue-100 border-2 border-blue-500 shadow-sm scale-110"
-                              : "bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:scale-105"
-                          }`}
-                        >
-                          {e}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">테마 색상</label>
                     <div className="flex flex-wrap gap-3">
                       {themeOptions.map((t) => (
@@ -544,7 +543,6 @@ export default function CurriculumPage() {
                         className="h-4 w-4 rounded-full"
                         style={{ backgroundColor: UNIT_THEME_COLORS[unitForm.theme] }}
                       />
-                      <span className="text-xl">{unitForm.emoji}</span>
                       <div>
                         <p className="text-sm font-semibold text-gray-900">
                           {unitForm.order}. {unitForm.title || "단원 제목"}

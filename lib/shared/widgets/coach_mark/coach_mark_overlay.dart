@@ -161,22 +161,115 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
         color: Colors.transparent,
         child: Stack(
           children: [
-            // Dark overlay with spotlight cutout
+            // Dark overlay with spotlight cutout - absorb taps to prevent interaction with underlying UI
+            GestureDetector(
+              onTap: () {}, // Absorb taps on dark area
+              behavior: HitTestBehavior.opaque,
+              child: targetRect != null
+                  ? _SpotlightPainterWidget(
+                      targetRect: targetRect,
+                      pulseAnimation: _pulseAnimation,
+                      animController: _animController,
+                    )
+                  : Container(color: Colors.black.withValues(alpha: 0.7)),
+            ),
+
+            // Tooltip with arrow (or fallback centered tooltip when target not found)
             if (targetRect != null)
-              _SpotlightPainterWidget(
-                targetRect: targetRect,
-                pulseAnimation: _pulseAnimation,
-                animController: _animController,
-              )
+              _buildTooltip(targetRect, step, screenSize)
             else
-              Container(color: Colors.black.withValues(alpha: 0.7)),
-
-            // Tooltip with arrow
-            if (targetRect != null)
-              _buildTooltip(targetRect, step, screenSize),
-
-
+              _buildFallbackTooltip(step, screenSize),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Fallback tooltip shown when target widget is not found (e.g., user switched tabs)
+  Widget _buildFallbackTooltip(CoachMarkStep step, Size screenSize) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          constraints: BoxConstraints(maxWidth: screenSize.width - 48),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                step.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.darkNavy,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                step.description,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_currentStep > 0)
+                    GestureDetector(
+                      onTap: _prevStep,
+                      child: Text(
+                        '이전',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  GestureDetector(
+                    onTap: _nextStep,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.mathBlue,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _currentStep == widget.steps.length - 1
+                            ? '완료'
+                            : '다음',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

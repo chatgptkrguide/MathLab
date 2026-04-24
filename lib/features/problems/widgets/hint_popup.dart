@@ -65,7 +65,7 @@ class _HintPopupState extends State<HintPopup> {
     return Center(
       child: Container(
         margin: const EdgeInsets.all(24),
-        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+        constraints: BoxConstraints(maxWidth: 400, maxHeight: MediaQuery.of(context).size.height * 0.7),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -276,114 +276,71 @@ class _HintPopupState extends State<HintPopup> {
   }
 
   Widget _buildLockedHint(int index, bool canUnlockThis) {
-    return Row(
-      children: [
-        // Lock icon
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: canUnlockThis
-                  ? [AppColors.mathOrange, const Color(0xFFE67E22)]
-                  : [Colors.grey[400]!, Colors.grey[500]!],
-            ),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.lock_rounded,
-            color: Colors.white,
-            size: canUnlockThis ? 20 : 18,
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Hint label
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '힌트 ${index + 1}',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '탭하여 힌트 보기',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Unlock button
-        if (canUnlockThis)
-          _buildUnlockButton(index)
-        else
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '잠김',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[500],
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildUnlockButton(int index) {
     return GestureDetector(
-      onTap: () {
-        widget.onUnlockHint(index);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.mathOrange, Color(0xFFE67E22)],
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.mathOrange.withValues(alpha: 0.4),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+      onTap: canUnlockThis ? () => widget.onUnlockHint(index) : null,
+      child: Row(
+        children: [
+          // Number badge
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: canUnlockThis
+                  ? AppColors.mathOrange.withValues(alpha: 0.15)
+                  : Colors.grey.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.lock_open_rounded, color: Colors.white, size: 16),
-            const SizedBox(width: 6),
-            const Text(
-              '해제',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            child: Center(
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: canUnlockThis
+                      ? AppColors.mathOrange
+                      : Colors.grey[400],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 12),
+          // Hint label
+          Expanded(
+            child: Text(
+              canUnlockThis ? '탭하여 힌트 열기' : '이전 힌트를 먼저 확인하세요',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: canUnlockThis ? FontWeight.w500 : FontWeight.w400,
+                color: canUnlockThis ? Colors.grey[700] : Colors.grey[400],
+              ),
+            ),
+          ),
+          // Unlock button or lock icon
+          if (canUnlockThis)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.mathOrange,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                '열기',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          else
+            Icon(
+              Icons.lock_outline_rounded,
+              size: 18,
+              color: Colors.grey[350],
+            ),
+        ],
       ),
     );
   }
+
 }

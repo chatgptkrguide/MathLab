@@ -43,28 +43,21 @@ class GradeSelectionCard extends StatelessWidget {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 28)),
-            const SizedBox(height: 6),
+            Text(icon, style: const TextStyle(fontSize: 26)),
+            const SizedBox(height: 4),
             Text(
-              title,
+              isActive ? '$title ($selectedGrade)' : title,
               style: AppTextStyles.bodyMedium.copyWith(
                 fontWeight: FontWeight.w700,
                 color: isActive ? color : AppColors.textPrimary,
-                fontSize: 14,
+                fontSize: 13,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
-            if (isActive) ...[
-              const SizedBox(height: 2),
-              Text(
-                selectedGrade,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ],
           ],
         ),
       ),

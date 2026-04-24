@@ -180,7 +180,56 @@ class AuthHandler {
     }
   }
 
-  // Kakao 로그인: SDK 호환성 문제로 비활성화 (Phase 2 예정)
+  /// Kakao 로그인 (개발 단계)
+  static Future<bool> handleKakaoLogin({
+    required BuildContext context,
+    required WidgetRef ref,
+    required bool mounted,
+  }) async {
+    if (mounted) {
+      LoadingOverlay.show(context, message: LoadingMessages.kakaoSignIn);
+    }
+
+    try {
+      final success = await ref.read(authProvider.notifier).signInWithKakao();
+
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (!mounted) return false;
+
+      if (success) {
+        return true;
+      } else {
+        if (mounted) {
+          _showErrorSnackBar(
+            context: context,
+            message: 'Kakao 로그인에 실패했습니다. 다시 시도해주세요.',
+          );
+        }
+        return false;
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Kakao Sign-In failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      if (mounted) {
+        LoadingOverlay.hide(context);
+      }
+
+      if (mounted) {
+        _showErrorSnackBar(
+          context: context,
+          message: 'Kakao 로그인 중 문제가 발생했습니다.',
+        );
+      }
+      return false;
+    }
+  }
 
   /// 이메일 로그인
   static Future<bool> handleEmailLogin({

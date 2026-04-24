@@ -33,6 +33,7 @@ class _OnboardingProfileSetupScreenState
   String _selectedGrade = '중1';
 
   bool _isLoading = false;
+  bool _isTransitioning = false;
 
   @override
   void dispose() {
@@ -42,10 +43,11 @@ class _OnboardingProfileSetupScreenState
   }
 
   void _nextPage() {
-    if (!mounted) return;
+    if (!mounted || _isTransitioning) return;
     AppLogger.info('_nextPage called: current=$_currentPage, total=$_totalPages',
         tag: 'OnboardingProfileSetup');
     if (_currentPage < _totalPages - 1) {
+      _isTransitioning = true;
       // Dismiss keyboard before transitioning
       FocusScope.of(context).unfocus();
       // Haptic feedback for smooth transition
@@ -57,22 +59,26 @@ class _OnboardingProfileSetupScreenState
         _currentPage,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutCubic,
-      );
+      ).then((_) {
+        _isTransitioning = false;
+      });
     } else {
       AppLogger.info('Already at last page', tag: 'OnboardingProfileSetup');
     }
   }
 
   void _previousPage() {
-    if (_currentPage > 0) {
-      // Haptic feedback for going back
+    if (_currentPage > 0 && !_isTransitioning) {
+      _isTransitioning = true;
       HapticFeedback.lightImpact();
       setState(() => _currentPage--);
       _pageController.animateToPage(
         _currentPage,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutCubic,
-      );
+      ).then((_) {
+        _isTransitioning = false;
+      });
     }
   }
 

@@ -6,7 +6,7 @@
 // Usage:
 // ```dart
 // final apiUrl = EnvConfig.apiBaseUrl;
-// final kakaoKey = EnvConfig.kakaoNativeAppKey;
+// final googleId = EnvConfig.googleWebClientId;
 // ```
 
 import 'dart:developer' as developer;
@@ -58,16 +58,16 @@ class EnvConfig {
   // Social Login Configuration
   // ========================================
 
-  /// Kakao Native App Key
-  /// ⚠️  Never hardcode this value
-  static String get kakaoNativeAppKey {
-    return _getEnvVar('KAKAO_NATIVE_APP_KEY', required: true);
-  }
-
   /// Google Web Client ID
   /// ⚠️  Never hardcode this value
   static String get googleWebClientId {
     return _getEnvVar('GOOGLE_WEB_CLIENT_ID', required: true);
+  }
+
+  /// Kakao Native App Key (개발 단계 — 비어있으면 Kakao SDK 초기화 건너뜀)
+  /// ⚠️  Never hardcode this value
+  static String get kakaoNativeAppKey {
+    return _getEnvVar('KAKAO_NATIVE_APP_KEY', required: false);
   }
 
   // ========================================

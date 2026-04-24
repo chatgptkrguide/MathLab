@@ -104,24 +104,24 @@ class AnswerInput extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.only(bottom: 7),
           child: GestureDetector(
             onTap: () => onSelectAnswer(option),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(11),
                 border: Border.all(color: borderColor, width: borderWidth),
               ),
               child: Row(
                 children: [
                   // Option label circle
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 26,
+                    height: 26,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isSelected && !isAnswerChecked
@@ -146,7 +146,7 @@ class AnswerInput extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: MathRichText(
                       text: option,
@@ -156,9 +156,9 @@ class AnswerInput extends StatelessWidget {
                                 ? FontWeight.w600
                                 : FontWeight.w500,
                         color: textColor,
-                        fontSize: 16,
+                        fontSize: 15,
                       ),
-                      mathFontSize: 18.0,
+                      mathFontSize: 16.0,
                       mathColor: textColor,
                     ),
                   ),

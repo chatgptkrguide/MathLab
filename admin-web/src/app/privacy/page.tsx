@@ -7,7 +7,7 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold mb-2">개인정보 처리방침</h1>
-        <p className="text-gray-500 mb-8">시행일자: 2025년 1월 1일</p>
+        <p className="text-gray-500 mb-8">시행일자: 2026년 4월 3일</p>
 
         <div className="prose prose-gray max-w-none space-y-6 text-[15px] leading-relaxed">
           <p>

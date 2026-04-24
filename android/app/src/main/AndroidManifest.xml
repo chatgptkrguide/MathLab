@@ -51,6 +51,18 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Kakao OAuth Redirect Handler -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="oauth" android:scheme="kakao${kakaoNativeAppKey}" />
+            </intent-filter>
+        </activity>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -62,7 +74,7 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- 카카오 로그인 커스텀 URL 스킴 쿼리 -->
+        <!-- KakaoTalk 앱 설치 여부 감지 (카카오 로그인 시 KakaoTalk 우선 시도) -->
         <package android:name="com.kakao.talk" />
     </queries>
 </manifest>

@@ -9,8 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-// Temporarily disabled due to compatibility issues
-// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 import 'core/config/env_config.dart';
 import 'core/utils/app_logger.dart';
@@ -76,18 +75,22 @@ void main() async {
       );
     }
 
-    // 4. Initialize Kakao SDK
-    // Temporarily disabled due to compatibility issues
-    // try {
-    //   KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
-    //   AppLogger.info('Kakao SDK initialized', tag: 'App');
-    // } catch (e) {
-    //   AppLogger.warning(
-    //     'Kakao SDK initialization failed (non-critical)',
-    //     tag: 'App',
-    //     error: e,
-    //   );
-    // }
+    // 4. Initialize Kakao SDK (개발 단계 — native app key 없으면 skip)
+    try {
+      final kakaoKey = EnvConfig.kakaoNativeAppKey;
+      if (kakaoKey.isNotEmpty) {
+        KakaoSdk.init(nativeAppKey: kakaoKey);
+        AppLogger.info('Kakao SDK initialized', tag: 'App');
+      } else {
+        AppLogger.info('Kakao SDK skipped (KAKAO_NATIVE_APP_KEY 미설정)', tag: 'App');
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Kakao SDK initialization failed (non-critical)',
+        tag: 'App',
+        error: e,
+      );
+    }
 
     // 5. Setup Crashlytics (Production only)
     if (EnvConfig.isProduction) {
@@ -132,7 +135,9 @@ void main() async {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    e.toString(),
+                    (() { try { return EnvConfig.isProduction; } catch (_) { return false; } })()
+                        ? '문제가 지속되면 앱을 재설치해주세요.'
+                        : e.toString(),
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.grey),
                   ),
