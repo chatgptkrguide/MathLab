@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBruskq02tYP7wIOlCgxG76X3GC1SsExgQ',
-    appId: '1:421762663548:ios:mathlab-gomath',
+    appId: '1:421762663548:ios:20d3e33da071d49bff35f9',
     messagingSenderId: '421762663548',
     projectId: 'mathlab-gomath',
     storageBucket: 'mathlab-gomath.firebasestorage.app',
