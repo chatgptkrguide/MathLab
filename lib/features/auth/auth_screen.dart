@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/config/env_config.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_durations.dart';
 import 'email_login_screen.dart';
@@ -66,6 +67,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     setState(() => _isLoading = true);
     await AuthHandler.handleKakaoLogin(context: context, ref: ref, mounted: mounted);
     if (mounted) setState(() => _isLoading = false);
+  }
+
+  /// KAKAO_NATIVE_APP_KEY가 비어있으면 SDK 미초기화 → 버튼 자체를 숨긴다.
+  bool get _kakaoEnabled {
+    try {
+      return EnvConfig.kakaoNativeAppKey.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> _handleEmailLogin() async {
@@ -219,15 +229,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.3))),
                         ),
                       ] else ...[
-                        const SizedBox(height: 8),
-                        SizedBox(width: double.infinity, height: 44,
-                          child: ElevatedButton(onPressed: _handleKakaoLogin,
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.kakaoYellow, foregroundColor: AppColors.kakaoBrown, elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Icon(Icons.chat_bubble_rounded, size: 16, color: AppColors.kakaoBrown), const SizedBox(width: 8),
-                              Text('Kakao로 계속하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.kakaoBrown)),
-                            ]))),
+                        if (_kakaoEnabled) ...[
+                          const SizedBox(height: 8),
+                          SizedBox(width: double.infinity, height: 44,
+                            child: ElevatedButton(onPressed: _handleKakaoLogin,
+                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.kakaoYellow, foregroundColor: AppColors.kakaoBrown, elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                Icon(Icons.chat_bubble_rounded, size: 16, color: AppColors.kakaoBrown), const SizedBox(width: 8),
+                                Text('Kakao로 계속하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.kakaoBrown)),
+                              ]))),
+                        ],
                         const SizedBox(height: 8),
                         SizedBox(width: double.infinity, height: 44,
                           child: OutlinedButton(onPressed: _handleEmailLogin,

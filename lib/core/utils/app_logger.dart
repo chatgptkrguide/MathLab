@@ -36,18 +36,29 @@ class AppLogger {
     return _loggerInstance!;
   }
 
-  /// Get log level based on environment
+  /// EnvConfig.enableLogging 조회 — env 미로드 시 안전하게 true 반환.
+  static bool _loggingEnabled() {
+    try {
+      return EnvConfig.enableLogging;
+    } catch (_) {
+      // env not initialized yet → allow logging in this very early window
+      return true;
+    }
+  }
+
+  /// Get log level based on environment.
+  /// EnvConfig 초기화 전에 호출되면 dotenv 미로드 예외가 던져질 수 있어 의도적으로 무시한다.
   static Level _getLogLevel() {
     try {
       if (kReleaseMode && EnvConfig.isProduction) {
-        return Level.error; // Only errors in production
+        return Level.error;
       } else if (EnvConfig.isProduction) {
-        return Level.warning; // Warnings and errors in production debug
+        return Level.warning;
       }
     } catch (_) {
-      // EnvConfig not yet initialized, use default
+      // Fallback: assume development before env is loaded.
     }
-    return Level.debug; // All logs in development
+    return Level.debug;
   }
 
   /// Debug log (detailed information for debugging)
@@ -58,7 +69,7 @@ class AppLogger {
     StackTrace? stackTrace,
     Map<String, dynamic>? data,
   }) {
-    try { if (!EnvConfig.enableLogging) return; } catch (_) {}
+    if (!_loggingEnabled()) return;
 
     final formattedMessage = _formatMessage(message, tag, data);
     _logger.d(formattedMessage, error: error, stackTrace: stackTrace);
@@ -70,7 +81,7 @@ class AppLogger {
     String? tag,
     Map<String, dynamic>? data,
   }) {
-    try { if (!EnvConfig.enableLogging) return; } catch (_) {}
+    if (!_loggingEnabled()) return;
 
     final formattedMessage = _formatMessage(message, tag, data);
     _logger.i(formattedMessage);
@@ -187,7 +198,7 @@ class AppLogger {
     Map<String, dynamic>? headers,
     dynamic body,
   }) {
-    try { if (!EnvConfig.enableLogging || !kDebugMode) return; } catch (_) {}
+    if (!kDebugMode || !_loggingEnabled()) return;
 
     debug(
       'HTTP Request',
@@ -209,7 +220,7 @@ class AppLogger {
     dynamic body,
     Duration? duration,
   }) {
-    try { if (!EnvConfig.enableLogging || !kDebugMode) return; } catch (_) {}
+    if (!kDebugMode || !_loggingEnabled()) return;
 
     debug(
       'HTTP Response',

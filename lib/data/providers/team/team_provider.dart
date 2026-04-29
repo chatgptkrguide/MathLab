@@ -375,13 +375,20 @@ class TeamNotifier extends StateNotifier<TeamState> {
         return false;
       }
 
-      // Get sender name
+      // Get sender name (best-effort — 빈 값이어도 초대 자체는 진행)
       String fromUserName = '';
       try {
         final userDoc =
             await _firestore.collection('users').doc(userId).get();
         fromUserName = userDoc.data()?['displayName'] as String? ?? '';
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.warning(
+          'Failed to fetch inviter display name',
+          tag: 'Team',
+          error: e,
+          data: {'userId': userId},
+        );
+      }
 
       await _invitationsRef.add({
         'teamId': team.id,

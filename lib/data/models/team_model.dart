@@ -102,11 +102,17 @@ class TeamModel {
   static DateTime _parseDateTime(dynamic value) {
     if (value is DateTime) return value;
     if (value is String) return DateTime.parse(value);
-    // Firestore Timestamp - duck typing for toDate()
+    // Firestore Timestamp - duck typing for toDate() to avoid hard dep on cloud_firestore here.
     if (value != null) {
       try {
         return (value as dynamic).toDate() as DateTime;
-      } catch (_) {}
+      } catch (e) {
+        assert(() {
+          // ignore: avoid_print
+          print('TeamModel._parseDateTime: unsupported value $value ($e)');
+          return true;
+        }());
+      }
     }
     return DateTime.now();
   }

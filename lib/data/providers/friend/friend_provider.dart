@@ -142,7 +142,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
           final data = doc.data() as Map<String, dynamic>;
           final fromUserId = data['fromUserId'] as String;
 
-          // Fetch sender's display name
+          // Fetch sender's display name (best-effort — 실패해도 요청 표시 자체는 진행)
           String fromUserName = '';
           String? fromUserAvatar;
           try {
@@ -153,7 +153,14 @@ class FriendNotifier extends StateNotifier<FriendState> {
               fromUserName = userData['displayName'] as String? ?? '';
               fromUserAvatar = userData['avatarUrl'] as String?;
             }
-          } catch (_) {}
+          } catch (e) {
+            AppLogger.warning(
+              'Failed to fetch sender info for friend request',
+              tag: 'Friend',
+              error: e,
+              data: {'fromUserId': fromUserId},
+            );
+          }
 
           return FriendRequestModel(
             id: doc.id,
@@ -273,7 +280,15 @@ class FriendNotifier extends StateNotifier<FriendState> {
           toName = toUserDoc.data()!['displayName'] as String? ?? '';
           toAvatar = toUserDoc.data()!['avatarUrl'] as String?;
         }
-      } catch (_) {}
+      } catch (e) {
+        // best-effort — 이름이 비어도 친구 관계 자체는 성립시킨다.
+        AppLogger.warning(
+          'Failed to fetch user profiles when accepting friend request',
+          tag: 'Friend',
+          error: e,
+          data: {'fromUserId': fromUserId, 'toUserId': toUserId},
+        );
+      }
 
       // Use a batch write for atomicity
       final batch = _firestore.batch();
@@ -609,8 +624,13 @@ class FriendsNotifier extends StateNotifier<List<FriendInfo>> {
       }).toList();
 
       state = [...friends, ...receivedFriends];
-    } catch (e) {
-      // 오류 시 빈 목록 유지
+    } catch (e, stackTrace) {
+      AppLogger.warning(
+        'Failed to load friends (leaderboard)',
+        tag: 'Friend',
+        error: e,
+        stackTrace: stackTrace,
+      );
       state = const [];
     }
   }
