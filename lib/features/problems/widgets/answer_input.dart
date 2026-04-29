@@ -103,69 +103,69 @@ class AnswerInput extends StatelessWidget {
           textColor = const Color(0xFF2C5F8A);
         }
 
+        final labelCircleColor = isSelected && !isAnswerChecked
+            ? const Color(0xFF61A1D8)
+            : isAnswerChecked && isThisCorrect
+                ? AppColors.mathGreen
+                : isAnswerChecked && isSelected && !isCorrect
+                    ? AppColors.mathRed
+                    : const Color(0xFFF0F0F0);
+
+        final labelTextColor = (isSelected && !isAnswerChecked) ||
+                (isAnswerChecked &&
+                    (isThisCorrect || (isSelected && !isCorrect)))
+            ? Colors.white
+            : const Color(0xFF999999);
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 7),
-          child: GestureDetector(
-            onTap: () => onSelectAnswer(option),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(11),
-                border: Border.all(color: borderColor, width: borderWidth),
-              ),
-              child: Row(
-                children: [
-                  // Option label circle
-                  Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isSelected && !isAnswerChecked
-                          ? const Color(0xFF61A1D8)
-                          : isAnswerChecked && isThisCorrect
-                              ? AppColors.mathGreen
-                              : isAnswerChecked && isSelected && !isCorrect
-                                  ? AppColors.mathRed
-                                  : const Color(0xFFF0F0F0),
-                    ),
-                    child: Center(
-                      child: Text(
-                        optionLabel,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: (isSelected && !isAnswerChecked) ||
-                                  (isAnswerChecked && (isThisCorrect || (isSelected && !isCorrect)))
-                              ? Colors.white
-                              : const Color(0xFF999999),
-                        ),
+          child: _PressableOptionTile(
+            onTap: isAnswerChecked ? null : () => onSelectAnswer(option),
+            isSelected: isSelected,
+            isAnswerChecked: isAnswerChecked,
+            backgroundColor: backgroundColor,
+            borderColor: borderColor,
+            borderWidth: borderWidth,
+            child: Row(
+              children: [
+                // Option label circle
+                Container(
+                  width: 26,
+                  height: 26,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: labelCircleColor,
+                  ),
+                  child: Center(
+                    child: Text(
+                      optionLabel,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: labelTextColor,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: MathRichText(
-                      text: option,
-                      textStyle: AppTextStyles.bodyMedium.copyWith(
-                        fontWeight:
-                            isSelected || (isAnswerChecked && isThisCorrect)
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                        color: textColor,
-                        fontSize: 15,
-                      ),
-                      mathFontSize: 16.0,
-                      mathColor: textColor,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: MathRichText(
+                    text: option,
+                    textStyle: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight:
+                          isSelected || (isAnswerChecked && isThisCorrect)
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                      color: textColor,
+                      fontSize: 15,
                     ),
+                    mathFontSize: 16.0,
+                    mathColor: textColor,
                   ),
-                  if (trailingIcon != null)
-                    Icon(trailingIcon, color: trailingIconColor, size: 22),
-                ],
-              ),
+                ),
+                if (trailingIcon != null)
+                  Icon(trailingIcon, color: trailingIconColor, size: 22),
+              ],
             ),
           ),
         );
@@ -229,6 +229,109 @@ class AnswerInput extends StatelessWidget {
       dropZones: dropZones,
       isEnabled: !isAnswerChecked,
       onChanged: onDragDropChanged,
+    );
+  }
+}
+
+/// 답안 선택 시 살짝 눌리는 scale 인터랙션을 제공하는 래퍼 위젯.
+/// 미답변 상태에서만 press 효과가 작동하며, 채점 후에는 정적으로 유지된다.
+class _PressableOptionTile extends StatefulWidget {
+  final VoidCallback? onTap;
+  final bool isSelected;
+  final bool isAnswerChecked;
+  final Color backgroundColor;
+  final Color borderColor;
+  final double borderWidth;
+  final Widget child;
+
+  const _PressableOptionTile({
+    required this.onTap,
+    required this.isSelected,
+    required this.isAnswerChecked,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.borderWidth,
+    required this.child,
+  });
+
+  @override
+  State<_PressableOptionTile> createState() => _PressableOptionTileState();
+}
+
+class _PressableOptionTileState extends State<_PressableOptionTile>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 120),
+      vsync: this,
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.97).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails _) {
+    if (widget.isAnswerChecked || widget.onTap == null) return;
+    _scaleController.forward();
+  }
+
+  void _onTapUp(TapUpDetails _) {
+    _scaleController.reverse();
+    widget.onTap?.call();
+  }
+
+  void _onTapCancel() {
+    _scaleController.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: ScaleTransition(
+        scale: _scaleAnim,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: 14,
+            // 선택된 보기는 vertical padding을 1px 늘려 존재감 차별화
+            vertical: widget.isSelected && !widget.isAnswerChecked ? 12 : 11,
+          ),
+          decoration: BoxDecoration(
+            color: widget.backgroundColor,
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(
+              color: widget.borderColor,
+              width: widget.borderWidth,
+            ),
+            // 선택된 항목에만 미세한 그림자 추가
+            boxShadow: widget.isSelected && !widget.isAnswerChecked
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF61A1D8).withValues(alpha: 0.18),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: widget.child,
+        ),
+      ),
     );
   }
 }

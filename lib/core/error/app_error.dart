@@ -342,9 +342,12 @@ class AppErrorHandler {
     }
   }
 
-  /// Show error to user (override with your UI implementation)
+  /// Show error to user.
+  ///
+  /// 기본 구현은 로그만 남긴다. UI 레이어에서 BuildContext가 필요하므로
+  /// 화면 단에서 직접 ScaffoldMessenger/SnackBar를 띄우는 것을 권장한다.
+  /// 글로벌 핸들러 패턴이 필요하면 `GlobalKey&lt;ScaffoldMessengerState&gt;`를 주입해 확장.
   static void showToUser(AppException error) {
-    // TODO: Implement with your snackbar/dialog system
     AppLogger.debug('Show to user: ${error.userMessage}');
   }
 }

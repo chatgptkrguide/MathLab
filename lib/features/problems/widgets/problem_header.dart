@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/providers/user/user_provider.dart';
+import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
 class ProblemHeader extends StatelessWidget {
@@ -91,19 +92,40 @@ class ProblemHeader extends StatelessWidget {
                 child: Stack(
                   children: [
                     Container(
-                      height: 8,
+                      height: 10,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(4),
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                     ),
-                    FractionallySizedBox(
+                    AnimatedFractionallySizedBox(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeOutCubic,
                       widthFactor: progress.clamp(0.0, 1.0),
                       child: Container(
-                        height: 8,
+                        height: 10,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          color: AppColors.mathGreen,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mathGreen.withValues(alpha: 0.45),
+                              blurRadius: 6,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        // 살짝 안쪽 하이라이트로 평면감 완화
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            height: 3,
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.28),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
                         ),
                       ),
                     ),

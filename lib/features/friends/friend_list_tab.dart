@@ -73,9 +73,7 @@ class _FriendCard extends ConsumerWidget {
         subtitle: Text(friend.statusLabel),
         trailing: PopupMenuButton<String>(
           onSelected: (value) async {
-            if (value == 'compare') {
-              // TODO: Navigate to comparison screen
-            } else if (value == 'remove') {
+            if (value == 'remove') {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -125,7 +123,6 @@ class _FriendCard extends ConsumerWidget {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(value: 'compare', child: Text('비교하기')),
             const PopupMenuItem(value: 'remove', child: Text('친구 삭제')),
             const PopupMenuItem(
                 value: 'block',

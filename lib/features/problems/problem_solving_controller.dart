@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/utils/app_logger.dart';
 import '../../data/models/problem/problem_model.dart';
 import '../../data/models/problem/problem_session_model.dart';
 import '../../data/models/wrong_answer_model.dart';
@@ -172,8 +173,15 @@ class ProblemSolvingController {
       await ref
           .read(wrongAnswerProvider(user.id).notifier)
           .addWrongAnswer(wrongAnswer);
-    } catch (e) {
-      debugPrint('Failed to save wrong answer: $e');
+    } catch (e, stackTrace) {
+      // 비치명적: 오답 노트 저장 실패해도 풀이 흐름은 계속.
+      AppLogger.warning(
+        'Failed to save wrong answer',
+        tag: 'Problem',
+        error: e,
+        stackTrace: stackTrace,
+        data: {'problemId': problem.id, 'userId': user.id},
+      );
     }
   }
 

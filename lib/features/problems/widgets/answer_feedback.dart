@@ -82,16 +82,23 @@ class AnswerFeedbackOverlay extends StatelessWidget {
                   position: slideAnimation,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      // 패널 상단 32px를 상태 색으로 채워 즉각적 시각 피드백 제공
+                      color: panelColor.withValues(alpha: 0.10),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(AppDimensions.radius24),
                         topRight: Radius.circular(AppDimensions.radius24),
                       ),
+                      border: Border(
+                        top: BorderSide(
+                          color: panelColor.withValues(alpha: 0.35),
+                          width: 2.5,
+                        ),
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: accentColor.withValues(alpha: 0.2),
-                          blurRadius: 20,
-                          offset: const Offset(0, -4),
+                          color: accentColor.withValues(alpha: 0.18),
+                          blurRadius: 24,
+                          offset: const Offset(0, -6),
                         ),
                       ],
                     ),
@@ -104,22 +111,27 @@ class AnswerFeedbackOverlay extends StatelessWidget {
                         ),
                         child: Padding(
                           padding:
-                              const EdgeInsets.all(AppDimensions.spacing24),
+                              const EdgeInsets.fromLTRB(
+                                AppDimensions.spacing24,
+                                AppDimensions.spacing16,
+                                AppDimensions.spacing24,
+                                AppDimensions.spacing24,
+                              ),
                           child: SingleChildScrollView(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                            // Drag handle
+                            // Drag handle — 상태 색과 동일한 톤으로 수정
                             Container(
                               width: AppDimensions.spacing40,
                               height: AppDimensions.spacing4,
                               decoration: BoxDecoration(
-                                color: AppColors.borderLight,
+                                color: panelColor.withValues(alpha: 0.30),
                                 borderRadius: BorderRadius.circular(
                                     AppDimensions.spacing2),
                               ),
                             ),
-                            const SizedBox(height: AppDimensions.spacing20),
+                            const SizedBox(height: AppDimensions.spacing16),
                             // Icon and title row
                             _buildTitleRow(
                                 panelColor, icon, title, isPartialCredit,
@@ -140,7 +152,7 @@ class AnswerFeedbackOverlay extends StatelessWidget {
                               _buildValidationHints(result.hints!),
                             ],
                             const SizedBox(height: AppDimensions.spacing20),
-                            // Continue button
+                            // Continue button — 상태 색 배경, 흰 글자
                             SizedBox(
                               width: double.infinity,
                               height: AppDimensions.buttonHeightLarge,

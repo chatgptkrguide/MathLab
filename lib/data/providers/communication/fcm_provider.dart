@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import '../../../core/utils/app_logger.dart';
 
 // FCM Service Provider
@@ -190,18 +189,16 @@ class FCMService {
 
   /// Handle foreground messages
   void _handleForegroundMessage(RemoteMessage message) {
+    final notification = message.notification;
     AppLogger.info(
-      'FCM 포그라운드 메시지 수신: ${message.notification?.title ?? "제목 없음"}',
+      'FCM 포그라운드 메시지 수신: ${notification?.title ?? "제목 없음"}',
       tag: 'FCM',
+      data: {
+        'title': notification?.title,
+        'body': notification?.body,
+        'payload': message.data,
+      },
     );
-    debugPrint('📬 알림 데이터: ${message.data}');
-
-    // Show in-app notification or update UI
-    if (message.notification != null) {
-      final notification = message.notification!;
-      debugPrint('📬 알림: ${notification.title}');
-      debugPrint('   내용: ${notification.body}');
-    }
   }
 
   /// Handle background messages (app in background)
@@ -209,10 +206,8 @@ class FCMService {
     AppLogger.info(
       'FCM 백그라운드 메시지 수신 (앱 열림): ${message.notification?.title ?? "제목 없음"}',
       tag: 'FCM',
+      data: {'payload': message.data},
     );
-    debugPrint('📬 알림 데이터: ${message.data}');
-
-    // Navigate to specific screen based on message data
     _handleNotificationNavigation(message);
   }
 
@@ -221,31 +216,27 @@ class FCMService {
     AppLogger.info(
       'FCM 초기 메시지 수신 (종료 상태에서 앱 열림): ${message.notification?.title ?? "제목 없음"}',
       tag: 'FCM',
+      data: {'payload': message.data},
     );
-    debugPrint('📬 알림 데이터: ${message.data}');
-
-    // Navigate to specific screen based on message data
     _handleNotificationNavigation(message);
   }
 
   /// Handle notification navigation
+  /// Phase 2: 알림 타입(type 필드)별 라우팅(딥링크/내비게이터) 연결 예정.
   void _handleNotificationNavigation(RemoteMessage message) {
     final data = message.data;
-
     if (data.isEmpty) return;
-
-    // TODO: Phase 2 - 알림 타입별 네비게이션 구현
 
     AppLogger.info(
       'FCM 알림 네비게이션 요청: ${data["type"] ?? "타입 없음"}',
       tag: 'FCM',
+      data: {'payload': data},
     );
-    debugPrint('📬 네비게이션 데이터: $data');
   }
 
-  /// Process pending deep link
+  /// Process pending deep link.
+  /// Phase 2: 콜드스타트 시 큐잉된 딥링크를 라우터로 디스패치 예정.
   void processPendingDeepLink(dynamic context) {
-    // TODO: Phase 2 - 대기 중인 딥링크 처리 구현
     AppLogger.info('대기 중인 딥링크 처리 요청됨', tag: 'FCM');
   }
 
@@ -267,6 +258,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   AppLogger.info(
     'FCM 백그라운드 메시지 처리 (앱 완전 종료 상태): ${message.notification?.title ?? "제목 없음"}',
     tag: 'FCM',
+    data: {'payload': message.data},
   );
-  debugPrint('📬 백그라운드 알림 데이터: ${message.data}');
 }

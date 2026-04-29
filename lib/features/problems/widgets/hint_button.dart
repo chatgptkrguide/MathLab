@@ -1,6 +1,7 @@
-// 💡 Duolingo-style Hint Button
+// Hint Button
 //
-// Animated hint button with pulse effect and XP cost indicator
+// 힌트 요청 버튼. 상시 pulse 애니메이션 없이 정적으로 표시되며,
+// 탭 시에만 짧은 scale down/up 인터랙션이 작동한다.
 
 import 'package:flutter/material.dart';
 import '../../../shared/constants/app_colors.dart';
@@ -27,167 +28,102 @@ class HintButton extends StatefulWidget {
 
 class _HintButtonState extends State<HintButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-  late Animation<double> _glowAnimation;
+  late AnimationController _tapController;
+  late Animation<double> _tapScaleAnim;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+    // 탭할 때만 한 번 실행되는 짧은 scale 애니메이션
+    _tapController = AnimationController(
+      duration: const Duration(milliseconds: 100),
       vsync: this,
-    )..repeat(reverse: true);
-
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
-    _glowAnimation = Tween<double>(begin: 0.2, end: 0.4).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    _tapScaleAnim = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _tapController, curve: Curves.easeIn),
     );
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
+    _tapController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleTap() async {
+    if (!widget.isEnabled) return;
+    await _tapController.forward();
+    await _tapController.reverse();
+    widget.onTap();
   }
 
   @override
   Widget build(BuildContext context) {
     final hasUnlockedAll = widget.unlockedCount >= widget.totalHints;
+    final accentColor =
+        hasUnlockedAll ? AppColors.mathGreen : AppColors.mathOrange;
+    final isDisabled = !widget.isEnabled;
 
     return GestureDetector(
-      onTap: widget.isEnabled ? widget.onTap : null,
-      child: AnimatedBuilder(
-        animation: _pulseController,
-        builder: (context, child) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: hasUnlockedAll
-                    ? [
-                        AppColors.mathGreen.withValues(alpha: 0.15),
-                        AppColors.mathGreen.withValues(alpha: 0.08),
-                      ]
-                    : [
-                        AppColors.mathOrange.withValues(alpha: 0.15),
-                        AppColors.mathOrange.withValues(alpha: 0.08),
-                      ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: hasUnlockedAll
-                    ? AppColors.mathGreen.withValues(alpha: 0.3)
-                    : AppColors.mathOrange.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: hasUnlockedAll
-                      ? AppColors.mathGreen.withValues(alpha: _glowAnimation.value)
-                      : AppColors.mathOrange.withValues(alpha: _glowAnimation.value),
-                  blurRadius: 12,
-                  spreadRadius: 0,
-                ),
-              ],
+      onTap: isDisabled ? null : _handleTap,
+      child: ScaleTransition(
+        scale: _tapScaleAnim,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDisabled
+                ? const Color(0xFFF2F2F2)
+                : accentColor.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDisabled
+                  ? const Color(0xFFDDDDDD)
+                  : accentColor.withValues(alpha: 0.28),
+              width: 1.5,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Animated lightbulb icon
-                Transform.scale(
-                  scale: _pulseAnimation.value,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: hasUnlockedAll
-                            ? [AppColors.mathGreen, const Color(0xFF06A03C)]
-                            : [AppColors.mathOrange, const Color(0xFFE67E22)],
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: hasUnlockedAll
-                              ? AppColors.mathGreen.withValues(alpha: 0.4)
-                              : AppColors.mathOrange.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      hasUnlockedAll ? Icons.check : Icons.lightbulb_rounded,
-                      color: Colors.white,
-                      size: 20,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                hasUnlockedAll
+                    ? Icons.check_circle_outline_rounded
+                    : Icons.lightbulb_outline_rounded,
+                color: isDisabled
+                    ? AppColors.textTertiary
+                    : accentColor,
+                size: 20,
+              ),
+              const SizedBox(width: 6),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '힌트',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDisabled
+                          ? AppColors.textTertiary
+                          : accentColor,
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                // Hint count and cost
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '힌트',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: hasUnlockedAll
-                            ? AppColors.mathGreen
-                            : AppColors.mathOrange,
-                      ),
+                  Text(
+                    '${widget.unlockedCount}/${widget.totalHints}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isDisabled
+                          ? AppColors.textTertiary
+                          : accentColor.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w500,
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          '${widget.unlockedCount}/${widget.totalHints}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: hasUnlockedAll
-                                ? AppColors.mathGreen.withValues(alpha: 0.15)
-                                : AppColors.mathOrange.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            hasUnlockedAll ? '완료' : '무료',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: hasUnlockedAll
-                                  ? AppColors.mathGreen
-                                  : AppColors.mathOrange,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
