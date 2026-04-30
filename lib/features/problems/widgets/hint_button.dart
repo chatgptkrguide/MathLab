@@ -69,7 +69,7 @@ class _HintButtonState extends State<HintButton>
       child: ScaleTransition(
         scale: _tapScaleAnim,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: isDisabled
                 ? const Color(0xFFF2F2F2)

@@ -41,7 +41,7 @@ class HeartsIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.paddingMedium,
-        vertical: AppDimensions.spacing8,
+        vertical: AppDimensions.spacing4,
       ),
       child: Row(
         children: [
@@ -56,10 +56,10 @@ class HeartsIndicator extends StatelessWidget {
             )
           else
             const SizedBox(width: AppDimensions.spacing16),
-          // Animated hearts display
+          // Animated hearts display — 우측 정렬로 힌트 버튼과 좌-우 균형
           Expanded(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: List.generate(
                 5,
                 (index) {
@@ -72,7 +72,7 @@ class HeartsIndicator extends StatelessWidget {
                     isFilled ? Icons.favorite : Icons.favorite_border,
                     color:
                         isFilled ? AppColors.mathRed : AppColors.borderDark,
-                    size: AppDimensions.iconMedium,
+                    size: 22,
                   );
 
                   if (isFilled) {
@@ -112,7 +112,7 @@ class HeartsIndicator extends StatelessWidget {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: heartIcon,
                   );
                 },

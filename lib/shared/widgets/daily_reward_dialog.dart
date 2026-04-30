@@ -290,10 +290,9 @@ class DailyRewardDialog extends ConsumerWidget {
                     .claimReward();
 
                 if (success && context.mounted) {
-                  await Future.delayed(const Duration(milliseconds: 800));
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
+                  // 인위적 지연 제거 — claimReward 자체가 이미 1 RTT 대기.
+                  // 사용자가 "보상 받고 화면 닫힘이 느리다"고 보고한 핵심 원인.
+                  Navigator.of(context).pop();
                 }
               }
             : null,
