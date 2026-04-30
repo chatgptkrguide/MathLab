@@ -6,6 +6,8 @@
 // - Wrong answer saving
 // - Hint management
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/app_logger.dart';
@@ -119,9 +121,9 @@ class ProblemSolvingController {
       score: session.score + earnedPoints,
     );
 
-    // Save wrong answer if incorrect
+    // Save wrong answer if incorrect — fire-and-forget으로 풀이 흐름 비차단.
     if (!result.isCorrect) {
-      _saveWrongAnswer(currentProblem, userAnswer);
+      unawaited(_saveWrongAnswer(currentProblem, userAnswer));
     }
 
     return AnswerCheckResult(
@@ -186,14 +188,18 @@ class ProblemSolvingController {
   }
 
   /// Sync session heart losses to Firestore.
+  /// 세션 동안 잃은 하트 수를 한 번의 Firestore 쓰기로 반영한다.
   void syncHeartsToFirestore(ProblemSessionModel session) {
+    final user = ref.read(userProvider);
+    if (user == null) return;
+
     final heartsLost = 5 - session.hearts;
     if (heartsLost <= 0) return;
 
-    final userNotifier = ref.read(userProvider.notifier);
-    for (int i = 0; i < heartsLost; i++) {
-      userNotifier.useHeart();
-    }
+    final newHearts = (user.hearts - heartsLost).clamp(0, user.maxHearts);
+    if (newHearts == user.hearts) return;
+
+    unawaited(ref.read(userProvider.notifier).updateHearts(newHearts));
   }
 
   /// Check if user has provided an answer

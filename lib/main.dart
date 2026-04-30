@@ -2,6 +2,7 @@
 //
 // Gamification-based math learning app powered by Flutter and Firebase.
 
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -65,8 +66,9 @@ void main() async {
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       AppLogger.info('FCM background handler registered', tag: 'App');
 
-      // Initialize Remote Config
-      await RemoteConfigService.initialize();
+      // Initialize Remote Config — 콜드스타트를 막지 않도록 fire-and-forget.
+      // 첫 화면이 기본값으로 렌더링된 후 백그라운드에서 원격 값을 활성화한다.
+      unawaited(RemoteConfigService.initialize());
     } catch (e) {
       AppLogger.error(
         'Firebase initialization failed',

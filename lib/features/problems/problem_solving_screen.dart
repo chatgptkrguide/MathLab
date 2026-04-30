@@ -71,9 +71,9 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(problemsForLessonProvider(widget.lessonId));
-    });
+    // 캐시 무효화하지 않음 — 같은 레슨을 다시 풀어도 같은 문제 세트라
+    // Firestore 라운드트립을 매번 발생시킬 이유가 없다.
+    // 강제 새로고침이 필요하면 명시적으로 invalidate를 호출할 것.
 
     _heartAnimController = AnimationController(
       duration: const Duration(milliseconds: 400),

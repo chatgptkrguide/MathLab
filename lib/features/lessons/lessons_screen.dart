@@ -6,6 +6,7 @@ import '../../data/models/lesson/lesson_progress_model.dart';
 import '../../data/models/lesson/unit_model.dart';
 import '../../data/providers/curriculum/curriculum_provider.dart';
 import '../../data/providers/lesson/lesson_progress_provider.dart';
+import '../../data/providers/problem/problem_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/grade_curriculum_map.dart';
@@ -942,6 +943,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     ref
         .read(lessonProgressProvider(user.uid).notifier)
         .startLesson(lessonId);
+
+    // Preload: 화면 진입 전에 문제 fetch를 시작해 푸시 애니메이션 동안 캐시를 채운다.
+    ref.read(problemsForLessonProvider(lessonId));
 
     Navigator.of(context).push(
       MaterialPageRoute(
