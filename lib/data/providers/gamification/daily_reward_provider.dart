@@ -3,6 +3,8 @@
 // 일일 보상 시스템 상태 관리.
 // Firestore와 연동하여 7일 주기 보상 사이클을 관리합니다.
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -210,36 +212,28 @@ class DailyRewardNotifier extends StateNotifier<DailyRewardState> {
         data: {'day': currentDay, 'type': todayReward.rewardType.name, 'amount': todayReward.amount},
       );
 
-      // 보상 지급
-      switch (todayReward.rewardType) {
-        case RewardType.gems:
-          await ref.read(userProvider.notifier).addGems(todayReward.amount);
-          break;
-        case RewardType.xp:
-          await ref.read(userProvider.notifier).addXp(todayReward.amount);
-          break;
-        case RewardType.hearts:
-          // 하트 추가: 현재 하트 + 보상 수량
-          final user = ref.read(userProvider);
-          if (user != null) {
-            final newHearts = user.hearts + todayReward.amount;
-            final maxHearts = user.maxHearts;
-            final clampedHearts = newHearts > maxHearts ? maxHearts : newHearts;
-
-            await firestore.collection('users').doc(uid).update({
-              'hearts': clampedHearts,
-              'updatedAt': Timestamp.fromDate(DateTime.now()),
-            });
-
-            // UserProvider 상태도 업데이트를 위해 다시 로드
-            await ref.read(userProvider.notifier).loadUser(uid);
-          }
-          break;
-      }
-
-      // Firestore에 수령 기록 저장
+      // 보상 지급 + dailyReward 기록을 병렬 실행해 RTT를 줄인다.
       final now = DateTime.now();
-      await firestore
+      final rewardWrite = () async {
+        switch (todayReward.rewardType) {
+          case RewardType.gems:
+            await ref.read(userProvider.notifier).addGems(todayReward.amount);
+            break;
+          case RewardType.xp:
+            await ref.read(userProvider.notifier).addXp(todayReward.amount);
+            break;
+          case RewardType.hearts:
+            final user = ref.read(userProvider);
+            if (user == null) return;
+            final newHearts =
+                (user.hearts + todayReward.amount).clamp(0, user.maxHearts);
+            // updateHearts는 Firestore + 로컬 state를 한 번에 갱신 — loadUser 재호출 불필요.
+            await ref.read(userProvider.notifier).updateHearts(newHearts);
+            break;
+        }
+      }();
+
+      final claimWrite = firestore
           .collection('users')
           .doc(uid)
           .collection('dailyReward')
@@ -249,6 +243,8 @@ class DailyRewardNotifier extends StateNotifier<DailyRewardState> {
         'lastClaimDate': Timestamp.fromDate(now),
         'updatedAt': Timestamp.fromDate(now),
       });
+
+      await Future.wait([rewardWrite, claimWrite]);
 
       // 상태 업데이트
       final updatedRewards = state.rewards.map((reward) {

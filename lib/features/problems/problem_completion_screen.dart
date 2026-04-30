@@ -3,6 +3,8 @@
 // Shown after all problems are completed.
 // Displays stars, stats, and saves progress.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/problem/problem_session_model.dart';
@@ -31,40 +33,32 @@ class ProblemCompletionScreen extends ConsumerStatefulWidget {
 
 class _ProblemCompletionScreenState
     extends ConsumerState<ProblemCompletionScreen> {
-  bool _isSaving = false;
-
   @override
   void initState() {
     super.initState();
+    // 보상 영속화는 fire-and-forget. 사용자는 이미 받은 점수/별을
+    // 클라이언트 상태로 즉시 보고, "계속하기"도 바로 누를 수 있다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _saveProgress();
+      unawaited(_saveProgress());
     });
   }
 
   Future<void> _saveProgress() async {
-    if (_isSaving) return;
-    setState(() => _isSaving = true);
+    final user = ref.read(userProvider);
+    if (user == null) return;
 
-    try {
-      final user = ref.read(userProvider);
-      if (user == null) return;
-
-      await ref
-          .read(lessonProgressProvider(user.uid).notifier)
-          .completeLesson(
+    // 3개 호출을 병렬로 실행 → Firestore RTT 3회 → 1회로 단축.
+    // 서로 의존성 없음 (lessonProgress / users 문서 / studyDates 분리).
+    await Future.wait([
+      ref.read(lessonProgressProvider(user.uid).notifier).completeLesson(
             lessonId: widget.lessonId,
             correctAnswers: widget.session.correctCount,
             totalQuestions: widget.session.problems.length,
             xpEarned: widget.session.score,
-          );
-
-      await ref.read(userProvider.notifier).addXp(widget.session.score);
-      await ref.read(userProvider.notifier).updateStreak();
-    } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
-    }
+          ),
+      ref.read(userProvider.notifier).addXp(widget.session.score),
+      ref.read(userProvider.notifier).updateStreak(),
+    ]);
   }
 
   @override
@@ -142,16 +136,13 @@ class _ProblemCompletionScreenState
                 ),
               ),
 
-              // Continue button
+              // Continue button — saving 진행 여부와 무관하게 항상 활성화.
+              // 보상은 백그라운드에서 영속화되므로 UX 차단할 이유 없음.
               SizedBox(
                 width: double.infinity,
                 height: AppDimensions.buttonHeightLarge,
                 child: ElevatedButton(
-                  onPressed: _isSaving
-                      ? null
-                      : () {
-                          Navigator.of(context).pop();
-                        },
+                  onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -160,22 +151,12 @@ class _ProblemCompletionScreenState
                     ),
                     elevation: 0,
                   ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: AppDimensions.iconMedium,
-                          height: AppDimensions.iconMedium,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.mathGreen),
-                          ),
-                        )
-                      : Text(
-                          '계속하기',
-                          style: AppTextStyles.button.copyWith(
-                            color: AppColors.mathGreen,
-                          ),
-                        ),
+                  child: Text(
+                    '계속하기',
+                    style: AppTextStyles.button.copyWith(
+                      color: AppColors.mathGreen,
+                    ),
+                  ),
                 ),
               ),
             ],

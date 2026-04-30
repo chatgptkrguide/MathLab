@@ -4,6 +4,8 @@
 // Manages user data operations with Firestore integration.
 // Handles user CRUD operations, profile updates, and gamification data.
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -259,8 +261,8 @@ class User extends _$User {
         'updatedAt': Timestamp.fromDate(now),
       });
 
-      // 학습 날짜 기록 (캘린더용)
-      await _recordStudyDate(state!.uid, now);
+      // 학습 날짜 기록 (캘린더용) — fire-and-forget. 보상 흐름을 막지 않는다.
+      unawaited(_recordStudyDate(state!.uid, now));
 
       state = updatedUser;
     } catch (e, st) {
