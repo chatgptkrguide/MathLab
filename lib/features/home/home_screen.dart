@@ -670,6 +670,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           label: 'AI 튜터에게 물어보세요',
           borderRadius: 14,
           onTap: () => _showComingSoon('AI 튜터'),
+          comingSoon: true,
         ),
         const SizedBox(height: 16),
         // Dark blue: Chat
@@ -680,6 +681,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
           label: '맴버들 채팅하기',
           borderRadius: 14,
           onTap: () => _showComingSoon('채팅'),
+          comingSoon: true,
         ),
       ],
     );
@@ -693,6 +695,7 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
     required double borderRadius,
     double iconBgOpacity = 0.12,
     required VoidCallback onTap,
+    bool comingSoon = false,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -733,6 +736,29 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (comingSoon) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
+                ),
+                child: const Text(
+                  '출시 예정',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
           ],
         ),
       ),
