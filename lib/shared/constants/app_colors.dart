@@ -6,28 +6,28 @@ class AppColors {
   AppColors._();
 
   // ============================================================
-  // === Brand Primary ===
+  // === Brand Primary (single source of truth) ===
   // ============================================================
-  static const primary = Color(0xFF1CB0F6); // Math Blue (main brand)
+  static const primary = Color(0xFF1CB0F6); // Math/Duolingo blue
   static const primaryDark = Color(0xFF1899D6); // Button blue
   static const primaryLight = Color(0xFF61A1D8); // Sky blue (Figma)
 
   // ============================================================
   // === Brand Secondary ===
   // ============================================================
-  static const mathBlue = Color(0xFF1CB0F6); // Duolingo blue
+  static const mathBlue = primary; // alias
   static const mathGreen = Color(0xFF58CC02); // Duolingo green
   static const mathGreenLight = Color(0xFF89E219); // Light green (gradient)
   static const mathOrange = Color(0xFFFF9600); // Math orange
   static const mathYellow = Color(0xFFFFC800); // Math yellow
   static const mathPurple = Color(0xFFCE82FF); // Math purple
   static const mathRed = Color(0xFFFF4B4B); // Math red
-  static const mathButtonBlue = Color(0xFF1899D6); // Button blue
+  static const mathButtonBlue = primaryDark; // alias
 
   // ============================================================
   // === Figma Accent Colors ===
   // ============================================================
-  static const skyBlue = Color(0xFF61A1D8); // Figma main bg
+  static const skyBlue = primaryLight; // alias
   static const darkNavy = Color(0xFF211E41); // Splash/login bg
   static const royalBlue = Color(0xFF4575F6); // Accent
   static const deepBlue = Color(0xFF0014F7); // CTA button
@@ -37,15 +37,15 @@ class AppColors {
   // ============================================================
   // === Semantic Colors ===
   // ============================================================
-  static const success = Color(0xFF58CC02); // Green
-  static const error = Color(0xFFFF4B4B); // Red
-  static const warning = Color(0xFFFF9600); // Orange
-  static const info = Color(0xFF1CB0F6); // Info blue
+  static const success = mathGreen; // alias
+  static const error = mathRed; // alias
+  static const warning = mathOrange; // alias
+  static const info = primary; // alias
 
   // Aliases for backward compatibility
-  static const successGreen = Color(0xFF58CC02);
-  static const errorRed = Color(0xFFFF4B4B);
-  static const warningOrange = Color(0xFFFF9600);
+  static const successGreen = mathGreen;
+  static const errorRed = mathRed;
+  static const warningOrange = mathOrange;
   static const disabled = Color(0xFFAFAFAF);
 
   // ============================================================

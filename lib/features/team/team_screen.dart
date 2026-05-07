@@ -84,18 +84,23 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.skyBlue,
+        foregroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         title: const Text(
           '팀',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           if (teamState.hasTeam)
             IconButton(
-              icon: const Icon(Icons.settings_outlined),
+              icon: const Icon(Icons.settings_outlined, color: Colors.white),
               onPressed: () => _showTeamSettings(context, user.uid, teamState),
               tooltip: '팀 설정',
             ),

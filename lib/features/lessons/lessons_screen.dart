@@ -10,6 +10,7 @@ import '../../data/providers/problem/problem_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/grade_curriculum_map.dart';
+import '../../core/utils/app_logger.dart';
 import '../problems/problem_solving_screen.dart';
 
 class LessonsScreenFigma extends ConsumerStatefulWidget {
@@ -159,27 +160,89 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   ),
                 ),
               ),
-              error: (_, __) => Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '커리큘럼을 불러오는데 실패했습니다',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
+              error: (error, stack) {
+                AppLogger.error(
+                  'Curriculum load failed',
+                  tag: 'Lessons',
+                  error: error,
+                  stackTrace: stack,
+                );
+                final msg = error.toString().toLowerCase();
+                final isOffline = msg.contains('socket') ||
+                    msg.contains('network') ||
+                    msg.contains('unreachable') ||
+                    msg.contains('failed host lookup');
+                final isTimeout = msg.contains('timeout') ||
+                    msg.contains('deadline');
+                final title = isOffline
+                    ? '인터넷 연결을 확인해 주세요'
+                    : isTimeout
+                        ? '응답 시간이 초과되었어요'
+                        : '커리큘럼을 불러오지 못했어요';
+                final hint = isOffline
+                    ? 'Wi-Fi 또는 모바일 데이터 상태를 확인하고\n다시 시도해 주세요.'
+                    : '잠시 후 다시 시도해 주세요.';
+                final icon = isOffline
+                    ? Icons.wifi_off_rounded
+                    : isTimeout
+                        ? Icons.access_time_rounded
+                        : Icons.error_outline_rounded;
+                return Expanded(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            icon,
+                            size: 48,
+                            color: AppColors.textTertiary,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            hint,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () =>
+                                ref.invalidate(curriculumProvider),
+                            icon: const Icon(Icons.refresh_rounded, size: 18),
+                            label: const Text('다시 시도'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.skyBlue,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () => ref.invalidate(curriculumProvider),
-                        child: const Text('다시 시도'),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
               data: (allUnits) {
                 // Filter units by user's grade
                 final gradeFilteredUnits = _filterUnitsByGrade(allUnits);

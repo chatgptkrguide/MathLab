@@ -43,6 +43,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
 
     state = const ShopState(status: ShopStatus.purchasing);
 
+    bool gemsSpent = false;
     try {
       final spent = await userNotifier.spendGems(item.gemCost);
       if (!spent) {
@@ -52,6 +53,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         );
         return false;
       }
+      gemsSpent = true;
 
       switch (item.type) {
         case ShopItemType.heartRefill:
@@ -79,6 +81,23 @@ class ShopNotifier extends StateNotifier<ShopState> {
       return true;
     } catch (e, st) {
       AppLogger.error('Purchase failed', tag: 'Shop', error: e, stackTrace: st);
+      if (gemsSpent) {
+        try {
+          await userNotifier.addGems(item.gemCost);
+          AppLogger.warning(
+            'Refunded ${item.gemCost} gems after item apply failure',
+            tag: 'Shop',
+            data: {'item': item.id},
+          );
+        } catch (refundErr, refundSt) {
+          AppLogger.error(
+            'CRITICAL: gem refund failed after item apply failure',
+            tag: 'Shop',
+            error: refundErr,
+            stackTrace: refundSt,
+          );
+        }
+      }
       state = const ShopState(
         status: ShopStatus.error,
         message: 'Purchase failed',
