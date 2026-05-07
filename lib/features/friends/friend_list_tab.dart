@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/friend_model.dart';
 import '../../data/providers/friend/friend_provider.dart';
+import '../../shared/widgets/common/empty_state_view.dart';
+import 'friend_search_screen.dart';
 
 class FriendListTab extends ConsumerWidget {
   final String userId;
@@ -17,18 +19,15 @@ class FriendListTab extends ConsumerWidget {
     final friendState = ref.watch(friendProvider(userId));
 
     if (friendState.friends.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('아직 친구가 없습니다',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600])),
-            const SizedBox(height: 8),
-            Text('친구를 추가하여 함께 학습하세요!',
-                style: TextStyle(fontSize: 14, color: Colors.grey[500])),
-          ],
+      return EmptyStateView(
+        icon: Icons.people_outline_rounded,
+        title: '아직 친구가 없어요',
+        subtitle: '친구를 추가하면 함께 진도를 비교하고\n서로 응원할 수 있어요.',
+        actionLabel: '친구 찾아보기',
+        onAction: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const FriendSearchScreen(),
+          ),
         ),
       );
     }

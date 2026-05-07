@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/friend_model.dart';
 import '../../data/providers/friend/friend_provider.dart';
+import '../../shared/widgets/common/empty_state_view.dart';
 
 class FriendActivityTab extends ConsumerWidget {
   final String userId;
@@ -15,15 +16,10 @@ class FriendActivityTab extends ConsumerWidget {
     final friendState = ref.watch(friendProvider(userId));
 
     if (friendState.friendActivities.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.timeline, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('친구 활동 내역이 없습니다', style: TextStyle(color: Colors.grey)),
-          ],
-        ),
+      return const EmptyStateView(
+        icon: Icons.timeline_rounded,
+        title: '친구 활동 내역이 없어요',
+        subtitle: '친구가 레슨을 완료하거나 레벨업을 하면\n이곳에 표시됩니다.',
       );
     }
 

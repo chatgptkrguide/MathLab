@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/friend_model.dart';
 import '../../data/providers/friend/friend_provider.dart';
+import '../../shared/widgets/common/empty_state_view.dart';
 
 class FriendRequestsTab extends ConsumerWidget {
   final String userId;
@@ -15,15 +16,10 @@ class FriendRequestsTab extends ConsumerWidget {
     final friendState = ref.watch(friendProvider(userId));
 
     if (friendState.pendingRequests.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('받은 친구 요청이 없습니다', style: TextStyle(color: Colors.grey)),
-          ],
-        ),
+      return const EmptyStateView(
+        icon: Icons.mark_email_unread_outlined,
+        title: '받은 친구 요청이 없어요',
+        subtitle: '새로운 친구 요청이 도착하면\n여기에 표시됩니다.',
       );
     }
 
