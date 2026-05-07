@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/providers/user/user_provider.dart';
+import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/grade_curriculum_map.dart';
@@ -927,6 +928,10 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
   // STATISTICS SECTION
   // ============================================================
   Widget _buildStatisticsSection(UserModel user) {
+    final progressState = ref.watch(lessonProgressProvider(user.uid));
+    final completedLessons = progressState.completedCount;
+    final earnedStars = progressState.totalStars;
+
     final stats = [
       {
         'label': '챌린지 완료',
@@ -936,7 +941,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
       },
       {
         'label': '완료한 레슨',
-        'value': (user.totalXp ~/ 50).toString(),
+        'value': completedLessons.toString(),
         'icon': Icons.check_circle_rounded,
         'color': AppColors.mathGreen,
       },
@@ -953,16 +958,16 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
         'color': AppColors.mathYellow,
       },
       {
-        'label': '정답 수',
-        'value': '${user.totalXp > 0 ? _formatNumber(user.totalXp ~/ 10) : 0}',
-        'icon': Icons.task_alt_rounded,
-        'color': const Color(0xFF26A69A),
+        'label': '획득 별',
+        'value': earnedStars.toString(),
+        'icon': Icons.star_rounded,
+        'color': const Color(0xFFFFB300),
       },
       {
-        'label': '3위 이내',
-        'value': '${user.achievements.where((a) => a == 'top3').length}',
-        'icon': Icons.leaderboard_rounded,
-        'color': AppColors.mathPurple,
+        'label': '최장 연속',
+        'value': '${user.longestStreak}일',
+        'icon': Icons.local_fire_department_rounded,
+        'color': const Color(0xFFFF7043),
       },
     ];
 
