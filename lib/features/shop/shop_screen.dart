@@ -379,6 +379,8 @@ class ShopScreen extends ConsumerWidget {
       return;
     }
 
+    final isPurchasing = ValueNotifier<bool>(false);
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -451,35 +453,56 @@ class ShopScreen extends ConsumerWidget {
               style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              final success =
-                  await ref.read(shopProvider.notifier).purchaseItem(item);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success
-                          ? '${item.name} 구매 완료!'
-                          : '구매에 실패했습니다',
-                    ),
-                    backgroundColor: success ? AppColors.success : AppColors.error,
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6B5CE7),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          ValueListenableBuilder<bool>(
+            valueListenable: isPurchasing,
+            builder: (context, purchasing, _) => ElevatedButton(
+              onPressed: purchasing
+                  ? null
+                  : () async {
+                      isPurchasing.value = true;
+                      Navigator.of(dialogContext).pop();
+                      final success = await ref
+                          .read(shopProvider.notifier)
+                          .purchaseItem(item);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? '${item.name} 구매 완료!'
+                                  : '구매에 실패했습니다',
+                            ),
+                            backgroundColor: success
+                                ? AppColors.success
+                                : AppColors.error,
+                          ),
+                        );
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6B5CE7),
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFF6B5CE7).withValues(alpha: 0.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-            ),
-            child: const Text(
-              '구매하기',
-              style: TextStyle(fontWeight: FontWeight.w700),
+              child: purchasing
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text(
+                      '구매하기',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
             ),
           ),
         ],

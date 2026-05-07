@@ -377,12 +377,12 @@ class _AdminLessonFormScreenState
       id: widget.lesson?.id ?? '',
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
-      order: int.parse(_orderController.text.trim()),
-      xpReward: int.parse(_xpRewardController.text.trim()),
+      order: int.tryParse(_orderController.text.trim()) ?? 0,
+      xpReward: int.tryParse(_xpRewardController.text.trim()) ?? 10,
       type: _selectedType,
       difficulty: _selectedDifficulty,
       concepts: _concepts,
-      estimatedMinutes: int.parse(_estimatedMinutesController.text.trim()),
+      estimatedMinutes: int.tryParse(_estimatedMinutesController.text.trim()) ?? 5,
     );
 
     try {

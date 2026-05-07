@@ -175,6 +175,7 @@ class MathLabApp extends StatelessWidget {
       // Theme
       theme: ThemeData(
         useMaterial3: true,
+        fontFamily: 'NotoSansKR',
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF1CB0F6),
           brightness: Brightness.light,
@@ -253,6 +254,7 @@ class MathLabApp extends StatelessWidget {
       // Dark theme
       darkTheme: ThemeData(
         useMaterial3: true,
+        fontFamily: 'NotoSansKR',
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF1CB0F6),
           brightness: Brightness.dark,

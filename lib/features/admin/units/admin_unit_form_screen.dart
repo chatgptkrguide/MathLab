@@ -223,7 +223,7 @@ class _AdminUnitFormScreenState extends ConsumerState<AdminUnitFormScreen> {
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       emoji: _emojiController.text.trim(),
-      order: int.parse(_orderController.text.trim()),
+      order: int.tryParse(_orderController.text.trim()) ?? 0,
       theme: _selectedTheme,
     );
 

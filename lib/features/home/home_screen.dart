@@ -156,8 +156,10 @@ class _HomeScreenFigmaState extends ConsumerState<HomeScreenFigma> {
                 '${name ?? '학습자'}의 수학 학습',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 10,
-                  letterSpacing: 1,
+                  fontSize: 12,
+                  height: 1.4,
+                  letterSpacing: 0.4,
+                  fontWeight: FontWeight.w500,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
