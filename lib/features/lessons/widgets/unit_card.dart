@@ -153,15 +153,43 @@ class UnitCard extends StatelessWidget {
 
   Widget _buildLessonsTree(BuildContext context) {
     if (unit.lessons.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.spacing24),
-          child: Text(
-            '레슨이 준비 중입니다',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textTertiary,
+      return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing24,
+          vertical: AppDimensions.spacing24,
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: _getUnitThemeColor().withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.lock_outline_rounded,
+                size: 30,
+                color: _getUnitThemeColor().withValues(alpha: 0.7),
+              ),
             ),
-          ),
+            const SizedBox(height: AppDimensions.spacing16),
+            Text(
+              '콘텐츠 준비 중',
+              style: AppTextStyles.headlineSmall.copyWith(
+                color: AppColors.textPrimary,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing8),
+            Text(
+              '이 단원의 레슨은 곧 추가될 예정이에요.',
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
         ),
       );
     }

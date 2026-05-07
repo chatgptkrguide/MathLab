@@ -1106,12 +1106,12 @@ class SampleProblems {
       ProblemModel(
         id: 'default_1',
         lessonId: lessonId,
-        question: '이 레슨의 문제는 준비 중입니다.',
+        question: '🔒 이 레슨의 문제는 아직 준비 중이에요',
         type: ProblemType.multipleChoice,
         difficulty: ProblemDifficulty.easy,
         options: ['확인'],
         correctAnswer: '확인',
-        explanation: '곧 추가될 예정입니다!',
+        explanation: '콘텐츠가 곧 추가될 예정입니다. 다른 레슨을 먼저 풀어보세요!',
         points: 0,
       ),
     ];
