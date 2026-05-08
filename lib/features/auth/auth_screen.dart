@@ -111,18 +111,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     children: [
                       const Spacer(flex: 2),
 
-                      // 메인 카피 (한국어) — anti-AI 가이드: 한국어 중심 표기
+                      // "Math is Fun!!!" 텍스트 (피그마: 기울어진 흰색 볼드)
                       Transform.rotate(
                         angle: -0.06,
                         child: const Text(
-                          '수학,\n즐거워질 시간',
+                          'Math is\nFun!!!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 32,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
-                            height: 1.25,
-                            letterSpacing: -0.3,
+                            height: 1.2,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -142,12 +142,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
                       const SizedBox(height: 24),
 
-                      // 브랜드 (영문) — 보조 표기
+                      // "GoMath Lab" 타이틀 (피그마: 흰색 36px 볼드, 가운데)
                       const Text(
                         'GoMath Lab',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 26,
+                          fontSize: 32,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: 1.0,
