@@ -984,19 +984,106 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
           ),
         ),
         const SizedBox(height: 14),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.7,
-          ),
-          itemCount: stats.length,
-          itemBuilder: (context, index) {
-            final stat = stats[index];
-            final statColor = (stat['color'] as Color?) ?? AppColors.mathBlue;
+        // === Hero stat: 누적 XP를 전폭 featured 카드로 ===
+        Builder(builder: (_) {
+          final hero =
+              stats.firstWhere((s) => s['label'] == '누적 XP', orElse: () => stats.first);
+          final heroColor = (hero['color'] as Color?) ?? AppColors.mathYellow;
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  heroColor.withValues(alpha: 0.18),
+                  heroColor.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: heroColor.withValues(alpha: 0.25),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: heroColor,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: heroColor.withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    (hero['icon'] as IconData?) ?? Icons.bolt_rounded,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (hero['label'] as String?) ?? '',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        (hero['value'] as String?) ?? '0',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textDark,
+                          height: 1.05,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.trending_up_rounded,
+                  color: heroColor,
+                  size: 22,
+                ),
+              ],
+            ),
+          );
+        }),
+        const SizedBox(height: 12),
+        // === Rest stats grid (5개, 마지막 한 칸 자연스럽게 빔) ===
+        Builder(builder: (_) {
+          final rest =
+              stats.where((s) => s['label'] != '누적 XP').toList();
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 1.7,
+            ),
+            itemCount: rest.length,
+            itemBuilder: (context, index) {
+              final stat = rest[index];
+              final statColor =
+                  (stat['color'] as Color?) ?? AppColors.mathBlue;
             return Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -1063,7 +1150,8 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               ),
             );
           },
-        ),
+        );
+        }),
       ],
     );
   }
@@ -1103,23 +1191,26 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () => Navigator.of(context).push(
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ShopScreen()),
             ),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.premiumBlue,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.premiumBlue,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                '업그레이드',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              minimumSize: const Size(0, 40),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(
+              '업그레이드',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),

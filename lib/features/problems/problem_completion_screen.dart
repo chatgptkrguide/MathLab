@@ -90,132 +90,193 @@ class _ProblemCompletionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.mathGreen,
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.spacing32),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: AppDimensions.spacing32),
-                      const Icon(
-                        Icons.celebration,
-                        size: 100,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: AppDimensions.spacing24),
-                      Text(
-                        '레슨 완료!',
-                        style: AppTextStyles.heading1.copyWith(
-                          color: Colors.white,
-                          fontSize: 32,
-                        ),
-                      ),
-                      const SizedBox(height: AppDimensions.spacing16),
-                      Text(
-                        widget.lessonTitle,
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppDimensions.spacing48),
+        child: Column(
+          children: [
+            // === 상단 녹색 accent 헤더 ===
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 36),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.mathGreen,
+                    AppColors.mathGreen.withValues(alpha: 0.85),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.mathGreen.withValues(alpha: 0.25),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.celebration_rounded,
+                      size: 64, color: Colors.white),
+                  const SizedBox(height: 12),
+                  Text(
+                    '레슨 완료!',
+                    style: AppTextStyles.heading1.copyWith(
+                      color: Colors.white,
+                      fontSize: 28,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.lessonTitle,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white.withValues(alpha: 0.92),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
 
-                      // Stars
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          3,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppDimensions.spacing8),
-                            child: Icon(
-                              index < widget.session.starsEarned
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              size: AppDimensions.iconXLarge,
-                              color: Colors.white,
-                            ),
+            // === 본문 (흰 배경) ===
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+                child: Column(
+                  children: [
+                    // Stars
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        3,
+                        (index) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppDimensions.spacing8),
+                          child: Icon(
+                            index < widget.session.starsEarned
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            size: 56,
+                            color: index < widget.session.starsEarned
+                                ? const Color(0xFFFFC800)
+                                : const Color(0xFFE0E0E0),
                           ),
                         ),
                       ),
+                    ),
+                    const SizedBox(height: AppDimensions.spacing32),
 
-                      const SizedBox(height: AppDimensions.spacing48),
-
-                      // Stats
-                      _buildStatCard(
-                          '정답률',
-                          '${(widget.session.accuracy * 100).toStringAsFixed(0)}%'),
-                      const SizedBox(height: AppDimensions.spacing16),
-                      _buildStatCard('점수', '${widget.session.score}점'),
-                      const SizedBox(height: AppDimensions.spacing16),
-                      _buildStatCard('남은 하트', '${widget.session.hearts}/5'),
-                      const SizedBox(height: AppDimensions.spacing32),
-                    ],
-                  ),
+                    // Stats
+                    _buildStatCard(
+                        '정답률',
+                        '${(widget.session.accuracy * 100).toStringAsFixed(0)}%',
+                        AppColors.mathGreen,
+                        Icons.check_circle_rounded),
+                    const SizedBox(height: 12),
+                    _buildStatCard('획득 점수', '${widget.session.score}점',
+                        AppColors.mathYellow, Icons.bolt_rounded),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                        '남은 하트',
+                        '${widget.session.hearts}/5',
+                        AppColors.mathRed,
+                        Icons.favorite_rounded),
+                    const SizedBox(height: AppDimensions.spacing16),
+                  ],
                 ),
               ),
+            ),
 
-              // Continue button — saving 진행 여부와 무관하게 항상 활성화.
-              // 보상은 백그라운드에서 영속화되므로 UX 차단할 이유 없음.
-              SizedBox(
+            // === Continue button ===
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+              child: SizedBox(
                 width: double.infinity,
                 height: AppDimensions.buttonHeightLarge,
                 child: ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.mathGreen,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(AppDimensions.radius12),
+                          BorderRadius.circular(AppDimensions.radius16),
                     ),
                     elevation: 0,
                   ),
                   child: Text(
                     '계속하기',
                     style: AppTextStyles.button.copyWith(
-                      color: AppColors.mathGreen,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildStatCard(String label, String value) {
+  Widget _buildStatCard(
+      String label, String value, Color accent, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacing20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(AppDimensions.radius12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radius16),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.2),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: accent, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
             child: Text(
               label,
               style: AppTextStyles.bodyLarge.copyWith(
-                color: Colors.white,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: AppDimensions.spacing8),
           Text(
             value,
-            style: AppTextStyles.heading2.copyWith(
-              color: Colors.white,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: accent,
+              letterSpacing: -0.3,
             ),
           ),
         ],
