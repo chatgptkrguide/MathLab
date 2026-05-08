@@ -20,6 +20,12 @@ jobs:
           channel: 'stable'
           cache: true
 
+      # pubspec.yaml에서 .env를 asset으로 등록 → CI 환경엔 .env 없어서
+      # asset_does_not_exist warning이 1건 발생, --no-fatal-warnings 미지정 시 fail.
+      # 시크릿이 들어가면 안 되니 빈 더미 파일로 통과.
+      - name: Create dummy .env for asset resolution
+        run: touch .env
+
       - name: Get dependencies
         run: flutter pub get
 
