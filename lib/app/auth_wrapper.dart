@@ -61,32 +61,42 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       // SyncManager(오프라인 동기화)는 Phase 2 — 도입 시 이 위치에
       // ref.read(syncManagerProvider.notifier).start(currentUserId) 호출 추가.
 
-      // 2. FCM 서비스 초기화 확인 및 토픽 구독 (타임아웃 적용)
-      try {
-        final fcmServiceInitialized = await ref
-            .read(fcmServiceInitializedProvider.future)
-            .timeout(const Duration(seconds: 10));
-        if (fcmServiceInitialized) {
-          final fcmService = ref.read(fcmServiceProvider);
-          try {
-            await fcmService.subscribeToTopic('user_$currentUserId');
-            AppLogger.info('사용자 토픽 구독 완료: user_$currentUserId', tag: 'AuthWrapper');
-            await fcmService.subscribeToTopic('all_users');
-            AppLogger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
-          } catch (e) {
-            AppLogger.error('FCM 토픽 구독 실패', error: e, tag: 'AuthWrapper');
-          }
-        }
-        AppLogger.info('FCM 푸시 알림 서비스 활성화됨', tag: 'AuthWrapper');
-      } catch (e) {
-        AppLogger.warning('FCM 초기화 타임아웃 또는 실패 (앱은 정상 작동)', tag: 'AuthWrapper');
-      }
+      // 2. FCM 서비스 초기화 + 토픽 구독은 비차단 (가입 직후 흰 화면 방지)
+      // FCM이 늦게 init되거나 네트워크가 약해도 사용자 진입은 즉시 처리.
+      // ignore: discarded_futures
+      _initializeFcmInBackground(currentUserId);
     } catch (e) {
       AppLogger.error('초기화 실패', error: e, tag: 'AuthWrapper');
       _hasInitError = true;
       if (mounted) setState(() {});
     } finally {
       _isInitializing = false;
+    }
+  }
+
+  /// FCM 초기화·토픽 구독을 차단하지 않고 백그라운드에서 수행.
+  /// 네트워크가 약해도 사용자 진입은 즉시 진행되도록 함.
+  Future<void> _initializeFcmInBackground(String currentUserId) async {
+    try {
+      final fcmServiceInitialized = await ref
+          .read(fcmServiceInitializedProvider.future)
+          .timeout(const Duration(seconds: 10));
+      if (!fcmServiceInitialized) return;
+
+      final fcmService = ref.read(fcmServiceProvider);
+      try {
+        await fcmService.subscribeToTopic('user_$currentUserId');
+        AppLogger.info('사용자 토픽 구독 완료: user_$currentUserId',
+            tag: 'AuthWrapper');
+        await fcmService.subscribeToTopic('all_users');
+        AppLogger.info('전체 사용자 토픽 구독 완료', tag: 'AuthWrapper');
+      } catch (e) {
+        AppLogger.error('FCM 토픽 구독 실패', error: e, tag: 'AuthWrapper');
+      }
+      AppLogger.info('FCM 푸시 알림 서비스 활성화됨', tag: 'AuthWrapper');
+    } catch (e) {
+      AppLogger.warning('FCM 초기화 타임아웃 또는 실패 (앱은 정상 작동)',
+          tag: 'AuthWrapper');
     }
   }
 

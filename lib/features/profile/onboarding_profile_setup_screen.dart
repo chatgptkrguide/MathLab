@@ -156,7 +156,21 @@ class _OnboardingProfileSetupScreenState
       AppColors.beigGreen, // 녹색 베이지 - 완료
     ];
 
-    return Scaffold(
+    return PopScope(
+      // 시스템 백버튼 시 이전 페이지로 이동, 첫 페이지면 종료 차단.
+      // 가입 완료 전 화면 이탈 시 AuthWrapper가 다시 같은 화면을 띄워
+      // 발생하는 깜빡임을 방지.
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (_currentPage > 0) {
+          _pageController.previousPage(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOut,
+          );
+        }
+      },
+      child: Scaffold(
       resizeToAvoidBottomInset: true, // 키보드가 올라올 때 화면 조정
       body: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -397,6 +411,7 @@ class _OnboardingProfileSetupScreenState
           ],
         ),
       ),
+    ),
     );
   }
 
