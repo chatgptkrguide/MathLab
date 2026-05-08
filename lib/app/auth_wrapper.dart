@@ -56,7 +56,10 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
         _shouldShowWelcome = true;
       }
 
-      // TODO: SyncManager, ProblemProvider 초기화 (Phase 2)
+      // ProblemProvider는 family(lessonId) lazy provider라 화면 진입 시
+      // 자동 init 되므로 여기서 별도 호출 불필요.
+      // SyncManager(오프라인 동기화)는 Phase 2 — 도입 시 이 위치에
+      // ref.read(syncManagerProvider.notifier).start(currentUserId) 호출 추가.
 
       // 2. FCM 서비스 초기화 확인 및 토픽 구독 (타임아웃 적용)
       try {

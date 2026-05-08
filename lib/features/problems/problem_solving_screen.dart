@@ -296,6 +296,67 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     );
   }
 
+  void _showLessonNotReadyDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.skyBlue.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.lock_outline_rounded,
+                color: AppColors.skyBlue,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                '레슨 준비 중',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          '이 레슨의 문제는 아직 추가되지 않았어요.\n곧 준비될 예정이니 다른 레슨을 먼저 풀어보세요!',
+          style: TextStyle(fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              if (mounted) Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.skyBlue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+            ),
+            child: const Text(
+              '다른 레슨 보기',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showHintPopup(ProblemModel problem) {
     _initController();
     final hints = problem.allHints;
@@ -351,6 +412,22 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
         body: Center(child: Text('문제를 불러올 수 없습니다: $error')),
       ),
       data: (problems) {
+        // 빈 lesson 또는 placeholder fallback 감지 시 진입 차단.
+        // sample_problems._defaultProblems가 만든 'default_1' 한 건만 들어오는 케이스를
+        // 사용자가 풀이 화면에서 만나면 가짜 문제처럼 보임 → 즉시 안내 후 학습 화면 복귀.
+        final isPlaceholderOnly = problems.isEmpty ||
+            (problems.length == 1 && problems.first.id == 'default_1');
+        if (isPlaceholderOnly) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _showLessonNotReadyDialog();
+          });
+          return Scaffold(
+            backgroundColor: AppColors.backgroundLight,
+            body: const SizedBox.shrink(),
+          );
+        }
+
         if (session == null) {
           _initController();
           session = _controller.initializeSession(problems);
