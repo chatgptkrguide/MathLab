@@ -65,11 +65,7 @@ jobs:
             | base64 --decode > android/app/google-services.json
 
       - name: Install Shorebird CLI
-        run: |
-          curl --proto '=https' --tlsv1.2 \
-            https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh \
-            -sSf | bash
-          echo "$HOME/.shorebird/bin" >> "$GITHUB_PATH"
+        uses: shorebirdtech/setup-shorebird@v1
 
       - name: Get dependencies
         run: flutter pub get
