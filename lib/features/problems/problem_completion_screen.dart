@@ -13,6 +13,7 @@ import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
+import '../../core/utils/app_logger.dart';
 
 class ProblemCompletionScreen extends ConsumerStatefulWidget {
   final ProblemSessionModel session;
@@ -49,16 +50,41 @@ class _ProblemCompletionScreenState
 
     // 3개 호출을 병렬로 실행 → Firestore RTT 3회 → 1회로 단축.
     // 서로 의존성 없음 (lessonProgress / users 문서 / studyDates 분리).
-    await Future.wait([
-      ref.read(lessonProgressProvider(user.uid).notifier).completeLesson(
-            lessonId: widget.lessonId,
-            correctAnswers: widget.session.correctCount,
-            totalQuestions: widget.session.problems.length,
-            xpEarned: widget.session.score,
+    try {
+      await Future.wait([
+        ref.read(lessonProgressProvider(user.uid).notifier).completeLesson(
+              lessonId: widget.lessonId,
+              correctAnswers: widget.session.correctCount,
+              totalQuestions: widget.session.problems.length,
+              xpEarned: widget.session.score,
+            ),
+        ref.read(userProvider.notifier).addXp(widget.session.score),
+        ref.read(userProvider.notifier).updateStreak(),
+      ]);
+    } catch (e, st) {
+      AppLogger.error(
+        '레슨 완료 영속화 실패',
+        tag: 'ProblemCompletion',
+        error: e,
+        stackTrace: st,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            '보상 저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
           ),
-      ref.read(userProvider.notifier).addXp(widget.session.score),
-      ref.read(userProvider.notifier).updateStreak(),
-    ]);
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: '다시 시도',
+            textColor: Colors.white,
+            onPressed: () => unawaited(_saveProgress()),
+          ),
+        ),
+      );
+    }
   }
 
   @override
