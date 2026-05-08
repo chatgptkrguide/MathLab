@@ -139,19 +139,30 @@ class _HintPopupState extends State<HintPopup> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '힌트',
+                  '풀이 힌트',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    letterSpacing: -0.3,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${widget.unlockedHints.length}/${widget.hints.length} 해제됨',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.85),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${widget.unlockedHints.length} / ${widget.hints.length} 단계',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
               ],
@@ -306,13 +317,35 @@ class _HintPopupState extends State<HintPopup> {
           const SizedBox(width: 12),
           // Hint label
           Expanded(
-            child: Text(
-              canUnlockThis ? '탭하여 힌트 열기' : '이전 힌트를 먼저 확인하세요',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: canUnlockThis ? FontWeight.w500 : FontWeight.w400,
-                color: canUnlockThis ? Colors.grey[700] : Colors.grey[400],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  canUnlockThis
+                      ? '힌트 ${index + 1}'
+                      : '힌트 ${index + 1}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: canUnlockThis
+                        ? AppColors.mathOrange
+                        : Colors.grey[400],
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  canUnlockThis
+                      ? '탭해서 단서를 열어보세요'
+                      : '이전 힌트를 먼저 확인하세요',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color:
+                        canUnlockThis ? Colors.grey[600] : Colors.grey[400],
+                  ),
+                ),
+              ],
             ),
           ),
           // Unlock button or lock icon

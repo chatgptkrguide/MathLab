@@ -489,6 +489,7 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                     // Hearts indicator
                     HeartsIndicator(
                       currentHearts: session!.hearts,
+                      maxHearts: ref.watch(userProvider)?.maxHearts ?? 5,
                       previousHearts: _previousHearts,
                       isAnswerChecked: isAnswerChecked,
                       heartAnimController: _heartAnimController,
