@@ -159,7 +159,7 @@ class CustomBottomNavigation extends StatelessWidget {
               Icon(
                 icon,
                 color: isSelected
-                    ? const Color(0xFF030204)
+                    ? AppColors.mathBlue
                     : AppColors.textLight,
                 size: 22,
               ),

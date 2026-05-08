@@ -21,7 +21,7 @@ class SectionHeader extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.paddingLarge,
+        horizontal: AppDimensions.paddingMedium,
         vertical: AppDimensions.paddingSmall,
       ),
       child: Container(

@@ -153,9 +153,17 @@ class SettingsScreen extends ConsumerWidget {
                       ],
                     ),
 
-                    const SizedBox(height: AppDimensions.spacing8),
+                    const SizedBox(height: AppDimensions.spacing24),
+
+                    const SectionHeader(
+                      title: '계정',
+                      accentColor: AppColors.mathRed,
+                    ),
 
                     Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.paddingMedium,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.mathRed.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
