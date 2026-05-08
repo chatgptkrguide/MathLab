@@ -9,6 +9,7 @@ import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_dimensions.dart';
 import '../../shared/constants/app_text_styles.dart';
+import 'common/success_hero.dart';
 
 class WelcomeDialog extends StatelessWidget {
   final UserModel user;
@@ -31,19 +32,11 @@ class WelcomeDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Success Animation (you can replace with Lottie later)
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: AppColors.mathGreen.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_circle,
-                size: 60,
-                color: AppColors.mathGreen,
-              ),
+            // Common success hero (다른 성공 모멘트와 시각 언어 통일)
+            const SuccessHero(
+              icon: Icons.waving_hand_rounded,
+              color: AppColors.mathGreen,
+              size: 88,
             ),
 
             const SizedBox(height: AppDimensions.spacing24),
