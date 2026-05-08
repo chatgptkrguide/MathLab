@@ -111,18 +111,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     children: [
                       const Spacer(flex: 2),
 
-                      // "Math is Fun!!!" 텍스트 (피그마: 기울어진 흰색 볼드)
+                      // "Math is Fun!!!" 텍스트 (Inter 영문 디스플레이, 매우 굵게)
                       Transform.rotate(
                         angle: -0.06,
                         child: const Text(
                           'Math is\nFun!!!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Inter',
+                            fontSize: 42,
+                            fontWeight: FontWeight.w900,
                             color: Colors.white,
-                            height: 1.2,
-                            letterSpacing: 0.5,
+                            height: 1.0,
+                            letterSpacing: -1.5,
                           ),
                         ),
                       ),
@@ -142,15 +143,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
                       const SizedBox(height: 24),
 
-                      // "GoMath Lab" 타이틀 (피그마: 흰색 36px 볼드, 가운데)
+                      // "GoMath Lab" 타이틀 (Inter, 살짝 가벼운 weight로 위계)
                       const Text(
                         'GoMath Lab',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Inter',
+                          fontSize: 30,
+                          fontWeight: FontWeight.w800,
                           color: Colors.white,
-                          letterSpacing: 1.0,
+                          letterSpacing: -0.5,
                         ),
                       ),
 

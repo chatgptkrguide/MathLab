@@ -124,6 +124,9 @@ flutter:
     - family: NotoSansKR
       fonts:
         - asset: assets/fonts/NotoSansKR-Variable.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Variable.ttf
 
 # ========================================
 # 앱 아이콘 설정 (flutter_launcher_icons)
