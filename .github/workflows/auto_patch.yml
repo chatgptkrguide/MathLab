@@ -1,0 +1,84 @@
+name: Auto OTA Patch (Shorebird)
+
+# main 브랜치에 Dart 코드/pubspec 변경이 push되면 자동으로
+# Shorebird stable track에 OTA 패치를 발행한다.
+# 사용자 핸드폰의 1.0.0+10 release 기반 앱이 다음 실행 시 자동 업데이트.
+#
+# 네이티브 코드(android/, ios/) 변경이 포함되면 패치로 처리할 수 없어
+# 수동으로 ./scripts/deploy.sh test android 를 돌려야 한다.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'assets/**'
+  workflow_dispatch:
+
+concurrency:
+  group: shorebird-patch-android
+  cancel-in-progress: false
+
+jobs:
+  patch-android:
+    name: Shorebird Patch (Android)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Create dummy .env (asset_does_not_exist 방지)
+        run: touch .env
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" \
+            | base64 --decode > android/app/mathlab-release.jks
+
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=mathlab-release.jks
+          EOF
+
+      - name: Decode google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" \
+            | base64 --decode > android/app/google-services.json
+
+      - name: Install Shorebird CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 \
+            https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh \
+            -sSf | bash
+          echo "$HOME/.shorebird/bin" >> "$GITHUB_PATH"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Shorebird patch android (stable track)
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          shorebird patch android \
+            --release-version=$(grep '^version:' pubspec.yaml | sed 's/version: //') \
+            --no-confirm \
+            --allow-asset-diffs
