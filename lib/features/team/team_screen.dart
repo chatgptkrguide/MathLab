@@ -9,8 +9,10 @@ import '../../data/providers/team/team_provider.dart';
 import '../../data/models/team_model.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_text_styles.dart';
+import 'widgets/team_empty_view.dart';
 import 'widgets/team_header.dart';
 import 'widgets/team_member_card.dart';
+import 'widgets/team_search_result_card.dart';
 import 'create_team_screen.dart';
 
 class TeamScreen extends ConsumerStatefulWidget {
@@ -112,7 +114,21 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
             ? const Center(child: CircularProgressIndicator())
             : teamState.hasTeam
                 ? _buildTeamView(teamState, user.uid)
-                : _buildNoTeamView(teamState, user.uid),
+                : TeamEmptyView(
+                    invitations: teamState.invitations,
+                    onCreateTeam: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const CreateTeamScreen(),
+                      ),
+                    ),
+                    onSearchTeam: () => _showSearchTeamSheet(context, user.uid),
+                    onAcceptInvitation: (inv) => ref
+                        .read(teamProvider(user.uid).notifier)
+                        .acceptInvitation(inv),
+                    onRejectInvitation: (inv) => ref
+                        .read(teamProvider(user.uid).notifier)
+                        .rejectInvitation(inv.id),
+                  ),
       ),
     );
   }
@@ -182,191 +198,6 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
         // Bottom padding
         const SliverToBoxAdapter(child: SizedBox(height: 100)),
       ],
-    );
-  }
-
-  // ============================
-  // No Team View (join/create)
-  // ============================
-  Widget _buildNoTeamView(TeamState teamState, String userId) {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const SizedBox(height: 40),
-
-        // Illustration
-        Center(
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: AppColors.skyBlue.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.people_rounded,
-              size: 56,
-              color: AppColors.skyBlue.withValues(alpha: 0.6),
-            ),
-          ),
-        ),
-        const SizedBox(height: 28),
-
-        Text(
-          '아직 팀이 없어요',
-          style: AppTextStyles.headlineSmall.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '팀을 만들거나 친구의 팀에 합류해서\n함께 학습해보세요!',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 36),
-
-        // Create Team Button
-        SizedBox(
-          height: 52,
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const CreateTeamScreen(),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.skyBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              '팀 만들기',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Join Team Button
-        SizedBox(
-          height: 52,
-          child: OutlinedButton(
-            onPressed: () => _showSearchTeamSheet(context, userId),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.skyBlue,
-              side: BorderSide(color: AppColors.skyBlue),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: const Text(
-              '팀 검색하기',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-
-        // Invitations
-        if (teamState.invitations.isNotEmpty) ...[
-          const SizedBox(height: 36),
-          Container(
-            padding: const EdgeInsets.only(left: 4, bottom: 12),
-            child: Text(
-              '받은 초대 (${teamState.invitations.length})',
-              style: AppTextStyles.titleMedium.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          ...teamState.invitations.map(
-            (inv) => _buildInvitationCard(inv, userId),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildInvitationCard(TeamInvitation invitation, String userId) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(
-          left: BorderSide(color: AppColors.royalBlue, width: 4),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  invitation.teamName,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${invitation.fromUserName}님의 초대  ·  ${invitation.getTimeAgo()}',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(teamProvider(userId).notifier)
-                  .rejectInvitation(invitation.id);
-            },
-            child: const Text('거절'),
-          ),
-          const SizedBox(width: 4),
-          ElevatedButton(
-            onPressed: () {
-              ref
-                  .read(teamProvider(userId).notifier)
-                  .acceptInvitation(invitation);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.royalBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-            child: const Text('수락'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -537,8 +368,15 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
                                 const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final team = teamState.searchResults[index];
-                              return _buildSearchResultCard(
-                                  team, userId, context);
+                              return TeamSearchResultCard(
+                                team: team,
+                                onJoin: () {
+                                  ref
+                                      .read(teamProvider(userId).notifier)
+                                      .joinTeam(team.id);
+                                  Navigator.pop(context);
+                                },
+                              );
                             },
                           ),
                   ),
@@ -547,70 +385,6 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildSearchResultCard(
-      TeamModel team, String userId, BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Text(team.displayIcon, style: const TextStyle(fontSize: 32)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  team.name,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '${team.memberCount}/${team.maxMembers}명',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: team.isFull
-                ? null
-                : () {
-                    ref
-                        .read(teamProvider(userId).notifier)
-                        .joinTeam(team.id);
-                    Navigator.pop(context);
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.skyBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            child: Text(team.isFull ? '가득 참' : '가입'),
-          ),
-        ],
       ),
     );
   }
