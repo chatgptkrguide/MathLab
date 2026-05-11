@@ -1,6 +1,12 @@
 // ❓ Problem Model
 //
 // Represents a math problem with question, answers, and metadata.
+//
+// Legacy compatibility:
+//   레거시 Firestore 문서는 단수 'hint' / 'imageUrl' 키를 사용했다.
+//   fromJson 이 단수 키를 읽으면 hints / imageUrls 리스트에 흡수하므로
+//   기존 문서를 다시 마이그레이션하지 않아도 동작이 동일하다.
+//   toJson 은 더 이상 단수 키를 쓰지 않는다.
 
 class ProblemModel {
   final String id;
@@ -11,10 +17,8 @@ class ProblemModel {
   final List<String> options; // For multiple choice
   final String correctAnswer;
   final String? explanation; // Explanation for the answer
-  final String? hint; // Hint for the problem (legacy, use hints instead)
   final List<String> hints; // Step-by-step hints (단계별 힌트)
   final int points; // Points awarded for correct answer
-  final String? imageUrl; // Optional single image (legacy, use imageUrls)
   final List<String> imageUrls; // Multiple images for the problem
 
   const ProblemModel({
@@ -26,28 +30,32 @@ class ProblemModel {
     this.options = const [],
     required this.correctAnswer,
     this.explanation,
-    this.hint,
     this.hints = const [],
     this.points = 10,
-    this.imageUrl,
     this.imageUrls = const [],
   });
 
-  /// All images (imageUrls list or legacy single imageUrl)
-  List<String> get allImages {
-    if (imageUrls.isNotEmpty) return imageUrls;
-    if (imageUrl != null) return [imageUrl!];
-    return [];
-  }
+  /// All images — 외부 호출자 호환 목적. 현재는 imageUrls 와 동일.
+  List<String> get allImages => imageUrls;
 
-  /// 모든 힌트 가져오기 (hints 리스트 또는 레거시 hint)
-  List<String> get allHints {
-    if (hints.isNotEmpty) return hints;
-    if (hint != null) return [hint!];
-    return [];
-  }
+  /// 모든 힌트 — 외부 호출자 호환 목적. 현재는 hints 와 동일.
+  List<String> get allHints => hints;
 
   factory ProblemModel.fromJson(Map<String, dynamic> json) {
+    final hintsList = List<String>.from(json['hints'] ?? const []);
+    final legacyHint = json['hint'] as String?;
+    if (hintsList.isEmpty && legacyHint != null && legacyHint.isNotEmpty) {
+      hintsList.add(legacyHint);
+    }
+
+    final imageUrlsList = List<String>.from(json['imageUrls'] ?? const []);
+    final legacyImageUrl = json['imageUrl'] as String?;
+    if (imageUrlsList.isEmpty &&
+        legacyImageUrl != null &&
+        legacyImageUrl.isNotEmpty) {
+      imageUrlsList.add(legacyImageUrl);
+    }
+
     return ProblemModel(
       id: json['id'] as String,
       lessonId: json['lessonId'] as String,
@@ -60,14 +68,12 @@ class ProblemModel {
         (e) => e.name == json['difficulty'],
         orElse: () => ProblemDifficulty.easy,
       ),
-      options: List<String>.from(json['options'] ?? []),
+      options: List<String>.from(json['options'] ?? const []),
       correctAnswer: json['correctAnswer'] as String,
       explanation: json['explanation'] as String?,
-      hint: json['hint'] as String?,
-      hints: List<String>.from(json['hints'] ?? []),
+      hints: hintsList,
       points: json['points'] as int? ?? 10,
-      imageUrl: json['imageUrl'] as String?,
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
+      imageUrls: imageUrlsList,
     );
   }
 
@@ -81,10 +87,8 @@ class ProblemModel {
       'options': options,
       'correctAnswer': correctAnswer,
       'explanation': explanation,
-      'hint': hint,
       'hints': hints,
       'points': points,
-      'imageUrl': imageUrl,
       'imageUrls': imageUrls,
     };
   }

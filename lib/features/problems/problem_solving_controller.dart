@@ -165,7 +165,7 @@ class ProblemSolvingController {
       question: problem.question,
       correctAnswer: problem.correctAnswer,
       userAnswer: userAnswer,
-      hint: problem.allHints.isNotEmpty ? problem.allHints.first : problem.hint,
+      hint: problem.allHints.isNotEmpty ? problem.allHints.first : null,
       explanation: problem.explanation,
       attemptDate: DateTime.now(),
       isResolved: false,
