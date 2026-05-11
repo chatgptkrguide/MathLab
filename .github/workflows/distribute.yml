@@ -1,12 +1,33 @@
 name: Distribute to Testers
 
+# 네이티브 코드(android/, ios/ 실제 빌드 산출물)가 변경되면
+# Shorebird OTA 로 처리할 수 없으므로 자동으로 Firebase App Distribution 에
+# 새 빌드를 올려 테스터가 재설치하도록 한다.
+#
+# fastlane/metadata/screenshots, README 등 빌드와 무관한 파일은 트리거에서 제외.
+# 수동 실행(workflow_dispatch)도 그대로 지원한다.
+
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/app/**'
+      - 'android/build.gradle*'
+      - 'android/settings.gradle*'
+      - 'android/gradle/**'
+      - 'android/gradle.properties'
+      - 'ios/Runner/**'
+      - 'ios/Runner.xcodeproj/**'
+      - 'ios/Runner.xcworkspace/**'
+      - 'ios/Podfile'
+      - 'ios/Podfile.lock'
+      - 'ios/Flutter/**'
   workflow_dispatch:
     inputs:
       platform:
         description: 'Platform to distribute'
         required: true
-        default: 'android'
+        default: 'both'
         type: choice
         options:
           - android
@@ -17,11 +38,15 @@ on:
         required: false
         default: 'New test build'
 
+concurrency:
+  group: distribute-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   distribute-android:
     name: Distribute Android
     runs-on: ubuntu-latest
-    if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
+    if: ${{ github.event_name == 'push' || inputs.platform == 'android' || inputs.platform == 'both' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +55,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.41.6'
           cache: true
 
       - name: Setup Java
@@ -60,8 +86,21 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Generate native splash drawables
+        run: dart run flutter_native_splash:create
+
       - name: Build APK
         run: flutter build apk --release
+
+      - name: Compose release notes
+        id: notes
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            MSG=$(git log -1 --pretty=%s)
+            echo "value=Auto: $MSG" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ inputs.release_notes }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -70,12 +109,12 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           groups: testers
           file: build/app/outputs/flutter-apk/app-release.apk
-          releaseNotes: "${{ inputs.release_notes }}"
+          releaseNotes: ${{ steps.notes.outputs.value }}
 
   distribute-ios:
     name: Distribute iOS
     runs-on: macos-latest
-    if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
+    if: ${{ github.event_name == 'push' || inputs.platform == 'ios' || inputs.platform == 'both' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -84,6 +123,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.41.6'
           cache: true
 
       - name: Create .env file
@@ -121,6 +161,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Install CocoaPods
+        run: cd ios && pod install --repo-update
+
       - name: Build IPA
         run: flutter build ipa --release --export-method=ad-hoc
 
@@ -134,6 +177,16 @@ jobs:
           fi
           echo "path=$IPA_PATH" >> "$GITHUB_OUTPUT"
 
+      - name: Compose release notes
+        id: notes
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            MSG=$(git log -1 --pretty=%s)
+            echo "value=Auto: $MSG" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ inputs.release_notes }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
@@ -141,4 +194,4 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           groups: testers
           file: ${{ steps.ipa.outputs.path }}
-          releaseNotes: "${{ inputs.release_notes }}"
+          releaseNotes: ${{ steps.notes.outputs.value }}
