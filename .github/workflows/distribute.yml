@@ -211,11 +211,23 @@ jobs:
             echo "value=${{ inputs.release_notes }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Upload to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          groups: testers
-          file: ${{ steps.ipa.outputs.path }}
-          releaseNotes: ${{ steps.notes.outputs.value }}
+      # macOS runner 는 docker container action 미지원이라
+      # wzieba/Firebase-Distribution-Github-Action (container) 을 못 쓴다.
+      # firebase CLI 로 동일 동작 수행.
+      - name: Install firebase-tools
+        run: npm install -g firebase-tools
+
+      - name: Write service account JSON
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          SA_PATH="$RUNNER_TEMP/firebase-sa.json"
+          printf '%s' "$SA_JSON" > "$SA_PATH"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SA_PATH" >> "$GITHUB_ENV"
+
+      - name: Upload to Firebase App Distribution (iOS)
+        run: |
+          firebase appdistribution:distribute "${{ steps.ipa.outputs.path }}" \
+            --app "${{ secrets.FIREBASE_IOS_APP_ID }}" \
+            --groups testers \
+            --release-notes "${{ steps.notes.outputs.value }}"
