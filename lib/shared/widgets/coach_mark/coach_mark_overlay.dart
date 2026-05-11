@@ -1,26 +1,13 @@
+// Coach mark overlay — dark spotlight that highlights a target widget and shows
+// a tooltip with title / description / next-prev navigation.
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
 
-/// 코치마크 단계 데이터
-class CoachMarkStep {
-  final GlobalKey targetKey;
-  final String title;
-  final String description;
-  final ArrowDirection arrowDirection;
-  final EdgeInsets tooltipOffset;
-  final int? tabIndex; // null = 현재 탭 유지
+import 'widgets/coach_mark_arrow.dart';
+import 'widgets/coach_mark_spotlight.dart';
+import 'widgets/coach_mark_step.dart';
+import 'widgets/coach_mark_tooltip_card.dart';
 
-  const CoachMarkStep({
-    required this.targetKey,
-    required this.title,
-    required this.description,
-    this.arrowDirection = ArrowDirection.up,
-    this.tooltipOffset = EdgeInsets.zero,
-    this.tabIndex,
-  });
-}
-
-enum ArrowDirection { up, down, left, right }
+export 'widgets/coach_mark_step.dart' show CoachMarkStep, ArrowDirection;
 
 /// 코치마크 오버레이 위젯
 /// 화면을 어둡게 하고, 대상 위젯을 spotlight으로 강조하며 설명을 표시
@@ -166,7 +153,7 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
               onTap: () {}, // Absorb taps on dark area
               behavior: HitTestBehavior.opaque,
               child: targetRect != null
-                  ? _SpotlightPainterWidget(
+                  ? CoachMarkSpotlight(
                       targetRect: targetRect,
                       pulseAnimation: _pulseAnimation,
                       animController: _animController,
@@ -190,86 +177,14 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Container(
+        child: CoachMarkTooltipCard(
+          title: step.title,
+          description: step.description,
+          showPrevious: _currentStep > 0,
+          isLastStep: _currentStep == widget.steps.length - 1,
+          onNext: _nextStep,
+          onPrevious: _prevStep,
           constraints: BoxConstraints(maxWidth: screenSize.width - 48),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                step.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkNavy,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                step.description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (_currentStep > 0)
-                    GestureDetector(
-                      onTap: _prevStep,
-                      child: Text(
-                        '이전',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    )
-                  else
-                    const SizedBox.shrink(),
-                  GestureDetector(
-                    onTap: _nextStep,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.mathBlue,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        _currentStep == widget.steps.length - 1
-                            ? '완료'
-                            : '다음',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -301,214 +216,25 @@ class _CoachMarkOverlayState extends State<CoachMarkOverlay>
         mainAxisSize: MainAxisSize.min,
         children: [
           // Arrow pointing up (when tooltip is below target)
-          if (!isAbove) _buildArrow(targetRect, isAbove: false),
+          if (!isAbove)
+            CoachMarkArrow(targetRect: targetRect, isAbove: false),
 
           // Tooltip card
-          Container(
+          CoachMarkTooltipCard(
+            title: step.title,
+            description: step.description,
+            showPrevious: _currentStep > 0,
+            isLastStep: _currentStep == widget.steps.length - 1,
+            onNext: _nextStep,
+            onPrevious: _prevStep,
             constraints: BoxConstraints(maxWidth: tooltipMaxWidth),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  step.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.darkNavy,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  step.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Previous button
-                    if (_currentStep > 0)
-                      GestureDetector(
-                        onTap: _prevStep,
-                        child: Text(
-                          '이전',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      )
-                    else
-                      const SizedBox.shrink(),
-                    // Next button
-                    GestureDetector(
-                      onTap: _nextStep,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.mathBlue,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          _currentStep == widget.steps.length - 1
-                              ? '완료'
-                              : '다음',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
 
           // Arrow pointing down (when tooltip is above target)
-          if (isAbove) _buildArrow(targetRect, isAbove: true),
+          if (isAbove)
+            CoachMarkArrow(targetRect: targetRect, isAbove: true),
         ],
       ),
     );
   }
-
-  Widget _buildArrow(Rect targetRect, {required bool isAbove}) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    // Calculate arrow horizontal position relative to tooltip
-    final arrowX = (targetRect.center.dx - 24).clamp(20.0, screenWidth - 68);
-
-    return Padding(
-      padding: EdgeInsets.only(left: arrowX - 24),
-      child: CustomPaint(
-        size: const Size(24, 12),
-        painter: _ArrowPainter(isAbove: isAbove),
-      ),
-    );
-  }
-
-}
-
-/// Spotlight painter - draws dark overlay with a cutout around the target
-class _SpotlightPainterWidget extends AnimatedWidget {
-  final Rect targetRect;
-  final Animation<double> pulseAnimation;
-
-  const _SpotlightPainterWidget({
-    required this.targetRect,
-    required this.pulseAnimation,
-    required AnimationController animController,
-  }) : super(listenable: animController);
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: MediaQuery.of(context).size,
-      painter: _SpotlightPainter(
-        targetRect: targetRect,
-        pulse: pulseAnimation.value,
-      ),
-    );
-  }
-}
-
-class _SpotlightPainter extends CustomPainter {
-  final Rect targetRect;
-  final double pulse;
-
-  _SpotlightPainter({required this.targetRect, this.pulse = 0});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withValues(alpha: 0.7);
-
-    // Full screen path
-    final fullPath = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    // Spotlight cutout (rounded rect with padding)
-    final padding = 8.0 + pulse;
-    final spotlightRect = RRect.fromRectAndRadius(
-      Rect.fromLTRB(
-        targetRect.left - padding,
-        targetRect.top - padding,
-        targetRect.right + padding,
-        targetRect.bottom + padding,
-      ),
-      const Radius.circular(12),
-    );
-
-    final cutoutPath = Path()..addRRect(spotlightRect);
-
-    // Combine paths (full screen minus spotlight)
-    final combinedPath =
-        Path.combine(PathOperation.difference, fullPath, cutoutPath);
-
-    canvas.drawPath(combinedPath, paint);
-
-    // Draw glow border around spotlight
-    final glowPaint = Paint()
-      ..color = AppColors.mathBlue.withValues(alpha: 0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
-    canvas.drawRRect(spotlightRect, glowPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SpotlightPainter oldDelegate) {
-    return oldDelegate.targetRect != targetRect || oldDelegate.pulse != pulse;
-  }
-}
-
-class _ArrowPainter extends CustomPainter {
-  final bool isAbove;
-
-  _ArrowPainter({required this.isAbove});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    if (isAbove) {
-      // Arrow pointing down (tooltip is above)
-      path.moveTo(0, 0);
-      path.lineTo(size.width / 2, size.height);
-      path.lineTo(size.width, 0);
-    } else {
-      // Arrow pointing up (tooltip is below)
-      path.moveTo(0, size.height);
-      path.lineTo(size.width / 2, 0);
-      path.lineTo(size.width, size.height);
-    }
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
