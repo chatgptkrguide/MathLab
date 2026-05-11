@@ -9,6 +9,7 @@ import '../../data/providers/user/user_provider.dart';
 import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/models/user/user_model.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/game_constants.dart';
 import '../../shared/constants/grade_curriculum_map.dart';
 import '../../data/providers/infrastructure/navigation_provider.dart';
 import 'edit_profile_screen.dart';
@@ -82,14 +83,7 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
     final leagueInfo = _getLeagueInfo(league);
 
     // Level progress calculation
-    final thresholds = {
-      'bronze': [0, 500],
-      'silver': [500, 1100],
-      'gold': [1100, 2500],
-      'diamond': [2500, 5000],
-      'master': [5000, 10000],
-    };
-    final t = thresholds[league] ?? [0, 500];
+    final t = GameConstants.leagueRange(league);
     final xpInTier = user.totalXp - t[0];
     final xpNeeded = t[1] - t[0];
     final progress =

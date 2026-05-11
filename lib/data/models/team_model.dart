@@ -2,6 +2,8 @@
 //
 // Represents study teams for group learning and competition
 
+import '../../core/utils/app_logger.dart';
+
 enum TeamRole { leader, member }
 
 class TeamModel {
@@ -107,11 +109,10 @@ class TeamModel {
       try {
         return (value as dynamic).toDate() as DateTime;
       } catch (e) {
-        assert(() {
-          // ignore: avoid_print
-          print('TeamModel._parseDateTime: unsupported value $value ($e)');
-          return true;
-        }());
+        AppLogger.warning(
+          'unsupported value $value ($e)',
+          tag: 'TeamModel._parseDateTime',
+        );
       }
     }
     return DateTime.now();
