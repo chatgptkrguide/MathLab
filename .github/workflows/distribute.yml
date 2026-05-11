@@ -83,14 +83,28 @@ jobs:
       - name: Decode google-services.json
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > android/app/google-services.json
 
+      - name: Install Shorebird CLI
+        uses: shorebirdtech/setup-shorebird@v1
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Generate native splash drawables
         run: dart run flutter_native_splash:create
 
-      - name: Build APK
-        run: flutter build apk --release
+      # shorebird release 가 내부적으로 flutter build apk --release 를 돌린 뒤
+      # 동일 산출물을 Shorebird 콘솔에 등록한다. 이렇게 해야 distribute 와
+      # 후속 OTA patch 가 같은 native dex 기반으로 동작한다.
+      # 같은 release-version 이 이미 존재하면 실패하므로 pubspec version 을
+      # 미리 bump 한 뒤 push/실행해야 한다.
+      - name: Shorebird release android
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          shorebird release android \
+            --artifact apk \
+            --release-version=$(grep '^version:' pubspec.yaml | sed 's/version: //') \
+            --no-confirm
 
       - name: Compose release notes
         id: notes
@@ -158,14 +172,25 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - name: Install Shorebird CLI
+        uses: shorebirdtech/setup-shorebird@v1
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Install CocoaPods
         run: cd ios && pod install --repo-update
 
-      - name: Build IPA
-        run: flutter build ipa --release --export-method=ad-hoc
+      # shorebird release 가 내부적으로 flutter build ipa 를 돌린 뒤
+      # 동일 산출물을 Shorebird 콘솔에 등록한다.
+      - name: Shorebird release ios
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          shorebird release ios \
+            --release-version=$(grep '^version:' pubspec.yaml | sed 's/version: //') \
+            --no-confirm \
+            -- --export-method=ad-hoc
 
       - name: Locate IPA
         id: ipa
