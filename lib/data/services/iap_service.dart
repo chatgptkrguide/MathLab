@@ -2,6 +2,12 @@
 //
 // Google Play / App Store 결제 처리를 담당하는 서비스.
 // in_app_purchase 패키지를 사용하여 실제 스토어 결제 흐름을 구현합니다.
+//
+// ⚠️ 영수증 위·변조 방지:
+//   IapReceiptVerifier 구현체를 주입하면 _verifyAndDeliverProduct 가
+//   서버 검증 결과를 기다린 뒤 프리미엄을 부여합니다.
+//   verifier 가 null 이면 클라이언트 영수증을 그대로 신뢰하며 경고 로그를
+//   남기므로, 프로덕션 출시 전에 반드시 구현체를 주입해야 합니다.
 
 import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -12,6 +18,23 @@ import '../models/subscription/premium_tier.dart';
 typedef IapPurchaseCallback = void Function(
     bool success, String? productId, String? error);
 
+/// 서버 영수증 검증 인터페이스.
+///
+/// 백엔드 endpoint 가 준비되면 본 인터페이스를 구현해 [IapService] 에 주입.
+/// 구현체는 Apple/Google receipt 를 백엔드로 전송하고 검증 결과 boolean 을 반환.
+/// 네트워크/서버 장애 등 검증 자체가 불가능한 상황은 예외를 던져
+/// 호출자가 사용자에게 재시도 안내를 할 수 있게 한다.
+abstract class IapReceiptVerifier {
+  /// purchase.verificationData.serverVerificationData 를 서버로 전송.
+  /// 반환값이 true 일 때만 IapService 가 프리미엄 활성화 콜백을 발화.
+  Future<bool> verify({
+    required String productId,
+    required String source, // 'app_store' | 'google_play'
+    required String verificationData,
+    String? transactionId,
+  });
+}
+
 /// In-App Purchase 서비스
 ///
 /// Google Play / App Store의 구독 상품을 로드하고,
@@ -21,6 +44,11 @@ class IapService {
   static const String yearlyProductId = 'mathlab_premium_yearly';
 
   static final Set<String> _productIds = {monthlyProductId, yearlyProductId};
+
+  IapService({this.receiptVerifier});
+
+  /// 서버 영수증 검증기 — null 이면 클라이언트 영수증을 그대로 신뢰 (dev 전용).
+  final IapReceiptVerifier? receiptVerifier;
 
   final InAppPurchase _iap = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _subscription;
@@ -208,24 +236,65 @@ class IapService {
     }
   }
 
-  /// 구매 검증 및 제품 전달
+  /// 구매 검증 및 제품 전달.
+  ///
+  /// [receiptVerifier] 가 주입돼 있으면 서버 검증 결과에 따라 분기하고,
+  /// 없으면 클라이언트 영수증을 그대로 신뢰한다 (dev 전용 — 프로덕션 금지).
   Future<void> _verifyAndDeliverProduct(PurchaseDetails purchase) async {
-    // TODO Phase 2: 서버 사이드 영수증 검증 추가
-    // - purchase.verificationData.serverVerificationData를
-    //   백엔드로 전송하여 영수증 검증
-    // - 검증 성공 시에만 프리미엄 활성화
+    final verifier = receiptVerifier;
 
-    AppLogger.info(
-      'Purchase verified: ${purchase.productID}',
-      tag: 'IAP',
-      data: {
-        'source': purchase.verificationData.source,
-        'transactionDate': purchase.transactionDate,
-      },
-    );
+    if (verifier == null) {
+      AppLogger.warning(
+        'Server receipt verification not configured — trusting client receipt. '
+        'Inject IapReceiptVerifier before production release.',
+        tag: 'IAP',
+        data: {'productId': purchase.productID},
+      );
+      onPurchaseResult?.call(true, purchase.productID, null);
+      return;
+    }
 
-    // 콜백으로 구매 성공 알림
-    onPurchaseResult?.call(true, purchase.productID, null);
+    try {
+      final ok = await verifier.verify(
+        productId: purchase.productID,
+        source: purchase.verificationData.source,
+        verificationData: purchase.verificationData.serverVerificationData,
+        transactionId: purchase.purchaseID,
+      );
+
+      if (ok) {
+        AppLogger.info(
+          'Purchase verified by server',
+          tag: 'IAP',
+          data: {
+            'productId': purchase.productID,
+            'source': purchase.verificationData.source,
+            'transactionDate': purchase.transactionDate,
+          },
+        );
+        onPurchaseResult?.call(true, purchase.productID, null);
+      } else {
+        AppLogger.warning(
+          'Server rejected receipt — premium NOT granted',
+          tag: 'IAP',
+          data: {
+            'productId': purchase.productID,
+            'transactionId': purchase.purchaseID,
+          },
+        );
+        onPurchaseResult?.call(
+            false, purchase.productID, '영수증 검증에 실패했습니다');
+      }
+    } catch (e, st) {
+      AppLogger.error(
+        'IAP server verification threw',
+        tag: 'IAP',
+        error: e,
+        stackTrace: st,
+      );
+      onPurchaseResult?.call(
+          false, purchase.productID, '결제 검증 중 오류가 발생했습니다');
+    }
   }
 
   /// 리소스 정리
