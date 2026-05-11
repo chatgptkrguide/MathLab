@@ -19,7 +19,7 @@
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>com.gomath.mathlab</key>
-		<string>MathLab AdHoc</string>
+		<string>com.gomath.mathlab AdHoc</string>
 	</dict>
 </dict>
 </plist>

@@ -181,11 +181,15 @@ jobs:
       # shorebird release 가 내부적으로 flutter build ipa 를 돌린 뒤
       # 동일 산출물을 Shorebird 콘솔에 등록한다.
       # release-version 은 pubspec version 으로 자동 결정 (플래그 없음).
+      # --export-options-plist 로 ad-hoc method + provisioning profile 매핑을
+      # 명시 (Xcode 15+ 의 ad-hoc → release-testing 자동 변환과 capability
+      # 누락 오류 회피).
       - name: Shorebird release ios
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
-          shorebird release ios --no-confirm -- --export-method=ad-hoc
+          shorebird release ios --no-confirm -- \
+            --export-options-plist=ios/exportOptions-adhoc.plist
 
       - name: Locate IPA
         id: ipa
