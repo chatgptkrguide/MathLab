@@ -51,21 +51,10 @@ class HeartsIndicator extends StatelessWidget {
         children: [
           Row(
             children: [
-              // Hint button (only shown when hints exist)
-              if (hints.isNotEmpty)
-                HintButton(
-                  unlockedCount: unlockedHintCount,
-                  totalHints: totalHints,
-                  xpCost: 0,
-                  isEnabled: !isAnswerChecked,
-                  onTap: onHintTap,
-                )
-              else
-                const SizedBox(width: AppDimensions.spacing16),
-              // Hearts row + count badge
+              // Hearts row + count badge (좌측)
               Expanded(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ...List.generate(
                       maxHearts,
@@ -150,6 +139,17 @@ class HeartsIndicator extends StatelessWidget {
                   ],
                 ),
               ),
+              // Hint button (우측 끝, 답안 입력 가까이)
+              if (hints.isNotEmpty) ...[
+                const SizedBox(width: AppDimensions.spacing12),
+                HintButton(
+                  unlockedCount: unlockedHintCount,
+                  totalHints: totalHints,
+                  xpCost: 0,
+                  isEnabled: !isAnswerChecked,
+                  onTap: onHintTap,
+                ),
+              ],
             ],
           ),
           // 자동 회복 안내 — 하트가 부족할 때만 노출
@@ -157,7 +157,7 @@ class HeartsIndicator extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Icon(
                     Icons.access_time_rounded,
