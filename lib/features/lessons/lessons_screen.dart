@@ -264,6 +264,51 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 // Filter units by user's grade
                 final gradeFilteredUnits = _filterUnitsByGrade(allUnits);
 
+                // 학년에 맞는 콘텐츠가 0 개인 경우 (초·중학생) 준비 중 안내.
+                if (gradeFilteredUnits.isEmpty) {
+                  final userGrade = ref.read(userProvider)?.currentGrade ?? '';
+                  final mapped =
+                      GradeCurriculumMap.getSubjectsForGrade(userGrade);
+                  final subjectName =
+                      mapped.isEmpty ? '해당 학년' : mapped.first;
+                  return Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.hourglass_bottom_rounded,
+                              size: 48,
+                              color: AppColors.textTertiary,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '$subjectName 콘텐츠 준비 중',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              '학년 맞춤 학습 콘텐츠를 준비하고 있어요.\n곧 만나보실 수 있습니다.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 13,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
                 final units = _selectedSubject == null
                     ? gradeFilteredUnits
                     : gradeFilteredUnits

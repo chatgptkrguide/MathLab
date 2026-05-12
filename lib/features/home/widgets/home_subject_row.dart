@@ -16,6 +16,42 @@ class HomeSubjectRow extends ConsumerWidget {
     final user = ref.watch(userProvider);
     final grade = user?.currentGrade ?? '중1';
     final subjects = GradeCurriculumMap.getSubjectsForGrade(grade);
+    final hasContent = GradeCurriculumMap.hasContentForGrade(grade);
+
+    // 콘텐츠 미보유 학년(초·중학생)은 안내 카드로 대체.
+    if (!hasContent && subjects.isNotEmpty) {
+      return SizedBox(
+        key: HomeScreenFigma.subjectRowKey,
+        height: 48,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.hourglass_bottom_rounded,
+                  size: 18, color: Color(0xFF8B8B93)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${subjects.first} 콘텐츠는 준비 중입니다',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF52525B),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     // 전체 접근이면 대표 과목 2개만 표시
     final displaySubjects = subjects.isEmpty
         ? ['공통수학1', '공통수학2']
