@@ -100,14 +100,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             children: [
               FadeTransition(
                 opacity: _fadeIn,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(28, 0, 28, bottom + 16),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                        child: IntrinsicHeight(
-                          child: Column(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(28, 0, 28, bottom + 16),
+                  child: Column(
                     children: [
                       const Spacer(flex: 2),
 
@@ -265,10 +260,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       const SizedBox(height: 4),
                     ],
                   ),
-                        ),
-                      ),
-                    );
-                  },
                 ),
               ),
 

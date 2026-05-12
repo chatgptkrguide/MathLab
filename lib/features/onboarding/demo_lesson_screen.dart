@@ -1,25 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../data/models/problem/problem_model.dart';
+import '../../data/models/problem/sample_problems.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/widgets/effects/noise_texture.dart';
 import '../../shared/widgets/math/math_renderer.dart';
 
-/// Data class for demo problems (no Firebase dependency)
-class DemoProblem {
-  final String question;
-  final List<String> options;
-  final int correctIndex;
-  final String explanation;
-
-  const DemoProblem({
-    required this.question,
-    required this.options,
-    required this.correctIndex,
-    required this.explanation,
-  });
-}
-
 /// Demo lesson screen for unauthenticated users.
-/// Runs entirely offline with hardcoded problems.
+/// Runs entirely offline using SampleProblems (no Firebase dependency).
+///
+/// 체험용 문제는 실제 학습 콘텐츠 lesson_1_1(덧셈 기초)의 멀티초이스 4문제를
+/// 그대로 가져온다. 사용자가 가입 전에도 앱의 진짜 문제·해설·힌트를 경험.
 class DemoLessonScreen extends StatefulWidget {
   const DemoLessonScreen({super.key});
 
@@ -29,32 +19,14 @@ class DemoLessonScreen extends StatefulWidget {
 
 class _DemoLessonScreenState extends State<DemoLessonScreen>
     with SingleTickerProviderStateMixin {
-  static const _problems = [
-    DemoProblem(
-      question: r'$3 + 5 = ?$',
-      options: ['6', '7', '8', '9'],
-      correctIndex: 2,
-      explanation: r'$3 + 5 = 8$입니다.',
-    ),
-    DemoProblem(
-      question: r'$12 - 7 = ?$',
-      options: ['4', '5', '6', '3'],
-      correctIndex: 1,
-      explanation: r'$12 - 7 = 5$입니다.',
-    ),
-    DemoProblem(
-      question: r'$4 \times 3 = ?$',
-      options: ['10', '11', '12', '14'],
-      correctIndex: 2,
-      explanation: r'$4 \times 3 = 12$입니다.',
-    ),
-    DemoProblem(
-      question: '다음 중 소수는?',
-      options: ['4', '6', '7', '9'],
-      correctIndex: 2,
-      explanation: '7은 1과 자기 자신으로만 나눠지는 소수입니다.',
-    ),
-  ];
+  /// 체험용 문제 — 실제 lesson_1_1(덧셈 기초) 의 multipleChoice 첫 4문제.
+  static final List<ProblemModel> _problems =
+      SampleProblems.getProblemsForLesson('lesson_1_1')
+          .where((p) => p.type == ProblemType.multipleChoice)
+          .take(4)
+          .toList();
+
+  int _correctIndexOf(ProblemModel p) => p.options.indexOf(p.correctAnswer);
 
   int _currentIndex = 0;
   int _correctCount = 0;
@@ -89,7 +61,7 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
     setState(() {
       _selectedOption = index;
       _answered = true;
-      if (index == _problems[_currentIndex].correctIndex) {
+      if (index == _correctIndexOf(_problems[_currentIndex])) {
         _correctCount++;
       }
     });
@@ -193,7 +165,7 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
                           // Options
                           ...List.generate(problem.options.length, (i) {
                             final isSelected = _selectedOption == i;
-                            final isCorrect = i == problem.correctIndex;
+                            final isCorrect = i == _correctIndexOf(problem);
                             Color bgColor;
                             Color borderColor;
                             Color textColor;
@@ -279,7 +251,7 @@ class _DemoLessonScreenState extends State<DemoLessonScreen>
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: MathRichText(
-                                      text: problem.explanation,
+                                      text: problem.explanation ?? '정답입니다!',
                                       textStyle: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.white,
