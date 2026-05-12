@@ -55,7 +55,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.41.6'
+          flutter-version: '3.41.9'
           cache: true
 
       - name: Setup Java
@@ -101,7 +101,8 @@ jobs:
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
-          shorebird release android --artifact apk --no-confirm
+          shorebird release android --artifact apk --no-confirm \
+            --flutter-version=3.41.9
 
       - name: Compose release notes
         id: notes
@@ -134,7 +135,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.41.6'
+          flutter-version: '3.41.9'
           cache: true
 
       - name: Create .env file
@@ -188,7 +189,8 @@ jobs:
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
-          shorebird release ios --no-confirm -- \
+          shorebird release ios --no-confirm \
+            --flutter-version=3.41.9 -- \
             --export-options-plist=ios/exportOptions-adhoc.plist
 
       - name: Locate IPA
