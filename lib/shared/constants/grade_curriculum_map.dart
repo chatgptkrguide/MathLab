@@ -49,7 +49,10 @@ class GradeCurriculumMap {
 
   /// curriculum_data.dart 에 콘텐츠가 존재하는 과목 코드.
   /// 매핑 결과 중 이 집합 밖의 과목은 학습 화면 진입 시 '준비 중' 으로 처리.
+  /// (기초수학·중학수학 은 초·중학생 학년용 단원으로 추가됨 — 427914b)
   static const Set<String> availableSubjectsInData = {
+    '기초수학',
+    '중학수학',
     '공통수학1',
     '공통수학2',
     '수학I',
