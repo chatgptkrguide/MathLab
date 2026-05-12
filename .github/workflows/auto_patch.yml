@@ -1,26 +1,12 @@
 name: Auto OTA Patch (Shorebird)
 
-# main 브랜치에 Dart 코드/pubspec 변경이 push되면 자동으로
-# Shorebird stable track에 OTA 패치를 발행한다.
-# 사용자 핸드폰의 release 기반 앱이 다음 실행 시 자동 업데이트.
+# OTA patch 발행 워크플로우. 자동 트리거 비활성 — GitHub Actions UI 또는
+# `gh workflow run "Auto OTA Patch (Shorebird)"` 으로 수동 실행만 가능.
 #
-# 네이티브 코드(android/, ios/) 변경이 포함되면 패치로 처리할 수 없어
-# 별도 워크플로우(distribute.yml)가 Firebase App Distribution을 자동 트리거한다.
-#
-# 사전 조건:
-#  - shorebird release android, shorebird release ios 가 한 번씩 실행되어
-#    릴리스 빌드가 Shorebird 콘솔에 등록돼 있어야 한다.
-#  - 새 release-version(pubspec.yaml version)을 푸시한 직후라면 패치 대상이
-#    없어 실패한다. 이 경우 ./scripts/deploy.sh test 로 release를 먼저 만든다.
+# 일반적으로는 로컬에서 ./scripts/deploy.sh patch [android|ios|both] 로 진행.
+# 백업/원격 빌드 환경이 필요할 때만 이 워크플로우를 수동 트리거한다.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'lib/**'
-      - 'pubspec.yaml'
-      - 'pubspec.lock'
-      - 'assets/**'
   workflow_dispatch:
 
 concurrency:

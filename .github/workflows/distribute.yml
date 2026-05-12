@@ -1,27 +1,12 @@
 name: Distribute to Testers
 
-# 네이티브 코드(android/, ios/ 실제 빌드 산출물)가 변경되면
-# Shorebird OTA 로 처리할 수 없으므로 자동으로 Firebase App Distribution 에
-# 새 빌드를 올려 테스터가 재설치하도록 한다.
+# Firebase App Distribution 배포 워크플로우. 자동 트리거 비활성 —
+# GitHub Actions UI 또는 `gh workflow run "Distribute to Testers"` 으로
+# 수동 실행만 가능.
 #
-# fastlane/metadata/screenshots, README 등 빌드와 무관한 파일은 트리거에서 제외.
-# 수동 실행(workflow_dispatch)도 그대로 지원한다.
+# 일반적으로는 로컬에서 ./scripts/deploy.sh test [android|ios|both] 로 진행.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'android/app/**'
-      - 'android/build.gradle*'
-      - 'android/settings.gradle*'
-      - 'android/gradle/**'
-      - 'android/gradle.properties'
-      - 'ios/Runner/**'
-      - 'ios/Runner.xcodeproj/**'
-      - 'ios/Runner.xcworkspace/**'
-      - 'ios/Podfile'
-      - 'ios/Podfile.lock'
-      - 'ios/Flutter/**'
   workflow_dispatch:
     inputs:
       platform:
