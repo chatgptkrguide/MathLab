@@ -89,8 +89,7 @@ jobs:
           shorebird patch android \
             --release-version=$(grep '^version:' pubspec.yaml | sed 's/version: //') \
             --no-confirm \
-            --allow-asset-diffs \
-            --flutter-version=3.41.9
+            --allow-asset-diffs
 
   patch-ios:
     name: Shorebird Patch (iOS)
@@ -159,5 +158,4 @@ jobs:
             --release-version=$(grep '^version:' pubspec.yaml | sed 's/version: //') \
             --no-confirm \
             --allow-asset-diffs \
-            --flutter-version=3.41.9 \
-            -- --export-options-plist=ios/exportOptions-adhoc.plist
+            --export-options-plist=ios/exportOptions-adhoc.plist
