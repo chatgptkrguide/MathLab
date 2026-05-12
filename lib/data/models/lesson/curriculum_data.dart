@@ -10,6 +10,8 @@ class CurriculumData {
   /// Get all units for all subjects
   static List<UnitModel> getSampleUnits() {
     return [
+      ...getBasicMathUnits(),
+      ...getMiddleSchoolMathUnits(),
       ...getCommonMath1Units(),
       ...getCommonMath2Units(),
       ...getMath1Units(),
@@ -17,6 +19,220 @@ class CurriculumData {
       ...getProbStatUnits(),
       ...getCalculusUnits(),
       ...getGeometryUnits(),
+    ];
+  }
+
+  /// 기초수학 units (초등 1~6학년).
+  /// 사칙연산 4 lesson 은 sample_problems.dart 의 기존 lesson_1_1/1_2/1_3
+  /// 데이터를 그대로 재사용 (덧셈·뺄셈·곱셈 각 6문제). 나머지는 placeholder.
+  static List<UnitModel> getBasicMathUnits() {
+    return [
+      UnitModel(
+        id: 'bm_arithmetic',
+        title: '사칙연산',
+        description: '덧셈, 뺄셈, 곱셈, 나눗셈의 기초',
+        order: 1,
+        emoji: '➕',
+        theme: UnitTheme.green,
+        subject: '기초수학',
+        lessons: const [
+          LessonModel(
+            id: 'lesson_1_1',
+            title: '덧셈 기초',
+            description: '두 수를 더해 합을 구합니다',
+            order: 1,
+            xpReward: 15,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.beginner,
+            concepts: ['덧셈', '교환법칙'],
+            estimatedMinutes: 8,
+          ),
+          LessonModel(
+            id: 'lesson_1_2',
+            title: '뺄셈 기초',
+            description: '두 수를 빼서 차를 구합니다',
+            order: 2,
+            xpReward: 15,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.beginner,
+            concepts: ['뺄셈', '차'],
+            estimatedMinutes: 8,
+          ),
+          LessonModel(
+            id: 'lesson_1_3',
+            title: '곱셈 기초',
+            description: '같은 수를 여러 번 더하는 곱셈',
+            order: 3,
+            xpReward: 20,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.beginner,
+            concepts: ['곱셈', '구구단'],
+            estimatedMinutes: 10,
+          ),
+          LessonModel(
+            id: 'bm_div_1',
+            title: '나눗셈 기초',
+            description: '곱셈의 역연산, 나눗셈을 익힙니다',
+            order: 4,
+            xpReward: 20,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.intermediate,
+            concepts: ['나눗셈', '몫', '나머지'],
+            estimatedMinutes: 10,
+          ),
+        ],
+      ),
+      UnitModel(
+        id: 'bm_fraction',
+        title: '분수와 소수',
+        description: '분수와 소수의 표현과 비교',
+        order: 2,
+        emoji: '🔢',
+        theme: UnitTheme.orange,
+        subject: '기초수학',
+        lessons: const [
+          LessonModel(
+            id: 'bm_frac_1',
+            title: '분수의 이해',
+            description: '전체와 부분, 분자와 분모',
+            order: 1,
+            xpReward: 20,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.beginner,
+            concepts: ['분수', '분자', '분모'],
+            estimatedMinutes: 10,
+          ),
+          LessonModel(
+            id: 'bm_frac_2',
+            title: '분수의 덧셈과 뺄셈',
+            description: '같은 분모끼리의 덧셈·뺄셈',
+            order: 2,
+            xpReward: 25,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.intermediate,
+            concepts: ['분수 덧셈', '분수 뺄셈'],
+            estimatedMinutes: 12,
+          ),
+          LessonModel(
+            id: 'bm_dec_1',
+            title: '소수의 이해',
+            description: '소수점과 자릿값을 익힙니다',
+            order: 3,
+            xpReward: 20,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.beginner,
+            concepts: ['소수', '소수점', '자릿값'],
+            estimatedMinutes: 10,
+          ),
+        ],
+      ),
+    ];
+  }
+
+  /// 중학수학 units (중1~3).
+  /// 모든 lesson 은 현재 placeholder 문제로 동작 (sample_problems 의
+  /// _defaultProblems fallback). 추후 정식 문제 데이터 채울 예정.
+  static List<UnitModel> getMiddleSchoolMathUnits() {
+    return [
+      UnitModel(
+        id: 'ms_int_rational',
+        title: '정수와 유리수',
+        description: '음수의 도입, 정수·유리수의 사칙연산',
+        order: 1,
+        emoji: '➖',
+        theme: UnitTheme.blue,
+        subject: '중학수학',
+        lessons: const [
+          LessonModel(
+            id: 'ms_int_1',
+            title: '정수의 사칙연산',
+            description: '양수·음수의 덧셈, 뺄셈, 곱셈, 나눗셈',
+            order: 1,
+            xpReward: 20,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.beginner,
+            concepts: ['정수', '부호', '절댓값'],
+            estimatedMinutes: 12,
+          ),
+          LessonModel(
+            id: 'ms_int_2',
+            title: '유리수의 사칙연산',
+            description: '분수·소수를 포함한 유리수 계산',
+            order: 2,
+            xpReward: 25,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.intermediate,
+            concepts: ['유리수', '분수 계산', '소수 계산'],
+            estimatedMinutes: 15,
+          ),
+        ],
+      ),
+      UnitModel(
+        id: 'ms_linear_eq',
+        title: '일차방정식과 부등식',
+        description: '미지수를 가진 등식과 부등식의 풀이',
+        order: 2,
+        emoji: '🧮',
+        theme: UnitTheme.purple,
+        subject: '중학수학',
+        lessons: const [
+          LessonModel(
+            id: 'ms_linear_1',
+            title: '일차방정식',
+            description: '이항과 동치변형으로 미지수 구하기',
+            order: 1,
+            xpReward: 25,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.intermediate,
+            concepts: ['일차방정식', '이항', '동치'],
+            estimatedMinutes: 15,
+          ),
+          LessonModel(
+            id: 'ms_linear_2',
+            title: '연립일차방정식',
+            description: '두 미지수의 연립 방정식 풀이 (대입·가감)',
+            order: 2,
+            xpReward: 30,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.intermediate,
+            concepts: ['연립방정식', '대입법', '가감법'],
+            estimatedMinutes: 18,
+          ),
+        ],
+      ),
+      UnitModel(
+        id: 'ms_function',
+        title: '함수와 그래프',
+        description: '일차함수·이차함수의 정의와 그래프',
+        order: 3,
+        emoji: '📈',
+        theme: UnitTheme.red,
+        subject: '중학수학',
+        lessons: const [
+          LessonModel(
+            id: 'ms_func_1',
+            title: '일차함수',
+            description: 'y = ax + b 그래프와 기울기',
+            order: 1,
+            xpReward: 25,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.intermediate,
+            concepts: ['일차함수', '기울기', '절편'],
+            estimatedMinutes: 15,
+          ),
+          LessonModel(
+            id: 'ms_func_2',
+            title: '이차함수의 기초',
+            description: 'y = ax² 그래프와 꼭짓점',
+            order: 2,
+            xpReward: 30,
+            type: LessonType.standard,
+            difficulty: LessonDifficulty.advanced,
+            concepts: ['이차함수', '꼭짓점', '대칭축'],
+            estimatedMinutes: 18,
+          ),
+        ],
+      ),
     ];
   }
 
