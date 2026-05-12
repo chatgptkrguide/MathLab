@@ -6,6 +6,7 @@ import '../../../data/providers/user/user_provider.dart';
 import '../../../data/providers/infrastructure/navigation_provider.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/grade_curriculum_map.dart';
+import '../../../shared/constants/subject_labels.dart';
 
 class ProfileSubjectSection extends ConsumerWidget {
   const ProfileSubjectSection({super.key});
@@ -36,7 +37,7 @@ class ProfileSubjectSection extends ConsumerWidget {
                     size: 22, color: Color(0xFF8B8B93)),
                 const SizedBox(width: 8),
                 Text(
-                  '${gradeSubjects.first} 콘텐츠 준비 중',
+                  '${SubjectLabels.displayOf(gradeSubjects.first)} 콘텐츠 준비 중',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -87,7 +88,7 @@ class ProfileSubjectSection extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    name,
+                    SubjectLabels.displayOf(name),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,

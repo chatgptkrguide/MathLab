@@ -11,6 +11,7 @@ import '../../data/providers/problem/problem_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/grade_curriculum_map.dart';
+import '../../shared/constants/subject_labels.dart';
 import '../problems/problem_solving_screen.dart';
 import 'widgets/lessons_blue_header.dart';
 import 'widgets/lessons_path.dart';
@@ -35,16 +36,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
   late Animation<Offset> _bannerSlideAnimation;
   late Animation<double> _bannerFadeAnimation;
 
-  // Firestore subject 값 → 표시 이름
-  static const _subjectLabels = {
-    '공통수학1': '공통수학1',
-    '공통수학2': '공통수학2',
-    '수학I': '수학I',
-    '수학II': '수학II',
-    '확률과통계': '확률과통계',
-    '미적분': '미적분',
-    '기하': '기하',
-  };
+  // 과목 표시 이름 변환은 SubjectLabels.displayOf 로 직접 호출.
 
   @override
   void initState() {
@@ -144,7 +136,6 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
             curriculumAsync: curriculumAsync,
             selectedSubject: _selectedSubject,
             getFilteredSubjects: _getFilteredSubjects,
-            subjectLabels: _subjectLabels,
             onSubjectChanged: (v) {
               setState(() => _selectedSubject = v);
             },
@@ -269,8 +260,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                   final userGrade = ref.read(userProvider)?.currentGrade ?? '';
                   final mapped =
                       GradeCurriculumMap.getSubjectsForGrade(userGrade);
-                  final subjectName =
-                      mapped.isEmpty ? '해당 학년' : mapped.first;
+                  final subjectName = mapped.isEmpty
+                      ? '해당 학년'
+                      : SubjectLabels.displayOf(mapped.first);
                   return Expanded(
                     child: Center(
                       child: Padding(

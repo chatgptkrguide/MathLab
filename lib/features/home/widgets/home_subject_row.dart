@@ -6,6 +6,7 @@ import '../../../data/providers/infrastructure/navigation_provider.dart';
 import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/grade_curriculum_map.dart';
+import '../../../shared/constants/subject_labels.dart';
 import '../home_screen.dart';
 
 class HomeSubjectRow extends ConsumerWidget {
@@ -36,7 +37,7 @@ class HomeSubjectRow extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${subjects.first} 콘텐츠는 준비 중입니다',
+                  '${SubjectLabels.displayOf(subjects.first)} 콘텐츠는 준비 중입니다',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -106,7 +107,7 @@ class HomeSubjectRow extends ConsumerWidget {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              name,
+                              SubjectLabels.displayOf(name),
                               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF18181B)),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/lesson/unit_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/subject_labels.dart';
 
 class LessonsBlueHeader extends StatelessWidget {
   final AsyncValue<List<UnitModel>> curriculumAsync;
   final String? selectedSubject;
   final List<String> Function(List<UnitModel> units) getFilteredSubjects;
-  final Map<String, String> subjectLabels;
   final ValueChanged<String?> onSubjectChanged;
 
   const LessonsBlueHeader({
@@ -18,7 +18,6 @@ class LessonsBlueHeader extends StatelessWidget {
     required this.curriculumAsync,
     required this.selectedSubject,
     required this.getFilteredSubjects,
-    required this.subjectLabels,
     required this.onSubjectChanged,
   });
 
@@ -68,7 +67,7 @@ class LessonsBlueHeader extends StatelessWidget {
                       ),
                       ...subjects.map((s) => DropdownMenuItem<String?>(
                             value: s,
-                            child: Text(subjectLabels[s] ?? s),
+                            child: Text(SubjectLabels.displayOf(s)),
                           )),
                     ],
                     onChanged: (v) {
