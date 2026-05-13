@@ -15,37 +15,12 @@
 /// 초/중학 학년은 학습 화면에 빈 상태가 노출된다. HomeSubjectRow /
 /// ProfileSubjectSection / LessonsScreen 측에서 '준비 중' 안내를 제공한다.
 class GradeCurriculumMap {
-  static List<String> getSubjectsForGrade(String grade) {
-    switch (grade) {
-      case '초1':
-      case '초2':
-      case '초3':
-      case '초4':
-      case '초5':
-      case '초6':
-        return const ['기초수학'];
-      case '중1':
-      case '중2':
-      case '중3':
-        return const ['중학수학'];
-      case '고1':
-        return const ['공통수학1', '공통수학2'];
-      case '고2':
-        return const ['수학I', '수학II', '확률과통계'];
-      case '고3':
-        return const ['수학I', '수학II', '확률과통계', '미적분', '기하'];
-      case '대학생':
-      case '성인':
-        return const []; // empty list = full access
-      default:
-        return const ['공통수학1'];
-    }
-  }
+  /// 정책: 학년 무관 — 모든 사용자에게 전체 단원·과목 노출.
+  /// (이전엔 학년별 필터링했으나 사용자 결정으로 해제)
+  static List<String> getSubjectsForGrade(String grade) => const [];
 
-  /// Returns true if the grade has full access (no filtering).
-  static bool hasFullAccess(String grade) {
-    return getSubjectsForGrade(grade).isEmpty;
-  }
+  /// 항상 true — 학년 필터 자체 비활성화. (호출 위치 호환성 위해 메서드 유지)
+  static bool hasFullAccess(String grade) => true;
 
   /// curriculum_data.dart 에 콘텐츠가 존재하는 과목 코드.
   /// 매핑 결과 중 이 집합 밖의 과목은 학습 화면 진입 시 '준비 중' 으로 처리.
@@ -62,11 +37,6 @@ class GradeCurriculumMap {
     '기하',
   };
 
-  /// 해당 학년이 현재 학습 콘텐츠가 준비된 학년인지.
-  /// (초·중학생은 false — 매핑은 정상이지만 데이터 미보유.)
-  static bool hasContentForGrade(String grade) {
-    final subjects = getSubjectsForGrade(grade);
-    if (subjects.isEmpty) return true; // full access
-    return subjects.any(availableSubjectsInData.contains);
-  }
+  /// 항상 true — 학년 필터 해제 후 모든 학년이 전체 콘텐츠 접근.
+  static bool hasContentForGrade(String grade) => true;
 }

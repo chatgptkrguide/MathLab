@@ -1,8 +1,13 @@
-// Wrong Answer Statistics
+// Wrong Answer Statistics — Anti-AI 재설계
 //
-// Horizontal scrollable gradient stat cards
+// 변경 사항:
+// - 균일 그라데이션 카드 4개 제거 → 비대칭 인라인 수평 레이아웃
+// - 숫자 크기에 극적 위계: 미해결 수치 크게, 해결 수치 중간, 복습 수치 작게
+// - 그라데이션 대신 단색 + border-left 수작업 강조선
+// - 통계 행 사이 자연스러운 불규칙 여백
 
 import 'package:flutter/material.dart';
+import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
 class WrongAnswerStats extends StatelessWidget {
@@ -20,35 +25,112 @@ class WrongAnswerStats extends StatelessWidget {
     final resolved = statistics['resolved'] ?? 0;
     final needsReview = statistics['needsReview'] ?? 0;
 
-    return SizedBox(
-      height: 130,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 미해결 — 가장 큰 숫자, 강조색
+            _StatItem(
+              value: unresolved,
+              label: '미해결',
+              valueColor: AppColors.mathRed,
+              valueFontSize: 28,
+              stripeColor: AppColors.mathRed,
+            ),
+            const _Divider(),
+            // 복습 필요
+            _StatItem(
+              value: needsReview,
+              label: '복습',
+              valueColor: AppColors.mathOrange,
+              valueFontSize: 22,
+              stripeColor: AppColors.mathOrange,
+            ),
+            const _Divider(),
+            // 해결 완료
+            _StatItem(
+              value: resolved,
+              label: '해결',
+              valueColor: Colors.white,
+              valueFontSize: 18,
+              stripeColor: AppColors.mathGreen,
+            ),
+            const _Divider(),
+            // 총합 — 가장 작게 (맥락 정보)
+            _StatItem(
+              value: total,
+              label: '전체',
+              valueColor: Colors.white.withValues(alpha: 0.6),
+              valueFontSize: 15,
+              stripeColor: Colors.transparent,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final int value;
+  final String label;
+  final Color valueColor;
+  final double valueFontSize;
+  final Color stripeColor;
+
+  const _StatItem({
+    required this.value,
+    required this.label,
+    required this.valueColor,
+    required this.valueFontSize,
+    required this.stripeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _StatCard(
-            icon: Icons.list_alt_rounded,
-            value: total,
-            label: '총 오답수',
-            gradientColors: const [Color(0xFFFF6B6B), Color(0xFFEE5A24)],
-          ),
-          _StatCard(
-            icon: Icons.error_outline_rounded,
-            value: unresolved,
-            label: '미해결',
-            gradientColors: const [Color(0xFFFF9F43), Color(0xFFEE5A24)],
-          ),
-          _StatCard(
-            icon: Icons.check_circle_outline_rounded,
-            value: resolved,
-            label: '해결완료',
-            gradientColors: const [Color(0xFF58CC02), Color(0xFF26A302)],
-          ),
-          _StatCard(
-            icon: Icons.replay_rounded,
-            value: needsReview,
-            label: '재시도 횟수',
-            gradientColors: const [Color(0xFF1CB0F6), Color(0xFF1899D6)],
+          // border-left 강조선 — 수작업 디테일
+          if (stripeColor != Colors.transparent)
+            Container(
+              width: 2,
+              height: valueFontSize * 1.1,
+              color: stripeColor.withValues(alpha: 0.7),
+              margin: const EdgeInsets.only(right: 7, top: 2),
+            ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value.toString(),
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    fontSize: valueFontSize,
+                    fontWeight: FontWeight.w800,
+                    color: valueColor,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.65),
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -56,77 +138,16 @@ class WrongAnswerStats extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final int value;
-  final String label;
-  final List<Color> gradientColors;
-
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.gradientColors,
-  });
+class _Divider extends StatelessWidget {
+  const _Divider();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 130,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradientColors,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: gradientColors.first.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: Colors.white, size: 18),
-          ),
-          const Spacer(),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value.toString(),
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: Colors.white.withValues(alpha: 0.85),
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
+      width: 1,
+      height: 30,
+      color: Colors.white.withValues(alpha: 0.15),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 }

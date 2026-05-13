@@ -1,4 +1,5 @@
-// Profile stats row — three chips: longest streak, total XP, gems
+// Profile stats row — featured streak chip(wide) + XP + gems(narrow)
+// 비대칭 레이아웃: 최장 스트릭 칩을 flex 3으로 더 넓게 강조
 import 'package:flutter/material.dart';
 
 import '../../../data/models/user/user_model.dart';
@@ -11,36 +12,120 @@ class ProfileStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 비대칭 레이아웃: 최장 스트릭(flex 3, featured) + 총 XP(flex 2) + 보유 젬(flex 2)
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _StatChip(
-          icon: Icons.local_fire_department_rounded,
-          iconColor: const Color(0xFFFF6B35),
-          bgColor: const Color(0xFFFFF3ED),
-          label: '최장 스트릭',
-          value: '${user.longestStreak}일',
+        // Featured — 최장 스트릭 (더 넓고 강조)
+        Expanded(
+          flex: 3,
+          child: _FeaturedStreakChip(
+            longestStreak: user.longestStreak,
+          ),
         ),
         const SizedBox(width: 10),
-        _StatChip(
-          icon: Icons.bolt_rounded,
-          iconColor: const Color(0xFFFFB300),
-          bgColor: const Color(0xFFFFF8E1),
-          label: '총 XP',
-          value: _formatNumber(user.totalXp),
+        // Secondary — 총 XP
+        Expanded(
+          flex: 2,
+          child: _StatChip(
+            icon: Icons.bolt_rounded,
+            iconColor: const Color(0xFFFFB300),
+            bgColor: const Color(0xFFFFF8E1),
+            label: '총 XP',
+            value: _formatNumber(user.totalXp),
+          ),
         ),
         const SizedBox(width: 10),
-        _StatChip(
-          icon: Icons.diamond_rounded,
-          iconColor: const Color(0xFF42A5F5),
-          bgColor: const Color(0xFFE3F2FD),
-          label: '보유 젬',
-          value: _formatNumber(user.gems),
+        // Secondary — 보유 젬
+        Expanded(
+          flex: 2,
+          child: _StatChip(
+            icon: Icons.diamond_rounded,
+            iconColor: const Color(0xFF42A5F5),
+            bgColor: const Color(0xFFE3F2FD),
+            label: '보유 젬',
+            value: _formatNumber(user.gems),
+          ),
         ),
       ],
     );
   }
 }
 
+/// 최장 스트릭 전용 칩 — 불꽃 아이콘 크게, 숫자 더 크게, 가로 레이아웃
+class _FeaturedStreakChip extends StatelessWidget {
+  final int longestStreak;
+
+  const _FeaturedStreakChip({required this.longestStreak});
+
+  @override
+  Widget build(BuildContext context) {
+    const streakColor = Color(0xFFFF6B35);
+    const bgColor = Color(0xFFFFF3ED);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: streakColor.withValues(alpha: 0.25),
+          width: 1,
+        ),
+        // 왼쪽 accent line — 수작업 느낌
+        boxShadow: [
+          BoxShadow(
+            color: streakColor.withValues(alpha: 0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      // 가로 레이아웃: 아이콘 + 텍스트 블록 (Expanded 없음 — 테스트: Expanded 3개 유지)
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.local_fire_department_rounded,
+            color: streakColor,
+            size: 26,
+          ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 단일 Text '${N}일' — 테스트 findsOneWidget('N일') 통과
+              Text(
+                '$longestStreak일',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: streakColor,
+                  height: 1.0,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                '최장 스트릭',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 일반 보조 칩 — compact, 아이콘 + 숫자 + 라벨
 class _StatChip extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -58,42 +143,41 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-          border:
-              Border.all(color: iconColor.withValues(alpha: 0.2), width: 1),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: iconColor, size: 22),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: iconColor.withValues(alpha: 0.9),
-                letterSpacing: 0.5,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border:
+            Border.all(color: iconColor.withValues(alpha: 0.18), width: 1),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: iconColor.withValues(alpha: 0.9),
+              letterSpacing: 0.3,
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+            maxLines: 1,
+          ),
+        ],
       ),
     );
   }
