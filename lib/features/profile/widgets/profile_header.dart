@@ -38,12 +38,15 @@ class ProfileHeader extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
+        // 리그별 색상 기반 그라데이션 (단색 페이드 X — 리그 색 + skyBlue 살짝)
+        // 리그 색이 사용자 정체성을 표현 (브론즈/실버/골드/다이아/마스터).
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
-            AppColors.skyBlue,
-            AppColors.skyBlue.withValues(alpha: 0.85),
+            leagueInfo.color,
+            Color.lerp(leagueInfo.color, AppColors.skyBlue, 0.45) ??
+                AppColors.skyBlue,
           ],
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),

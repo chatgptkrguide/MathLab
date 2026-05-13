@@ -24,19 +24,20 @@ class ProfileStatsRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        // Secondary — 총 XP
+        // Secondary — 현재 연속 (총 XP 는 헤더의 큰 숫자 와 중복이라 교체)
         Expanded(
           flex: 2,
           child: _StatChip(
-            icon: Icons.bolt_rounded,
-            iconColor: const Color(0xFFFFB300),
-            bgColor: const Color(0xFFFFF8E1),
-            label: '총 XP',
-            value: _formatNumber(user.totalXp),
+            icon: Icons.calendar_today_rounded,
+            iconColor: const Color(0xFFFF6B35),
+            bgColor: const Color(0xFFFFF3ED),
+            label: '현재 연속',
+            value: '${user.streak}일',
+            horizontal: true,
           ),
         ),
         const SizedBox(width: 10),
-        // Secondary — 보유 젬
+        // Secondary — 보유 젬 (세로 레이아웃 유지 — _StatChip 차별화)
         Expanded(
           flex: 2,
           child: _StatChip(
@@ -45,6 +46,7 @@ class ProfileStatsRow extends StatelessWidget {
             bgColor: const Color(0xFFE3F2FD),
             label: '보유 젬',
             value: _formatNumber(user.gems),
+            horizontal: false,
           ),
         ),
       ],
@@ -63,19 +65,18 @@ class _FeaturedStreakChip extends StatelessWidget {
     const streakColor = Color(0xFFFF6B35);
     const bgColor = Color(0xFFFFF3ED);
 
+    // border-left accent + 직사각형 모서리 — 앱 전반 디자인 언어 통일
+    // (오답 카드 강조선과 동일 패턴, _StatChip 둥근 칩과 의도적 위계 차이)
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+      padding: const EdgeInsets.fromLTRB(8, 11, 12, 11),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: streakColor.withValues(alpha: 0.25),
-          width: 1,
+        border: Border(
+          left: BorderSide(color: streakColor, width: 4),
         ),
-        // 왼쪽 accent line — 수작업 느낌
         boxShadow: [
           BoxShadow(
-            color: streakColor.withValues(alpha: 0.06),
+            color: streakColor.withValues(alpha: 0.08),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -125,13 +126,16 @@ class _FeaturedStreakChip extends StatelessWidget {
   }
 }
 
-/// 일반 보조 칩 — compact, 아이콘 + 숫자 + 라벨
+/// 일반 보조 칩 — 두 가지 레이아웃 지원.
+/// horizontal=false (기본): 세로 — 아이콘 위, 숫자/라벨 아래.
+/// horizontal=true       : 가로 — 좌측 아이콘, 우측 라벨/값 (앱 디자인 언어 다양성).
 class _StatChip extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final Color bgColor;
   final String label;
   final String value;
+  final bool horizontal;
 
   const _StatChip({
     required this.icon,
@@ -139,46 +143,90 @@ class _StatChip extends StatelessWidget {
     required this.bgColor,
     required this.label,
     required this.value,
+    this.horizontal = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+      padding: EdgeInsets.symmetric(
+        vertical: horizontal ? 9 : 11,
+        horizontal: horizontal ? 10 : 8,
+      ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(horizontal ? 12 : 14),
         border:
             Border.all(color: iconColor.withValues(alpha: 0.18), width: 1),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: iconColor, size: 20),
-          const SizedBox(height: 5),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              color: iconColor.withValues(alpha: 0.9),
-              letterSpacing: 0.3,
+      child: horizontal
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(icon, color: iconColor, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 9,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                          height: 1.0,
+                        ),
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        value,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: iconColor.withValues(alpha: 0.95),
+                          letterSpacing: 0.2,
+                          height: 1.0,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: iconColor, size: 20),
+                const SizedBox(height: 5),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: iconColor.withValues(alpha: 0.9),
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                ),
+              ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-          ),
-        ],
-      ),
     );
   }
 }
