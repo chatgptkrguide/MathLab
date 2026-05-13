@@ -76,7 +76,10 @@ platform :ios do
 
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute do
-    sh(shorebird_cmd("release ios --export-method=ad-hoc"))
+    # exportOptions plist 명시: pbxproj manual signing + 'com.gomath.mathlab AdHoc'
+    # profile 매핑이 archive·export 양쪽에 동일 적용되게 (Xcode 15+ release-testing
+    # 자동 변환과 capability 누락 오류 회피).
+    sh(shorebird_cmd("release ios -- --export-options-plist=ios/exportOptions-adhoc.plist"))
 
     firebase_app_distribution(
       app: "1:421762663548:ios:20d3e33da071d49bff35f9",
@@ -92,7 +95,8 @@ platform :ios do
 
   desc "OTA patch via Shorebird (no reinstall needed)"
   lane :patch do
-    sh(shorebird_cmd("patch ios"))
+    # exportOptions plist 명시로 archive·export profile 매핑 통일.
+    sh(shorebird_cmd("patch ios --export-options-plist=ios/exportOptions-adhoc.plist"))
     UI.success("✅ iOS OTA patch deployed! 테스터 앱 자동 업데이트.")
   end
 
