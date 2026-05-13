@@ -20,18 +20,16 @@ class HomeActionButtons extends StatelessWidget {
         // Blue: Assignments & Weekly Tests
         _ActionItem(
           color: const Color(0xFF3195FF),
-          shadowColor: const Color(0xFF1C7CE2),
           icon: Icons.assignment_rounded,
           iconBgOpacity: 0.5,
-          label: '과제  및 주간테스트 확인 & 제출',
-          borderRadius: 8,
+          label: '과제 및 주간테스트 확인 & 제출',
+          borderRadius: 14,
           onTap: onAssignmentsTap,
         ),
         const SizedBox(height: 16),
         // Light purple: AI Tutor
         _ActionItem(
           color: const Color(0xFFA2B6FF),
-          shadowColor: const Color(0xFF499609),
           icon: Icons.smart_toy_rounded,
           label: 'AI 튜터에게 물어보세요',
           borderRadius: 14,
@@ -42,9 +40,8 @@ class HomeActionButtons extends StatelessWidget {
         // Dark blue: Chat
         _ActionItem(
           color: const Color(0xFF0F31AC),
-          shadowColor: const Color(0xFFD27312),
           icon: Icons.chat_rounded,
-          label: '맴버들 채팅하기',
+          label: '멤버들 채팅하기',
           borderRadius: 14,
           onTap: onChatTap,
           comingSoon: true,
@@ -56,7 +53,6 @@ class HomeActionButtons extends StatelessWidget {
 
 class _ActionItem extends StatelessWidget {
   final Color color;
-  final Color shadowColor;
   final IconData icon;
   final String label;
   final double borderRadius;
@@ -66,7 +62,6 @@ class _ActionItem extends StatelessWidget {
 
   const _ActionItem({
     required this.color,
-    required this.shadowColor,
     required this.icon,
     required this.label,
     required this.borderRadius,
@@ -87,7 +82,8 @@ class _ActionItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [
             BoxShadow(
-              color: shadowColor,
+              // shadowColor는 버튼 배경색 alpha 0.6 — 의미 있는 색 그림자
+              color: color.withValues(alpha: 0.6),
               offset: const Offset(0, 4),
             ),
           ],

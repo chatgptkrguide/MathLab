@@ -79,6 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                           icon: Icons.person_outline,
                           title: '닉네임 변경',
                           subtitle: user?.displayName ?? '설정되지 않음',
+                          trailing: const SizedBox.shrink(),
                           onTap: () => _showNicknameDialog(
                               context, ref, user?.displayName),
                         ),
@@ -148,6 +149,7 @@ class SettingsScreen extends ConsumerWidget {
                           icon: Icons.info_outline,
                           title: '앱 정보',
                           subtitle: 'v1.0.0',
+                          trailing: const SizedBox.shrink(),
                           onTap: () => _showAppInfoDialog(context),
                         ),
                       ],
@@ -177,6 +179,7 @@ class SettingsScreen extends ConsumerWidget {
                             icon: Icons.logout,
                             title: '로그아웃',
                             titleColor: AppColors.mathRed,
+                            trailing: const SizedBox.shrink(),
                             onTap: () => showDialog(
                               context: context,
                               builder: (_) => const LogoutDialog(),
@@ -192,6 +195,7 @@ class SettingsScreen extends ConsumerWidget {
                             icon: Icons.delete_outline,
                             title: '계정 탈퇴',
                             titleColor: AppColors.mathRed,
+                            trailing: const SizedBox.shrink(),
                             onTap: () => showDialog(
                               context: context,
                               builder: (_) => const DeleteAccountDialog(),

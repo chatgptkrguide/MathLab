@@ -54,6 +54,8 @@ class AppColors {
   static const surface = Colors.white;
   static const background = Colors.white;
   static const backgroundLight = Color(0xFFF7F7F7);
+  // 문제풀이 화면 등에서 사용하는 살짝 어두운 베이지 톤(거의 흰색).
+  static const surfaceMuted = Color(0xFFFAFAFA);
   static const cardBg = Color(0xFFF5F5F5);
   static const chipBg = Color(0xFFF1F2F1);
   static const profileBg = Color(0xFFE4F5FF);
@@ -90,6 +92,12 @@ class AppColors {
   static const streakOrange = Color(0xFFFF9600);
   static const levelPurple = Color(0xFFCE82FF);
 
+  // ------------------------------------------------------------
+  // === 레벨 뱃지 색상 (Lv.N 표시용 단색) ===
+  // 사용처: 레벨 뱃지(Lv.1~99), 단순 금속 톤 1색 + Dark variant.
+  // 주의: 아래 league* 와 같은 금속 이름을 쓰지만 **목적·값이 다름**.
+  //       리그 시스템(주간 경쟁 5단계)에는 league* 를 사용할 것.
+  // ------------------------------------------------------------
   static const levelBronze = Color(0xFFCD7F32);
   static const levelSilver = Color(0xFFC0C0C0);
   static const levelGold = Color(0xFFFFD700);
@@ -97,9 +105,14 @@ class AppColors {
   static const levelSilverDark = Color(0xFF909090);
   static const levelGoldDark = Color(0xFFDAA520);
 
-  // League tier tokens — profile_header _getLeagueInfo 등에서 참조.
-  // (levelBronze/levelGold 와 별도 — 위는 단순 레벨 뱃지용 금속 색이고,
-  //  아래는 5단계 리그 시스템의 base/gradientEnd 쌍.)
+  // ------------------------------------------------------------
+  // === 리그 등급 색상 (5단계 리그 그라데이션 - base + Light 쌍) ===
+  // 사용처: profile_header `_getLeagueInfo`, 리그 화면 그라데이션.
+  // 구조: 각 등급은 base(어두운 톤) + Light(밝은 톤) 한 쌍을 이루며
+  //       LinearGradient 의 시작·끝 색으로 사용된다.
+  // 등급: Bronze < Silver < Gold < Diamond < Master (5단계)
+  // 주의: 위 level* (단순 뱃지 단색) 과 절대 혼동하지 말 것.
+  // ------------------------------------------------------------
   static const leagueBronze = Color(0xFFCD7F32);
   static const leagueBronzeLight = Color(0xFFDEA05E);
   static const leagueSilver = Color(0xFF78909C);

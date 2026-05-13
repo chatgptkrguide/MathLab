@@ -332,10 +332,10 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: AppColors.surfaceMuted,
       body: Stack(
         children: [
-          Container(color: const Color(0xFFFAFAFA)),
+          Container(color: AppColors.surfaceMuted),
           SafeArea(
             child: Stack(
               children: [

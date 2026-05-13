@@ -102,12 +102,12 @@ class _StatSquare extends StatelessWidget {
         children: [
           Image.asset(
             icon,
-            width: featured ? 46 : 42,
-            height: featured ? 46 : 42,
+            width: featured ? 58 : 36,
+            height: featured ? 58 : 36,
             errorBuilder: (_, __, ___) => Icon(
               fallbackIcon,
               color: fallbackColor,
-              size: featured ? 46 : 42,
+              size: featured ? 58 : 36,
             ),
           ),
           const SizedBox(height: 4),
@@ -126,8 +126,8 @@ class _StatSquare extends StatelessWidget {
             value,
             style: TextStyle(
               color: Colors.black,
-              fontSize: featured ? 14 : 12,
-              fontWeight: featured ? FontWeight.w800 : FontWeight.w600,
+              fontSize: featured ? 18 : 12,
+              fontWeight: featured ? FontWeight.w900 : FontWeight.w600,
               letterSpacing: 1,
             ),
             textAlign: TextAlign.center,

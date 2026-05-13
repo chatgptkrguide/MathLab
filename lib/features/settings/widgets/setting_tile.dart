@@ -5,12 +5,15 @@ import '../../../shared/constants/constants.dart';
 /// 설정 항목 타일
 /// - 아이콘, 제목, 부제목, 탭 핸들러를 지원
 /// - Consistent 56px min height with aligned trailing icon
+/// - [trailing] null이면 chevron_right 기본 표시.
+///   토글 → Switch 위젯 전달, 다이얼로그 → SizedBox.shrink() 등으로 의미 구분.
 class SettingTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
   final Color? titleColor;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   const SettingTile({
     super.key,
@@ -19,6 +22,7 @@ class SettingTile extends StatelessWidget {
     this.subtitle,
     this.titleColor,
     this.onTap,
+    this.trailing,
   });
 
   @override
@@ -75,11 +79,12 @@ class SettingTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: AppColors.textTertiary,
-                  size: 24,
-                ),
+                trailing ??
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textTertiary,
+                      size: 24,
+                    ),
               ],
             ),
           ),

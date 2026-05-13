@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/team_model.dart';
+import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_text_styles.dart';
 
 class TeamHeader extends StatelessWidget {
@@ -18,11 +19,7 @@ class TeamHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF5B8EC9), Color(0xFF61A1D8)],
-        ),
+        color: AppColors.primaryDark,
       ),
       child: Column(
         children: [
@@ -72,23 +69,30 @@ class TeamHeader extends StatelessWidget {
 
           const SizedBox(height: 18),
 
-          // Stats row
+          // Stats row — 주간 XP featured (flex:2), 멤버·총 XP compact (flex:1)
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildStat('멤버', '$memberCount/${team.maxMembers}'),
+              Expanded(
+                child: _buildStat('멤버', '$memberCount/${team.maxMembers}'),
+              ),
               Container(
                 width: 1,
                 height: 28,
                 color: Colors.white.withValues(alpha: 0.3),
               ),
-              _buildStat('총 XP', _formatXp(team.totalXp)),
+              Expanded(
+                child: _buildStat('총 XP', _formatXp(team.totalXp)),
+              ),
               Container(
                 width: 1,
                 height: 28,
                 color: Colors.white.withValues(alpha: 0.3),
               ),
-              _buildStat('주간 XP', _formatXp(team.weeklyXp)),
+              Expanded(
+                flex: 2,
+                child: _buildStat('주간 XP', _formatXp(team.weeklyXp),
+                    featured: true),
+              ),
             ],
           ),
         ],
@@ -96,22 +100,25 @@ class TeamHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(String label, String value) {
+  Widget _buildStat(String label, String value, {bool featured = false}) {
     return Column(
       children: [
         Text(
           value,
-          style: AppTextStyles.titleMedium.copyWith(
+          style: (featured ? AppTextStyles.headlineSmall : AppTextStyles.titleMedium)
+              .copyWith(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: featured ? FontWeight.w900 : FontWeight.bold,
           ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 2),
         Text(
           label,
           style: AppTextStyles.caption.copyWith(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: Colors.white.withValues(alpha: featured ? 0.9 : 0.7),
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );

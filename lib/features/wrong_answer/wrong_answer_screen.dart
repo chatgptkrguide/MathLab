@@ -168,15 +168,24 @@ class _WrongAnswerScreenState extends ConsumerState<WrongAnswerScreen> {
         decoration: BoxDecoration(
           color: isActive
               ? Colors.white
-              : Colors.white.withValues(alpha: 0.15),
+              : Colors.white.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(17),
+          border: isActive
+              ? Border.all(
+                  color: AppColors.xpGold.withValues(alpha: 0.6),
+                  width: 1.5,
+                )
+              : null,
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isActive ? const Color(0xFF333333) : Colors.white,
+            // 활성: xpGold 계열 accent, 비활성: alpha 0.5 절제
+            color: isActive
+                ? AppColors.xpGold
+                : Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ),

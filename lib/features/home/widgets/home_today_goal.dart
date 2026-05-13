@@ -50,9 +50,9 @@ class HomeTodayGoal extends StatelessWidget {
                 const Text(
                   '오늘의 목표',
                   style: TextStyle(
-                    color: Color(0xFF0D061F),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -60,7 +60,8 @@ class HomeTodayGoal extends StatelessWidget {
                   '$dailyXP / $dailyGoal XP',
                   style: const TextStyle(
                     color: Color(0xFF18181B),
-                    fontSize: 12,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -70,7 +71,7 @@ class HomeTodayGoal extends StatelessWidget {
                     value: progress,
                     minHeight: 9,
                     backgroundColor: const Color(0xFFE0E0E0),
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.tealGreen),
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.xpGold),
                   ),
                 ),
               ],
