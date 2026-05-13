@@ -57,15 +57,18 @@ class HeartsIndicator extends StatelessWidget {
                     size: 22,
                   );
 
-                  if (isFilled) {
+                  // glow 는 가장 최근에 획득한 하트 1개에만 — 네온 누적 방지.
+                  final isMostRecentFilled =
+                      isFilled && index == currentHearts - 1;
+                  if (isMostRecentFilled) {
                     heartIcon = Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.mathRed
-                                .withValues(alpha: 0.3),
-                            blurRadius: 6,
+                                .withValues(alpha: 0.18),
+                            blurRadius: 3,
                             spreadRadius: 0,
                           ),
                         ],

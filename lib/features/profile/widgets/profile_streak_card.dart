@@ -18,14 +18,7 @@ class ProfileStreakCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFFFF8F0),
-            const Color(0xFFFFF3E8),
-          ],
-        ),
+        color: const Color(0xFFFFF8F0),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: const Color(0xFFFFD9B3),
@@ -42,19 +35,8 @@ class ProfileStreakCard extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFFFF8A50), Color(0xFFFF6D00)],
-                  ),
+                  color: const Color(0xFFFF6D00),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFFF6D00).withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
                 ),
                 child: Center(
                   child: Text(

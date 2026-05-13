@@ -114,9 +114,10 @@ class _StatSquare extends StatelessWidget {
             value,
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.3,
+              height: 1.1,
             ),
             textAlign: TextAlign.center,
             maxLines: 1,

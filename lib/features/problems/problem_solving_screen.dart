@@ -375,19 +375,6 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             ProblemQuestionCard(problem: currentProblem),
-                            // 답안 입력 직전 inline 힌트 트리거 — 우측 상단
-                            // 화이트 스페이스 대신 손가락 동선에 가까운 위치.
-                            if (hints.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: AppDimensions.spacing12),
-                                child: InlineHintTrigger(
-                                  unlockedCount: unlockedCount,
-                                  totalHints: hints.length,
-                                  isEnabled: !isAnswerChecked,
-                                  onTap: () => _showHintPopup(currentProblem),
-                                ),
-                              ),
                             const SizedBox(height: AppDimensions.spacing20),
                             AnswerInput(
                               problem: currentProblem,
@@ -406,6 +393,19 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                               parseDragDropAnswer:
                                   _controller.parseDragDropAnswer,
                             ),
+                            // 답 시도 후 막혔을 때 힌트 — AnswerInput 아래로 배치.
+                            // 동선: 문제 읽기 → 답 시도 → 막히면 힌트.
+                            if (hints.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: AppDimensions.spacing14),
+                                child: InlineHintTrigger(
+                                  unlockedCount: unlockedCount,
+                                  totalHints: hints.length,
+                                  isEnabled: !isAnswerChecked,
+                                  onTap: () => _showHintPopup(currentProblem),
+                                ),
+                              ),
                             const SizedBox(height: AppDimensions.spacing18),
                             UnlockedHintsSection(
                               hints: hints,
