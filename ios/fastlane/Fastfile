@@ -95,8 +95,9 @@ platform :ios do
 
   desc "OTA patch via Shorebird (no reinstall needed)"
   lane :patch do
-    # exportOptions plist 명시로 archive·export profile 매핑 통일.
-    sh(shorebird_cmd("patch ios --export-options-plist=ios/exportOptions-adhoc.plist"))
+    # --allow-asset-diffs: 환경 차이로 인한 사소한 asset 차이 허용.
+    # --export-options-plist: archive·export profile 매핑 통일.
+    sh(shorebird_cmd("patch ios --allow-asset-diffs --export-options-plist=ios/exportOptions-adhoc.plist"))
     UI.success("✅ iOS OTA patch deployed! 테스터 앱 자동 업데이트.")
   end
 

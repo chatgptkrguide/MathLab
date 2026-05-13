@@ -37,7 +37,9 @@ platform :android do
 
   desc "OTA patch via Shorebird (no reinstall needed)"
   lane :patch do
-    sh(shorebird_cmd("patch android"))
+    # --allow-asset-diffs: tree-shaken icon font 등의 사소한 asset 차이를 허용
+    # (release 빌드와 patch 빌드의 환경 차이로 자주 발생).
+    sh(shorebird_cmd("patch android --allow-asset-diffs"))
     UI.success("✅ Android OTA patch deployed! 테스터 앱 자동 업데이트.")
   end
 
