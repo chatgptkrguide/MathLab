@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/game_constants.dart';
+import '../../../shared/utils/number_format.dart';
 import '../edit_profile_screen.dart';
 import '../../settings/settings_screen.dart';
 
@@ -241,34 +242,34 @@ class ProfileHeader extends StatelessWidget {
   _LeagueDisplayInfo _getLeagueInfo(String league) {
     switch (league) {
       case 'silver':
-        return _LeagueDisplayInfo(
+        return const _LeagueDisplayInfo(
           name: '실버',
-          color: const Color(0xFF78909C),
-          gradientEnd: const Color(0xFFB0BEC5),
+          color: AppColors.leagueSilver,
+          gradientEnd: AppColors.leagueSilverLight,
         );
       case 'gold':
-        return _LeagueDisplayInfo(
+        return const _LeagueDisplayInfo(
           name: '골드',
-          color: const Color(0xFFFF9800),
-          gradientEnd: const Color(0xFFFFB74D),
+          color: AppColors.leagueGold,
+          gradientEnd: AppColors.leagueGoldLight,
         );
       case 'diamond':
-        return _LeagueDisplayInfo(
+        return const _LeagueDisplayInfo(
           name: '다이아몬드',
-          color: const Color(0xFF42A5F5),
-          gradientEnd: const Color(0xFF90CAF9),
+          color: AppColors.leagueDiamond,
+          gradientEnd: AppColors.leagueDiamondLight,
         );
       case 'master':
-        return _LeagueDisplayInfo(
+        return const _LeagueDisplayInfo(
           name: '마스터',
-          color: const Color(0xFF7E57C2),
-          gradientEnd: const Color(0xFFB39DDB),
+          color: AppColors.leagueMaster,
+          gradientEnd: AppColors.leagueMasterLight,
         );
       default: // bronze
-        return _LeagueDisplayInfo(
+        return const _LeagueDisplayInfo(
           name: '브론즈',
-          color: const Color(0xFFCD7F32),
-          gradientEnd: const Color(0xFFDEA05E),
+          color: AppColors.leagueBronze,
+          gradientEnd: AppColors.leagueBronzeLight,
         );
     }
   }
@@ -380,7 +381,7 @@ class _LeagueBadgeColumn extends StatelessWidget {
         const SizedBox(height: 6),
         // Total XP — large, dominant
         Text(
-          _formatNumber(user.totalXp),
+          formatCompact(user.totalXp),
           style: const TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w900,
@@ -443,7 +444,7 @@ class _ProgressTrack extends StatelessWidget {
             ),
             if (!isComplete)
               Text(
-                '${_formatNumber(xpRemaining)} XP 남음',
+                '${formatCompact(xpRemaining)} XP 남음',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
@@ -532,7 +533,7 @@ class _ProgressTrack extends StatelessWidget {
         Row(
           children: [
             Text(
-              _formatNumber(xpInTier),
+              formatCompact(xpInTier),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -540,7 +541,7 @@ class _ProgressTrack extends StatelessWidget {
               ),
             ),
             Text(
-              ' / ${_formatNumber(xpNeeded)} XP',
+              ' / ${formatCompact(xpNeeded)} XP',
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,
@@ -573,12 +574,4 @@ class _LeagueDisplayInfo {
     required this.color,
     required this.gradientEnd,
   });
-}
-
-String _formatNumber(int number) {
-  if (number >= 1000) {
-    return '${(number / 1000).toStringAsFixed(number % 1000 == 0 ? 0 : 1)}k'
-        .replaceAll('.0k', 'k');
-  }
-  return number.toString();
 }

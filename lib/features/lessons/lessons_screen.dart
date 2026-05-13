@@ -10,8 +10,6 @@ import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/providers/problem/problem_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
-import '../../shared/constants/grade_curriculum_map.dart';
-import '../../shared/constants/subject_labels.dart';
 import '../problems/problem_solving_screen.dart';
 import 'widgets/lessons_blue_header.dart';
 import 'widgets/lessons_path.dart';
@@ -98,18 +96,11 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     super.dispose();
   }
 
-  List<UnitModel> _filterUnitsByGrade(List<UnitModel> units) {
-    final user = ref.read(userProvider);
-    final grade = user?.currentGrade ?? '중1';
-    final allowedSubjects = GradeCurriculumMap.getSubjectsForGrade(grade);
-    if (GradeCurriculumMap.hasFullAccess(grade)) return units;
-    return units.where((u) => allowedSubjects.contains(u.subject)).toList();
-  }
-
+  /// 학년 필터 해제 — 모든 과목 코드를 그대로 반환.
+  /// (LessonsBlueHeader 의 callback signature 호환을 위해 메서드 유지)
   List<String> _getFilteredSubjects(List<UnitModel> units) {
-    final filtered = _filterUnitsByGrade(units);
     final subjects = <String>{};
-    for (final u in filtered) {
+    for (final u in units) {
       subjects.add(u.subject);
     }
     return subjects.toList();
@@ -252,58 +243,9 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 );
               },
               data: (allUnits) {
-                // Filter units by user's grade
-                final gradeFilteredUnits = _filterUnitsByGrade(allUnits);
-
-                // 학년에 맞는 콘텐츠가 0 개인 경우 (초·중학생) 준비 중 안내.
-                if (gradeFilteredUnits.isEmpty) {
-                  final userGrade = ref.read(userProvider)?.currentGrade ?? '';
-                  final mapped =
-                      GradeCurriculumMap.getSubjectsForGrade(userGrade);
-                  final subjectName = mapped.isEmpty
-                      ? '해당 학년'
-                      : SubjectLabels.displayOf(mapped.first);
-                  return Expanded(
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.hourglass_bottom_rounded,
-                              size: 48,
-                              color: AppColors.textTertiary,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '$subjectName 콘텐츠 준비 중',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              '학년 맞춤 학습 콘텐츠를 준비하고 있어요.\n곧 만나보실 수 있습니다.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 13,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }
-
                 final units = _selectedSubject == null
-                    ? gradeFilteredUnits
-                    : gradeFilteredUnits
+                    ? allUnits
+                    : allUnits
                         .where((u) => u.subject == _selectedSubject)
                         .toList();
 

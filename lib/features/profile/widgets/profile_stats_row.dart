@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/models/user/user_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/utils/number_format.dart';
 
 class ProfileStatsRow extends StatelessWidget {
   final UserModel user;
@@ -45,7 +46,7 @@ class ProfileStatsRow extends StatelessWidget {
             iconColor: const Color(0xFF42A5F5),
             bgColor: const Color(0xFFE3F2FD),
             label: '보유 젬',
-            value: _formatNumber(user.gems),
+            value: formatCompact(user.gems),
             horizontal: false,
           ),
         ),
@@ -231,10 +232,3 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-String _formatNumber(int number) {
-  if (number >= 1000) {
-    return '${(number / 1000).toStringAsFixed(number % 1000 == 0 ? 0 : 1)}k'
-        .replaceAll('.0k', 'k');
-  }
-  return number.toString();
-}

@@ -40,14 +40,14 @@ class _PremiumUpgradeScreenState extends ConsumerState<PremiumUpgradeScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              AppColors.mathBlue, // Brand blue
-              Color(0xFF7E57C2), // Purple
-              Color(0xFF5E35B1), // Deep purple
+              AppColors.mathBlue,      // #1CB0F6 Brand blue (top)
+              AppColors.primaryDark,   // #1899D6 Mid-tone blue
+              Color(0xFF0E6FA8),       // Deep blue (bottom) — 보라 계열 완전 제거
             ],
-            stops: [0.0, 0.6, 1.0],
+            stops: [0.0, 0.55, 1.0],
           ),
         ),
         child: SafeArea(

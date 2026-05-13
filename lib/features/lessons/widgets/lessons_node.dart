@@ -94,18 +94,20 @@ class LessonsNode extends StatelessWidget {
             const SizedBox(height: 8),
           ],
 
-          // Node: rounded square
+          // Node: rounded square — current 레슨은 더 크게(110), 그 외 84
           Container(
-            width: 84,
-            height: 84,
+            width: isCurrent ? 110 : 84,
+            height: isCurrent ? 110 : 84,
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(isCurrent ? 16 : 12),
               boxShadow: isActive
                   ? [
                       BoxShadow(
-                        color: bgColor.withValues(alpha: 0.35),
-                        blurRadius: 12,
+                        color: bgColor.withValues(
+                          alpha: isCurrent ? 0.5 : 0.35,
+                        ),
+                        blurRadius: isCurrent ? 18 : 12,
                         offset: const Offset(0, 4),
                       ),
                     ]
@@ -123,7 +125,11 @@ class LessonsNode extends StatelessWidget {
                 child: Icon(
                   isCompleted ? Icons.check_rounded : nodeIcon,
                   color: isLocked ? AppColors.skyBlue : Colors.white,
-                  size: isCompleted ? 36 : 32,
+                  size: isCompleted
+                      ? 36
+                      : isCurrent
+                          ? 44
+                          : 32,
                 ),
               ),
             ),

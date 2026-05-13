@@ -1,11 +1,9 @@
-// Home subject row — grade-based horizontal subject chips.
+// Home subject row — horizontal representative subject chips.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/providers/infrastructure/navigation_provider.dart';
-import '../../../data/providers/user/user_provider.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../shared/constants/grade_curriculum_map.dart';
 import '../../../shared/constants/subject_labels.dart';
 import '../home_screen.dart';
 
@@ -14,49 +12,8 @@ class HomeSubjectRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-    final grade = user?.currentGrade ?? '중1';
-    final subjects = GradeCurriculumMap.getSubjectsForGrade(grade);
-    final hasContent = GradeCurriculumMap.hasContentForGrade(grade);
-
-    // 콘텐츠 미보유 학년(초·중학생)은 안내 카드로 대체.
-    if (!hasContent && subjects.isNotEmpty) {
-      return SizedBox(
-        key: HomeScreenFigma.subjectRowKey,
-        height: 48,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.cardBg,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.hourglass_bottom_rounded,
-                  size: 18, color: Color(0xFF8B8B93)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${SubjectLabels.displayOf(subjects.first)} 콘텐츠는 준비 중입니다',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF52525B),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // 전체 접근이면 대표 과목 2개만 표시
-    final displaySubjects = subjects.isEmpty
-        ? ['공통수학1', '공통수학2']
-        : subjects.take(2).toList();
+    // 학년 필터 해제됨 — 모든 사용자에게 대표 과목 2개 노출.
+    const displaySubjects = ['공통수학1', '공통수학2'];
 
     final subjectStyles = {
       '기초수학': (Icons.calculate_rounded, AppColors.mathGreen, const Color(0xFFE8FFE0)),

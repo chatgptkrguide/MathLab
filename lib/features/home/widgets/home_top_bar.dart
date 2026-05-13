@@ -21,28 +21,31 @@ class HomeTopBar extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Left: greeting
+        // Left: greeting — 학습자명을 메인(fs16/w800), 인사말을 서브(fs11/w500)로 위계 명확화
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '안녕하세요!',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: 2),
               Text(
-                '${name ?? '학습자'}의 수학 학습',
+                '안녕하세요, ${name ?? '학습자'}님',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
-                  height: 1.4,
-                  letterSpacing: 0.4,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  height: 1.2,
+                  letterSpacing: 0.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                '오늘도 수학 한 걸음',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  height: 1.3,
+                  letterSpacing: 0.6,
                   fontWeight: FontWeight.w500,
                 ),
                 maxLines: 1,

@@ -41,19 +41,23 @@ class LessonsStatsBar extends StatelessWidget {
       color: const Color(0xFFFAFAFA),
       child: Row(
         children: [
-          // Unit name chip
+          // Unit name chip — sky-blue tinted bg for visibility on #FAFAFA
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(4),
+              color: AppColors.skyBlue.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: AppColors.skyBlue.withValues(alpha: 0.25),
+                width: 1,
+              ),
             ),
             child: Text(
               unitName,
               style: const TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                color: AppColors.skyBlue,
                 letterSpacing: 1,
               ),
               overflow: TextOverflow.ellipsis,

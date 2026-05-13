@@ -176,48 +176,56 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
                       const SizedBox(height: 10),
 
-                      // Google 로그인
+                      // Google 로그인 — 메인 채움 버튼 (최우선 소셜 옵션)
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
-                        child: OutlinedButton(
+                        height: 50,
+                        child: ElevatedButton(
                           onPressed: _handleGoogleLogin,
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF3C3C3C),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.g_mobiledata, size: 22, color: Colors.white.withValues(alpha: 0.85)),
+                              Icon(Icons.g_mobiledata, size: 22, color: AppColors.googleBlue),
                               const SizedBox(width: 8),
-                              Text('Google로 계속하기',
-                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.85))),
+                              const Text('Google로 계속하기',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3C3C3C))),
                             ],
                           ),
                         ),
                       ),
 
+                      // Apple 로그인 (iOS 전용) — 짙은 채움 버튼 (2순위)
                       if (defaultTargetPlatform == TargetPlatform.iOS) ...[
                         const SizedBox(height: 8),
                         SizedBox(
-                          width: double.infinity, height: 48,
-                          child: OutlinedButton(
+                          width: double.infinity, height: 50,
+                          child: ElevatedButton(
                             onPressed: _handleAppleLogin,
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1A1A1A),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Icon(Icons.apple, size: 20, color: Colors.white.withValues(alpha: 0.85)),
+                              const Icon(Icons.apple, size: 20, color: Colors.white),
                               const SizedBox(width: 8),
-                              Text('Apple로 계속하기',
-                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.85))),
+                              const Text('Apple로 계속하기',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                             ]),
                           ),
                         ),
                       ],
 
+                      // 더 보기 / 숨은 로그인 수단
                       if (!_showMoreLogin) ...[
                         const SizedBox(height: 12),
                         GestureDetector(
@@ -226,36 +234,47 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.3))),
                         ),
                       ] else ...[
+                        // Kakao — 브랜드 칩 (3순위, 작은 높이)
                         if (_kakaoEnabled) ...[
-                          const SizedBox(height: 8),
-                          SizedBox(width: double.infinity, height: 44,
+                          const SizedBox(height: 10),
+                          SizedBox(width: double.infinity, height: 40,
                             child: ElevatedButton(onPressed: _handleKakaoLogin,
-                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.kakaoYellow, foregroundColor: AppColors.kakaoBrown, elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.kakaoYellow,
+                                foregroundColor: AppColors.kakaoBrown,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                Icon(Icons.chat_bubble_rounded, size: 16, color: AppColors.kakaoBrown), const SizedBox(width: 8),
-                                Text('Kakao로 계속하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.kakaoBrown)),
+                                Icon(Icons.chat_bubble_rounded, size: 15, color: AppColors.kakaoBrown),
+                                const SizedBox(width: 6),
+                                Text('Kakao로 계속하기',
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.kakaoBrown)),
                               ]))),
                         ],
-                        const SizedBox(height: 8),
-                        SizedBox(width: double.infinity, height: 44,
-                          child: OutlinedButton(onPressed: _handleEmailLogin,
-                            style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Icon(Icons.mail_outline_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)), const SizedBox(width: 8),
-                              Text('이메일로 계속하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.6))),
-                            ]))),
+                        // 이메일 — 텍스트 링크 (4순위, 가장 낮은 시각적 무게)
+                        const SizedBox(height: 12),
+                        GestureDetector(
+                          onTap: _handleEmailLogin,
+                          child: Text('이메일로 계속하기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withValues(alpha: 0.55),
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white.withValues(alpha: 0.3),
+                            )),
+                        ),
                       ],
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 14),
 
+                      // 먼저 체험해보기 — opacity 0.25 → 0.55 (핵심 전환 경로)
                       GestureDetector(
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const DemoLessonScreen())),
                         child: Text('먼저 체험해보기',
-                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.25),
-                            decoration: TextDecoration.underline, decorationColor: Colors.white.withValues(alpha: 0.15))),
+                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.55),
+                            decoration: TextDecoration.underline, decorationColor: Colors.white.withValues(alpha: 0.35))),
                       ),
                       const SizedBox(height: 4),
                     ],

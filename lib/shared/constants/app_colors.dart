@@ -97,6 +97,20 @@ class AppColors {
   static const levelSilverDark = Color(0xFF909090);
   static const levelGoldDark = Color(0xFFDAA520);
 
+  // League tier tokens — profile_header _getLeagueInfo 등에서 참조.
+  // (levelBronze/levelGold 와 별도 — 위는 단순 레벨 뱃지용 금속 색이고,
+  //  아래는 5단계 리그 시스템의 base/gradientEnd 쌍.)
+  static const leagueBronze = Color(0xFFCD7F32);
+  static const leagueBronzeLight = Color(0xFFDEA05E);
+  static const leagueSilver = Color(0xFF78909C);
+  static const leagueSilverLight = Color(0xFFB0BEC5);
+  static const leagueGold = Color(0xFFFF9800);
+  static const leagueGoldLight = Color(0xFFFFB74D);
+  static const leagueDiamond = Color(0xFF42A5F5);
+  static const leagueDiamondLight = Color(0xFF90CAF9);
+  static const leagueMaster = Color(0xFF7E57C2);
+  static const leagueMasterLight = Color(0xFFB39DDB);
+
   // ============================================================
   // === Dark Variants ===
   // ============================================================
