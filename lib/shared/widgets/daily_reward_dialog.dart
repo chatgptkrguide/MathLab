@@ -43,22 +43,33 @@ class DailyRewardDialog extends ConsumerWidget {
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 타이틀
-                Text(
-                  '🔥 일일 보상',
-                  style: AppTextStyles.headlineMedium.copyWith(
-                    color: AppColors.textDark,
-                  ),
+                // 타이틀 + 진행 — 왼쪽 정렬 (균일 가운데 배치 탈피)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '일일 보상',
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: AppColors.textDark,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${rewardState.currentDay}/7일째',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppDimensions.spacing8),
-                Text(
-                  'Day ${rewardState.currentDay} / 7',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.spacing24),
+                const SizedBox(height: AppDimensions.spacing20),
 
                 // 7일 보상 그리드
                 _buildRewardGrid(rewardState),
@@ -88,160 +99,217 @@ class DailyRewardDialog extends ConsumerWidget {
     );
   }
 
-  /// 7일 보상 그리드
+  /// 7일 보상 — 위 3개 + 가운데 3개 + 맨 아래 Day 7 가로 wide 카드.
+  /// (4×2 균일 grid 대신 의도적 비대칭 — Day 7 보상이 시각적으로 도드라짐)
   Widget _buildRewardGrid(DailyRewardState rewardState) {
     final rewards = rewardState.rewards;
     if (rewards.isEmpty) {
-      // 로딩 중이면 기본 보상 표시
       return const SizedBox(height: 200);
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.9,
-      ),
-      itemCount: 7,
-      itemBuilder: (context, index) {
-        final reward = rewards[index];
-        final isCurrentDay = reward.day == rewardState.currentDay;
-        final isClaimed = reward.isClaimed;
-        final isFuture = reward.day > rewardState.currentDay && !isClaimed;
+    Widget cell(int dayIndex) {
+      final reward = rewards[dayIndex];
+      final isCurrentDay = reward.day == rewardState.currentDay;
+      final isClaimed = reward.isClaimed;
+      final isFuture = reward.day > rewardState.currentDay && !isClaimed;
+      return _buildRewardDay(
+        reward: reward,
+        isCurrentDay: isCurrentDay,
+        isClaimed: isClaimed,
+        isFuture: isFuture,
+      );
+    }
 
-        return _buildRewardDay(
-          reward: reward,
-          isCurrentDay: isCurrentDay,
-          isClaimed: isClaimed,
-          isFuture: isFuture,
-        );
-      },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 1~3일 — 첫 줄 3개
+        SizedBox(
+          height: 92,
+          child: Row(
+            children: [
+              Expanded(child: cell(0)),
+              const SizedBox(width: 8),
+              Expanded(child: cell(1)),
+              const SizedBox(width: 8),
+              Expanded(child: cell(2)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        // 4~6일 — 둘째 줄 3개
+        SizedBox(
+          height: 92,
+          child: Row(
+            children: [
+              Expanded(child: cell(3)),
+              const SizedBox(width: 8),
+              Expanded(child: cell(4)),
+              const SizedBox(width: 8),
+              Expanded(child: cell(5)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        // 7일 — 가로 wide 카드 (특별 보상)
+        SizedBox(
+          height: 88,
+          child: cell(6),
+        ),
+      ],
     );
   }
 
-  /// 개별 보상 날짜 카드
+  /// 개별 보상 날짜 카드.
+  /// border-left accent 패턴 통일 (앱 전반 디자인 언어와 같이).
+  /// 그라데이션 제거 — 단색 배경 + 강조선만으로 상태 표현.
   Widget _buildRewardDay({
     required DailyRewardModel reward,
     required bool isCurrentDay,
     required bool isClaimed,
     required bool isFuture,
   }) {
-    // 7일차는 특별 보상 (큰 보상)
     final isSpecialDay = reward.day == 7;
 
+    // 상태별 색·강조선
+    final Color accentColor;
+    final Color bgColor;
+    if (isCurrentDay) {
+      accentColor = AppColors.gold;
+      bgColor = AppColors.gold.withValues(alpha: 0.06);
+    } else if (isClaimed) {
+      accentColor = AppColors.tealGreen;
+      bgColor = AppColors.tealGreen.withValues(alpha: 0.06);
+    } else {
+      accentColor = Colors.grey.shade300;
+      bgColor = Colors.grey.shade50;
+    }
+
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
-        gradient: isCurrentDay
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.gold.withValues(alpha: 0.2),
-                  AppColors.gold.withValues(alpha: 0.08),
-                ],
-              )
-            : null,
-        color: isCurrentDay
-            ? null
-            : isClaimed
-                ? AppColors.tealGreen.withValues(alpha: 0.1)
-                : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(AppDimensions.radius16),
-        border: Border.all(
-          color: isCurrentDay
-              ? AppColors.gold
-              : isClaimed
-                  ? AppColors.tealGreen
-                  : Colors.grey.shade200,
-          width: isCurrentDay ? 2.5 : 1,
+        color: bgColor,
+        border: Border(
+          left: BorderSide(
+            color: accentColor,
+            width: isCurrentDay ? 4 : 3,
+          ),
         ),
         boxShadow: isCurrentDay
             ? [
                 BoxShadow(
-                  color: AppColors.gold.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  color: AppColors.gold.withValues(alpha: 0.15),
+                  blurRadius: 6,
+                  offset: const Offset(0, 1),
                 ),
               ]
             : null,
       ),
       child: Stack(
-        alignment: Alignment.center,
         children: [
-          // 메인 콘텐츠
-          Positioned.fill(
-            child: Opacity(
-              opacity: isFuture ? 0.4 : 1.0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing4, horizontal: AppDimensions.spacing2),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 날짜
-                      Text(
-                        'Day ${reward.day}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: isCurrentDay
-                              ? AppColors.gold
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      // 보상 이모지
-                      Text(
-                        reward.emoji,
-                        style: TextStyle(
-                          fontSize: isSpecialDay ? 24 : 20,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      // 보상 라벨
-                      Text(
-                        reward.label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textDark,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
+          Opacity(
+            opacity: isFuture ? 0.45 : 1.0,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                isSpecialDay ? 16 : 8,
+                isSpecialDay ? 12 : 8,
+                isSpecialDay ? 16 : 8,
+                isSpecialDay ? 12 : 8,
               ),
+              child: isSpecialDay
+                  ? _specialDayContent(reward, isCurrentDay)
+                  : _regularDayContent(reward, isCurrentDay),
             ),
           ),
-
-          // 수령 완료 체크마크 오버레이
+          // 수령 완료 체크마크
           if (isClaimed)
             Positioned(
               top: 4,
               right: 4,
               child: Container(
-                width: 18,
-                height: 18,
+                width: 16,
+                height: 16,
                 decoration: const BoxDecoration(
                   color: AppColors.tealGreen,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 12,
-                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 11),
               ),
             ),
         ],
       ),
+    );
+  }
+
+  Widget _regularDayContent(DailyRewardModel reward, bool isCurrentDay) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Day ${reward.day}',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: isCurrentDay ? AppColors.gold : AppColors.textSecondary,
+            letterSpacing: 0.2,
+          ),
+        ),
+        Text(reward.emoji, style: const TextStyle(fontSize: 22)),
+        Text(
+          reward.label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textDark,
+            height: 1.1,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  /// Day 7 특별 보상 — 가로 wide + 큰 이모지 + 강조 텍스트
+  Widget _specialDayContent(DailyRewardModel reward, bool isCurrentDay) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(reward.emoji, style: const TextStyle(fontSize: 36)),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Day 7 · 특별 보상',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isCurrentDay
+                      ? AppColors.gold
+                      : AppColors.textSecondary,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                reward.label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textDark,
+                  height: 1.1,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -1,44 +1,30 @@
 // Hearts Indicator Widget
 //
-// Displays animated hearts (with explicit count + recovery hint) and hint button.
+// Displays animated hearts with explicit count + auto-recovery hint.
+// 힌트 버튼은 답안 영역 위 InlineHintTrigger 로 별도 분리됨.
 
 import 'package:flutter/material.dart';
-import '../../../data/models/problem/problem_model.dart';
 import '../../../shared/constants/app_colors.dart';
 import '../../../shared/constants/app_dimensions.dart';
-import 'hint_button.dart';
 
 class HeartsIndicator extends StatelessWidget {
   final int currentHearts;
   final int maxHearts;
   final int previousHearts;
-  final bool isAnswerChecked;
   final AnimationController heartAnimController;
   final Animation<double> heartScaleAnim;
-
-  // Hint-related
-  final ProblemModel? currentProblem;
-  final int unlockedHintCount;
-  final int totalHints;
-  final VoidCallback onHintTap;
 
   const HeartsIndicator({
     super.key,
     required this.currentHearts,
     this.maxHearts = 5,
     required this.previousHearts,
-    required this.isAnswerChecked,
     required this.heartAnimController,
     required this.heartScaleAnim,
-    required this.currentProblem,
-    required this.unlockedHintCount,
-    required this.totalHints,
-    required this.onHintTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hints = currentProblem?.allHints ?? [];
     final missing = (maxHearts - currentHearts).clamp(0, maxHearts);
 
     return Container(
@@ -49,107 +35,89 @@ class HeartsIndicator extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Hearts row + count badge — 힌트 버튼은 답안 영역 위 inline 으로
+          // 분리됨 (problem_solving_screen 의 InlineHintTrigger).
+          // 여기는 하트 표시에만 집중해서 좌측 정렬·여백 정리.
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              // Hearts row + count badge (좌측)
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    ...List.generate(
-                      maxHearts,
-                      (index) {
-                        final isFilled = index < currentHearts;
-                        final isLostHeart = !isFilled &&
-                            index == currentHearts &&
-                            currentHearts < previousHearts;
+              ...List.generate(
+                maxHearts,
+                (index) {
+                  final isFilled = index < currentHearts;
+                  final isLostHeart = !isFilled &&
+                      index == currentHearts &&
+                      currentHearts < previousHearts;
 
-                        Widget heartIcon = Icon(
-                          isFilled
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: isFilled
-                              ? AppColors.mathRed
-                              : AppColors.borderDark,
-                          size: 22,
-                        );
+                  Widget heartIcon = Icon(
+                    isFilled ? Icons.favorite : Icons.favorite_border,
+                    color: isFilled
+                        ? AppColors.mathRed
+                        : AppColors.borderDark,
+                    size: 22,
+                  );
 
-                        if (isFilled) {
-                          heartIcon = Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.mathRed
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 6,
-                                  spreadRadius: 0,
-                                ),
-                              ],
+                  if (isFilled) {
+                    heartIcon = Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mathRed
+                                .withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: heartIcon,
+                    );
+                  }
+
+                  if (isLostHeart) {
+                    heartIcon = AnimatedBuilder(
+                      animation: heartAnimController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: heartScaleAnim.value,
+                          child: Icon(
+                            Icons.favorite_border,
+                            color: Color.lerp(
+                              AppColors.mathRed,
+                              AppColors.borderDark,
+                              heartAnimController.value,
                             ),
-                            child: heartIcon,
-                          );
-                        }
-
-                        if (isLostHeart) {
-                          heartIcon = AnimatedBuilder(
-                            animation: heartAnimController,
-                            builder: (context, child) {
-                              return Transform.scale(
-                                scale: heartScaleAnim.value,
-                                child: Icon(
-                                  Icons.favorite_border,
-                                  color: Color.lerp(
-                                    AppColors.mathRed,
-                                    AppColors.borderDark,
-                                    heartAnimController.value,
-                                  ),
-                                  size: AppDimensions.iconMedium,
-                                ),
-                              );
-                            },
-                          );
-                        }
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 3),
-                          child: heartIcon,
+                            size: AppDimensions.iconMedium,
+                          ),
                         );
                       },
-                    ),
-                    const SizedBox(width: 8),
-                    // Numeric count badge — 한눈에 X/N 인지
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.mathRed.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '$currentHearts/$maxHearts',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.mathRed,
-                          height: 1.0,
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: heartIcon,
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.mathRed.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$currentHearts/$maxHearts',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.mathRed,
+                    height: 1.0,
+                  ),
                 ),
               ),
-              // Hint button (우측 끝, 답안 입력 가까이)
-              if (hints.isNotEmpty) ...[
-                const SizedBox(width: AppDimensions.spacing12),
-                HintButton(
-                  unlockedCount: unlockedHintCount,
-                  totalHints: totalHints,
-                  xpCost: 0,
-                  isEnabled: !isAnswerChecked,
-                  onTap: onHintTap,
-                ),
-              ],
             ],
           ),
           // 자동 회복 안내 — 하트가 부족할 때만 노출

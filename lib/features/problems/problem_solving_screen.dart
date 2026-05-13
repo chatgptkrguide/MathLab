@@ -23,6 +23,7 @@ import 'widgets/problem_content.dart';
 import 'widgets/answer_input.dart';
 import 'widgets/answer_feedback.dart';
 import 'widgets/problem_action_button.dart';
+import 'widgets/hint_button.dart';
 import 'widgets/hint_popup.dart';
 
 class ProblemSolvingScreen extends ConsumerStatefulWidget {
@@ -352,19 +353,13 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                       onBack: () => Navigator.of(context).pop(),
                     ),
 
-                    // Hearts indicator
+                    // Hearts indicator (힌트 버튼 분리됨)
                     HeartsIndicator(
                       currentHearts: session!.hearts,
                       maxHearts: ref.watch(userProvider)?.maxHearts ?? 5,
                       previousHearts: _previousHearts,
-                      isAnswerChecked: isAnswerChecked,
                       heartAnimController: _heartAnimController,
                       heartScaleAnim: _heartScaleAnim,
-                      currentProblem: currentProblem,
-                      unlockedHintCount: unlockedCount,
-                      totalHints: hints.length,
-                      onHintTap: () =>
-                          _showHintPopup(currentProblem),
                     ),
 
                     // Question + answer area
@@ -380,6 +375,19 @@ class _ProblemSolvingScreenState extends ConsumerState<ProblemSolvingScreen>
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             ProblemQuestionCard(problem: currentProblem),
+                            // 답안 입력 직전 inline 힌트 트리거 — 우측 상단
+                            // 화이트 스페이스 대신 손가락 동선에 가까운 위치.
+                            if (hints.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: AppDimensions.spacing12),
+                                child: InlineHintTrigger(
+                                  unlockedCount: unlockedCount,
+                                  totalHints: hints.length,
+                                  isEnabled: !isAnswerChecked,
+                                  onTap: () => _showHintPopup(currentProblem),
+                                ),
+                              ),
                             const SizedBox(height: AppDimensions.spacing20),
                             AnswerInput(
                               problem: currentProblem,

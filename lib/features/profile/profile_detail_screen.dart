@@ -3,7 +3,6 @@
 //
 // 세부 위젯은 widgets/ 하위로 분할됨:
 //   - ProfileHeader
-//   - ProfileStatsRow
 //   - ProfileStreakCard
 //   - ProfileSubjectSection
 //   - ProfileBadgesSection
@@ -15,7 +14,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/providers/user/user_provider.dart';
 import 'widgets/profile_header.dart';
-import 'widgets/profile_stats_row.dart';
 import 'widgets/profile_streak_card.dart';
 import 'widgets/profile_subject_section.dart';
 import 'widgets/profile_badges_section.dart';
@@ -62,8 +60,8 @@ class _ProfileDetailScreenState extends ConsumerState<ProfileDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfileStatsRow(user: user),
-                  const SizedBox(height: 16),
+                  // ProfileStatsRow 제거 (최장스트릭·현재 연속·보유 젬은
+                  // 헤더의 큰 수치 + 스트릭 카드 + 상점 화면에서 노출).
                   ProfileStreakCard(user: user),
                   const SizedBox(height: 20),
                   const ProfileSubjectSection(),

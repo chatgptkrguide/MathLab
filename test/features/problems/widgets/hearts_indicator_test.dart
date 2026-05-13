@@ -1,13 +1,11 @@
 // 회귀 가드: HeartsIndicator
 //
-// 직전에 힌트 버튼 위치를 좌측 → 우측 끝으로 옮긴 UX 수정과 위젯 분할
-// 작업 이후, 다음 항목이 깨지지 않도록 기본 동작을 핀으로 박는다.
+// 힌트 버튼은 InlineHintTrigger(별도 위젯) 으로 분리됨 — HeartsIndicator
+// 는 하트 표시·카운트 뱃지·회복 안내만 담당.
 //
 // 1. 채워진/빈 하트 개수가 currentHearts/maxHearts 와 정확히 일치
 // 2. 카운트 뱃지 "X/N" 텍스트
 // 3. 하트 부족 시 자동 회복 안내 노출, 0 일 때 메시지 분기
-// 4. hints 가 비어 있으면 HintButton 미노출
-// 5. hints 가 있고 isAnswerChecked=false 일 때 HintButton 활성
 //
 // 애니메이션 controller 는 TickerProvider 없이 dummy 로 주입.
 
@@ -15,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mathlab/data/models/problem/problem_model.dart';
 import 'package:mathlab/features/problems/widgets/hearts_indicator.dart';
 import 'package:mathlab/features/problems/widgets/hint_button.dart';
 
@@ -34,16 +31,6 @@ class _TestProvider extends TickerProvider {
     }
   }
 }
-
-ProblemModel _problem({List<String> hints = const []}) => ProblemModel(
-      id: 'p1',
-      lessonId: 'l1',
-      question: '1+1=?',
-      type: ProblemType.multipleChoice,
-      correctAnswer: '2',
-      options: const ['1', '2', '3', '4'],
-      hints: hints,
-    );
 
 Widget _wrap(Widget child) =>
     MaterialApp(home: Scaffold(body: SafeArea(child: child)));
@@ -73,13 +60,8 @@ void main() {
         currentHearts: 5,
         maxHearts: 5,
         previousHearts: 5,
-        isAnswerChecked: false,
         heartAnimController: controller,
         heartScaleAnim: scale,
-        currentProblem: _problem(),
-        unlockedHintCount: 0,
-        totalHints: 0,
-        onHintTap: () {},
       )));
 
       expect(find.byIcon(Icons.favorite), findsNWidgets(5));
@@ -93,13 +75,8 @@ void main() {
         currentHearts: 3,
         maxHearts: 5,
         previousHearts: 3,
-        isAnswerChecked: false,
         heartAnimController: controller,
         heartScaleAnim: scale,
-        currentProblem: _problem(),
-        unlockedHintCount: 0,
-        totalHints: 0,
-        onHintTap: () {},
       )));
 
       expect(find.byIcon(Icons.favorite), findsNWidgets(3));
@@ -114,13 +91,8 @@ void main() {
         currentHearts: 0,
         maxHearts: 5,
         previousHearts: 0,
-        isAnswerChecked: false,
         heartAnimController: controller,
         heartScaleAnim: scale,
-        currentProblem: _problem(),
-        unlockedHintCount: 0,
-        totalHints: 0,
-        onHintTap: () {},
       )));
 
       expect(find.byIcon(Icons.favorite), findsNothing);
@@ -128,69 +100,59 @@ void main() {
       expect(find.text('0/5'), findsOneWidget);
       expect(find.text('30분 후 1개 자동 회복'), findsOneWidget);
     });
-  });
 
-  group('HeartsIndicator — 힌트 버튼', () {
-    testWidgets('hints 비어 있으면 HintButton 미노출', (tester) async {
+    testWidgets('힌트 버튼은 더 이상 HeartsIndicator 내부에 없음 (분리됨)',
+        (tester) async {
       await tester.pumpWidget(_wrap(HeartsIndicator(
         currentHearts: 5,
         maxHearts: 5,
         previousHearts: 5,
-        isAnswerChecked: false,
         heartAnimController: controller,
         heartScaleAnim: scale,
-        currentProblem: _problem(hints: const []),
-        unlockedHintCount: 0,
-        totalHints: 0,
-        onHintTap: () {},
       )));
 
       expect(find.byType(HintButton), findsNothing);
+      expect(find.byType(InlineHintTrigger), findsNothing);
+    });
+  });
+
+  group('InlineHintTrigger — 분리된 힌트 트리거', () {
+    testWidgets('표시: 라벨 "힌트 보기" + N/N 카운트', (tester) async {
+      await tester.pumpWidget(_wrap(InlineHintTrigger(
+        unlockedCount: 1,
+        totalHints: 3,
+        isEnabled: true,
+        onTap: () {},
+      )));
+
+      expect(find.text('힌트 보기'), findsOneWidget);
+      expect(find.text('1 / 3'), findsOneWidget);
+      expect(find.byIcon(Icons.lightbulb_outline_rounded), findsOneWidget);
     });
 
-    testWidgets('hints 가 있으면 HintButton 노출 + 콜백 전달', (tester) async {
+    testWidgets('모든 힌트 열림 시 "모든 힌트 열림" + 체크 아이콘', (tester) async {
+      await tester.pumpWidget(_wrap(InlineHintTrigger(
+        unlockedCount: 3,
+        totalHints: 3,
+        isEnabled: true,
+        onTap: () {},
+      )));
+
+      expect(find.text('모든 힌트 열림'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle_outline_rounded), findsOneWidget);
+    });
+
+    testWidgets('isEnabled=true 시 탭 콜백 전달', (tester) async {
       var tapped = 0;
-      await tester.pumpWidget(_wrap(HeartsIndicator(
-        currentHearts: 5,
-        maxHearts: 5,
-        previousHearts: 5,
-        isAnswerChecked: false,
-        heartAnimController: controller,
-        heartScaleAnim: scale,
-        currentProblem: _problem(hints: const ['힌트1', '힌트2']),
-        unlockedHintCount: 1,
+      await tester.pumpWidget(_wrap(InlineHintTrigger(
+        unlockedCount: 0,
         totalHints: 2,
-        onHintTap: () => tapped++,
+        isEnabled: true,
+        onTap: () => tapped++,
       )));
 
-      final hintButton = find.byType(HintButton);
-      expect(hintButton, findsOneWidget);
-      final widget = tester.widget<HintButton>(hintButton);
-      expect(widget.unlockedCount, 1);
-      expect(widget.totalHints, 2);
-      expect(widget.isEnabled, isTrue);
-
-      widget.onTap();
+      await tester.tap(find.byType(InlineHintTrigger));
       expect(tapped, 1);
-    });
-
-    testWidgets('isAnswerChecked=true 면 HintButton 비활성', (tester) async {
-      await tester.pumpWidget(_wrap(HeartsIndicator(
-        currentHearts: 5,
-        maxHearts: 5,
-        previousHearts: 5,
-        isAnswerChecked: true,
-        heartAnimController: controller,
-        heartScaleAnim: scale,
-        currentProblem: _problem(hints: const ['힌트']),
-        unlockedHintCount: 0,
-        totalHints: 1,
-        onHintTap: () {},
-      )));
-
-      final widget =
-          tester.widget<HintButton>(find.byType(HintButton));
-      expect(widget.isEnabled, isFalse);
     });
   });
 }
