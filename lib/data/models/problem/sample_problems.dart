@@ -1101,17 +1101,21 @@ class SampleProblems {
   // 기본 문제 (커리큘럼에 맞는 문제가 없을 때)
   // ============================================================
 
+  /// 정식 문제가 아직 매핑되지 않은 lesson 의 임시 placeholder.
+  /// 사용자가 학습 흐름에서 막히지 않도록 '테스트 문제' 라고 명시 + 통과 가능한
+  /// 단순 답안 1개를 제공한다.
   static List<ProblemModel> _defaultProblems(String lessonId) {
     return [
       ProblemModel(
-        id: 'default_1',
+        id: 'test_$lessonId',
         lessonId: lessonId,
-        question: '🔒 이 레슨의 문제는 아직 준비 중이에요',
+        question: '🧪 테스트 문제\n\n이 레슨의 정식 문제는 준비 중입니다. '
+            '아래 "확인" 을 눌러 다음으로 진행하세요.',
         type: ProblemType.multipleChoice,
         difficulty: ProblemDifficulty.easy,
         options: ['확인'],
         correctAnswer: '확인',
-        explanation: '콘텐츠가 곧 추가될 예정입니다. 다른 레슨을 먼저 풀어보세요!',
+        explanation: '테스트 문제입니다. 곧 정식 학습 콘텐츠가 추가됩니다.',
         points: 0,
       ),
     ];
