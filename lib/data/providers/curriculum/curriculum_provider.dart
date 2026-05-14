@@ -1,69 +1,28 @@
 // 📚 Curriculum Provider
 //
-// Manages curriculum data with Firestore integration and offline fallback.
+// 커리큘럼 메타데이터 (단원·레슨 제목, 과목, 순서) 는 정적 콘텐츠라
+// `CurriculumData` 코드 상수를 단일 진실로 사용한다.
+//
+// Firestore 의 `units` 컬렉션에 과거에 시드된 영문 라벨이 남아 있어
+// 화면에 "arithmetic" 등이 노출되는 문제가 있었음 (2026-05). 코드 측
+// 데이터가 항상 최신·한글이므로 Firestore 폴백을 제거하고 코드를 우선시.
+//
+// 진도/통계 등 사용자별 동적 데이터는 별도 provider (lesson_progress 등) 에서
+// Firestore 와 동기화.
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/error/app_error.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../models/lesson/curriculum_data.dart';
 import '../../models/lesson/unit_model.dart';
-import '../infrastructure/firebase_providers.dart';
 
-/// 커리큘럼 유닛 데이터 Provider (Firestore + 오프라인 폴백)
-final curriculumProvider =
-    FutureProvider<List<UnitModel>>((ref) async {
-  final firestore = ref.read(firestoreProvider);
-
-  try {
-    final snapshot = await firestore
-        .collection('units')
-        .orderBy('order')
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      AppLogger.info(
-        'Firestore에 커리큘럼 없음, 샘플 데이터 사용',
-        tag: 'Curriculum',
-      );
-      return CurriculumData.getSampleUnits();
-    }
-
-    // top-level lessons 컬렉션에서 전체 레슨 로드
-    final lessonsSnapshot = await firestore
-        .collection('lessons')
-        .orderBy('order')
-        .get();
-
-    final lessonsByUnit = <String, List<Map<String, dynamic>>>{};
-    for (final lessonDoc in lessonsSnapshot.docs) {
-      final lessonData = lessonDoc.data();
-      lessonData['id'] = lessonDoc.id;
-      final unitId = lessonData['unitId'] as String? ?? '';
-      lessonsByUnit.putIfAbsent(unitId, () => []).add(lessonData);
-    }
-
-    final units = <UnitModel>[];
-    for (final doc in snapshot.docs) {
-      final data = doc.data();
-      data['id'] = doc.id;
-      data['lessons'] = lessonsByUnit[doc.id] ?? [];
-      units.add(UnitModel.fromJson(data));
-    }
-
-    AppLogger.info(
-      '${units.length}개 유닛 로드 (총 ${units.fold<int>(0, (s, u) => s + u.lessonCount)}개 레슨)',
-      tag: 'Curriculum',
-    );
-    return units;
-  } catch (e, stackTrace) {
-    AppErrorHandler.handle(e, stackTrace);
-    AppLogger.warning(
-      'Firestore 커리큘럼 로드 실패, 샘플 데이터 사용',
-      tag: 'Curriculum',
-    );
-    return CurriculumData.getSampleUnits();
-  }
+final curriculumProvider = FutureProvider<List<UnitModel>>((ref) async {
+  final units = CurriculumData.getSampleUnits();
+  AppLogger.info(
+    '커리큘럼 ${units.length}개 유닛 / ${units.fold<int>(0, (s, u) => s + u.lessonCount)}개 레슨 (코드 단일 진실)',
+    tag: 'Curriculum',
+  );
+  return units;
 });
 
 /// 커리큘럼 시드 데이터 업로드 유틸리티
