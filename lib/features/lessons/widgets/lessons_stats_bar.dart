@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/lesson/unit_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/grade_groups.dart';
 
 class LessonsStatsBar extends StatelessWidget {
   final int streak;
@@ -27,10 +28,15 @@ class LessonsStatsBar extends StatelessWidget {
     String unitName = '전체 과목';
     final units = curriculumAsync.valueOrNull;
     if (units != null && selectedSubject != null) {
-      final filteredUnits =
-          units.where((u) => u.subject == selectedSubject).toList();
-      if (filteredUnits.isNotEmpty) {
-        unitName = filteredUnits.first.title;
+      if (GradeGroups.isGradeSentinel(selectedSubject)) {
+        final grade = GradeGroups.gradeFromSentinel(selectedSubject)!;
+        unitName = '$grade 전체';
+      } else {
+        final filteredUnits =
+            units.where((u) => u.subject == selectedSubject).toList();
+        if (filteredUnits.isNotEmpty) {
+          unitName = filteredUnits.first.title;
+        }
       }
     } else if (units != null && units.isNotEmpty) {
       unitName = units.first.title;

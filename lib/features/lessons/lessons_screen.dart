@@ -10,6 +10,7 @@ import '../../data/providers/lesson/lesson_progress_provider.dart';
 import '../../data/providers/problem/problem_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
+import '../../shared/constants/grade_groups.dart';
 import '../problems/problem_solving_screen.dart';
 import 'widgets/lessons_blue_header.dart';
 import 'widgets/lessons_path.dart';
@@ -243,11 +244,21 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                 );
               },
               data: (allUnits) {
-                final units = _selectedSubject == null
+                final selected = _selectedSubject;
+                final units = selected == null
                     ? allUnits
-                    : allUnits
-                        .where((u) => u.subject == _selectedSubject)
-                        .toList();
+                    : GradeGroups.isGradeSentinel(selected)
+                        ? () {
+                            final grade =
+                                GradeGroups.gradeFromSentinel(selected)!;
+                            final allowed = GradeGroups.subjectsOf(grade);
+                            return allUnits
+                                .where((u) => allowed.contains(u.subject))
+                                .toList();
+                          }()
+                        : allUnits
+                            .where((u) => u.subject == selected)
+                            .toList();
 
                 // Flatten all lessons from all units for the path
                 final allLessons = <LessonModel>[];

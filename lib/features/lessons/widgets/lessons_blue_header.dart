@@ -5,17 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/lesson/unit_model.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/grade_groups.dart';
 import '../../../shared/constants/subject_labels.dart';
-
-/// 과목 → 학년 분류 (2022 개정 교육과정 기준).
-/// 드롭다운에서 학년 헤더 아래에 묶어 표시하기 위함.
-const _gradeGroups = <String, List<String>>{
-  '초등': ['기초수학'],
-  '중등': ['중학수학'],
-  '고1': ['공통수학1', '공통수학2'],
-  '고2': ['수학I', '수학II'],
-  '고3 (선택)': ['확률과통계', '미적분', '기하'],
-};
 
 class LessonsBlueHeader extends StatelessWidget {
   final AsyncValue<List<UnitModel>> curriculumAsync;
@@ -73,8 +64,6 @@ class LessonsBlueHeader extends StatelessWidget {
                         _buildSelectedLabels(available),
                     items: _buildGroupedItems(available),
                     onChanged: (v) {
-                      // 헤더 sentinel ('__grade_*') 은 무시
-                      if (v != null && v.startsWith('__grade_')) return;
                       HapticFeedback.selectionClick();
                       onSubjectChanged(v);
                     },
@@ -106,8 +95,9 @@ class LessonsBlueHeader extends StatelessWidget {
     );
   }
 
-  /// 학년 헤더(선택 불가) + 들여쓰기된 과목 항목 구성.
-  /// 헤더 value 는 '__grade_<학년>' sentinel — onChanged 에서 필터링.
+  /// 학년 헤더 (학년 전체 선택) + 들여쓰기된 과목 항목 구성.
+  /// 헤더 value 는 '__grade_<학년>' sentinel — 선택 시 그 학년 모든 과목
+  /// 으로 필터링 (lessons_screen 에서 분기 처리).
   List<DropdownMenuItem<String?>> _buildGroupedItems(Set<String> available) {
     final items = <DropdownMenuItem<String?>>[
       const DropdownMenuItem<String?>(
@@ -116,25 +106,39 @@ class LessonsBlueHeader extends StatelessWidget {
       ),
     ];
 
-    for (final entry in _gradeGroups.entries) {
+    for (final entry in GradeGroups.map.entries) {
       final visibleSubjects =
           entry.value.where(available.contains).toList();
       if (visibleSubjects.isEmpty) continue;
 
+      // 학년 전체 선택 — 굵게 + 학년 라벨
       items.add(
         DropdownMenuItem<String?>(
-          enabled: false,
-          value: '__grade_${entry.key}',
+          value: GradeGroups.sentinelFor(entry.key),
           child: Padding(
-            padding: const EdgeInsets.only(top: 6, bottom: 2),
-            child: Text(
-              entry.key,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF999999),
-                letterSpacing: 0.5,
-              ),
+            padding: const EdgeInsets.only(top: 4, bottom: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  entry.key,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.skyBlue,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '전체',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.skyBlue.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -145,7 +149,7 @@ class LessonsBlueHeader extends StatelessWidget {
           DropdownMenuItem<String?>(
             value: code,
             child: Padding(
-              padding: const EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.only(left: 14),
               child: Text(SubjectLabels.displayOf(code)),
             ),
           ),
@@ -157,16 +161,17 @@ class LessonsBlueHeader extends StatelessWidget {
   }
 
   /// DropdownButton 의 selected label — 들여쓰기 없이 깔끔하게 표시.
+  /// items 순서와 정확히 일치해야 함 (Flutter assert).
   List<Widget> _buildSelectedLabels(Set<String> available) {
     final labels = <Widget>[
       const Text('전체 과목'),
     ];
-    for (final entry in _gradeGroups.entries) {
+    for (final entry in GradeGroups.map.entries) {
       final visibleSubjects =
           entry.value.where(available.contains).toList();
       if (visibleSubjects.isEmpty) continue;
-      // 헤더 자리에는 빈 위젯 (sentinel 은 onChange 안 됨)
-      labels.add(const SizedBox.shrink());
+      // 학년 sentinel 의 label — '고1 전체' 형태
+      labels.add(Text('${entry.key} 전체'));
       for (final code in visibleSubjects) {
         labels.add(Text(SubjectLabels.displayOf(code)));
       }
