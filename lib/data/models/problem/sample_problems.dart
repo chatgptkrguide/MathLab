@@ -3,6 +3,7 @@
 // Mock problem data for MVP demonstration.
 
 import 'problem_model.dart';
+import 'cm1_problems_extended.dart';
 
 class SampleProblems {
   /// Get sample problems for a lesson
@@ -17,18 +18,82 @@ class SampleProblems {
         return _multiplicationBasics();
 
       // === 공통수학1 ===
+      // Unit 1.1 다항식의 연산
       case 'cm1_1_1_1':
         return _cm1PolynomialOps();
       case 'cm1_1_1_2':
         return _cm1PolynomialDiv();
       case 'cm1_1_1_3':
         return _cm1MultiplicationFormulas();
+      case 'cm1_1_1_4':
+        return Cm1ProblemsExtended.mult4Variation();
+      // Unit 1.2 항등식·나머지정리
       case 'cm1_1_2_1':
         return _cm1Identity();
       case 'cm1_1_2_2':
         return _cm1RemainderTheorem();
+      // Unit 1.3 인수분해
       case 'cm1_1_3_1':
         return _cm1Factorization();
+      case 'cm1_1_3_2':
+        return Cm1ProblemsExtended.factorizationVarious();
+      // Unit 2.1 복소수
+      case 'cm1_2_1_1':
+        return Cm1ProblemsExtended.complexUnit();
+      case 'cm1_2_1_2':
+        return Cm1ProblemsExtended.complexOps();
+      case 'cm1_2_1_3':
+        return Cm1ProblemsExtended.negativeRoot();
+      // Unit 2.2 이차방정식
+      case 'cm1_2_2_1':
+        return Cm1ProblemsExtended.quadraticDiscriminant();
+      case 'cm1_2_2_2':
+        return Cm1ProblemsExtended.quadraticRootCoeff();
+      // Unit 2.3 이차함수
+      case 'cm1_2_3_1':
+        return Cm1ProblemsExtended.quadFunctionRelation();
+      case 'cm1_2_3_2':
+        return Cm1ProblemsExtended.quadMinMax();
+      // Unit 2.4 고차방정식
+      case 'cm1_2_4_1':
+        return Cm1ProblemsExtended.higherDegreeEqn();
+      case 'cm1_2_4_2':
+        return Cm1ProblemsExtended.cubicRootCoeff();
+      case 'cm1_2_4_3':
+        return Cm1ProblemsExtended.omegaProperties();
+      // Unit 2.5 연립방정식
+      case 'cm1_2_5_1':
+        return Cm1ProblemsExtended.simultaneousQuad();
+      case 'cm1_2_5_2':
+        return Cm1ProblemsExtended.indeterminateEqn();
+      // Unit 2.6 부등식
+      case 'cm1_2_6_1':
+        return Cm1ProblemsExtended.linearInequality();
+      case 'cm1_2_6_2':
+        return Cm1ProblemsExtended.simulLinearIneq();
+      case 'cm1_2_6_3':
+        return Cm1ProblemsExtended.absLinearIneq();
+      // Unit 2.7 이차부등식
+      case 'cm1_2_7_1':
+        return Cm1ProblemsExtended.quadInequality();
+      case 'cm1_2_7_2':
+        return Cm1ProblemsExtended.simulQuadIneq();
+      case 'cm1_2_7_3':
+        return Cm1ProblemsExtended.realRootCondition();
+      // Unit 3.1 경우의 수
+      case 'cm1_3_1_1':
+        return Cm1ProblemsExtended.countingBasics();
+      case 'cm1_3_1_2':
+        return Cm1ProblemsExtended.permutation();
+      case 'cm1_3_1_3':
+        return Cm1ProblemsExtended.combination();
+      // Unit 4.1 행렬
+      case 'cm1_4_1_1':
+        return Cm1ProblemsExtended.matrixBasics();
+      case 'cm1_4_1_2':
+        return Cm1ProblemsExtended.matrixOps();
+      case 'cm1_4_1_3':
+        return Cm1ProblemsExtended.matrixMultiply();
 
       // === 공통수학2 ===
       case 'lesson_set_1':
