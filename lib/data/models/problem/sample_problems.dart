@@ -4,6 +4,7 @@
 
 import 'problem_model.dart';
 import 'cm1_problems_extended.dart';
+import 'all_subjects_problems.dart';
 
 class SampleProblems {
   /// Get sample problems for a lesson
@@ -94,6 +95,236 @@ class SampleProblems {
         return Cm1ProblemsExtended.matrixOps();
       case 'cm1_4_1_3':
         return Cm1ProblemsExtended.matrixMultiply();
+
+      // === 초등 기초수학 ===
+      case 'bm_div_1':
+        return AllSubjectsProblems.bmDiv1();
+      case 'bm_frac_1':
+        return AllSubjectsProblems.bmFrac1();
+      case 'bm_frac_2':
+        return AllSubjectsProblems.bmFrac2();
+      case 'bm_dec_1':
+        return AllSubjectsProblems.bmDec1();
+
+      // === 중학수학 ===
+      case 'ms_int_1':
+        return AllSubjectsProblems.msInt1();
+      case 'ms_int_2':
+        return AllSubjectsProblems.msInt2();
+      case 'ms_linear_1':
+        return AllSubjectsProblems.msLinear1();
+      case 'ms_linear_2':
+        return AllSubjectsProblems.msLinear2();
+      case 'ms_func_1':
+        return AllSubjectsProblems.msFunc1();
+      case 'ms_func_2':
+        return AllSubjectsProblems.msFunc2();
+
+      // === 공통수학2 추가 ===
+      case 'lesson_set_5':
+        return AllSubjectsProblems.lessonSet5();
+      case 'lesson_set_6':
+        return AllSubjectsProblems.lessonSet6();
+      case 'lesson_func_1':
+        return AllSubjectsProblems.lessonFunc1();
+      case 'lesson_func_2':
+        return AllSubjectsProblems.lessonFunc2();
+      case 'lesson_func_3':
+        return AllSubjectsProblems.lessonFunc3();
+      case 'lesson_func_4':
+        return AllSubjectsProblems.lessonFunc4();
+      case 'lesson_func_5':
+        return AllSubjectsProblems.lessonFunc5();
+      case 'lesson_func_6':
+        return AllSubjectsProblems.lessonFunc6();
+      case 'lesson_geo_1':
+        return AllSubjectsProblems.lessonGeo1();
+      case 'lesson_geo_2':
+        return AllSubjectsProblems.lessonGeo2();
+      case 'lesson_geo_3':
+        return AllSubjectsProblems.lessonGeo3();
+      case 'lesson_geo_4':
+        return AllSubjectsProblems.lessonGeo4();
+      case 'lesson_geo_5':
+        return AllSubjectsProblems.lessonGeo5();
+      case 'lesson_geo_6':
+        return AllSubjectsProblems.lessonGeo6();
+      case 'lesson_geo_7':
+        return AllSubjectsProblems.lessonGeo7();
+
+      // === 수학I 추가 ===
+      case 'lesson_exp_3':
+        return AllSubjectsProblems.lessonExp3();
+      case 'lesson_exp_5':
+        return AllSubjectsProblems.lessonExp5();
+      case 'lesson_exp_6':
+        return AllSubjectsProblems.lessonExp6();
+      case 'lesson_exp_7':
+        return AllSubjectsProblems.lessonExp7();
+      case 'lesson_trig_1':
+        return AllSubjectsProblems.lessonTrig1();
+      case 'lesson_trig_2':
+        return AllSubjectsProblems.lessonTrig2();
+      case 'lesson_trig_3':
+        return AllSubjectsProblems.lessonTrig3();
+      case 'lesson_trig_4':
+        return AllSubjectsProblems.lessonTrig4();
+      case 'lesson_trig_5':
+        return AllSubjectsProblems.lessonTrig5();
+      case 'lesson_trig_6':
+        return AllSubjectsProblems.lessonTrig6();
+      case 'lesson_seq_1':
+        return AllSubjectsProblems.lessonSeq1();
+      case 'lesson_seq_2':
+        return AllSubjectsProblems.lessonSeq2();
+      case 'lesson_seq_3':
+        return AllSubjectsProblems.lessonSeq3();
+      case 'lesson_seq_4':
+        return AllSubjectsProblems.lessonSeq4();
+      case 'lesson_seq_5':
+        return AllSubjectsProblems.lessonSeq5();
+      case 'lesson_seq_6':
+        return AllSubjectsProblems.lessonSeq6();
+      case 'lesson_seq_7':
+        return AllSubjectsProblems.lessonSeq7();
+
+      // === 수학II ===
+      case 'lesson_lim_1':
+        return AllSubjectsProblems.lessonLim1();
+      case 'lesson_lim_2':
+        return AllSubjectsProblems.lessonLim2();
+      case 'lesson_lim_3':
+        return AllSubjectsProblems.lessonLim3();
+      case 'lesson_lim_4':
+        return AllSubjectsProblems.lessonLim4();
+      case 'lesson_lim_5':
+        return AllSubjectsProblems.lessonLim5();
+      case 'lesson_diff_1':
+        return AllSubjectsProblems.lessonDiff1();
+      case 'lesson_diff_2':
+        return AllSubjectsProblems.lessonDiff2();
+      case 'lesson_diff_3':
+        return AllSubjectsProblems.lessonDiff3();
+      case 'lesson_diff_4':
+        return AllSubjectsProblems.lessonDiff4();
+      case 'lesson_diff_5':
+        return AllSubjectsProblems.lessonDiff5();
+      case 'lesson_diff_6':
+        return AllSubjectsProblems.lessonDiff6();
+      case 'lesson_diff_7':
+        return AllSubjectsProblems.lessonDiff7();
+      case 'lesson_integ_1':
+        return AllSubjectsProblems.lessonInteg1();
+      case 'lesson_integ_2':
+        return AllSubjectsProblems.lessonInteg2();
+      case 'lesson_integ_3':
+        return AllSubjectsProblems.lessonInteg3();
+      case 'lesson_integ_4':
+        return AllSubjectsProblems.lessonInteg4();
+      case 'lesson_integ_5':
+        return AllSubjectsProblems.lessonInteg5();
+      case 'lesson_integ_6':
+        return AllSubjectsProblems.lessonInteg6();
+
+      // === 확률과 통계 ===
+      case 'lesson_perm_1':
+        return AllSubjectsProblems.lessonPerm1();
+      case 'lesson_perm_2':
+        return AllSubjectsProblems.lessonPerm2();
+      case 'lesson_perm_3':
+        return AllSubjectsProblems.lessonPerm3();
+      case 'lesson_perm_4':
+        return AllSubjectsProblems.lessonPerm4();
+      case 'lesson_perm_5':
+        return AllSubjectsProblems.lessonPerm5();
+      case 'lesson_prob_1':
+        return AllSubjectsProblems.lessonProb1();
+      case 'lesson_prob_2':
+        return AllSubjectsProblems.lessonProb2();
+      case 'lesson_prob_3':
+        return AllSubjectsProblems.lessonProb3();
+      case 'lesson_prob_4':
+        return AllSubjectsProblems.lessonProb4();
+      case 'lesson_prob_5':
+        return AllSubjectsProblems.lessonProb5();
+      case 'lesson_stat_1':
+        return AllSubjectsProblems.lessonStat1();
+      case 'lesson_stat_2':
+        return AllSubjectsProblems.lessonStat2();
+      case 'lesson_stat_3':
+        return AllSubjectsProblems.lessonStat3();
+      case 'lesson_stat_4':
+        return AllSubjectsProblems.lessonStat4();
+      case 'lesson_stat_5':
+        return AllSubjectsProblems.lessonStat5();
+      case 'lesson_stat_6':
+        return AllSubjectsProblems.lessonStat6();
+
+      // === 미적분 ===
+      case 'lesson_seqlim_1':
+        return AllSubjectsProblems.lessonSeqlim1();
+      case 'lesson_seqlim_2':
+        return AllSubjectsProblems.lessonSeqlim2();
+      case 'lesson_seqlim_3':
+        return AllSubjectsProblems.lessonSeqlim3();
+      case 'lesson_seqlim_4':
+        return AllSubjectsProblems.lessonSeqlim4();
+      case 'lesson_seqlim_5':
+        return AllSubjectsProblems.lessonSeqlim5();
+      case 'lesson_adiff_1':
+        return AllSubjectsProblems.lessonAdiff1();
+      case 'lesson_adiff_2':
+        return AllSubjectsProblems.lessonAdiff2();
+      case 'lesson_adiff_3':
+        return AllSubjectsProblems.lessonAdiff3();
+      case 'lesson_adiff_4':
+        return AllSubjectsProblems.lessonAdiff4();
+      case 'lesson_adiff_5':
+        return AllSubjectsProblems.lessonAdiff5();
+      case 'lesson_adiff_6':
+        return AllSubjectsProblems.lessonAdiff6();
+      case 'lesson_ainteg_1':
+        return AllSubjectsProblems.lessonAinteg1();
+      case 'lesson_ainteg_2':
+        return AllSubjectsProblems.lessonAinteg2();
+      case 'lesson_ainteg_3':
+        return AllSubjectsProblems.lessonAinteg3();
+      case 'lesson_ainteg_4':
+        return AllSubjectsProblems.lessonAinteg4();
+      case 'lesson_ainteg_5':
+        return AllSubjectsProblems.lessonAinteg5();
+
+      // === 기하 ===
+      case 'lesson_conic_1':
+        return AllSubjectsProblems.lessonConic1();
+      case 'lesson_conic_2':
+        return AllSubjectsProblems.lessonConic2();
+      case 'lesson_conic_3':
+        return AllSubjectsProblems.lessonConic3();
+      case 'lesson_conic_4':
+        return AllSubjectsProblems.lessonConic4();
+      case 'lesson_conic_5':
+        return AllSubjectsProblems.lessonConic5();
+      case 'lesson_vec_1':
+        return AllSubjectsProblems.lessonVec1();
+      case 'lesson_vec_2':
+        return AllSubjectsProblems.lessonVec2();
+      case 'lesson_vec_3':
+        return AllSubjectsProblems.lessonVec3();
+      case 'lesson_vec_4':
+        return AllSubjectsProblems.lessonVec4();
+      case 'lesson_vec_5':
+        return AllSubjectsProblems.lessonVec5();
+      case 'lesson_space_1':
+        return AllSubjectsProblems.lessonSpace1();
+      case 'lesson_space_2':
+        return AllSubjectsProblems.lessonSpace2();
+      case 'lesson_space_3':
+        return AllSubjectsProblems.lessonSpace3();
+      case 'lesson_space_4':
+        return AllSubjectsProblems.lessonSpace4();
+      case 'lesson_space_5':
+        return AllSubjectsProblems.lessonSpace5();
 
       // === 공통수학2 ===
       case 'lesson_set_1':
