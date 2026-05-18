@@ -108,7 +108,11 @@ platform :ios do
   desc "Deploy to App Store (submit for review)"
   lane :deploy_app_store do
     ensure_api_key
-    sh(shorebird_cmd("release ios"))
+    # --export-options-plist 미지정 시 Xcode 가 pbxproj 의 AdHoc profile 을
+    # 그대로 사용 → "iOS App Store profile 이 아니다" 에러로 IPA 생성 실패.
+    # 그 상태에서 deliver 가 build/ios/ipa/ 에 남아 있던 이전 AdHoc IPA 를
+    # 잘못 업로드해 App Store Connect 에서 무효 처리되는 버그가 있었음.
+    sh(shorebird_cmd("release ios -- --export-options-plist=ios/exportOptions-appstore.plist"))
 
     deliver(
       ipa: latest_ipa,
