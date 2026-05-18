@@ -1,15 +1,38 @@
 name: Flutter CI
 
+# main / develop 으로 push 또는 PR 될 때 코드 분석만 수행.
+# 문서나 fastlane 설정만 바뀌었을 때는 트리거 안 되도록 paths 좁힘.
+
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'analysis_options.yaml'
+      - '.github/workflows/flutter_ci.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'analysis_options.yaml'
+      - '.github/workflows/flutter_ci.yml'
+
+# 같은 ref 의 in-flight 분석은 새 push 가 오면 취소.
+concurrency:
+  group: flutter-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   analyze:
     name: Code Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -20,9 +43,19 @@ jobs:
           channel: 'stable'
           cache: true
 
-      # pubspec.yaml에서 .env를 asset으로 등록 → CI 환경엔 .env 없어서
-      # asset_does_not_exist warning이 1건 발생, --no-fatal-warnings 미지정 시 fail.
-      # 시크릿이 들어가면 안 되니 빈 더미 파일로 통과.
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      # pubspec.yaml 에서 .env를 asset으로 등록 → CI 환경엔 .env 없어서
+      # asset_does_not_exist warning이 1건 발생. 시크릿이 들어가면 안 되니
+      # 빈 더미 파일로 통과.
       - name: Create dummy .env for asset resolution
         run: touch .env
 
