@@ -53,6 +53,9 @@ class _ProblemCompletionScreenState
     // (병렬 실행 시 둘 다 원본 state 를 동시에 읽고 각자 copyWith → 나중에 끝나는
     // 쪽이 먼저 끝난 쪽의 변경을 덮어써 XP 가 사라지는 race condition 발생.)
     try {
+      // eagerError: 한쪽이 실패하면 즉시 catch 로 가서 사용자에게 재시도 SnackBar 노출.
+      // 기본값(false) 이면 양쪽이 끝날 때까지 기다린 뒤 첫 에러만 던지므로,
+      // 일부 데이터만 저장된 상태에서 "성공" 처럼 보이는 회색지대가 생긴다.
       await Future.wait([
         ref.read(lessonProgressProvider(user.uid).notifier).completeLesson(
               lessonId: widget.lessonId,
@@ -64,7 +67,7 @@ class _ProblemCompletionScreenState
           await ref.read(userProvider.notifier).addXp(widget.session.score);
           await ref.read(userProvider.notifier).updateStreak();
         }(),
-      ]);
+      ], eagerError: true);
     } catch (e, st) {
       AppLogger.error(
         '레슨 완료 영속화 실패',

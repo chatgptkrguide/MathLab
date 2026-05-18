@@ -201,8 +201,13 @@ extension UserProgress on User {
         updatedAt: now,
       );
 
-      // Update user document
-      await _firestore.collection('users').doc(uid).update({
+      // 모든 mutation 을 단일 batch 로 묶어 원자성 보장.
+      // user document update 와 하위 컬렉션 삭제가 부분 성공하면
+      // XP/level 만 리셋되고 lessonProgress 는 남는 회색지대가 발생한다.
+      final userDocRef = _firestore.collection('users').doc(uid);
+      final batch = _firestore.batch();
+
+      batch.update(userDocRef, {
         'xp': 0,
         'totalXp': 0,
         'level': 1,
@@ -216,35 +221,15 @@ extension UserProgress on User {
         'updatedAt': Timestamp.fromDate(now),
       });
 
-      // Delete all lesson progress
-      final lessonProgressRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('lessonProgress');
-      final lessonProgressDocs = await lessonProgressRef.get();
-      final batch = _firestore.batch();
-      for (final doc in lessonProgressDocs.docs) {
-        batch.delete(doc.reference);
-      }
-
-      // Delete all wrong answers
-      final wrongAnswersRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('wrongAnswers');
-      final wrongAnswersDocs = await wrongAnswersRef.get();
-      for (final doc in wrongAnswersDocs.docs) {
-        batch.delete(doc.reference);
-      }
-
-      // Delete all achievements
-      final achievementsRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('achievements');
-      final achievementsDocs = await achievementsRef.get();
-      for (final doc in achievementsDocs.docs) {
-        batch.delete(doc.reference);
+      // 하위 컬렉션 3개를 모두 같은 batch 에 추가.
+      // 주의: Firestore batch 는 최대 500 operation. 사용자별 진행/오답이
+      // 그보다 많아질 가능성이 있으면 chunk 단위 commit 으로 분리 필요.
+      final subCollections = ['lessonProgress', 'wrongAnswers', 'achievements'];
+      for (final name in subCollections) {
+        final snapshot = await userDocRef.collection(name).get();
+        for (final doc in snapshot.docs) {
+          batch.delete(doc.reference);
+        }
       }
 
       await batch.commit();

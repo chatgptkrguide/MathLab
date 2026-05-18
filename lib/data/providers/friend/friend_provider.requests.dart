@@ -28,8 +28,10 @@ extension FriendRequests on FriendNotifier {
           try {
             final userDoc =
                 await _firestore.collection('users').doc(fromUserId).get();
-            if (userDoc.exists) {
-              final userData = userDoc.data()!;
+            // exists 와 data() 사이의 race (동시 삭제 등) 로 data() 가 null 일 수 있어
+            // ! 대신 null-safe 접근으로 변경.
+            final userData = userDoc.data();
+            if (userData != null) {
               fromUserName = userData['displayName'] as String? ?? '';
               fromUserAvatar = userData['avatarUrl'] as String?;
             }

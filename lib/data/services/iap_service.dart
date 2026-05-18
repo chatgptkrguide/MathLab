@@ -11,6 +11,7 @@
 
 import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import '../../core/config/env_config.dart';
 import '../../core/utils/app_logger.dart';
 import '../models/subscription/premium_tier.dart';
 
@@ -244,9 +245,20 @@ class IapService {
     final verifier = receiptVerifier;
 
     if (verifier == null) {
+      // 프로덕션에서 verifier 가 주입되지 않은 상태로 도달했다면 결제 우회 위험.
+      // 클라이언트 영수증을 신뢰하지 않고 즉시 실패 처리한다.
+      if (EnvConfig.isProduction) {
+        AppLogger.error(
+          'IapReceiptVerifier not injected in production — refusing purchase.',
+          tag: 'IAP',
+          data: {'productId': purchase.productID},
+        );
+        onPurchaseResult?.call(
+            false, purchase.productID, '결제 검증 서버가 설정되지 않았습니다');
+        return;
+      }
       AppLogger.warning(
-        'Server receipt verification not configured — trusting client receipt. '
-        'Inject IapReceiptVerifier before production release.',
+        'Dev only: trusting client receipt (no verifier injected).',
         tag: 'IAP',
         data: {'productId': purchase.productID},
       );
