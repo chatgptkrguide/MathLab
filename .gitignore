@@ -235,3 +235,6 @@ fixtures/*.prod.*
 */fastlane/test_output
 vendor/bundle/
 Gemfile.lock
+
+# Playwright MCP temp snapshots
+.playwright-mcp/

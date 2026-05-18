@@ -48,8 +48,10 @@ class _ProblemCompletionScreenState
     final user = ref.read(userProvider);
     if (user == null) return;
 
-    // 3개 호출을 병렬로 실행 → Firestore RTT 3회 → 1회로 단축.
-    // 서로 의존성 없음 (lessonProgress / users 문서 / studyDates 분리).
+    // lessonProgress 는 별개 provider 라 병렬 OK. 단, addXp + updateStreak 는
+    // 같은 userProvider state 를 mutate 하므로 직렬로 실행해야 한다.
+    // (병렬 실행 시 둘 다 원본 state 를 동시에 읽고 각자 copyWith → 나중에 끝나는
+    // 쪽이 먼저 끝난 쪽의 변경을 덮어써 XP 가 사라지는 race condition 발생.)
     try {
       await Future.wait([
         ref.read(lessonProgressProvider(user.uid).notifier).completeLesson(
@@ -58,8 +60,10 @@ class _ProblemCompletionScreenState
               totalQuestions: widget.session.problems.length,
               xpEarned: widget.session.score,
             ),
-        ref.read(userProvider.notifier).addXp(widget.session.score),
-        ref.read(userProvider.notifier).updateStreak(),
+        () async {
+          await ref.read(userProvider.notifier).addXp(widget.session.score);
+          await ref.read(userProvider.notifier).updateStreak();
+        }(),
       ]);
     } catch (e, st) {
       AppLogger.error(

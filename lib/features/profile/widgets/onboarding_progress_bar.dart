@@ -18,7 +18,7 @@ class OnboardingProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (currentPage + 1) / totalPages;
+    final progress = totalPages > 1 ? currentPage / (totalPages - 1) : 0.0;
 
     return SafeArea(
       child: Container(
@@ -81,26 +81,32 @@ class OnboardingProgressBar extends StatelessWidget {
                             borderRadius: BorderRadius.circular(AppDimensions.radius12),
                           ),
                         ),
-                        // 진행률 (듀오링고 녹색 그라디언트)
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: (MediaQuery.of(context).size.width - 120) *
-                              progress,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                AppColors.mathGreenLight, // 밝은 녹색
-                                AppColors.mathGreen, // 듀오링고 녹색
+                        // 진행률 (듀오링고 녹색 그라디언트) — 단계 전환 시 부드럽게 채워짐
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0.0, end: progress),
+                          duration: const Duration(milliseconds: 650),
+                          curve: Curves.easeOutCubic,
+                          builder: (context, value, _) => Container(
+                            width: (MediaQuery.of(context).size.width - 120) *
+                                value,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.mathGreenLight,
+                                  AppColors.mathGreen,
+                                ],
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(AppDimensions.radius12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      AppColors.mathGreen.withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(AppDimensions.radius12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.mathGreen.withValues(alpha: 0.4),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
                         ),
                       ],
@@ -116,11 +122,16 @@ class OnboardingProgressBar extends StatelessWidget {
                     color: AppColors.mathBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppDimensions.radius12),
                   ),
-                  child: Text(
-                    '${(progress * 100).toInt()}%',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.mathBlue,
-                      fontWeight: FontWeight.bold,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: progress),
+                    duration: const Duration(milliseconds: 650),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, _) => Text(
+                      '${(value * 100).toInt()}%',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.mathBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

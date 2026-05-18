@@ -1,12 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/config/env_config.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/app_durations.dart';
-import 'email_login_screen.dart';
 import 'logic/auth_handler.dart';
-import '../onboarding/demo_lesson_screen.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -18,7 +15,6 @@ class AuthScreen extends ConsumerStatefulWidget {
 class _AuthScreenState extends ConsumerState<AuthScreen>
     with SingleTickerProviderStateMixin {
   bool _isLoading = false;
-  bool _showMoreLogin = false;
   late AnimationController _animationController;
   late Animation<double> _fadeIn;
 
@@ -60,28 +56,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     setState(() => _isLoading = true);
     await AuthHandler.handleAppleLogin(context: context, ref: ref, mounted: mounted);
     if (mounted) setState(() => _isLoading = false);
-  }
-
-  Future<void> _handleKakaoLogin() async {
-    if (_isLoading) return;
-    setState(() => _isLoading = true);
-    await AuthHandler.handleKakaoLogin(context: context, ref: ref, mounted: mounted);
-    if (mounted) setState(() => _isLoading = false);
-  }
-
-  /// KAKAO_NATIVE_APP_KEY가 비어있으면 SDK 미초기화 → 버튼 자체를 숨긴다.
-  bool get _kakaoEnabled {
-    try {
-      return EnvConfig.kakaoNativeAppKey.isNotEmpty;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<void> _handleEmailLogin() async {
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => const EmailLoginScreen()),
-    );
   }
 
   @override
@@ -225,57 +199,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         ),
                       ],
 
-                      // 더 보기 / 숨은 로그인 수단
-                      if (!_showMoreLogin) ...[
-                        const SizedBox(height: 12),
-                        GestureDetector(
-                          onTap: () => setState(() => _showMoreLogin = true),
-                          child: Text('다른 방법으로 로그인',
-                            style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.3))),
-                        ),
-                      ] else ...[
-                        // Kakao — 브랜드 칩 (3순위, 작은 높이)
-                        if (_kakaoEnabled) ...[
-                          const SizedBox(height: 10),
-                          SizedBox(width: double.infinity, height: 40,
-                            child: ElevatedButton(onPressed: _handleKakaoLogin,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.kakaoYellow,
-                                foregroundColor: AppColors.kakaoBrown,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                Icon(Icons.chat_bubble_rounded, size: 15, color: AppColors.kakaoBrown),
-                                const SizedBox(width: 6),
-                                Text('Kakao로 계속하기',
-                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.kakaoBrown)),
-                              ]))),
-                        ],
-                        // 이메일 — 텍스트 링크 (4순위, 가장 낮은 시각적 무게)
-                        const SizedBox(height: 12),
-                        GestureDetector(
-                          onTap: _handleEmailLogin,
-                          child: Text('이메일로 계속하기',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withValues(alpha: 0.55),
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.white.withValues(alpha: 0.3),
-                            )),
-                        ),
-                      ],
-
-                      const SizedBox(height: 14),
-
-                      // 먼저 체험해보기 — opacity 0.25 → 0.55 (핵심 전환 경로)
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const DemoLessonScreen())),
-                        child: Text('먼저 체험해보기',
-                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.55),
-                            decoration: TextDecoration.underline, decorationColor: Colors.white.withValues(alpha: 0.35))),
-                      ),
                       const SizedBox(height: 4),
                     ],
                   ),

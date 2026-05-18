@@ -7,45 +7,46 @@
 part of 'user_provider.dart';
 
 extension UserProgress on User {
-  /// Add XP to user
+  /// Add XP to user (optimistic: state 먼저 갱신 → UI 즉시 반영 → Firestore write)
   Future<void> addXp(int amount) async {
     if (state == null) return;
     if (amount <= 0 || amount > 200) return; // Firestore rules: max +200
 
+    AppLogger.info('Adding XP', tag: 'User', data: {'amount': amount});
+
+    int newXp = state!.xp + amount;
+    int newTotalXp = state!.totalXp + amount;
+    int newLevel = state!.level;
+
+    // Level up loop — 충분히 큰 보상으로 한 번에 여러 레벨도 오를 수 있도록.
+    while (true) {
+      final neededForLevel = (100 * (1.5 * newLevel)).round();
+      if (newXp < neededForLevel) break;
+      newXp -= neededForLevel;
+      newLevel++;
+      AppLogger.info('Level up!', tag: 'User', data: {'newLevel': newLevel});
+    }
+
+    final now = DateTime.now();
+    final updatedUser = state!.copyWith(
+      xp: newXp,
+      totalXp: newTotalXp,
+      level: newLevel,
+      updatedAt: now,
+    );
+
+    // 옵티미스틱: state 먼저 → UI 즉시 반영. Firestore write 실패해도 세션 내 XP 는 보임.
+    state = updatedUser;
+
     try {
-      AppLogger.info('Adding XP', tag: 'User', data: {'amount': amount});
-
-      int newXp = state!.xp + amount;
-      int newTotalXp = state!.totalXp + amount;
-      int newLevel = state!.level;
-
-      // Check for level up
-      while (newXp >= state!.xpNeededForNextLevel) {
-        newXp -= state!.xpNeededForNextLevel;
-        newLevel++;
-        AppLogger.info('Level up!', tag: 'User', data: {'newLevel': newLevel});
-      }
-
-      final updatedUser = state!.copyWith(
-        xp: newXp,
-        totalXp: newTotalXp,
-        level: newLevel,
-        updatedAt: DateTime.now(),
-      );
-
-      await _firestore
-          .collection('users')
-          .doc(state!.uid)
-          .update({
+      await _firestore.collection('users').doc(updatedUser.uid).update({
         'xp': newXp,
         'totalXp': newTotalXp,
         'level': newLevel,
-        'updatedAt': Timestamp.fromDate(updatedUser.updatedAt),
+        'updatedAt': Timestamp.fromDate(now),
       });
-
-      state = updatedUser;
     } catch (e, st) {
-      AppLogger.error('Failed to add XP', tag: 'User', error: e, stackTrace: st);
+      AppLogger.error('Failed to persist XP', tag: 'User', error: e, stackTrace: st);
     }
   }
 
