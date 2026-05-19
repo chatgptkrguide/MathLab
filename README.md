@@ -60,6 +60,8 @@
 
 ## 📱 개발 환경 설정
 
+> 👥 **공동 개발자라면 먼저 [ONBOARDING.md](ONBOARDING.md)를 보세요.** 시크릿 파일 받기, 첫 빌드, 배포 권한까지 한 번에 안내합니다.
+
 ### 요구사항
 - Flutter SDK 3.24.0 이상
 - Dart SDK 3.5.0 이상
@@ -80,7 +82,10 @@ flutter pub get
 cp .env.example .env
 # .env 파일에서 실제 값으로 교체
 
-# 4. 앱 실행
+# 4. 셋업 검증 (선택)
+./scripts/verify_setup.sh
+
+# 5. 앱 실행
 flutter run
 ```
 
