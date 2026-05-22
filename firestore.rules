@@ -113,6 +113,30 @@ service cloud.firestore {
       match /fcmTokens/{tokenId} {
         allow read, write: if isOwner(userId);
       }
+
+      // User's friend list (sub-collection of users/{uid}/friends)
+      // friend_provider.dart 가 _userFriendsRef = users/{uid}/friends 로 접근.
+      // 본인 친구 목록은 본인이 관리.
+      match /friends/{friendId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // User's blocked users (sub-collection)
+      match /blocked/{blockedUserId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // User's daily challenge progress (sub-collection, per date)
+      match /daily_challenge_progress/{dateKey} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) &&
+                       (!('currentValue' in request.resource.data) ||
+                         (request.resource.data.currentValue is int &&
+                          request.resource.data.currentValue >= 0 &&
+                          request.resource.data.currentValue <= 1000)) &&
+                       (!('completed' in request.resource.data) ||
+                         request.resource.data.completed is bool);
+      }
     }
 
     // Problems Collection (Read for authenticated, Write for admin)
@@ -289,6 +313,70 @@ service cloud.firestore {
                       resource.data.toUserId == request.auth.uid &&
                       resource.data.status == 'pending';
 
+      allow delete: if isSignedIn() &&
+                      (resource.data.fromUserId == request.auth.uid ||
+                       resource.data.toUserId == request.auth.uid);
+    }
+
+    // Activities Collection (친구 활동 피드 — top-level)
+    // friend_provider.activities.dart 가 where('userId', whereIn: chunk) 로 조회.
+    match /activities/{activityId} {
+      // Read: 인증된 사용자 (친구 활동 조회용)
+      allow read: if isSignedIn();
+
+      // Create: 본인이 자기 활동만 기록
+      allow create: if isSignedIn() &&
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.timestamp is timestamp;
+
+      // Update/Delete: 본인 활동만
+      allow update, delete: if isSignedIn() &&
+                              resource.data.userId == request.auth.uid;
+    }
+
+    // Daily Challenges Collection (오늘의 글로벌 챌린지 정의)
+    // daily_challenge_provider.dart 가 첫 사용자 호출 시 _todayKey 로 생성.
+    match /daily_challenges/{dateKey} {
+      allow read: if isSignedIn();
+
+      // Create: 인증된 사용자가 첫 호출 시 생성 가능 + 필드 무결성 검증
+      // (race condition 발생해도 같은 데이터로 덮어씌워지므로 무해)
+      allow create: if isSignedIn() &&
+                      request.resource.data.challengeType is string &&
+                      request.resource.data.targetValue is int &&
+                      request.resource.data.targetValue >= 1 &&
+                      request.resource.data.targetValue <= 100 &&
+                      request.resource.data.rewardXp is int &&
+                      request.resource.data.rewardXp >= 1 &&
+                      request.resource.data.rewardXp <= 1000 &&
+                      request.resource.data.description is string;
+
+      // Update/Delete: 백엔드만 (사용자가 챌린지 정의 임의 변경 차단)
+      allow update, delete: if false;
+    }
+
+    // Friend Requests Collection (친구 요청 — top-level)
+    // friend_provider.dart 의 _friendRequestsRef = collection('friend_requests').
+    match /friend_requests/{requestId} {
+      // Read: 보낸 사람 또는 받은 사람
+      allow read: if isSignedIn() &&
+                    (resource.data.fromUserId == request.auth.uid ||
+                     resource.data.toUserId == request.auth.uid);
+
+      // Create: 본인이 자기 ID로 보내는 pending 요청만
+      allow create: if isSignedIn() &&
+                      request.resource.data.fromUserId == request.auth.uid &&
+                      request.resource.data.toUserId != request.auth.uid &&
+                      request.resource.data.status == 'pending';
+
+      // Update: 받은 사람이 pending → accepted/rejected 로만 변경
+      allow update: if isSignedIn() &&
+                      resource.data.toUserId == request.auth.uid &&
+                      resource.data.status == 'pending' &&
+                      (request.resource.data.status == 'accepted' ||
+                       request.resource.data.status == 'rejected');
+
+      // Delete: 보낸 사람 또는 받은 사람
       allow delete: if isSignedIn() &&
                       (resource.data.fromUserId == request.auth.uid ||
                        resource.data.toUserId == request.auth.uid);
