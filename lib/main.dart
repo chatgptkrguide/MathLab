@@ -4,10 +4,12 @@
 
 import 'dart:async';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -61,6 +63,27 @@ void main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       AppLogger.info('Firebase initialized successfully', tag: 'App');
+
+      // Activate App Check before any Firebase service call.
+      // Debug builds: debug provider (token must be registered in Firebase console).
+      // Release builds: Play Integrity (Android) / DeviceCheck (iOS).
+      try {
+        await FirebaseAppCheck.instance.activate(
+          androidProvider: kReleaseMode
+              ? AndroidProvider.playIntegrity
+              : AndroidProvider.debug,
+          appleProvider: kReleaseMode
+              ? AppleProvider.deviceCheck
+              : AppleProvider.debug,
+        );
+        AppLogger.info('App Check activated', tag: 'App');
+      } catch (e) {
+        AppLogger.warning(
+          'App Check activation failed (non-critical, enforcement is monitor-only)',
+          tag: 'App',
+          error: e,
+        );
+      }
 
       // Register FCM background message handler
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
