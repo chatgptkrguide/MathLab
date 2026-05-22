@@ -27,6 +27,11 @@ jobs:
     name: Distribute Android
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # Production environment gates secret access behind owner approval.
+    # collaborator 가 workflow_dispatch 실행 시 본인 승인 필요.
+    environment: production
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4

@@ -14,7 +14,7 @@
 ### iOS (4개)
 - [ ] `ios/Runner/GoogleService-Info.plist` — Firebase iOS 설정
 - [ ] `ios/Flutter/KakaoSecrets.xcconfig` — iOS Kakao 키
-- [ ] iOS 배포 인증서 `.p12` + 비밀번호 (`~/Documents/인증서.p12`)
+- [ ] iOS 배포 인증서 `.p12` + 비밀번호 (위치는 별도 채널로 전달)
 - [ ] iOS 프로비저닝 프로파일 `.mobileprovision`
 
 ### 배포 자동화 (2개)

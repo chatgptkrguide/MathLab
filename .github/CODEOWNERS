@@ -1,0 +1,53 @@
+# Code Owners
+#
+# main 브랜치 보호의 "require code owner reviews" 와 함께 동작.
+# 아래 경로의 파일이 변경된 PR 은 반드시 @chatgptkrguide 의 승인이 필요.
+#
+# 문법: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners
+
+# CI/CD 및 자동화 — 시크릿/배포에 직접 영향
+/.github/                                @chatgptkrguide
+/.github/workflows/                      @chatgptkrguide
+/.github/CODEOWNERS                      @chatgptkrguide
+
+# Firebase 보안 규칙 / 설정
+/firestore.rules                         @chatgptkrguide
+/storage.rules                           @chatgptkrguide
+/firestore.indexes.json                  @chatgptkrguide
+/firebase.json                           @chatgptkrguide
+/.firebaserc                             @chatgptkrguide
+/lib/firebase_options.dart               @chatgptkrguide
+
+# Firebase Functions (서버 측 권한 보유)
+/functions/                              @chatgptkrguide
+
+# 배포 자동화 / Fastlane
+/fastlane/                               @chatgptkrguide
+/android/fastlane/                       @chatgptkrguide
+/ios/fastlane/                           @chatgptkrguide
+/scripts/                                @chatgptkrguide
+
+# 시크릿 핸드오버 / 환경변수 템플릿
+/SECRETS_HANDOVER.md                     @chatgptkrguide
+/.env.example                            @chatgptkrguide
+/.env.production.example                 @chatgptkrguide
+/.env.template                           @chatgptkrguide
+
+# Android 빌드/서명 관련
+/android/app/build.gradle                @chatgptkrguide
+/android/app/build.gradle.kts            @chatgptkrguide
+/android/build.gradle                    @chatgptkrguide
+/android/build.gradle.kts                @chatgptkrguide
+/android/key.properties.example          @chatgptkrguide
+
+# iOS 빌드/서명 관련
+/ios/Runner.xcodeproj/                   @chatgptkrguide
+/ios/Runner/Info.plist                   @chatgptkrguide
+/ios/Runner/*.entitlements               @chatgptkrguide
+/ios/Flutter/KakaoSecrets.xcconfig.example @chatgptkrguide
+
+# 의존성 — 악성 패키지 추가 차단
+/pubspec.yaml                            @chatgptkrguide
+/pubspec.lock                            @chatgptkrguide
+/functions/package.json                  @chatgptkrguide
+/functions/package-lock.json             @chatgptkrguide
