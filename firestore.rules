@@ -30,8 +30,15 @@ service cloud.firestore {
 
     // Users Collection
     match /users/{userId} {
-      // Read: Owner can read their own data, admin can read all
-      allow read: if isOwner(userId) || isAdmin();
+      // Read:
+      //   - Owner: 자기 데이터 전부
+      //   - Admin: 전부
+      //   - 인증된 다른 사용자: 검색/리더보드/친구 추천 등에서 필요한 공개 정보 접근 허용
+      //   ⚠️ users doc 에 email / phoneNumber 같은 민감 필드 저장 시 노출 위험.
+      //      현재 시드/일반 가입 흐름에서는 둘 다 null. Firebase Auth user 객체에서 직접
+      //      받아오므로 Firestore doc 에는 평소 안 들어감. 만약 향후 저장하게 된다면
+      //      public_profiles 서브컬렉션 분리 패턴으로 전환할 것.
+      allow read: if isSignedIn();
 
       // Create: Only during sign up with valid data
       allow create: if isOwner(userId) &&
