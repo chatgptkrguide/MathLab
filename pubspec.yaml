@@ -112,6 +112,7 @@ flutter:
     - .env
     - assets/images/
     - assets/images/login/
+    - assets/images/lessons/
     - assets/icons/
     - assets/illustrations/
     - assets/animations/
@@ -128,6 +129,12 @@ flutter:
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter-Variable.ttf
+    - family: NexonLv1Gothic
+      fonts:
+        - asset: assets/fonts/NEXON-Lv1-Gothic-Regular.otf
+          weight: 400
+        - asset: assets/fonts/NEXON-Lv1-Gothic-Bold.otf
+          weight: 700
 
 # ========================================
 # 앱 아이콘 설정 (flutter_launcher_icons)

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/app_logger.dart';
@@ -11,10 +12,8 @@ import '../../data/providers/problem/problem_provider.dart';
 import '../../data/providers/user/user_provider.dart';
 import '../../shared/constants/app_colors.dart';
 import '../../shared/constants/grade_groups.dart';
+import '../../shared/constants/subject_labels.dart';
 import '../problems/problem_solving_screen.dart';
-import 'widgets/lessons_blue_header.dart';
-import 'widgets/lessons_path.dart';
-import 'widgets/lessons_stats_bar.dart';
 
 class LessonsScreenFigma extends ConsumerStatefulWidget {
   /// 코치마크용 GlobalKey
@@ -115,16 +114,11 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
         : const LessonProgressState();
     final curriculumAsync = ref.watch(curriculumProvider);
 
-    final streak = user?.streak ?? 0;
-    final xp = user?.xp ?? 0;
-    final level = user?.level ?? 1;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: const Color(0xFFFFB51B),
       body: Column(
         children: [
-          // Blue rounded header with dropdown
-          LessonsBlueHeader(
+          _LessonsOrangeHeader(
             curriculumAsync: curriculumAsync,
             selectedSubject: _selectedSubject,
             getFilteredSubjects: _getFilteredSubjects,
@@ -133,21 +127,12 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
             },
           ),
 
-          // Stats bar
-          LessonsStatsBar(
-            streak: streak,
-            xp: xp,
-            level: level,
-            curriculumAsync: curriculumAsync,
-            selectedSubject: _selectedSubject,
-          ),
-
           // Main content: lesson path
           if (progressState.isLoading)
             const Expanded(
               child: Center(
                 child: CircularProgressIndicator(
-                  color: AppColors.skyBlue,
+                  color: Colors.white,
                 ),
               ),
             )
@@ -156,7 +141,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
               loading: () => const Expanded(
                 child: Center(
                   child: CircularProgressIndicator(
-                    color: AppColors.skyBlue,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -172,8 +157,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                     msg.contains('network') ||
                     msg.contains('unreachable') ||
                     msg.contains('failed host lookup');
-                final isTimeout = msg.contains('timeout') ||
-                    msg.contains('deadline');
+                final isTimeout =
+                    msg.contains('timeout') || msg.contains('deadline');
                 final title = isOffline
                     ? '인터넷 연결을 확인해 주세요'
                     : isTimeout
@@ -221,12 +206,11 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
-                            onPressed: () =>
-                                ref.invalidate(curriculumProvider),
+                            onPressed: () => ref.invalidate(curriculumProvider),
                             icon: const Icon(Icons.refresh_rounded, size: 18),
                             label: const Text('다시 시도'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.skyBlue,
+                              backgroundColor: const Color(0xFFFF8A00),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -256,9 +240,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                                 .where((u) => allowed.contains(u.subject))
                                 .toList();
                           }()
-                        : allUnits
-                            .where((u) => u.subject == selected)
-                            .toList();
+                        : allUnits.where((u) => u.subject == selected).toList();
 
                 // Flatten all lessons from all units for the path
                 final allLessons = <LessonModel>[];
@@ -273,20 +255,18 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
                     onRefresh: () async {
                       ref.invalidate(curriculumProvider);
                     },
-                    color: AppColors.skyBlue,
+                    color: const Color(0xFFFF8A00),
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(
                         parent: BouncingScrollPhysics(),
                       ),
-                      padding: const EdgeInsets.only(
-                        top: 24,
-                        bottom: 100,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(0, 40, 0, 96),
                       child: SlideTransition(
                         position: _bannerSlideAnimation,
                         child: FadeTransition(
                           opacity: _bannerFadeAnimation,
-                          child: LessonsPath(
+                          child: _LessonBoard(
+                            key: LessonsScreenFigma.lessonPathKey,
                             lessons: allLessons,
                             progressState: progressState,
                             allUnits: allUnits,
@@ -345,9 +325,8 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     bool unitUnlocked = true;
     if (parentUnit != null) {
       // 같은 과목의 유닛들만 필터링하여 순서 확인
-      final sameSubjectUnits = units
-          .where((u) => u.subject == parentUnit!.subject)
-          .toList();
+      final sameSubjectUnits =
+          units.where((u) => u.subject == parentUnit!.subject).toList();
       final unitIndex = sameSubjectUnits.indexOf(parentUnit);
       if (unitIndex > 0) {
         final prevUnit = sameSubjectUnits[unitIndex - 1];
@@ -407,9 +386,7 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
     }
 
     // Record lesson start
-    ref
-        .read(lessonProgressProvider(user.uid).notifier)
-        .startLesson(lessonId);
+    ref.read(lessonProgressProvider(user.uid).notifier).startLesson(lessonId);
 
     // Preload: 화면 진입 전에 문제 fetch를 시작해 푸시 애니메이션 동안 캐시를 채운다.
     ref.read(problemsForLessonProvider(lessonId));
@@ -426,4 +403,260 @@ class _LessonsScreenFigmaState extends ConsumerState<LessonsScreenFigma>
       ),
     );
   }
+}
+
+class _LessonsOrangeHeader extends StatelessWidget {
+  final AsyncValue<List<UnitModel>> curriculumAsync;
+  final String? selectedSubject;
+  final List<String> Function(List<UnitModel> units) getFilteredSubjects;
+  final ValueChanged<String?> onSubjectChanged;
+
+  const _LessonsOrangeHeader({
+    required this.curriculumAsync,
+    required this.selectedSubject,
+    required this.getFilteredSubjects,
+    required this.onSubjectChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final allUnits = curriculumAsync.valueOrNull ?? [];
+    final available = getFilteredSubjects(allUnits).toSet();
+
+    return AspectRatio(
+      aspectRatio: 692 / 260,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, constraints.maxHeight);
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                'assets/images/lessons/lesson_reference_header.png',
+                fit: BoxFit.fill,
+                filterQuality: FilterQuality.high,
+              ),
+              Positioned(
+                left: size.width * 0.068,
+                top: size.height * 0.554,
+                width: size.width * 0.487,
+                height: size.height * 0.262,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String?>(
+                    value: selectedSubject,
+                    isExpanded: true,
+                    borderRadius: BorderRadius.circular(20),
+                    dropdownColor: Colors.white,
+                    icon: const SizedBox.shrink(),
+                    selectedItemBuilder: (context) =>
+                        _buildInvisibleLabels(available),
+                    items: _buildGroupedItems(available),
+                    onChanged: (v) {
+                      HapticFeedback.selectionClick();
+                      onSubjectChanged(v);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  List<DropdownMenuItem<String?>> _buildGroupedItems(Set<String> available) {
+    final items = <DropdownMenuItem<String?>>[
+      const DropdownMenuItem<String?>(
+        value: null,
+        child: Text('전체과목'),
+      ),
+    ];
+
+    for (final entry in GradeGroups.map.entries) {
+      final visibleSubjects = entry.value.where(available.contains).toList();
+      if (visibleSubjects.isEmpty) continue;
+
+      items.add(
+        DropdownMenuItem<String?>(
+          value: GradeGroups.sentinelFor(entry.key),
+          child: Text('${entry.key} 전체'),
+        ),
+      );
+
+      for (final code in visibleSubjects) {
+        items.add(
+          DropdownMenuItem<String?>(
+            value: code,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Text(SubjectLabels.displayOf(code)),
+            ),
+          ),
+        );
+      }
+    }
+
+    return items;
+  }
+
+  List<Widget> _buildInvisibleLabels(Set<String> available) {
+    final labels = <Widget>[
+      const SizedBox.expand(),
+    ];
+    for (final entry in GradeGroups.map.entries) {
+      final visibleSubjects = entry.value.where(available.contains).toList();
+      if (visibleSubjects.isEmpty) continue;
+      labels.add(const SizedBox.expand());
+      for (final _ in visibleSubjects) {
+        labels.add(const SizedBox.expand());
+      }
+    }
+    return labels;
+  }
+}
+
+class _LessonBoard extends StatelessWidget {
+  final List<LessonModel> lessons;
+  final LessonProgressState progressState;
+  final List<UnitModel> allUnits;
+  final void Function(
+    String lessonId,
+    List<UnitModel> units,
+    LessonProgressState progressState,
+  ) onLessonTap;
+
+  const _LessonBoard({
+    super.key,
+    required this.lessons,
+    required this.progressState,
+    required this.allUnits,
+    required this.onLessonTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (lessons.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 80),
+        child: Center(
+          child: Text(
+            '이 과목에는 아직 레슨이 없습니다',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final cards = _buildCards();
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 616),
+        child: AspectRatio(
+          aspectRatio: 616 / 907,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final boardSize = Size(
+                constraints.maxWidth,
+                constraints.maxHeight,
+              );
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'assets/images/lessons/lesson_reference_roadmap.png',
+                    fit: BoxFit.fill,
+                    filterQuality: FilterQuality.high,
+                  ),
+                  _LessonTapTarget(
+                    card: cards[0],
+                    rect: _LessonBoardRects.add,
+                    boardSize: boardSize,
+                  ),
+                  _LessonTapTarget(
+                    card: cards[1],
+                    rect: _LessonBoardRects.subtract,
+                    boardSize: boardSize,
+                  ),
+                  _LessonTapTarget(
+                    card: cards[2],
+                    rect: _LessonBoardRects.divide,
+                    boardSize: boardSize,
+                  ),
+                  _LessonTapTarget(
+                    card: cards[3],
+                    rect: _LessonBoardRects.multiply,
+                    boardSize: boardSize,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<_LessonCardData> _buildCards() {
+    return List.generate(4, (index) {
+      final lesson = index < lessons.length ? lessons[index] : null;
+      return _LessonCardData(
+        lesson: lesson,
+        onTap: lesson == null
+            ? null
+            : () => onLessonTap(lesson.id, allUnits, progressState),
+      );
+    });
+  }
+}
+
+class _LessonTapTarget extends StatelessWidget {
+  final _LessonCardData card;
+  final Rect rect;
+  final Size boardSize;
+
+  const _LessonTapTarget({
+    required this.card,
+    required this.rect,
+    required this.boardSize,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: rect.left * boardSize.width,
+      top: rect.top * boardSize.height,
+      width: rect.width * boardSize.width,
+      height: rect.height * boardSize.height,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: card.onTap,
+          borderRadius: BorderRadius.circular(22),
+        ),
+      ),
+    );
+  }
+}
+
+class _LessonCardData {
+  final LessonModel? lesson;
+  final VoidCallback? onTap;
+
+  const _LessonCardData({
+    required this.lesson,
+    required this.onTap,
+  });
+}
+
+class _LessonBoardRects {
+  static const add = Rect.fromLTWH(0.157, 0.214, 0.312, 0.212);
+  static const subtract = Rect.fromLTWH(0.527, 0.214, 0.312, 0.212);
+  static const divide = Rect.fromLTWH(0.157, 0.465, 0.312, 0.212);
+  static const multiply = Rect.fromLTWH(0.527, 0.465, 0.312, 0.212);
 }
